@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import type { UserRole } from '@/lib/supabase/types';
 
 export default function ConfirmPage() {
   const router = useRouter();
@@ -15,7 +16,6 @@ export default function ConfirmPage() {
         // Get the token hash from URL
         const tokenHash = searchParams.get('token_hash');
         const type = searchParams.get('type');
-        const next = searchParams.get('next') || '/';
 
         if (tokenHash && type) {
           const { error } = await supabase.auth.verifyOtp({
@@ -25,8 +25,36 @@ export default function ConfirmPage() {
 
           if (error) throw error;
 
-          // Redirect to the dashboard or specified next URL
-          router.push(next);
+          // Get user's role from profiles
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error('User not found');
+
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+          if (profileError) throw profileError;
+
+          // Redirect based on role
+          const role = profile.role as UserRole;
+          switch (role) {
+            case 'food_donor':
+              router.push('/donor/dashboard');
+              break;
+            case 'food_receiver':
+              router.push('/receiver/dashboard');
+              break;
+            case 'terminals':
+              router.push('/terminal/dashboard');
+              break;
+            case 'city':
+              router.push('/city/dashboard');
+              break;
+            default:
+              router.push('/dashboard');
+          }
         }
       } catch (err: any) {
         setError(err.message || 'An error occurred during email confirmation');
