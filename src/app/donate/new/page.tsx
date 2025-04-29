@@ -48,13 +48,13 @@ export default function CreateDonationPage() {
         const fileExt = formData.image.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const { error: uploadError, data } = await supabase.storage
-          .from('donation-images')
+          .from('donations')
           .upload(fileName, formData.image);
 
         if (uploadError) throw uploadError;
         if (data) {
           const { data: { publicUrl } } = supabase.storage
-            .from('donation-images')
+            .from('donations')
             .getPublicUrl(data.path);
           image_url = publicUrl;
         }
