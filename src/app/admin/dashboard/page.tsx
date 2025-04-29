@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * Admin Dashboard Page
+ * Provides overview and management of the entire application
+ */
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
