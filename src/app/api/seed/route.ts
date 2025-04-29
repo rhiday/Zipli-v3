@@ -8,63 +8,73 @@ const mockUsersPath = path.join(process.cwd(), 'mockData', 'users.json');
 const mockUsers = JSON.parse(fs.readFileSync(mockUsersPath, 'utf8'));
 
 export async function GET() {
+  // Only run in development
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json({ error: 'This route is only available in development' }, { status: 403 });
+  }
+
   try {
-    // Clear warnings about JSON import type
-    const users = mockUsers as Array<{
-      email: string;
-      password: string;
-      role: string;
-      full_name: string;
-    }>;
+    // Create test users
+    const users = [
+      {
+        email: 'alice@example.com',
+        password: 'testpass123',
+        role: 'food_donor',
+        full_name: 'Alice Restaurant',
+        organization_name: 'Alice\'s Restaurant',
+      },
+      {
+        email: 'bob@example.com',
+        password: 'testpass123',
+        role: 'food_receiver',
+        full_name: 'Bob Charity',
+        organization_name: 'Bob\'s Food Bank',
+      },
+      {
+        email: 'helsinki@example.com',
+        password: 'testpass123',
+        role: 'city',
+        full_name: 'Helsinki Admin',
+        organization_name: 'Helsinki',
+      },
+    ];
 
-    // Create users and their profiles
     for (const user of users) {
-      // Check if user already exists
-      const { data: existingUser } = await supabase
-        .from('auth.users')
-        .select('email')
-        .eq('email', user.email)
-        .single();
+      console.log(`Creating user ${user.email}...`);
+      
+      // Create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: user.email,
+        password: user.password,
+      });
 
-      if (!existingUser) {
-        // Create auth user
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: user.email,
-          password: user.password,
-        });
+      if (authError) {
+        console.error(`Error creating user ${user.email}:`, authError);
+        throw authError;
+      }
 
-        if (authError) {
-          console.error(`Error creating user ${user.email}:`, authError);
-          continue;
-        }
+      if (authData.user) {
+        // Create profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: user.email,
+            role: user.role,
+            full_name: user.full_name,
+            organization_name: user.organization_name,
+          });
 
-        if (authData.user) {
-          // Create organization record
-          const { error: orgError } = await supabase
-            .from('organizations')
-            .insert({
-              id: authData.user.id,
-              name: user.full_name,
-              contact_person: user.full_name,
-              contact_number: '123-456-7890',
-              email: user.email,
-              address: '123 Main St',
-              created_by: authData.user.id,
-            });
-
-          if (orgError) {
-            console.error(`Error creating organization for ${user.email}:`, orgError);
-          }
+        if (profileError) {
+          console.error(`Error creating profile for ${user.email}:`, profileError);
+          throw profileError;
         }
       }
     }
 
-    return NextResponse.json({ success: true, message: 'Database seeded with mock users' });
+    return NextResponse.json({ message: 'Seed completed successfully' });
   } catch (error) {
-    console.error('Error seeding database:', error);
-    return NextResponse.json(
-      { success: false, message: 'Failed to seed database', error },
-      { status: 500 }
-    );
+    console.error('Seed error:', error);
+    return NextResponse.json({ error: 'Seed failed' }, { status: 500 });
   }
 } 
