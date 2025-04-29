@@ -205,6 +205,7 @@ export default function RegisterPage() {
                 >
                   <option value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</option>
                   <option value="food_receiver">Food Receiver (Community Kitchens, Churches, Charities)</option>
+                  <option value="terminals">Food Terminals (Large-scale Food Processing Centers)</option>
                   <option value="city">City Administration</option>
                 </select>
               </div>

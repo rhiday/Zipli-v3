@@ -144,6 +144,7 @@ export default function ProfilePage(): React.ReactElement {
                   >
                     <option value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</option>
                     <option value="food_receiver">Food Receiver (Community Kitchens, Churches, Charities)</option>
+                    <option value="terminals">Food Terminals (Large-scale Food Processing Centers)</option>
                     <option value="city">City Administration</option>
                   </select>
                 </div>
@@ -189,6 +190,7 @@ export default function ProfilePage(): React.ReactElement {
                   <p className="mt-1 capitalize text-gray-900">
                     {profile?.role === 'food_donor' ? 'Food Donor (Restaurants, Catering, Large Kitchens)' :
                      profile?.role === 'food_receiver' ? 'Food Receiver (Community Kitchens, Churches, Charities)' :
+                     profile?.role === 'terminals' ? 'Food Terminals (Large-scale Food Processing Centers)' :
                      profile?.role === 'city' ? 'City Administration' : profile?.role}
                   </p>
                 </div>
