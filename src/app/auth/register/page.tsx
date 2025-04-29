@@ -90,22 +90,7 @@ export default function RegisterPage() {
       if (authError) throw authError;
 
       if (authData.user) {
-        // 2. Insert the organization data into the organizations table
-        const { error: orgError } = await supabase
-          .from('organizations')
-          .insert({
-            id: authData.user.id,  // Link to auth user
-            name: formData.organizationName,
-            contact_person: formData.contactPerson,
-            contact_number: formData.contactNumber,
-            email: formData.email,
-            address: formData.address || '',
-            created_by: authData.user.id,
-          });
-
-        if (orgError) throw orgError;
-
-        // 3. Create the user profile with the selected role
+        // Create the user profile with all the details
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
@@ -113,6 +98,9 @@ export default function RegisterPage() {
             email: formData.email,
             role: formData.role,
             full_name: formData.contactPerson,
+            organization_name: formData.organizationName,
+            contact_number: formData.contactNumber,
+            address: formData.address || '',
           });
 
         if (profileError) throw profileError;
