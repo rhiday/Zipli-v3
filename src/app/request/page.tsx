@@ -1,0 +1,168 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { supabase } from '@/lib/supabase/client';
+import { PlusIcon, SearchIcon, UsersIcon, CalendarIcon } from 'lucide-react';
+
+type Request = {
+  id: string;
+  description: string;
+  people_count: number;
+  pickup_date: string;
+  pickup_time: string;
+  status: string;
+  created_at: string;
+  user: {
+    email: string;
+  } | null;
+};
+
+export default function RequestsPage() {
+  const [requests, setRequests] = useState<Request[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed' | 'cancelled'>('all');
+
+  useEffect(() => {
+    fetchRequests();
+  }, [statusFilter]);
+
+  const fetchRequests = async () => {
+    try {
+      let query = supabase
+        .from('requests')
+        .select(`
+          *,
+          user:users(email)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (statusFilter !== 'all') {
+        query = query.eq('status', statusFilter);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setRequests(data as Request[]);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredRequests = requests.filter(request =>
+    request.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-green-700"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-800">Food Requests</h1>
+          <Link href="/request/new">
+            <Button className="bg-green-700 hover:bg-green-600">
+              <PlusIcon className="mr-2 h-4 w-4" />
+              New Request
+            </Button>
+          </Link>
+        </div>
+
+        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Search requests..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full rounded-md border border-gray-300 pl-10 pr-4 py-2 focus:border-green-500 focus:outline-none focus:ring-green-500"
+            />
+            <SearchIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'completed' | 'cancelled')}
+            className="rounded-md border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-green-500"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        {error && (
+          <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredRequests.map((request) => (
+            <Link
+              key={request.id}
+              href={`/request/${request.id}`}
+              className="block overflow-hidden rounded-lg bg-white shadow-md transition-transform hover:scale-[1.02]"
+            >
+              <div className="p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className={`rounded-full px-2 py-1 text-xs font-medium ${
+                    request.status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : request.status === 'completed'
+                      ? 'bg-gray-100 text-gray-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {request.status}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {new Date(request.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <p className="mb-4 text-sm text-gray-600 line-clamp-3">
+                  {request.description}
+                </p>
+
+                <div className="space-y-2 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <UsersIcon className="mr-2 h-4 w-4" />
+                    <span>For {request.people_count} people</span>
+                  </div>
+                  <div className="flex items-center">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <span>{new Date(request.pickup_date).toLocaleDateString()}</span>
+                  </div>
+                  <p>🕒 {request.pickup_time}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {filteredRequests.length === 0 && (
+          <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center">
+            <p className="text-gray-500">
+              {searchTerm
+                ? 'No requests found matching your search.'
+                : 'No requests available at the moment.'}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
