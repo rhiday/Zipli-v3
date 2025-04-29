@@ -114,7 +114,7 @@ export interface Database {
     }
     Enums: {
       donation_status: "available" | "claimed" | "picked_up" | "cancelled"
-      user_role: "donor" | "receiver"
+      user_role: "food_donor" | "food_receiver" | "city"
     }
   }
 }

@@ -15,13 +15,14 @@ export default function RegisterPage() {
     contactPerson: '',
     contactNumber: '',
     address: '',
+    role: 'food_donor' as const,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -98,6 +99,18 @@ export default function RegisterPage() {
           });
 
         if (orgError) throw orgError;
+
+        // 3. Create the user profile with the selected role
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: formData.email,
+            role: formData.role,
+            full_name: formData.contactPerson,
+          });
+
+        if (profileError) throw profileError;
 
         // Success - show confirmation message and redirect
         router.push('/auth/verify-email');
@@ -178,6 +191,23 @@ export default function RegisterPage() {
           ) : (
             // Step 2: Organization Details
             <div className="space-y-4">
+              <div>
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                  Organization Type
+                </label>
+                <select
+                  id="role"
+                  name="role"
+                  required
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                >
+                  <option value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</option>
+                  <option value="food_receiver">Food Receiver (Community Kitchens, Churches, Charities)</option>
+                  <option value="city">City Administration</option>
+                </select>
+              </div>
               <div>
                 <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700">
                   Organization Name

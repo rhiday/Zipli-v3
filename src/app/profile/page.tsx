@@ -142,8 +142,9 @@ export default function ProfilePage(): React.ReactElement {
                     onChange={handleChange}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
                   >
-                    <option value="donor">Donor</option>
-                    <option value="receiver">Receiver</option>
+                    <option value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</option>
+                    <option value="food_receiver">Food Receiver (Community Kitchens, Churches, Charities)</option>
+                    <option value="city">City Administration</option>
                   </select>
                 </div>
 
@@ -185,7 +186,11 @@ export default function ProfilePage(): React.ReactElement {
                   <label className="block text-sm font-medium text-gray-700">
                     Role
                   </label>
-                  <p className="mt-1 capitalize text-gray-900">{profile?.role}</p>
+                  <p className="mt-1 capitalize text-gray-900">
+                    {profile?.role === 'food_donor' ? 'Food Donor (Restaurants, Catering, Large Kitchens)' :
+                     profile?.role === 'food_receiver' ? 'Food Receiver (Community Kitchens, Churches, Charities)' :
+                     profile?.role === 'city' ? 'City Administration' : profile?.role}
+                  </p>
                 </div>
 
                 <div className="flex justify-end">
