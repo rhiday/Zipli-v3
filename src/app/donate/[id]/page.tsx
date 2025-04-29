@@ -149,7 +149,9 @@ export default function DonationDetailPage(): React.ReactElement {
               <div>
                 <h3 className="font-medium text-gray-700">Expiry Date</h3>
                 <p className="text-gray-600">
-                  {new Date(donation.food_item.expiry_date).toLocaleDateString()}
+                  {donation.food_item.expiry_date 
+                    ? new Date(donation.food_item.expiry_date).toLocaleDateString()
+                    : 'Not specified'}
                 </p>
               </div>
             </div>

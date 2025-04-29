@@ -58,6 +58,7 @@ export interface Database {
           created_at: string
           description: string | null
           donor_id: string | null
+          expiry_date: string | null
           id: string
           image_url: string | null
           name: string
@@ -67,6 +68,7 @@ export interface Database {
           created_at?: string
           description?: string | null
           donor_id?: string | null
+          expiry_date?: string | null
           id?: string
           image_url?: string | null
           name: string
@@ -76,6 +78,7 @@ export interface Database {
           created_at?: string
           description?: string | null
           donor_id?: string | null
+          expiry_date?: string | null
           id?: string
           image_url?: string | null
           name?: string
