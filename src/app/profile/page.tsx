@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { Profile } from '@/lib/supabase/types';
 
-export default function ProfilePage(): JSX.Element {
+export default function ProfilePage(): React.ReactElement {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

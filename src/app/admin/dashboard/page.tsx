@@ -8,7 +8,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
-export default function AdminDashboardPage(): JSX.Element {
+export default function AdminDashboardPage(): React.ReactElement {
   const router = useRouter();
   
   return (

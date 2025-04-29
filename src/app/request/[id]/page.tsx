@@ -20,7 +20,7 @@ type RequestDetail = {
   } | null;
 };
 
-export default function RequestDetailPage({ params }: { params: { id: string } }) {
+export default function RequestDetailPage({ params }: { params: { id: string } }): React.ReactElement {
   const router = useRouter();
   const [request, setRequest] = useState<RequestDetail | null>(null);
   const [loading, setLoading] = useState(true);

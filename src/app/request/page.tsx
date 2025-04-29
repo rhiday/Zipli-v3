@@ -19,7 +19,7 @@ type Request = {
   } | null;
 };
 
-export default function RequestsPage() {
+export default function RequestsPage(): React.ReactElement {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
