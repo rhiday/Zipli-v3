@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { UserRole } from '@/lib/supabase/types';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -15,7 +16,7 @@ export default function RegisterPage() {
     contactPerson: '',
     contactNumber: '',
     address: '',
-    role: 'food_donor' as const,
+    role: 'food_donor' as UserRole,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,14 @@ export default function RegisterPage() {
   };
 
   const validateStep1 = () => {
+    if (!formData.role) {
+      setError('Please select a role');
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = () => {
     if (!formData.email || !formData.password || !formData.confirmPassword) {
       setError('All fields are required');
       return false;
@@ -39,10 +48,6 @@ export default function RegisterPage() {
       setError('Password must be at least 6 characters');
       return false;
     }
-    return true;
-  };
-
-  const validateStep2 = () => {
     if (!formData.organizationName || !formData.contactPerson || !formData.contactNumber) {
       setError('All fields are required');
       return false;
@@ -128,7 +133,7 @@ export default function RegisterPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-800">Create your account</h1>
           <p className="mt-2 text-gray-600">
-            {step === 1 ? 'Set up your login details' : 'Tell us about your organization'}
+            {step === 1 ? 'Select your role' : 'Complete your registration'}
           </p>
         </div>
 
@@ -140,7 +145,29 @@ export default function RegisterPage() {
 
         <form onSubmit={step === 1 ? nextStep : handleRegister} className="mt-8 space-y-6">
           {step === 1 ? (
-            // Step 1: Account Details
+            // Step 1: Role Selection
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                  I am registering as
+                </label>
+                <select
+                  id="role"
+                  name="role"
+                  required
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                >
+                  <option value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</option>
+                  <option value="food_receiver">Food Receiver (Community Kitchens, Churches, Charities)</option>
+                  <option value="terminals">Food Terminals (Large-scale Food Processing Centers)</option>
+                  <option value="city">City Administration</option>
+                </select>
+              </div>
+            </div>
+          ) : (
+            // Step 2: Account and Organization Details
             <div className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -187,41 +214,38 @@ export default function RegisterPage() {
                   className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
                 />
               </div>
-            </div>
-          ) : (
-            // Step 2: Organization Details
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                  Organization Type
-                </label>
-                <select
-                  id="role"
-                  name="role"
-                  required
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                >
-                  <option value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</option>
-                  <option value="food_receiver">Food Receiver (Community Kitchens, Churches, Charities)</option>
-                  <option value="terminals">Food Terminals (Large-scale Food Processing Centers)</option>
-                  <option value="city">City Administration</option>
-                </select>
-              </div>
               <div>
                 <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700">
-                  Organization Name
+                  {formData.role === 'terminals' ? 'Terminal Name' :
+                   formData.role === 'city' ? 'Your City' :
+                   'Organization Name'}
                 </label>
-                <input
-                  id="organizationName"
-                  name="organizationName"
-                  type="text"
-                  required
-                  value={formData.organizationName}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                />
+                {formData.role === 'city' ? (
+                  <select
+                    id="organizationName"
+                    name="organizationName"
+                    required
+                    value={formData.organizationName}
+                    onChange={handleChange}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                  >
+                    <option value="">Select a city</option>
+                    <option value="Helsinki">Helsinki</option>
+                    <option value="Espoo">Espoo</option>
+                    <option value="Vantaa">Vantaa</option>
+                  </select>
+                ) : (
+                  <input
+                    id="organizationName"
+                    name="organizationName"
+                    type="text"
+                    required
+                    value={formData.organizationName}
+                    onChange={handleChange}
+                    placeholder={formData.role === 'terminals' ? 'Enter terminal name' : 'Enter organization name'}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                  />
+                )}
               </div>
               <div>
                 <label htmlFor="contactPerson" className="block text-sm font-medium text-gray-700">
