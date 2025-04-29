@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import type { UserRole } from '@/lib/supabase/types';
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -30,9 +31,31 @@ export default function AuthCallback() {
           return;
         }
 
-        // Otherwise, redirect to dashboard
-        router.push('/dashboard');
-        return;
+        // Get user's role and redirect accordingly
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.session.user.id)
+          .single();
+
+        if (profile) {
+          const role = profile.role as UserRole;
+          switch (role) {
+            case 'food_donor':
+              router.push('/donate');
+              break;
+            case 'food_receiver':
+              router.push('/feed');
+              break;
+            case 'terminals':
+            case 'city':
+              router.push('/dashboard');
+              break;
+            default:
+              router.push('/dashboard');
+          }
+          return;
+        }
       }
 
       // If we don't have a session, redirect to login
