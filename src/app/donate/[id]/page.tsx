@@ -11,7 +11,7 @@ type DonationWithFoodItem = Donation & {
   food_item: FoodItem;
 };
 
-export default function DonationDetailPage(): JSX.Element {
+export default function DonationDetailPage(): React.ReactElement {
   const params = useParams();
   const router = useRouter();
   const [state, setState] = useState<DonationWithFoodItemResponse>({
