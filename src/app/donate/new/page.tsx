@@ -10,12 +10,12 @@ export default function CreateDonationPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    title: '',
+    name: '',
     description: '',
-    quantity: '',
-    location: '',
-    distance: '',
-    pickup_time: '',
+    quantity: 1,
+    expiry_date: '',
+    pickup_time_start: '',
+    pickup_time_end: '',
     image: null as File | null,
   });
 
@@ -60,20 +60,35 @@ export default function CreateDonationPage() {
         }
       }
 
+      // Create food item first
+      const { data: foodItem, error: foodItemError } = await supabase
+        .from('food_items')
+        .insert([
+          {
+            donor_id: user.id,
+            name: formData.name,
+            description: formData.description,
+            image_url,
+            expiry_date: formData.expiry_date,
+          }
+        ])
+        .select()
+        .single();
+
+      if (foodItemError) throw foodItemError;
+      if (!foodItem) throw new Error('Failed to create food item');
+
       // Create donation
       const { error: insertError } = await supabase
         .from('donations')
         .insert([
           {
-            organization_id: user.id,
-            title: formData.title,
-            description: formData.description,
+            food_item_id: foodItem.id,
+            donor_id: user.id,
             quantity: formData.quantity,
-            location: formData.location,
-            distance: formData.distance,
-            pickup_time: formData.pickup_time,
-            image_url,
-            status: 'active'
+            status: 'available',
+            pickup_time_start: formData.pickup_time_start,
+            pickup_time_end: formData.pickup_time_end,
           }
         ]);
 
@@ -101,15 +116,15 @@ export default function CreateDonationPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              Title
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Food Item Name
             </label>
             <input
-              id="title"
-              name="title"
+              id="name"
+              name="name"
               type="text"
               required
-              value={formData.title}
+              value={formData.name}
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
@@ -146,47 +161,46 @@ export default function CreateDonationPage() {
           </div>
 
           <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-              Location
+            <label htmlFor="expiry_date" className="block text-sm font-medium text-gray-700">
+              Expiry Date
             </label>
             <input
-              id="location"
-              name="location"
-              type="text"
+              id="expiry_date"
+              name="expiry_date"
+              type="datetime-local"
               required
-              value={formData.location}
+              value={formData.expiry_date}
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="distance" className="block text-sm font-medium text-gray-700">
-              Distance Willing to Travel
+            <label htmlFor="pickup_time_start" className="block text-sm font-medium text-gray-700">
+              Pickup Time Start
             </label>
             <input
-              id="distance"
-              name="distance"
-              type="text"
+              id="pickup_time_start"
+              name="pickup_time_start"
+              type="datetime-local"
               required
-              value={formData.distance}
+              value={formData.pickup_time_start}
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="pickup_time" className="block text-sm font-medium text-gray-700">
-              Pickup Time
+            <label htmlFor="pickup_time_end" className="block text-sm font-medium text-gray-700">
+              Pickup Time End
             </label>
             <input
-              id="pickup_time"
-              name="pickup_time"
-              type="text"
+              id="pickup_time_end"
+              name="pickup_time_end"
+              type="datetime-local"
               required
-              value={formData.pickup_time}
+              value={formData.pickup_time_end}
               onChange={handleChange}
-              placeholder="e.g., 2-4 PM today"
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
