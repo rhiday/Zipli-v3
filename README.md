@@ -27,11 +27,12 @@ pnpm dev
 
 ## Test Accounts
 
-Mock login credentials:
+Actual login credentials for testing roles (password is 'password' for all):
 
-- alice@zipli.test / password (Donor)
-- bob@zipli.test / password (Receiver)
-- helsinki@zipli.test / password (City Admin)
+- `Donor email` (Donor)
+- `Receiver email` (Receiver)
+- `City email` (City Admin)
+- `Terminal email` (Terminal)
 
 ## Supabase Notes
 
