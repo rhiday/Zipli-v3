@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
@@ -19,8 +21,11 @@ export default function CreateDonationPage() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    setFormData(prev => ({
+        ...prev,
+        [name]: type === 'number' ? parseInt(value, 10) || 0 : value
+    }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,8 +43,8 @@ export default function CreateDonationPage() {
     const pickupDate = new Date(formData.pickup_time);
     const twoWeeksFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
 
-    if (pickupDate <= now) {
-      setError('Pickup time must be in the future.');
+    if (!formData.pickup_time || pickupDate <= now) {
+      setError('Pickup time must be set and in the future.');
       setLoading(false);
       return;
     }
@@ -47,6 +52,11 @@ export default function CreateDonationPage() {
       setError('Pickup time must be within the next 14 days.');
       setLoading(false);
       return;
+    }
+    if (!formData.expiry_date) {
+        setError('Expiry date must be set.');
+        setLoading(false);
+        return;
     }
 
     try {
@@ -60,7 +70,7 @@ export default function CreateDonationPage() {
       // Upload image if provided
       if (formData.image) {
         const fileExt = formData.image.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
         const { error: uploadError, data } = await supabase.storage
           .from('donations')
           .upload(fileName, formData.image);
@@ -83,7 +93,7 @@ export default function CreateDonationPage() {
             name: formData.name,
             description: formData.description,
             image_url,
-            expiry_date: formData.expiry_date,
+            expiry_date: new Date(formData.expiry_date).toISOString(),
           }
         ])
         .select()
@@ -101,7 +111,7 @@ export default function CreateDonationPage() {
             donor_id: user.id,
             quantity: formData.quantity,
             status: 'available',
-            pickup_time: formData.pickup_time,
+            pickup_time: new Date(formData.pickup_time).toISOString(),
           }
         ]);
 
@@ -120,94 +130,93 @@ export default function CreateDonationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-2xl rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-2xl font-bold text-gray-800">Create New Donation</h1>
+    <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
+      <div className="mx-auto max-w-2xl rounded-lg bg-base p-6 md:p-8 shadow">
+        <h1 className="mb-6 text-titleMd font-display text-primary">Create New Donation</h1>
 
         {error && (
-          <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-700">
+          <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-label font-medium text-primary mb-1">
               Food Item Name
             </label>
-            <input
+            <Input
               id="name"
               name="name"
               type="text"
               required
+              placeholder="e.g., Whole Wheat Bread, Mixed Vegetables"
               value={formData.name}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-label font-medium text-primary mb-1">
               Description
             </label>
-            <textarea
+            <Textarea
               id="description"
               name="description"
               required
+              placeholder="Provide details about the item, condition, allergens, etc."
               value={formData.description}
               onChange={handleChange}
               rows={4}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
-              Quantity
+            <label htmlFor="quantity" className="block text-label font-medium text-primary mb-1">
+              Quantity (Units/Approx. Weight)
             </label>
-            <input
+            <Input
               id="quantity"
               name="quantity"
-              type="text"
+              type="number"
               required
+              min="1"
+              placeholder="e.g., 10 loaves, 5 kg"
               value={formData.quantity}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="expiry_date" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="expiry_date" className="block text-label font-medium text-primary mb-1">
               Expiry Date
             </label>
-            <input
+            <Input
               id="expiry_date"
               name="expiry_date"
               type="datetime-local"
               required
               value={formData.expiry_date}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="pickup_time" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="pickup_time" className="block text-label font-medium text-primary mb-1">
               Pickup Time (must be within 14 days)
             </label>
-            <input
+            <Input
               id="pickup_time"
               name="pickup_time"
               type="datetime-local"
               required
               value={formData.pickup_time}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="image" className="block text-label font-medium text-primary mb-1">
               Image (Optional)
             </label>
             <input
@@ -216,22 +225,23 @@ export default function CreateDonationPage() {
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-green-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-100"
+              className="block w-full text-sm text-primary-75 file:mr-4 file:rounded-md file:border-0 file:bg-primary-10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary-25 file:cursor-pointer"
             />
           </div>
 
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-end space-x-3 pt-4">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
+              size="md"
               onClick={() => router.back()}
-              className="border-gray-300"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-green-700 hover:bg-green-600"
+              variant="primary"
+              size="md"
               disabled={loading}
             >
               {loading ? 'Creating...' : 'Create Donation'}

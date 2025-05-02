@@ -66,14 +66,14 @@ export default function AuthCallback() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md text-center">
-        <h1 className="text-2xl font-bold text-gray-800">Processing</h1>
-        <p className="mt-2 text-gray-600">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+      <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
+        <h1 className="text-titleSm font-display text-primary">Processing</h1>
+        <p className="mt-2 text-body text-primary-75">
           Please wait while we complete your authentication...
         </p>
         <div className="mt-6 flex justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-green-700"></div>
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
         </div>
       </div>
     </div>

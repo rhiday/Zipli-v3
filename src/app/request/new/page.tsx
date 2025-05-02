@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
@@ -17,10 +19,10 @@ export default function CreateRequestPage() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'people_count' ? parseInt(value) || 1 : value
+      [name]: type === 'number' ? parseInt(value, 10) || 1 : value
     }));
   };
 
@@ -33,6 +35,12 @@ export default function CreateRequestPage() {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
       if (!user) throw new Error('Not authenticated');
+
+      if (!formData.description || !formData.pickup_date || !formData.pickup_time) {
+          setError('Please fill in all required fields.');
+          setLoading(false);
+          return;
+      }
 
       const { error: insertError } = await supabase
         .from('requests')
@@ -49,7 +57,7 @@ export default function CreateRequestPage() {
 
       if (insertError) throw insertError;
 
-      router.push('/request');
+      router.push('/feed');
     } catch (err: any) {
       setError(err.message || 'An error occurred while creating the request');
     } finally {
@@ -58,38 +66,37 @@ export default function CreateRequestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-2xl rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-2xl font-bold text-gray-800">Create Food Request</h1>
+    <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
+      <div className="mx-auto max-w-2xl rounded-lg bg-base p-6 md:p-8 shadow">
+        <h1 className="mb-6 text-titleMd font-display text-primary">Create Food Request</h1>
 
         {error && (
-          <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-700">
+          <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description
+            <label htmlFor="description" className="block text-label font-medium text-primary mb-1">
+              Description of Need
             </label>
-            <textarea
+            <Textarea
               id="description"
               name="description"
               required
               value={formData.description}
               onChange={handleChange}
               rows={4}
-              placeholder="Please describe your food needs..."
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+              placeholder="Please describe the type of food needed, dietary restrictions, etc."
             />
           </div>
 
           <div>
-            <label htmlFor="people_count" className="block text-sm font-medium text-gray-700">
-              Number of People
+            <label htmlFor="people_count" className="block text-label font-medium text-primary mb-1">
+              Number of People to Feed
             </label>
-            <input
+            <Input
               id="people_count"
               name="people_count"
               type="number"
@@ -97,15 +104,14 @@ export default function CreateRequestPage() {
               required
               value={formData.people_count}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="pickup_date" className="block text-sm font-medium text-gray-700">
-              Preferred Pickup Date
+            <label htmlFor="pickup_date" className="block text-label font-medium text-primary mb-1">
+              Preferred Pickup/Delivery Date
             </label>
-            <input
+            <Input
               id="pickup_date"
               name="pickup_date"
               type="date"
@@ -113,38 +119,37 @@ export default function CreateRequestPage() {
               value={formData.pickup_date}
               onChange={handleChange}
               min={new Date().toISOString().split('T')[0]}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="pickup_time" className="block text-sm font-medium text-gray-700">
-              Preferred Pickup Time
+            <label htmlFor="pickup_time" className="block text-label font-medium text-primary mb-1">
+              Preferred Pickup/Delivery Time Window
             </label>
-            <input
+            <Input
               id="pickup_time"
               name="pickup_time"
               type="text"
               required
               value={formData.pickup_time}
               onChange={handleChange}
-              placeholder="e.g., Morning, Afternoon, 2-4 PM"
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+              placeholder="e.g., Morning, Afternoon, 2-4 PM, Anytime"
             />
           </div>
 
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-end space-x-3 pt-4">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
+              size="md"
               onClick={() => router.back()}
-              className="border-gray-300"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-green-700 hover:bg-green-600"
+              variant="primary"
+              size="md"
               disabled={loading}
             >
               {loading ? 'Creating...' : 'Create Request'}

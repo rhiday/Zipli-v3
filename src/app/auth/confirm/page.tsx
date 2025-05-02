@@ -4,6 +4,8 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import type { UserRole } from '@/lib/supabase/types';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 function ConfirmPageContent() {
   const router = useRouter();
@@ -41,17 +43,13 @@ function ConfirmPageContent() {
           const role = profile.role as UserRole;
           switch (role) {
             case 'food_donor':
-              router.push('/donor/dashboard');
+              router.push('/donate');
               break;
             case 'food_receiver':
-              router.push('/receiver/dashboard');
+              router.push('/feed');
               break;
             case 'terminals':
-              router.push('/terminal/dashboard');
-              break;
             case 'city':
-              router.push('/city/dashboard');
-              break;
             default:
               router.push('/dashboard');
           }
@@ -65,24 +63,19 @@ function ConfirmPageContent() {
   }, [router, searchParams]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Email Confirmation</h1>
-          {error ? (
-            <>
-              <p className="mt-2 text-red-600">{error}</p>
-              <button
-                onClick={() => router.push('/auth/login')}
-                className="mt-4 text-green-600 hover:text-green-500"
-              >
-                Return to login
-              </button>
-            </>
-          ) : (
-            <p className="mt-2 text-gray-600">Verifying your email...</p>
-          )}
-        </div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+      <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
+        <h1 className="text-titleSm font-display text-primary">Email Confirmation</h1>
+        {error ? (
+          <>
+            <p className="mt-2 text-body text-negative">Error: {error}</p>
+            <Button onClick={() => router.push('/auth/login')} variant="secondary" size="md" className="mt-4">
+              Return to login
+            </Button>
+          </>
+        ) : (
+          <p className="mt-2 text-body text-primary-75">Verifying your email...</p>
+        )}
       </div>
     </div>
   );
@@ -91,11 +84,12 @@ function ConfirmPageContent() {
 export default function ConfirmPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-        <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-800">Email Confirmation</h1>
-            <p className="mt-2 text-gray-600">Loading...</p>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+        <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
+          <h1 className="text-titleSm font-display text-primary">Email Confirmation</h1>
+          <p className="mt-2 text-body text-primary-75">Loading...</p>
+          <div className="mt-6 flex justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
           </div>
         </div>
       </div>

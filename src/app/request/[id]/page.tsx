@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { UsersIcon, CalendarIcon, ClockIcon, CheckIcon, XIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type RequestDetail = {
   id: string;
@@ -12,7 +13,7 @@ type RequestDetail = {
   people_count: number;
   pickup_date: string;
   pickup_time: string;
-  status: string;
+  status: 'active' | 'completed' | 'cancelled';
   created_at: string;
   user_id: string;
   user: {
@@ -29,8 +30,13 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    fetchRequest();
     checkUser();
+  }, []);
+
+  useEffect(() => {
+    if (params.id) {
+      fetchRequest();
+    }
   }, [params.id]);
 
   const checkUser = async () => {
@@ -41,6 +47,8 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
   };
 
   const fetchRequest = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const { data, error } = await supabase
         .from('requests')
@@ -49,36 +57,37 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
           user:users(email)
         `)
         .eq('id', params.id)
-        .single();
+        .single<RequestDetail>();
 
       if (error) throw error;
-      setRequest(data as RequestDetail);
+      setRequest(data);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Failed to load request details.');
+      setRequest(null);
     } finally {
       setLoading(false);
     }
   };
 
   const handleStatusUpdate = async (newStatus: 'completed' | 'cancelled') => {
-    if (!user) {
-      router.push('/auth/login');
+    if (!user || !request) {
+      setError('Cannot update status: User or Request data missing.');
       return;
     }
 
     setActionLoading(true);
+    setError(null);
     try {
       const { error } = await supabase
         .from('requests')
-        .update({ status: newStatus })
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
         .eq('id', params.id);
 
       if (error) throw error;
 
-      // Refresh request data
       await fetchRequest();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Failed to update request status.');
     } finally {
       setActionLoading(false);
     }
@@ -86,23 +95,27 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-green-700"></div>
+      <div className="flex min-h-screen items-center justify-center bg-cream">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!request) {
+  if (error || !request) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
-        <XIcon className="mb-4 h-12 w-12 text-red-500" />
-        <h1 className="text-2xl font-bold text-gray-800">Request Not Found</h1>
-        <p className="mt-2 text-gray-600">This request may have been removed or doesn't exist.</p>
+      <div className="min-h-screen bg-cream flex flex-col items-center justify-center p-6 text-center">
+        <XIcon className="mb-4 h-12 w-12 text-negative" />
+        <h1 className="text-titleMd font-display text-primary">Request Not Found</h1>
+        <p className="mt-2 text-body text-primary-75">
+          {error || 'This request may have been removed or doesn\'t exist.'}
+        </p>
         <Button
-          onClick={() => router.push('/request')}
-          className="mt-6 bg-green-700 hover:bg-green-600"
+          variant="secondary"
+          size="md"
+          onClick={() => router.back()}
+          className="mt-6"
         >
-          View All Requests
+          Go Back
         </Button>
       </div>
     );
@@ -111,102 +124,113 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
   const isOwner = user?.id === request.user_id;
   const canTakeAction = request.status === 'active';
 
+  const statusClass = (() => {
+    switch (request.status) {
+      case 'active': return 'bg-positive/10 text-positive';
+      case 'completed': return 'bg-stone text-primary-50';
+      case 'cancelled': return 'bg-rose/10 text-negative';
+      default: return 'bg-stone text-primary-50';
+    }
+  })();
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-4xl space-y-6">
+    <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
+      <div className="mx-auto max-w-3xl space-y-6">
         <Button
           onClick={() => router.back()}
-          variant="outline"
-          className="mb-6"
+          variant="secondary"
+          size="sm"
         >
           ← Back
         </Button>
 
-        {error && (
-          <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+        {error && !loading && (
+          <div className="rounded-md bg-rose/10 p-4 text-body text-negative">
             {error}
           </div>
         )}
 
-        <div className="overflow-hidden rounded-lg bg-white shadow-md">
-          <div className="p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <span className={`rounded-full px-3 py-1 text-sm font-medium ${
-                request.status === 'active'
-                  ? 'bg-green-100 text-green-800'
-                  : request.status === 'completed'
-                  ? 'bg-gray-100 text-gray-800'
-                  : 'bg-red-100 text-red-800'
-              }`}>
+        <div className="overflow-hidden rounded-lg bg-base shadow">
+          <div className="p-6 md:p-8">
+            <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span
+                className={cn(
+                  'inline-block w-fit whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium capitalize',
+                  statusClass
+                )}
+              >
                 {request.status}
               </span>
-              <span className="text-sm text-gray-500">
+              <span className="text-caption text-primary-50">
                 Created {new Date(request.created_at).toLocaleDateString()}
               </span>
             </div>
 
             <div className="mb-6 space-y-4">
-              <p className="text-gray-600">{request.description}</p>
+              <p className="text-bodyLg text-primary">{request.description}</p>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <UsersIcon className="h-5 w-5" />
+              <div className="grid gap-x-4 gap-y-3 sm:grid-cols-2 md:grid-cols-3">
+                <div className="flex items-center space-x-2 text-body text-primary-75">
+                  <UsersIcon className="h-5 w-5 flex-shrink-0 text-primary-50" />
                   <span>For {request.people_count} people</span>
                 </div>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <CalendarIcon className="h-5 w-5" />
+                <div className="flex items-center space-x-2 text-body text-primary-75">
+                  <CalendarIcon className="h-5 w-5 flex-shrink-0 text-primary-50" />
                   <span>{new Date(request.pickup_date).toLocaleDateString()}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <ClockIcon className="h-5 w-5" />
+                <div className="flex items-center space-x-2 text-body text-primary-75">
+                  <ClockIcon className="h-5 w-5 flex-shrink-0 text-primary-50" />
                   <span>{request.pickup_time}</span>
                 </div>
               </div>
             </div>
 
             {request.user && (
-              <div className="mb-6 rounded-lg bg-gray-50 p-4">
-                <h2 className="mb-2 font-semibold text-gray-800">Requester Information</h2>
-                <p className="text-gray-600">{request.user.email}</p>
+              <div className="mb-6 rounded-md border border-primary-10 bg-primary-10/50 p-4">
+                <h2 className="mb-1 text-label font-semibold text-primary">Requester Information</h2>
+                <p className="text-body text-primary-75">{request.user.email}</p>
               </div>
             )}
 
             {isOwner && canTakeAction && (
-              <div className="flex space-x-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:space-x-4 border-t border-primary-10 pt-6">
                 <Button
                   onClick={() => handleStatusUpdate('completed')}
-                  className="flex-1 bg-green-700 hover:bg-green-600"
+                  variant="primary"
+                  size="md"
+                  className="flex-1"
                   disabled={actionLoading}
                 >
                   <CheckIcon className="mr-2 h-4 w-4" />
-                  Mark as Fulfilled
+                  {actionLoading ? 'Updating...' : 'Mark as Fulfilled'}
                 </Button>
                 <Button
                   onClick={() => handleStatusUpdate('cancelled')}
-                  variant="outline"
-                  className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
+                  variant="negative"
+                  size="md"
+                  className="flex-1"
                   disabled={actionLoading}
                 >
                   <XIcon className="mr-2 h-4 w-4" />
-                  Cancel Request
+                  {actionLoading ? 'Updating...' : 'Cancel Request'}
                 </Button>
               </div>
             )}
 
             {request.status === 'completed' && (
-              <div className="rounded-lg bg-green-50 p-4 text-green-700">
+              <div className="rounded-md bg-positive/10 p-4 text-positive">
                 <div className="flex items-center">
-                  <CheckIcon className="mr-2 h-5 w-5" />
-                  <span>This request has been fulfilled!</span>
+                  <CheckIcon className="mr-2 h-5 w-5 flex-shrink-0" />
+                  <span className="text-body font-medium">This request has been fulfilled!</span>
                 </div>
               </div>
             )}
 
             {request.status === 'cancelled' && (
-              <div className="rounded-lg bg-red-50 p-4 text-red-700">
+              <div className="rounded-md bg-rose/10 p-4 text-negative">
                 <div className="flex items-center">
-                  <XIcon className="mr-2 h-5 w-5" />
-                  <span>This request has been cancelled.</span>
+                  <XIcon className="mr-2 h-5 w-5 flex-shrink-0" />
+                  <span className="text-body font-medium">This request has been cancelled.</span>
                 </div>
               </div>
             )}

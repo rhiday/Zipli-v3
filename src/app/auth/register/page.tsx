@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -116,27 +117,26 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+      <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Create your account</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-titleSm font-display text-primary">Create your account</h1>
+          <p className="mt-2 text-body text-primary-75">
             {step === 1 ? 'Select your role' : 'Complete your registration'}
           </p>
         </div>
 
         {error && (
-          <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+          <div className="rounded-md bg-rose/10 p-4 text-body text-negative">
             {error}
           </div>
         )}
 
         <form onSubmit={step === 1 ? nextStep : handleRegister} className="mt-8 space-y-6">
           {step === 1 ? (
-            // Step 1: Role Selection
             <div className="space-y-4">
               <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="role" className="block text-label font-medium text-primary mb-1">
                   I am registering as
                 </label>
                 <select
@@ -145,7 +145,7 @@ export default function RegisterPage() {
                   required
                   value={formData.role}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                  className="mt-1 block w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</option>
                   <option value="food_receiver">Food Receiver (Community Kitchens, Churches, Charities)</option>
@@ -155,157 +155,145 @@ export default function RegisterPage() {
               </div>
             </div>
           ) : (
-            // Step 2: Account and Organization Details
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Confirm Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700">
-                  {formData.role === 'terminals' ? 'Terminal Name' :
-                   formData.role === 'city' ? 'Your City' :
-                   'Organization Name'}
-                </label>
-                {formData.role === 'city' ? (
-                  <select
-                    id="organizationName"
-                    name="organizationName"
+            <>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
+                    Email address
+                  </label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
                     required
-                    value={formData.organizationName}
+                    value={formData.email}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                  >
-                    <option value="">Select a city</option>
-                    <option value="Helsinki">Helsinki</option>
-                    <option value="Espoo">Espoo</option>
-                    <option value="Vantaa">Vantaa</option>
-                  </select>
-                ) : (
-                  <input
-                    id="organizationName"
-                    name="organizationName"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="password" className="block text-label font-medium text-primary mb-1">
+                    Password (min. 6 characters)
+                  </label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-label font-medium text-primary mb-1">
+                    Confirm Password
+                  </label>
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="organizationName" className="block text-label font-medium text-primary mb-1">
+                    {formData.role === 'terminals' ? 'Terminal Name' :
+                    formData.role === 'city' ? 'Your City' :
+                    'Organization Name'}
+                  </label>
+                  {formData.role === 'city' ? (
+                    <select
+                      id="organizationName"
+                      name="organizationName"
+                      required
+                      value={formData.organizationName}
+                      onChange={handleChange}
+                      className="mt-1 block w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30"
+                    >
+                      <option value="">Select a city</option>
+                      <option value="Helsinki">Helsinki</option>
+                      <option value="Espoo">Espoo</option>
+                      <option value="Vantaa">Vantaa</option>
+                    </select>
+                  ) : (
+                    <Input
+                      id="organizationName"
+                      name="organizationName"
+                      type="text"
+                      required
+                      value={formData.organizationName}
+                      onChange={handleChange}
+                      placeholder={formData.role === 'terminals' ? 'Enter terminal name' : 'Enter organization name'}
+                    />
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="contactPerson" className="block text-label font-medium text-primary mb-1">
+                    Contact Person
+                  </label>
+                  <Input
+                    id="contactPerson"
+                    name="contactPerson"
                     type="text"
                     required
-                    value={formData.organizationName}
+                    value={formData.contactPerson}
                     onChange={handleChange}
-                    placeholder={formData.role === 'terminals' ? 'Enter terminal name' : 'Enter organization name'}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
                   />
-                )}
+                </div>
+                <div>
+                  <label htmlFor="contactNumber" className="block text-label font-medium text-primary mb-1">
+                    Contact Number
+                  </label>
+                  <Input
+                    id="contactNumber"
+                    name="contactNumber"
+                    type="tel"
+                    required
+                    value={formData.contactNumber}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="address" className="block text-label font-medium text-primary mb-1">
+                    Address (Optional)
+                  </label>
+                  <Input
+                    id="address"
+                    name="address"
+                    type="text"
+                    value={formData.address}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
-              <div>
-                <label htmlFor="contactPerson" className="block text-sm font-medium text-gray-700">
-                  Contact Person
-                </label>
-                <input
-                  id="contactPerson"
-                  name="contactPerson"
-                  type="text"
-                  required
-                  value={formData.contactPerson}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700">
-                  Contact Number
-                </label>
-                <input
-                  id="contactNumber"
-                  name="contactNumber"
-                  type="tel"
-                  required
-                  value={formData.contactNumber}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                  Address
-                </label>
-                <input
-                  id="address"
-                  name="address"
-                  type="text"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="flex justify-between">
-            {step === 2 && (
-              <Button 
-                type="button" 
-                onClick={prevStep}
-                className="bg-gray-200 text-gray-800 hover:bg-gray-300 shadow-sm"
-              >
+              <Button type="button" onClick={prevStep} variant="secondary" size="md">
                 Back
               </Button>
-            )}
-            
+            </>
+          )}
+
+          <div>
             <Button
-              type={step === 1 ? "button" : "submit"}
-              onClick={step === 1 ? nextStep : undefined}
-              className={`${step === 1 ? 'ml-auto' : ''} bg-green-700 hover:bg-green-600 shadow-md`}
+              type="submit"
+              variant="primary"
+              size="md"
+              className="w-full"
               disabled={loading}
             >
-              {step === 1 ? 'Next' : loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? (step === 1 ? '...' : 'Registering...') : (step === 1 ? 'Next' : 'Register')}
             </Button>
           </div>
         </form>
 
-        <div className="mt-6 text-center text-sm">
-          <span className="text-gray-600">Already have an account? </span>
+        <div className="text-center text-body">
+          <span className="text-inactive">Already have an account? </span>
           <Link
             href="/auth/login"
-            className="font-medium text-green-600 hover:text-green-500"
+            className="font-medium text-earth hover:text-primary"
           >
             Log in
           </Link>

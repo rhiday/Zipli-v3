@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { UserRole } from '@/lib/supabase/types';
+import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -62,27 +64,27 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+      <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Welcome back</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-titleSm font-display text-primary">Welcome back</h1>
+          <p className="mt-2 text-body text-primary-75">
             Sign in to your account
           </p>
         </div>
 
         {error && (
-          <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+          <div className="rounded-md bg-rose/10 p-4 text-body text-negative">
             {error}
           </div>
         )}
 
         <form onSubmit={handleLogin} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
               Email address
             </label>
-            <input
+            <Input
               id="email"
               name="email"
               type="email"
@@ -90,15 +92,14 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-label font-medium text-primary mb-1">
               Password
             </label>
-            <input
+            <Input
               id="password"
               name="password"
               type="password"
@@ -106,7 +107,6 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />
           </div>
 
@@ -118,17 +118,17 @@ export default function LoginPage() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                className="h-4 w-4 rounded border-border text-primary focus:ring-primary/50"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="remember-me" className="ml-2 block text-body text-primary">
                 Remember me
               </label>
             </div>
 
-            <div className="text-sm">
+            <div className="text-body">
               <Link
                 href="/auth/forgot-password"
-                className="font-medium text-green-600 hover:text-green-500"
+                className="font-medium text-earth hover:text-primary"
               >
                 Forgot your password?
               </Link>
@@ -138,7 +138,9 @@ export default function LoginPage() {
           <div>
             <Button
               type="submit"
-              className="w-full bg-green-700 hover:bg-green-600"
+              variant="primary"
+              size="md"
+              className="w-full"
               disabled={loading}
             >
               {loading ? 'Signing in...' : 'Sign in'}
@@ -146,16 +148,22 @@ export default function LoginPage() {
           </div>
         </form>
 
-        <div className="text-center text-sm">
-          <span className="text-gray-600">Don't have an account?</span>{' '}
+        <div className="text-center text-body">
+          <span className="text-inactive">Don't have an account?</span>{' '}
           <Link
             href="/auth/register"
-            className="font-medium text-green-600 hover:text-green-500"
+            className="font-medium text-earth hover:text-primary"
           >
             Sign up
           </Link>
         </div>
       </div>
+
+      {process.env.NODE_ENV === 'development' && (
+        <div className="absolute bottom-4 right-4 z-50">
+          <DevLoginSwitcher />
+        </div>
+      )}
     </div>
   );
 } 

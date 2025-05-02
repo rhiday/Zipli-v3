@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase/client';
 import { Donation, FoodItem } from '@/lib/supabase/types';
 import { DonationWithFoodItemResponse } from '@/lib/supabase/responses';
+import { cn } from '@/lib/utils';
 
 type DonationWithFoodItem = Donation & {
   food_item: FoodItem;
@@ -29,6 +30,7 @@ export default function DonationDetailPage(): React.ReactElement {
   }, [params.id]);
 
   const fetchDonation = async () => {
+    setState(prev => ({ ...prev, loading: true, error: null }));
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
@@ -41,19 +43,23 @@ export default function DonationDetailPage(): React.ReactElement {
         .from('donations')
         .select(`
           *,
-          pickup_time,
           food_item:food_items(*)
         `)
         .eq('id', params.id)
-        .single();
+        .single<DonationWithFoodItem>();
 
-      setState({ data: data as DonationWithFoodItem, error: null, loading: false });
+      if (error) throw error;
+
+      setState({ data, error: null, loading: false });
     } catch (err: any) {
-      setState({ data: null, error: err.message, loading: false });
+      console.error("Fetch Donation Error:", err);
+      setState({ data: null, error: err.message || 'Failed to load donation details.', loading: false });
     }
   };
 
   const handleStatusUpdate = async (newStatus: 'available' | 'claimed' | 'picked_up' | 'cancelled') => {
+    if (!state.data) return;
+    
     try {
       setActionLoading(true);
       const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -65,14 +71,15 @@ export default function DonationDetailPage(): React.ReactElement {
 
       const { error } = await supabase
         .from('donations')
-        .update({ status: newStatus })
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
         .eq('id', params.id)
         .eq('donor_id', user.id);
 
       if (error) throw error;
       await fetchDonation();
     } catch (err: any) {
-      setState(prev => ({ ...prev, error: err.message }));
+      console.error("Update Status Error:", err);
+      setState(prev => ({ ...prev, error: err.message || 'Failed to update status.' }));
     } finally {
       setActionLoading(false);
     }
@@ -80,17 +87,20 @@ export default function DonationDetailPage(): React.ReactElement {
 
   if (state.loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-green-700"></div>
+      <div className="flex min-h-screen items-center justify-center bg-cream">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
   }
 
   if (state.error || !state.data) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="mx-auto max-w-3xl rounded-lg bg-red-50 p-4 text-sm text-red-700">
+      <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
+        <div className="mx-auto max-w-3xl rounded-lg bg-rose/10 p-4 text-body text-negative">
           {state.error || 'Donation not found'}
+        </div>
+        <div className="mt-4 text-center">
+            <Button variant="secondary" onClick={() => router.back()}>Go Back</Button>
         </div>
       </div>
     );
@@ -98,23 +108,33 @@ export default function DonationDetailPage(): React.ReactElement {
 
   const donation = state.data;
 
+  const statusClass = (() => {
+      switch (donation.status) {
+          case 'available': return 'bg-positive/10 text-positive';
+          case 'claimed': return 'bg-sky/10 text-info';
+          case 'picked_up': return 'bg-stone text-primary-50';
+          case 'cancelled': return 'bg-rose/10 text-negative';
+          default: return 'bg-stone text-primary-50';
+      }
+  })();
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-3xl space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-800">Donation Details</h1>
+          <h1 className="text-titleMd font-display text-primary">Donation Details</h1>
           <Button
             onClick={() => router.push('/donate')}
-            variant="outline"
-            className="border-green-700 text-green-700 hover:bg-green-50"
+            variant="secondary"
+            size="sm"
           >
             Back to Donations
           </Button>
         </div>
 
-        <div className="overflow-hidden rounded-lg bg-white shadow">
+        <div className="overflow-hidden rounded-lg bg-base shadow">
           {donation.food_item.image_url && (
-            <div className="aspect-video w-full">
+            <div className="aspect-video w-full bg-primary-10">
               <img
                 src={donation.food_item.image_url}
                 alt={donation.food_item.name}
@@ -123,59 +143,56 @@ export default function DonationDetailPage(): React.ReactElement {
             </div>
           )}
 
-          <div className="p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-800">
+          <div className="p-6 space-y-5">
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="text-titleSm font-semibold text-primary">
                 {donation.food_item.name}
               </h2>
-              <span className={`rounded-full px-3 py-1 text-sm capitalize ${
-                donation.status === 'available'
-                  ? 'bg-green-100 text-green-800'
-                  : donation.status === 'claimed'
-                  ? 'bg-blue-100 text-blue-800'
-                  : donation.status === 'picked_up'
-                  ? 'bg-purple-100 text-purple-800'
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
-                {donation.status}
+              <span
+                  className={cn(
+                      'inline-block whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium capitalize',
+                      statusClass
+                  )}
+              >
+                {donation.status.replace('_', ' ')}
               </span>
             </div>
 
-            <p className="text-gray-600">{donation.food_item.description}</p>
+            <p className="text-body text-primary-75">{donation.food_item.description || <span className="italic text-primary-50">No description provided.</span>}</p>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
               <div>
-                <h3 className="font-medium text-gray-700">Quantity</h3>
-                <p className="text-gray-600">{donation.quantity}</p>
+                <h3 className="mb-1 text-label font-medium text-primary-75">Quantity</h3>
+                <p className="text-body text-primary">{donation.quantity}</p>
               </div>
               <div>
-                <h3 className="font-medium text-gray-700">Expiry Date</h3>
-                <p className="text-gray-600">
+                <h3 className="mb-1 text-label font-medium text-primary-75">Expiry Date</h3>
+                <p className="text-body text-primary">
                   {donation.food_item.expiry_date 
                     ? new Date(donation.food_item.expiry_date).toLocaleDateString()
-                    : 'Not specified'}
+                    : <span className="italic text-primary-50">Not specified</span>}
                 </p>
               </div>
+              <div>
+                 <h3 className="mb-1 text-label font-medium text-primary-75">Pickup Time</h3>
+                 <p className="text-body text-primary">
+                    {donation.pickup_time 
+                    ? new Date(donation.pickup_time).toLocaleString() 
+                    : <span className="italic text-primary-50">Not specified</span>}
+                 </p>
+              </div>
             </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700">Pickup Time</h3>
-              <p className="text-gray-600">
-                {donation.pickup_time 
-                  ? new Date(donation.pickup_time).toLocaleString() 
-                  : 'Not specified'}
-              </p>
-            </div>
-
+            
             {donation.status === 'available' && (
-              <div className="flex space-x-4">
+              <div className="flex space-x-4 border-t border-primary-10 pt-5">
                 <Button
                   onClick={() => handleStatusUpdate('cancelled')}
-                  variant="destructive"
+                  variant="negative"
+                  size="md"
                   disabled={actionLoading}
                   className="flex-1"
                 >
-                  Cancel Donation
+                  {actionLoading ? 'Cancelling...' : 'Cancel Donation'}
                 </Button>
               </div>
             )}

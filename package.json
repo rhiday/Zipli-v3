@@ -26,7 +26,7 @@
     "@testing-library/react": "^14.0.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^22.15.3",
-    "@types/react": "^19.1.2",
+    "@types/react": "^18.3.20",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.0.0",

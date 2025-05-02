@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -58,19 +59,17 @@ export default function ResetPasswordPage() {
 
   if (!hash && !success) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-        <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Invalid Reset Link</h1>
-          <p className="text-gray-600">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+        <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
+          <h1 className="text-titleSm font-display text-primary">Invalid Reset Link</h1>
+          <p className="text-body text-primary-75">
             The password reset link is invalid or has expired. Please request a new one.
           </p>
-          <div className="mt-6">
-            <Link href="/auth/forgot-password">
-              <Button className="bg-green-700 hover:bg-green-600 shadow-md">
-                Request New Reset Link
-              </Button>
-            </Link>
-          </div>
+          <Link href="/auth/forgot-password">
+            <Button variant="primary" size="md">
+              Request New Reset Link
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -78,80 +77,76 @@ export default function ResetPasswordPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-        <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md text-center">
-          <h1 className="text-2xl font-bold text-green-700">Password Reset Successful</h1>
-          <p className="text-gray-600">
-            Your password has been updated. You will be redirected to the login page shortly.
+      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+        <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
+          <h1 className="text-titleSm font-display text-earth">Password Reset Successful</h1>
+          <p className="text-body text-primary-75">
+            Your password has been updated. Redirecting to login...
           </p>
-          <div className="mt-6">
-            <Link href="/auth/login">
-              <Button className="bg-green-700 hover:bg-green-600 shadow-md">
-                Go to Login
-              </Button>
-            </Link>
-          </div>
+          <Link href="/auth/login">
+            <Button variant="primary" size="md">
+              Go to Login Now
+            </Button>
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+      <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800">Reset Your Password</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-titleSm font-display text-primary">Reset Your Password</h1>
+          <p className="mt-2 text-body text-primary-75">
             Enter a new password for your account.
           </p>
         </div>
 
         {error && (
-          <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+          <div className="rounded-md bg-rose/10 p-4 text-body text-negative">
             {error}
           </div>
         )}
 
         <form onSubmit={handleResetPassword} className="mt-8 space-y-6">
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                New Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                minLength={6}
-              />
-            </div>
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm New Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                minLength={6}
-              />
-            </div>
+          <div>
+            <label htmlFor="password" className="block text-label font-medium text-primary mb-1">
+              New Password
+            </label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              minLength={6}
+            />
+          </div>
+          <div>
+            <label htmlFor="confirmPassword" className="block text-label font-medium text-primary mb-1">
+              Confirm New Password
+            </label>
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              minLength={6}
+            />
           </div>
 
           <div>
             <Button
               type="submit"
-              className="w-full bg-green-700 hover:bg-green-600 shadow-md"
+              variant="primary"
+              size="md"
+              className="w-full"
               disabled={loading}
             >
               {loading ? 'Updating Password...' : 'Reset Password'}

@@ -37,3 +37,8 @@ Actual login credentials for testing roles (password is 'password' for all):
 ## Supabase Notes
 
 For details on specific Supabase configurations, RLS debugging, and lessons learned during development, see [`SUPABASE_NOTES.md`](./SUPABASE_NOTES.md).
+
+## Future Plans: Test Automation
+
+- Implement end-to-end (E2E) and integration tests using Playwright (or a similar framework) to automate UI checks, component interactions, routing, and user flow validation.
+- This will help cover unit tests and edge cases for increased stability and faster development cycles.
