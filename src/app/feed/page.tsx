@@ -69,6 +69,11 @@ export default function FeedPage(): React.ReactElement {
         .eq('status', 'available')
         .returns<DonationFeed[]>();
 
+      // --- DEBUG ---
+      console.log('Fetched donations data:', data);
+      console.log('Fetching error:', error);
+      // --- END DEBUG ---
+
       if (error) throw error;
       setDonations(data || []);
     } catch (err: any) {
