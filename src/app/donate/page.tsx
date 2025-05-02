@@ -16,8 +16,7 @@ type DonationWithFoodItem = {
   };
   quantity: number;
   status: string;
-  pickup_time_start: string;
-  pickup_time_end: string;
+  pickup_time: string;
   created_at: string;
 };
 
@@ -48,8 +47,7 @@ export default function DonorDashboardPage(): React.ReactElement {
           id,
           quantity,
           status,
-          pickup_time_start,
-          pickup_time_end,
+          pickup_time,
           created_at,
           food_item:food_items!inner(
             name,
@@ -178,8 +176,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                     </p>
                     <p className="text-sm text-gray-600">
                       <span className="font-medium">Pickup:</span>{' '}
-                      {new Date(donation.pickup_time_start).toLocaleTimeString()} -{' '}
-                      {new Date(donation.pickup_time_end).toLocaleTimeString()}
+                      {new Date(donation.pickup_time).toLocaleString()}
                     </p>
                   </div>
                   <Button

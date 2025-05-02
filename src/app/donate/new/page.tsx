@@ -14,8 +14,7 @@ export default function CreateDonationPage() {
     description: '',
     quantity: 1,
     expiry_date: '',
-    pickup_time_start: '',
-    pickup_time_end: '',
+    pickup_time: '',
     image: null as File | null,
   });
 
@@ -34,6 +33,21 @@ export default function CreateDonationPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    const now = new Date();
+    const pickupDate = new Date(formData.pickup_time);
+    const twoWeeksFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    if (pickupDate <= now) {
+      setError('Pickup time must be in the future.');
+      setLoading(false);
+      return;
+    }
+    if (pickupDate > twoWeeksFromNow) {
+      setError('Pickup time must be within the next 14 days.');
+      setLoading(false);
+      return;
+    }
 
     try {
       // Get current user
@@ -87,12 +101,14 @@ export default function CreateDonationPage() {
             donor_id: user.id,
             quantity: formData.quantity,
             status: 'available',
-            pickup_time_start: formData.pickup_time_start,
-            pickup_time_end: formData.pickup_time_end,
+            pickup_time: formData.pickup_time,
           }
         ]);
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error("Error inserting into donations:", insertError);
+        throw insertError;
+      }
 
       // Redirect to donations list
       router.push('/donate');
@@ -176,30 +192,15 @@ export default function CreateDonationPage() {
           </div>
 
           <div>
-            <label htmlFor="pickup_time_start" className="block text-sm font-medium text-gray-700">
-              Pickup Time Start
+            <label htmlFor="pickup_time" className="block text-sm font-medium text-gray-700">
+              Pickup Time (must be within 14 days)
             </label>
             <input
-              id="pickup_time_start"
-              name="pickup_time_start"
+              id="pickup_time"
+              name="pickup_time"
               type="datetime-local"
               required
-              value={formData.pickup_time_start}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="pickup_time_end" className="block text-sm font-medium text-gray-700">
-              Pickup Time End
-            </label>
-            <input
-              id="pickup_time_end"
-              name="pickup_time_end"
-              type="datetime-local"
-              required
-              value={formData.pickup_time_end}
+              value={formData.pickup_time}
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             />

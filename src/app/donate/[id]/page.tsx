@@ -9,6 +9,7 @@ import { DonationWithFoodItemResponse } from '@/lib/supabase/responses';
 
 type DonationWithFoodItem = Donation & {
   food_item: FoodItem;
+  pickup_time: string;
 };
 
 export default function DonationDetailPage(): React.ReactElement {
@@ -40,6 +41,7 @@ export default function DonationDetailPage(): React.ReactElement {
         .from('donations')
         .select(`
           *,
+          pickup_time,
           food_item:food_items(*)
         `)
         .eq('id', params.id)
@@ -154,6 +156,15 @@ export default function DonationDetailPage(): React.ReactElement {
                     : 'Not specified'}
                 </p>
               </div>
+            </div>
+
+            <div>
+              <h3 className="font-medium text-gray-700">Pickup Time</h3>
+              <p className="text-gray-600">
+                {donation.pickup_time 
+                  ? new Date(donation.pickup_time).toLocaleString() 
+                  : 'Not specified'}
+              </p>
             </div>
 
             {donation.status === 'available' && (
