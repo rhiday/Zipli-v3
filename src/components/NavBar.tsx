@@ -9,8 +9,8 @@ export default function NavBar() {
 
   if (!user) return null;
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
+    signOut();
     router.push('/auth/login');
   };
 
