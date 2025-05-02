@@ -32,3 +32,7 @@ Mock login credentials:
 - alice@zipli.test / password (Donor)
 - bob@zipli.test / password (Receiver)
 - helsinki@zipli.test / password (City Admin)
+
+## Supabase Notes
+
+For details on specific Supabase configurations, RLS debugging, and lessons learned during development, see [`SUPABASE_NOTES.md`](./SUPABASE_NOTES.md).
