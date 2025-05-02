@@ -8,7 +8,7 @@ import type { UserRole } from '@/lib/supabase/types';
 
 const testUsers = {
   donor: { email: 'donor@zipli.test', password: 'password', role: 'food_donor' },
-  receiver: { email: 'receiverr@zipli.test', password: 'password', role: 'food_receiver' },
+  receiver: { email: 'receiver@zipli.test', password: 'password', role: 'food_receiver' },
   city: { email: 'city@zipli.test', password: 'password', role: 'city' },
   terminal: { email: 'terminal@zipli.test', password: 'password', role: 'terminals' },
 };
