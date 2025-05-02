@@ -7,10 +7,10 @@ import { useRouter } from 'next/navigation';
 import type { UserRole } from '@/lib/supabase/types';
 
 const testUsers = {
-  donor: { email: 'Donor email', password: 'password', role: 'food_donor' },
-  receiver: { email: 'Receiver email', password: 'password', role: 'food_receiver' },
-  city: { email: 'City email', password: 'password', role: 'city' },
-  terminal: { email: 'Terminal email', password: 'password', role: 'terminals' },
+  donor: { email: 'donor@zipli.test', password: 'password', role: 'food_donor' },
+  receiver: { email: 'receiverr@zipli.test', password: 'password', role: 'food_receiver' },
+  city: { email: 'city@zipli.test', password: 'password', role: 'city' },
+  terminal: { email: 'terminal@zipli.test', password: 'password', role: 'terminals' },
 };
 
 export default function DevLoginSwitcher() {
