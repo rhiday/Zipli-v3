@@ -20,7 +20,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 z-50 w-full border-t border-primary-10 bg-base shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.1)] md:hidden">
-      <div className="mx-auto grid h-16 max-w-lg grid-cols-3">
+      <div className="mx-auto flex h-16 max-w-lg justify-around">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -28,32 +28,42 @@ export default function BottomNav() {
               key={item.label}
               href={item.href}
               className={cn(
-                'group inline-flex flex-col items-center justify-center px-5',
-                item.isCentral ? '-mt-4' : 'hover:bg-primary-10' // Style central button differently
+                'group inline-flex flex-col items-center justify-center text-center w-full',
+                item.isCentral ? '-mt-5' : 'px-2 hover:bg-primary-10'
               )}
             >
               {item.isCentral ? (
-                <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-lime text-primary shadow-md group-hover:bg-lime/90">
-                  <item.icon className="h-6 w-6" aria-hidden="true" />
+                <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-lime text-primary shadow-md group-hover:bg-lime/90">
+                  <item.icon className="h-7 w-7" aria-hidden="true" />
                 </div>
               ) : (
-                <item.icon
-                  className={cn(
-                    'mb-1 h-6 w-6 text-primary-50 group-hover:text-primary',
-                    isActive && 'text-primary'
-                  )}
-                  aria-hidden="true"
-                />
+                <div className={cn(
+                    "flex flex-col items-center justify-center w-full h-full rounded-lg",
+                    isActive ? 'bg-cream' : 'bg-transparent'
+                )}>
+                    <item.icon
+                    className={cn(
+                        'mb-1 h-6 w-6 text-primary-50 group-hover:text-primary',
+                        isActive && 'text-primary'
+                    )}
+                    aria-hidden="true"
+                    />
+                     <span
+                        className={cn(
+                            'text-caption',
+                            isActive ? 'text-primary font-semibold' : 'text-primary-50',
+                            'group-hover:text-primary'
+                        )}
+                        >
+                        {item.label}
+                    </span>
+                </div>
               )}
-              <span
-                className={cn(
-                  'text-caption',
-                  isActive ? 'text-primary' : 'text-primary-50',
-                  item.isCentral ? 'font-medium text-primary' : 'group-hover:text-primary'
-                )}
-              >
-                {item.label}
-              </span>
+              {item.isCentral && (
+                   <span className={cn('text-caption font-medium text-primary')}>
+                        {item.label}
+                   </span>
+              )}
             </Link>
           );
         })}
