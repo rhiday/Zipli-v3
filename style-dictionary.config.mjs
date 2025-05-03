@@ -1,9 +1,9 @@
-import StyleDictionary from 'style-dictionary';
+const StyleDictionary = require('style-dictionary');
 
-// Inline custom format registration for Tailwind colors
+// Custom format for Tailwind colors
 StyleDictionary.registerFormat({
   name: 'tailwind/colors',
-  formatter({ dictionary }) {
+  formatter: function({ dictionary }) {
     const colors = {};
     dictionary.allProperties.forEach(token => {
       if (token.attributes && token.attributes.category === 'color') {
@@ -16,7 +16,7 @@ StyleDictionary.registerFormat({
   }
 });
 
-export default {
+module.exports = {
   source: ['tokens/figma.tokens.json'],
   platforms: {
     css: {
