@@ -12,6 +12,8 @@ import { Avatar } from '@/components/ui/Avatar';
 import BottomNav from '@/components/BottomNav';
 import { ChevronRight, Languages, MessageSquare, Info, ChevronDown } from 'lucide-react';
 import { Profile } from '@/lib/supabase/types';
+import DonationCard from '@/components/donations/DonationCard';
+import { Header } from '@/components/layout';
 
 type DonationWithFoodItem = {
   id: string;
@@ -117,27 +119,7 @@ export default function DonorDashboardPage(): React.ReactElement {
 
   return (
     <div className="min-h-screen bg-base pb-20">
-      <header className="bg-primary p-4 pt-10 text-white relative overflow-hidden">
-        <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-                <Button variant="secondary" size="sm" className="rounded-full border border-white/50 bg-white/10 hover:bg-white/20 text-white !text-label">
-                    <Languages className="mr-1.5 h-4 w-4" /> English
-                </Button>
-                <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-full border border-white/50 bg-white/10 hover:bg-white/20 text-white">
-                        <MessageSquare className="h-5 w-5" />
-            </Button>
-                    <button onClick={() => router.push('/profile')} className="rounded-full border border-white/50 bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-primary focus:ring-white">
-                       <Avatar fallback={getInitials(dashboardData.profile?.full_name)} className="!h-9 !w-9 bg-transparent text-white" />
-                    </button>
-                </div>
-          </div>
-            <p className="text-body font-semibold text-primary-25/80 mb-1">Good to see you!</p>
-            <h1 className="text-displayXs font-semibold truncate font-display">
-                {dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'}
-            </h1>
-        </div>
-      </header>
+      <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'} />
 
       <main className="p-4 space-y-6">
         <section>
@@ -198,67 +180,26 @@ export default function DonorDashboardPage(): React.ReactElement {
         )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {dashboardData.donations.length > 0 ? (
-              dashboardData.donations.map((donation) => {
-                 const statusClass = (() => {
-                    switch (donation.status) {
-                    case 'available': return 'bg-positive/20 text-positive';
-                    case 'claimed': return 'bg-sky/10 text-info';
-                    case 'picked_up': return 'bg-stone/70 text-white';
-                    case 'cancelled': return 'bg-negative/10 text-negative';
-                    default: return 'bg-stone text-primary-50';
-                    }
-                })();
-                
-                return (
-              <div
-                key={donation.id}
-                    className="overflow-hidden rounded-lg bg-base shadow-[0_2px_4px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.04)] border border-primary-10 cursor-pointer"
-                    onClick={() => router.push(`/donate/${donation.id}`)}
-              >
-                {donation.food_item.image_url && (
-                  <img
-                    src={donation.food_item.image_url}
-                    alt={donation.food_item.name}
-                        className="h-32 w-full object-cover"
-                  />
-                )}
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <h3 className="text-body font-semibold text-primary line-clamp-1">
-                      {donation.food_item.name}
-                    </h3>
-                        <span
-                          className={cn(
-                            'inline-block whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-medium capitalize',
-                            statusClass
-                          )}
-                        >
-                          {donation.status.replace('_', ' ')}
-                    </span>
-                  </div>
-                      <p className="text-caption text-primary-75 mb-2 line-clamp-2">
-                    {donation.food_item.description}
-                  </p>
-                      <p className="text-caption text-primary-50">
-                        Expires: {new Date(donation.food_item.expiry_date).toLocaleDateString()}
-                    </p>
-                    </div>
-                  </div>
-                );
-              })
+              dashboardData.donations.map((donation) => (
+                <DonationCard
+                  key={donation.id}
+                  donation={donation}
+                  onClick={() => router.push(`/donate/${donation.id}`)}
+                />
+              ))
             ) : (
               <div className="col-span-full text-center py-8 bg-base rounded-lg">
                 <p className="text-body text-primary-75 mb-4">No past offers found.</p>
-                  <Button
+                <Button
                   variant="primary"
                   size="md"
-                onClick={() => router.push('/donate/new')}
-              >
+                  onClick={() => router.push('/donate/new')}
+                >
                   Create Your First Offer
-              </Button>
-            </div>
-          )}
-        </div>
+                </Button>
+              </div>
+            )}
+          </div>
         </section>
       </main>
 

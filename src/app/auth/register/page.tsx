@@ -156,126 +156,126 @@ export default function RegisterPage() {
             </div>
           ) : (
             <>
-              <div className="space-y-4">
-                <div>
+            <div className="space-y-4">
+              <div>
                   <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
-                    Email address
-                  </label>
+                  Email address
+                </label>
                   <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
                   <label htmlFor="password" className="block text-label font-medium text-primary mb-1">
                     Password (min. 6 characters)
-                  </label>
+                </label>
                   <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
                   <label htmlFor="confirmPassword" className="block text-label font-medium text-primary mb-1">
-                    Confirm Password
-                  </label>
+                  Confirm Password
+                </label>
                   <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
                   <label htmlFor="organizationName" className="block text-label font-medium text-primary mb-1">
-                    {formData.role === 'terminals' ? 'Terminal Name' :
-                    formData.role === 'city' ? 'Your City' :
-                    'Organization Name'}
-                  </label>
-                  {formData.role === 'city' ? (
-                    <select
-                      id="organizationName"
-                      name="organizationName"
-                      required
-                      value={formData.organizationName}
-                      onChange={handleChange}
+                  {formData.role === 'terminals' ? 'Terminal Name' :
+                   formData.role === 'city' ? 'Your City' :
+                   'Organization Name'}
+                </label>
+                {formData.role === 'city' ? (
+                  <select
+                    id="organizationName"
+                    name="organizationName"
+                    required
+                    value={formData.organizationName}
+                    onChange={handleChange}
                       className="mt-1 block w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30"
-                    >
-                      <option value="">Select a city</option>
-                      <option value="Helsinki">Helsinki</option>
-                      <option value="Espoo">Espoo</option>
-                      <option value="Vantaa">Vantaa</option>
-                    </select>
-                  ) : (
+                  >
+                    <option value="">Select a city</option>
+                    <option value="Helsinki">Helsinki</option>
+                    <option value="Espoo">Espoo</option>
+                    <option value="Vantaa">Vantaa</option>
+                  </select>
+                ) : (
                     <Input
-                      id="organizationName"
-                      name="organizationName"
-                      type="text"
-                      required
-                      value={formData.organizationName}
-                      onChange={handleChange}
-                      placeholder={formData.role === 'terminals' ? 'Enter terminal name' : 'Enter organization name'}
-                    />
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="contactPerson" className="block text-label font-medium text-primary mb-1">
-                    Contact Person
-                  </label>
-                  <Input
-                    id="contactPerson"
-                    name="contactPerson"
+                    id="organizationName"
+                    name="organizationName"
                     type="text"
                     required
-                    value={formData.contactPerson}
+                    value={formData.organizationName}
                     onChange={handleChange}
+                    placeholder={formData.role === 'terminals' ? 'Enter terminal name' : 'Enter organization name'}
                   />
-                </div>
-                <div>
-                  <label htmlFor="contactNumber" className="block text-label font-medium text-primary mb-1">
-                    Contact Number
-                  </label>
+                )}
+              </div>
+              <div>
+                  <label htmlFor="contactPerson" className="block text-label font-medium text-primary mb-1">
+                  Contact Person
+                </label>
                   <Input
-                    id="contactNumber"
-                    name="contactNumber"
-                    type="tel"
-                    required
-                    value={formData.contactNumber}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
+                  id="contactPerson"
+                  name="contactPerson"
+                  type="text"
+                  required
+                  value={formData.contactPerson}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                  <label htmlFor="contactNumber" className="block text-label font-medium text-primary mb-1">
+                  Contact Number
+                </label>
+                  <Input
+                  id="contactNumber"
+                  name="contactNumber"
+                  type="tel"
+                  required
+                  value={formData.contactNumber}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
                   <label htmlFor="address" className="block text-label font-medium text-primary mb-1">
                     Address (Optional)
-                  </label>
+                </label>
                   <Input
-                    id="address"
-                    name="address"
-                    type="text"
-                    value={formData.address}
-                    onChange={handleChange}
-                  />
-                </div>
+                  id="address"
+                  name="address"
+                  type="text"
+                  value={formData.address}
+                  onChange={handleChange}
+                />
               </div>
+            </div>
               <Button type="button" onClick={prevStep} variant="secondary" size="md">
                 Back
               </Button>
             </>
-          )}
-
+            )}
+            
           <div>
             <Button
               type="submit"

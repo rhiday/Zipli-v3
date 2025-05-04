@@ -14,14 +14,10 @@ const Sidebar = () => {
   );
 };
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex h-screen bg-cream">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto pb-16 md:pb-0"> {/* Add padding-bottom for mobile tab bar */}
-        {children}
-      </main>
-      <MobileTabLayout />
-    </div>
-  );
-} 
+const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="min-h-screen bg-base flex flex-col">
+    {children}
+  </div>
+);
+
+export default DashboardLayout; 
