@@ -19,8 +19,8 @@ export default function BottomNav() {
   // TODO: Only render for specific roles or routes if needed
 
   return (
-    <nav className="fixed bottom-0 left-0 z-50 w-full border-t border-primary-10 bg-base shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.1)] md:hidden">
-      <div className="mx-auto flex h-16 max-w-lg justify-around">
+    <nav className="fixed bottom-0 left-0 z-50 w-full h-[76px] border-t border-primary-10 bg-base shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.1)] md:hidden">
+      <div className="mx-auto flex h-full max-w-lg justify-around items-center">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -29,7 +29,7 @@ export default function BottomNav() {
               href={item.href}
               className={cn(
                 'group inline-flex flex-col items-center justify-center text-center w-full',
-                item.isCentral ? '-mt-5' : 'px-2 hover:bg-primary-10'
+                item.isCentral ? '-mt-8' : 'px-2 hover:bg-primary-10'
               )}
             >
               {item.isCentral ? (
@@ -38,8 +38,10 @@ export default function BottomNav() {
                 </div>
               ) : (
                 <div className={cn(
-                    "flex flex-col items-center justify-center w-full h-full rounded-lg",
-                    isActive ? 'bg-cream' : 'bg-transparent'
+                    "flex flex-col items-center justify-center w-full rounded-lg",
+                    isActive
+                      ? 'bg-cream py-2'
+                      : 'bg-transparent'
                 )}>
                     <item.icon
                     className={cn(
@@ -50,7 +52,7 @@ export default function BottomNav() {
                     />
                      <span
                         className={cn(
-                            'text-caption',
+                            'text-xs',
                             isActive ? 'text-primary font-semibold' : 'text-primary-50',
                             'group-hover:text-primary'
                         )}
