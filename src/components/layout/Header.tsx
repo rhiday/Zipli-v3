@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => (
       alt="Background Shape"
       width={89}
       height={141}
-      className="absolute top-4 right-4 opacity-10 pointer-events-none scale-110"
+      className="absolute top-17 right-20 opacity-10 pointer-events-none scale-100"
     />
 
     {/* Main Header Content (needs relative positioning to stay on top) */}
@@ -42,6 +42,18 @@ const Header: React.FC<HeaderProps> = ({ title }) => (
         <h1 className="text-titleMd font-sans font-medium tracking-tight text-base">{title || 'FoodAiders ry'}</h1>
       </div>
     </div>
+
+    {/* REMOVE Watermark Image */}
+    {/* 
+    <Image
+      src="/images/logo-watermark.svg"
+      alt=""
+      aria-hidden="true"
+      width={140}
+      height={140}
+      className="absolute right-0 bottom-0 h-auto w-[140px] select-none opacity-10 pointer-events-none md:w-[200px]"
+    />
+    */}
   </div>
 );
 

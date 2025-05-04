@@ -19,6 +19,10 @@ module.exports = {
   			yellow:   '#f6e200',
 
   			// UI semantic
+  			secondary: '#021d13cc', // primary @ 80% opacity
+  			tertiary:  '#021d1399', // primary @ 60% opacity
+  			interactive: '#024209', // Same as earth
+
   			positive: {
   				DEFAULT: '#a6f175',
   				hover:   '#18e170',
