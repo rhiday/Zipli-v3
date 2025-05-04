@@ -1,17 +1,37 @@
 'use client';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import dynamic from 'next/dynamic';
+import React from 'react';
+import Header from './layout/Header'; // Assuming Header might be part of AppShell
+import BottomNav from './BottomNav'; // Assuming BottomNav might be part of AppShell
+// Or import whatever components are actually used in AppShell
 
 const DesktopGlobalNavbar = dynamic(() => import('@/components/DesktopGlobalNavbar'), { ssr: false });
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+interface AppShellProps {
+  children: React.ReactNode;
+}
+
+const AppShell: React.FC<AppShellProps> = ({ children }) => {
   return (
     <AuthProvider>
-      {/* Render DesktopGlobalNavbar only on medium screens and up */}
-      <div className="hidden md:block">
+      {/* Layout: flex container on md for sidebar + content */}
+      <div className="min-h-screen md:flex">
+        {/* Sidebar for desktop */}
         <DesktopGlobalNavbar />
+        {/* Main content container */}
+        <div className="flex flex-col flex-1">
+          {/* Optional Header if global */}
+          {/* <Header /> */}
+          <main className="flex-grow px-4 md:px-0">
+            {children}
+          </main>
+          {/* Optional BottomNav for mobile */}
+          {/* <BottomNav /> */}
+        </div>
       </div>
-      {children}
     </AuthProvider>
   );
-} 
+};
+
+export default AppShell; 

@@ -4,16 +4,19 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/Input';
-import { PlusIcon, SearchIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Select } from '@/components/ui/Select';
-import { Avatar } from '@/components/ui/Avatar';
 import BottomNav from '@/components/BottomNav';
-import { ChevronRight, Languages, MessageSquare, Info, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronRight, Languages, MessageSquare, Info, ChevronDown, UserCircle } from 'lucide-react';
 import { Profile } from '@/lib/supabase/types';
 import DonationCard from '@/components/donations/DonationCard';
-import { Header } from '@/components/layout';
+import Header from '@/components/layout/Header';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { jsPDF } from 'jspdf';
 
 type DonationWithFoodItem = {
   id: string;
@@ -39,9 +42,24 @@ export default function DonorDashboardPage(): React.ReactElement {
   const [dashboardData, setDashboardData] = useState<DonorDashboardData>({ profile: null, donations: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedMonth, setSelectedMonth] = useState('February');
+  
+  const allMonths = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  // Calculate last 3 months
+  const currentDate = new Date();
+  const currentMonthIndex = currentDate.getMonth(); // 0-11
+  const lastThreeMonthsIndices = [
+      (currentMonthIndex - 2 + 12) % 12, // Two months ago
+      (currentMonthIndex - 1 + 12) % 12, // One month ago
+      currentMonthIndex // Current month
+  ];
+  const lastThreeMonths = lastThreeMonthsIndices.map(index => allMonths[index]);
+
+  // Set default selected month to the current month
+  const [selectedMonth, setSelectedMonth] = useState(allMonths[currentMonthIndex]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -97,13 +115,18 @@ export default function DonorDashboardPage(): React.ReactElement {
     }
   };
 
-  const filteredDonations = dashboardData.donations.filter(donation => {
-    const matchesSearch = searchTerm === '' ||
-      donation.food_item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      donation.food_item.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-    return matchesSearch;
-  });
+  // Placeholder PDF generation function
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('Zipli Summary', 10, 10);
+    doc.setFontSize(12);
+    doc.text(`Total food offered: 46kg`, 10, 20);
+    doc.text(`Portions offered: 131`, 10, 30);
+    doc.text(`Saved in food disposal costs: 125€`, 10, 40);
+    doc.text(`Emission reduction: 89%`, 10, 50);
+    doc.save('zipli-summary.pdf');
+  };
 
   if (loading) {
     return (
@@ -113,79 +136,127 @@ export default function DonorDashboardPage(): React.ReactElement {
     );
   }
 
-  const getInitials = (name?: string | null) => {
-    return name?.split(' ').map(n => n[0]).join('').toUpperCase() || '??';
-  }
-
   return (
     <div className="min-h-screen bg-base pb-20">
       <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'} />
 
-      <main className="p-4 space-y-6">
+      <main className="relative z-20 -mt-6 rounded-t-3xl md:rounded-t-none bg-base py-4 px-6 md:px-12 space-y-6">
         <section>
             <div className="flex justify-between items-center mb-3">
-                <h2 className="text-titleXs font-medium text-primary">Your impact</h2>
-                <button className="inline-flex items-center gap-1 text-primary text-body font-semibold focus:outline-none focus:ring-1 focus:ring-primary rounded-sm px-1">
-                    {selectedMonth}
-                    <ChevronDown className="h-4 w-4" />
-                </button>
+                <h2 className="text-lg font-semibold text-primary">Your impact</h2>
+                 <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="underline underline-offset-4 inline-flex items-center gap-1 text-primary text-lg font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-1">
+                        {selectedMonth}
+                        <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-white">
+                    {lastThreeMonths.map((month) => (
+                      <DropdownMenuItem key={month} onSelect={() => setSelectedMonth(month)}>
+                        {month}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
             </div>
-            <div className="mb-4">
-                <span className="text-displayXs font-semibold text-primary mr-2">46kg</span>
-                <span className="text-body text-primary-75">Total food offered</span>
+            <div className="mb-4 flex items-baseline gap-2">
+                <span className="text-4xl font-bold text-green-800 mr-0">46kg</span>
+                <span className="text-base text-primary-75">Total food offered</span>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-lg bg-lime/20 p-3 space-y-1">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 mt-6">
+                <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
                     <div className="flex justify-between items-start">
-                        <p className="text-stat font-semibold text-primary">131</p>
+                        <p className="text-2xl font-semibold text-green-800">131</p>
                         <button className="p-0.5 text-primary-50 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
                             <Info className="h-3.5 w-3.5" />
                         </button>
                     </div>
-                    <p className="text-label text-primary-75">Portions offered</p>
+                    <p className="text-sm font-normal text-primary-75">Portions offered</p>
                 </div>
-                 <div className="rounded-lg bg-lime/20 p-3 space-y-1">
+                 <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
                      <div className="flex justify-between items-start">
-                        <p className="text-stat font-semibold text-primary">125€</p>
-                         <div className="w-3.5 h-3.5 flex-shrink-0"></div>
+                        <p className="text-2xl font-semibold text-green-800">125€</p>
                     </div>
-                    <p className="text-label text-primary-75">Saved in food disposal costs</p>
+                    <p className="text-sm font-normal text-primary-75">Saved in food disposal costs</p>
                 </div>
-                 <div className="rounded-lg bg-lime/20 p-3 space-y-1">
+                 <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
                      <div className="flex justify-between items-start">
-                        <p className="text-stat font-semibold text-primary">89%</p>
+                        <p className="text-2xl font-semibold text-green-800">89%</p>
                         <button className="p-0.5 text-primary-50 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
                             <Info className="h-3.5 w-3.5" />
                         </button>
                     </div>
-                    <p className="text-label text-primary-75">Emission reduction</p>
+                    <p className="text-sm font-normal text-primary-75">Emission reduction</p>
+                </div>
+                <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
+                    <div className="flex justify-between items-start">
+                        <p className="text-2xl font-semibold text-green-800">10t</p>
+                        <button className="p-0.5 text-primary-50 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
+                            <Info className="h-3.5 w-3.5" />
+                        </button>
+                    </div>
+                    <p className="text-sm font-normal text-primary-75">CO2 Avoided</p>
                 </div>
           </div>
         </section>
 
-        <section className="rounded-lg bg-base p-4 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.04)] border border-primary-10 flex items-center justify-between cursor-pointer hover:bg-primary-10">
-           <div>
-                <h3 className="text-body font-semibold text-primary mb-1">Export to PDF</h3>
-                <p className="text-caption text-primary-75">Environmental and social impact data for reporting, and operation planning.</p>
-        </div>
-            <ChevronRight className="h-5 w-5 text-primary-50" />
+        <section
+          onClick={handleExportPDF}
+          role="button"
+          tabIndex={0}
+          className="rounded-xl border border-border bg-base p-4 flex items-center justify-between cursor-pointer hover:bg-muted/50"
+        >
+           <div className="flex-1 mr-4">
+                <h3 className="text-base font-semibold text-primary mb-1">Export to PDF</h3>
+                <p className="text-sm text-muted-foreground">Environmental and social impact data for reporting, and operation planning.</p>
+           </div>
+           <ArrowRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
         </section>
 
         <section>
           <h2 className="text-titleXs font-medium text-primary mb-4">Past offers</h2>
-        {error && (
-              <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">
-            {error}
-          </div>
-        )}
+          {error && (
+            <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">
+              {error}
+            </div>
+          )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {dashboardData.donations.length > 0 ? (
               dashboardData.donations.map((donation) => (
-                <DonationCard
+                <div
                   key={donation.id}
-                  donation={donation}
-                  onClick={() => router.push(`/donate/${donation.id}`)}
-                />
+                  className="bg-base rounded-xl border border-border p-4"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-base font-medium text-primary">
+                      {donation.food_item.name}
+                    </h3>
+                    <span
+                      className={cn(
+                        'px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap',
+                        donation.status === 'available'    ? 'bg-green-100 text-green-800' :
+                        donation.status === 'claimed'      ? 'bg-yellow-100 text-yellow-800' :
+                        donation.status === 'picked_up'    ? 'bg-blue-100 text-blue-800' :
+                        donation.status === 'cancelled'    ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      )}
+                    >
+                      {donation.status === 'picked_up'  ? 'Successful' :
+                       donation.status === 'cancelled'  ? 'Cancelled'  :
+                       donation.status === 'available'  ? 'Available'  :
+                       donation.status === 'claimed'    ? 'Claimed'    :
+                       donation.status.replace('_', ' ')
+                      }
+                    </span>
+                  </div>
+                  <p className="text-sm text-primary-75 mb-2">
+                    {donation.food_item.description}
+                  </p>
+                  <p className="text-sm text-primary-75">
+                    Picked up: {new Date(donation.pickup_time).toLocaleDateString()}
+                  </p>
+                </div>
               ))
             ) : (
               <div className="col-span-full text-center py-8 bg-base rounded-lg">
