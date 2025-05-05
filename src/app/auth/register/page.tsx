@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { UserRole } from '@/lib/supabase/types';
+import clsx from 'clsx';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -132,7 +133,7 @@ export default function RegisterPage() {
           </div>
         )}
 
-        <form onSubmit={step === 1 ? nextStep : handleRegister} className="mt-8 space-y-6">
+        <form onSubmit={handleRegister} className="mt-8 space-y-6">
           {step === 1 ? (
             <div className="space-y-4">
               <div>
@@ -270,21 +271,23 @@ export default function RegisterPage() {
                 />
               </div>
             </div>
-              <Button type="button" onClick={prevStep} variant="secondary" size="md">
+            </>
+          )}
+
+          <div className={clsx("flex", step === 1 ? "justify-end" : "justify-between")}>
+            {step === 2 && (
+              <Button type="button" variant="secondary" onClick={prevStep} disabled={loading}>
                 Back
               </Button>
-            </>
             )}
-            
-          <div>
             <Button
-              type="submit"
+              type={step === 1 ? "button" : "submit"}
               variant="primary"
-              size="md"
-              className="w-full"
+              onClick={step === 1 ? nextStep : undefined}
               disabled={loading}
+              className={step === 1 ? "w-full" : ""}
             >
-              {loading ? (step === 1 ? '...' : 'Registering...') : (step === 1 ? 'Next' : 'Register')}
+              {step === 1 ? 'Next' : loading ? 'Registering...' : 'Register Account'}
             </Button>
           </div>
         </form>
