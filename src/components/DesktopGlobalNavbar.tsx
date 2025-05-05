@@ -60,10 +60,12 @@ export default function DesktopGlobalNavbar() {
         })}
       </div>
 
-      {/* Logout button at bottom */}
+      {/* Logout button removed from bottom */}
+      {/* 
       <Button variant="ghost" size="sm" onClick={handleLogout} className="w-full">
         Logout
       </Button>
+      */}
     </nav>
   );
 } 

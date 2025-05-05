@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Languages, MessageSquare, UserCircle } from 'lucide-react';
+import Link from 'next/link';
 
 interface HeaderProps {
   title?: string;
@@ -37,9 +38,13 @@ const Header: React.FC<HeaderProps> = ({ title }) => (
           <button className="w-10 h-10 border border-[#F3F4ED] rounded-full flex items-center justify-center">
             <MessageSquare className="w-5 h-5 text-white" />
           </button>
-          <button className="w-10 h-10 border border-[#F3F4ED] rounded-full flex items-center justify-center">
+          <Link 
+            href="/profile" 
+            className="w-10 h-10 border border-[#F3F4ED] rounded-full flex items-center justify-center" 
+            aria-label="View Profile"
+           >
             <UserCircle className="w-5 h-5 text-white" />
-          </button>
+          </Link>
         </div>
       </div>
       {/* Greeting block: second on mobile, first on desktop */}

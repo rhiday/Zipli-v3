@@ -126,6 +126,15 @@ export default function ProfilePage(): React.ReactElement {
     }
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      setError("Failed to log out: " + error.message);
+    } else {
+      router.push('/auth/login');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-cream">
@@ -320,6 +329,19 @@ export default function ProfilePage(): React.ReactElement {
                 </div>
               </div>
             )}
+
+            {/* Add Logout Button */}
+            <div className="mt-8 border-t border-primary-10 pt-6">
+              <Button
+                variant="negative"
+                size="md"
+                onClick={handleLogout}
+                className="w-full"
+              >
+                Log Out
+              </Button>
+            </div>
+
           </div>
         </div>
       </div>

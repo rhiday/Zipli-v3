@@ -3,11 +3,11 @@ import { cva, type VariantProps } from "class-variance-authority";
 import clsx from "clsx";
 
 const button = cva(
-  "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+  "inline-flex items-center justify-center rounded-full font-semibold transition-colors focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive cursor-pointer",
   {
     variants: {
       variant: {
-        primary:   "bg-primary text-white hover:bg-primary-75",
+        primary:   "bg-positive text-interactive hover:bg-[#83e956]",
         secondary: "bg-cream text-primary hover:bg-cloud",
         destructive:"bg-negative text-white hover:bg-negative-hover",
         ghost:     "bg-transparent text-primary hover:bg-primary/10",
@@ -15,8 +15,8 @@ const button = cva(
       },
       size: {
         sm: "h-8 px-3 text-label rounded-sm",
-        md: "h-10 px-4 text-body rounded-md",
-        lg: "h-12 px-6 text-bodyLg rounded-md"
+        md: "px-6 py-3 text-bodyLg",
+        lg: "h-[46px] w-[110px] px-6 text-bodyLg rounded-md"
       }
     },
     defaultVariants: { variant: "primary", size: "md" }
