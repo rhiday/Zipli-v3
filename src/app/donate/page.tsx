@@ -10,6 +10,7 @@ import { ArrowRight, ChevronRight, Languages, MessageSquare, Info, ChevronDown, 
 import { Profile } from '@/lib/supabase/types';
 import DonationCard from '@/components/donations/DonationCard';
 import Header from '@/components/layout/Header';
+import Link from 'next/link';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -224,39 +225,41 @@ export default function DonorDashboardPage(): React.ReactElement {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {dashboardData.donations.length > 0 ? (
               dashboardData.donations.map((donation) => (
-                <div
-                  key={donation.id}
-                  className="bg-base rounded-xl border border-border p-4"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-base font-medium text-primary">
-                      {donation.food_item.name}
-                    </h3>
-                    <span
-                      className={cn(
-                        'px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap',
-                        donation.status === 'available'    ? 'bg-green-100 text-green-800' :
-                        donation.status === 'claimed'      ? 'bg-yellow-100 text-yellow-800' :
-                        donation.status === 'picked_up'    ? 'bg-blue-100 text-blue-800' :
-                        donation.status === 'cancelled'    ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      )}
-                    >
-                      {donation.status === 'picked_up'  ? 'Successful' :
-                       donation.status === 'cancelled'  ? 'Cancelled'  :
-                       donation.status === 'available'  ? 'Available'  :
-                       donation.status === 'claimed'    ? 'Claimed'    :
-                       donation.status.replace('_', ' ')
-                      }
-                    </span>
-                  </div>
-                  <p className="text-sm text-primary-75 mb-2">
-                    {donation.food_item.description}
-                  </p>
-                  <p className="text-sm text-primary-75">
-                    Picked up: {new Date(donation.pickup_time).toLocaleDateString()}
-                  </p>
-                </div>
+                <Link key={donation.id} href={`/donate/${donation.id}`} legacyBehavior passHref>
+                  <a className="block bg-base rounded-xl border border-border p-4 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-base font-medium text-primary">
+                        {donation.food_item.name}
+                      </h3>
+                      <span
+                        className={cn(
+                          'px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap',
+                          donation.status === 'available'    ? 'bg-green-100 text-green-800' :
+                          donation.status === 'claimed'      ? 'bg-yellow-100 text-yellow-800' :
+                          donation.status === 'picked_up'    ? 'bg-blue-100 text-blue-800' :
+                          donation.status === 'cancelled'    ? 'bg-red-100 text-red-800' :
+                          'bg-gray-100 text-gray-800'
+                        )}
+                      >
+                        {donation.status === 'picked_up'  ? 'Successful' :
+                         donation.status === 'cancelled'  ? 'Cancelled'  :
+                         donation.status === 'available'  ? 'Available'  :
+                         donation.status === 'claimed'    ? 'Claimed'    :
+                         donation.status.replace('_', ' ')
+                        }
+                      </span>
+                    </div>
+                    <p className="text-sm text-primary-75 mb-2">
+                      {donation.food_item.description}
+                    </p>
+                    <p className="text-sm text-primary-75">
+                      {donation.pickup_time 
+                        ? `Picked up: ${new Date(donation.pickup_time).toLocaleDateString()}`
+                        : 'Recurring Schedule'
+                       }
+                    </p>
+                  </a>
+                </Link>
               ))
             ) : (
               <div className="col-span-full text-center py-8 bg-base rounded-lg">

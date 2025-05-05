@@ -5,38 +5,25 @@ import { cn } from '@/lib/utils'; // Assuming you have cn or clsx
 // Define CVA variants for the input
 const inputVariants = cva(
   [
-    // Base styles - Use border-2 consistently
-    "w-full rounded-md border-2 bg-base px-4 py-[14px]", 
-    "text-bodyLg text-primary placeholder:text-inactive", 
-    "transition-colors duration-150 ease-in-out", // Ensure smooth color transition
-
-    // Default state styles - Use tertiary border color
-    "border-tertiary", 
-
-    // Hover state styles - Only change color, width is already border-2
-    "hover:border-primary", // Change to primary color on hover? Or keep tertiary? Let's try primary.
-
-    // Focus state styles - Use ring instead of changing border width
-    "focus:outline-none focus:border-interactive focus:ring-1 focus:ring-interactive focus:ring-offset-0", // Ring for focus, keep border color change
-
-    // Disabled state (good practice)
-    "disabled:cursor-not-allowed disabled:opacity-50 disabled:border-border" // Maybe different disabled border
+    // Base styles
+    "w-full input-default border-2 border-[var(--zipli-border-light,#F3F4F6)] bg-white text-[var(--zipli-text-primary)] rounded-[12px] px-4 py-3 text-bodyLg placeholder:text-inactive transition-colors duration-150 ease-in-out",
+    // Hover (only color changes)
+    "hover:input-hover hover:border-2 hover:border-[var(--zipli-border-light,#F3F4F6)] hover:shadow-[0_0_0_2px_rgba(0,128,0,0.1)]",
+    // Focus (color changes)
+    "focus:input-focus focus:border-2 focus:border-[var(--zipli-interactive,#014421)] focus:outline-none focus:bg-white",
+    // Disabled
+    "disabled:cursor-not-allowed disabled:opacity-50 disabled:border-border"
   ],
   {
     variants: {
-      // Add error variant based on Figma specs
       error: {
         true: [
-          // Override base and state borders with negative color
-          "border-negative",
-          "hover:border-negative", 
-          // Use negative color for focus ring, adjust opacity if needed
-          "focus:border-negative focus:ring-negative focus:ring-opacity-30"
+          "input-error border-2 border-[var(--zipli-error,#EF4444)] bg-[#fff5f5] hover:border-[var(--zipli-error,#EF4444)] focus:border-[var(--zipli-error,#EF4444)] focus:ring-0"
         ]
       }
     },
     defaultVariants: {
-      error: false // Default to not being in error state
+      error: false
     },
   }
 );

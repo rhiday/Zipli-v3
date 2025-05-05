@@ -67,6 +67,7 @@ export default function FeedPage(): React.ReactElement {
           )
         `)
         .eq('status', 'available')
+        .neq('donor_id', user.id)
         .order('created_at', { ascending: false })
         .returns<DonationFeed[]>();
 
