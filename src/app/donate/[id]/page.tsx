@@ -166,14 +166,6 @@ export default function DonationDetailPage(): React.ReactElement {
                 <p className="text-body text-primary">{donation.quantity}</p>
               </div>
               <div>
-                <h3 className="mb-1 text-label font-medium text-primary-75">Expiry Date</h3>
-                <p className="text-body text-primary">
-                  {donation.food_item.expiry_date 
-                    ? new Date(donation.food_item.expiry_date).toLocaleDateString()
-                    : <span className="italic text-primary-50">Not specified</span>}
-                </p>
-              </div>
-              <div>
                  <h3 className="mb-1 text-label font-medium text-primary-75">Pickup Time</h3>
                  <p className="text-body text-primary">
                     {donation.pickup_time 

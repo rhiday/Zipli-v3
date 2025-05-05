@@ -6,8 +6,8 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { useForm } from 'react-hook-form';
-import { AlertTriangle, Camera, Trash2, Pencil, Plus, Minus, CalendarIcon } from 'lucide-react';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { AlertTriangle, Camera, Trash2, Pencil, Plus, Minus, CalendarIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -16,8 +16,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type ItemInput = {
   name: string;
@@ -28,15 +33,15 @@ type ItemInput = {
   image?: FileList;
 };
 
+type TimeSlot = {
+  start: string;
+  end: string;
+};
+
 type DonationFormInputs = {
   items: ItemInput[];
-  expiry_date?: Date;
   pickup_date?: Date;
-  pickup_time_only?: string;
-  pickup_type: 'specific' | 'recurring';
-  pickup_day?: number;
-  pickup_start_time?: string;
-  pickup_end_time?: string;
+  pickup_slots: TimeSlot[];
   instructions_for_driver?: string;
 };
 
@@ -61,23 +66,24 @@ export default function CreateDonationPage() {
     trigger,
     setValue,
     getValues,
+    control,
   } = useForm<DonationFormInputs>({
     defaultValues: {
       items: [{ name: '', description: '', quantity: 0.5, allergens: '', displayState: 'editing', image: undefined }],
-      pickup_type: 'specific',
       pickup_date: undefined,
-      pickup_time_only: '',
-      pickup_day: undefined,
-      pickup_start_time: '',
-      pickup_end_time: '',
-      expiry_date: undefined,
+      pickup_slots: [{ start: '', end: '' }],
       instructions_for_driver: ''
     }
   });
 
   const items = watch('items');
   const pickupDateValue = watch('pickup_date');
-  const expiryDateValue = watch('expiry_date');
+
+  // Use useFieldArray for pickup slots
+  const { fields: slotFields, append: appendSlot, remove: removeSlot } = useFieldArray({
+    control,
+    name: "pickup_slots"
+  });
 
   // Fetch profile data on mount
   useEffect(() => {
@@ -181,56 +187,42 @@ export default function CreateDonationPage() {
   const onSubmit = async (data: DonationFormInputs) => {
     setServerError(null);
 
-    // Construct full pickup_time from date and time_only
-    if (!data.pickup_date || !data.pickup_time_only) {
-      setServerError('Pickup date and time must be set.');
-      setStep(2); // Go back to step 2 if missing
-      return;
-    }
-
-    const [hours, minutes] = data.pickup_time_only.split(':').map(Number);
-    const pickupDate = new Date(data.pickup_date);
-    pickupDate.setHours(hours, minutes, 0, 0); // Set time on the selected date
-
-    const finalPickupTimeISO = pickupDate.toISOString();
-
-    const now = new Date();
-    // Validate combined pickupDate
-    const twoWeeksFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-
-     if (!data.expiry_date) { // Keep expiry check for later step
-       setServerError('Expiry date must be set.');
-       // setStep(3); // Go to step 3 when implemented
-       return;
-     }
-
-    if (pickupDate <= now) {
-      setServerError('Pickup time must be in the future.');
+    // Check if date and at least one valid slot are provided
+    if (!data.pickup_date || !data.pickup_slots || data.pickup_slots.length === 0 || !data.pickup_slots[0].start || !data.pickup_slots[0].end) {
+      setServerError('Pickup date and at least one valid time slot (start and end) are required.');
       setStep(2);
       return;
     }
-    
-    if (pickupDate > twoWeeksFromNow) {
-      setServerError('Pickup time must be within 14 days.');
+
+    // Combine date with the START time of the FIRST slot for validation and submission
+    const [startHours, startMinutes] = data.pickup_slots[0].start.split(':').map(Number);
+    const firstPickupDateTime = new Date(data.pickup_date);
+    firstPickupDateTime.setHours(startHours, startMinutes, 0, 0);
+    const finalPickupTimeISO = firstPickupDateTime.toISOString(); // For DB
+
+    const now = new Date();
+    const threeWeeksFromNow = new Date(now.getTime() + 21 * 24 * 60 * 60 * 1000); // Use 21 days
+
+    // Validate using the combined date and time of the first slot
+    if (firstPickupDateTime <= now) {
+      setServerError('First pickup slot must start in the future.');
+      setStep(2);
+      return;
+    }
+    if (firstPickupDateTime > threeWeeksFromNow) {
+      setServerError('Pickup date must be within 3 weeks.');
        setStep(2);
       return;
     }
+    
+    // Log all slots (for potential future use)
+    console.log("Selected Slots:", data.pickup_slots);
+    console.log("Instructions:", data.instructions_for_driver || "None");
 
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
       if (!user) throw new Error('Not authenticated');
-
-      // Log recurring data if selected
-      if (data.pickup_type === 'recurring') {
-        console.log("--- Recurring Pickup Data (Not Saved Yet) ---");
-        console.log("Type:", data.pickup_type);
-        console.log("Day:", data.pickup_day);
-        console.log("Start Time:", data.pickup_start_time);
-        console.log("End Time:", data.pickup_end_time);
-      }
-      // Log instructions
-      console.log("Instructions:", data.instructions_for_driver || "None");
 
       // Insert each item and its donation
       for (const [idx, item] of data.items.entries()) {
@@ -271,7 +263,6 @@ export default function CreateDonationPage() {
               name: item.name,
               description: item.description,
               image_url: item_image_url,
-              expiry_date: new Date(data.expiry_date).toISOString(),
               allergens: item.allergens,
             }
           ])
@@ -288,7 +279,9 @@ export default function CreateDonationPage() {
               donor_id: user.id,
               quantity: item.quantity,
               status: 'available',
-              pickup_time: data.pickup_type === 'specific' ? finalPickupTimeISO : null,
+              pickup_time: finalPickupTimeISO, // Use the combined ISO string of date + first slot start time
+              instructions_for_driver: data.instructions_for_driver,
+              pickup_slots: data.pickup_slots // Save the array of slots
             }
           ]);
         if (insertError) {
@@ -298,7 +291,7 @@ export default function CreateDonationPage() {
       }
 
       reset();
-      router.push('/donate');
+      router.push('/donate/thank-you');
     } catch (err: any) {
       setServerError(err.message || 'An error occurred while creating the donation');
     }
@@ -578,165 +571,154 @@ export default function CreateDonationPage() {
             <>
               <h2 className="text-lg font-semibold mb-4 text-primary">Pickup Scheduling</h2>
               
-              {/* Pickup Type Toggle */}
-              <RadioGroup 
-                defaultValue={watch('pickup_type')} 
-                onValueChange={(value: 'specific' | 'recurring') => setValue('pickup_type', value)} 
-                className="mb-6 grid grid-cols-2 gap-4"
-                disabled={isSubmitting}
-              >
-                <Label 
-                  htmlFor="pickup_specific" 
-                  className={cn(
-                    "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground",
-                    watch('pickup_type') === 'specific' && "border-primary"
-                  )}
-                >
-                  <RadioGroupItem value="specific" id="pickup_specific" className="sr-only" />
-                  Specific Date & Time
-                </Label>
-                 <Label 
-                  htmlFor="pickup_recurring" 
-                   className={cn(
-                    "flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground",
-                    watch('pickup_type') === 'recurring' && "border-primary"
-                  )}
-                 >
-                  <RadioGroupItem value="recurring" id="pickup_recurring" className="sr-only" />
-                  Recurring Weekly
-                </Label>
-              </RadioGroup>
-
-              {/* Conditional Inputs */}
-              {watch('pickup_type') === 'specific' && (
-                <div className="space-y-4 mb-6">
-                  {/* == Specific Date/Time Inputs == */}
-                  {/* Date Picker (Existing Code)*/}
-                  <div>
-                     <label className="block text-label font-semibold text-secondary mb-2">
-                       Pickup Date
-                     </label>
-                     <Popover>
-                       <PopoverTrigger asChild>
-                         <Button
-                           variant={"secondary"}
-                           className={cn(
-                             "w-full justify-start text-left font-normal",
-                             !pickupDateValue && "text-inactive"
-                           )}
-                           disabled={isSubmitting}
-                         >
-                           <CalendarIcon className="mr-2 h-4 w-4" />
-                           {pickupDateValue ? format(pickupDateValue, "PPP") : <span>Pick a date</span>}
-                         </Button>
-                       </PopoverTrigger>
-                       <PopoverContent className="w-auto p-0 bg-white">
-                         <Calendar
-                           mode="single"
-                           selected={pickupDateValue}
-                           onSelect={(date: Date | undefined) => setValue('pickup_date', date, { shouldValidate: true })}
-                           disabled={(date: Date) => date < new Date(new Date().setHours(0, 0, 0, 0)) || date > new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)}
-                           initialFocus
-                         />
-                       </PopoverContent>
-                     </Popover>
-                     {errors.pickup_date && (
-                       <p className="mt-1.5 text-sm text-negative flex items-center gap-1">
-                         <AlertTriangle className="h-4 w-4" /> {errors.pickup_date.message}
-                       </p>
-                     )}
-                  </div>
-                   {/* Time Picker (Existing Code)*/}
-                   <div>
-                    <label htmlFor="pickup_time_only" className="block text-label font-semibold text-secondary mb-2">
-                      Pickup Time
-                    </label>
-                    <Input
-                      id="pickup_time_only"
-                      type="time"
-                      {...register("pickup_time_only")}
-                      error={!!errors.pickup_time_only}
-                      disabled={isSubmitting}
-                    />
-                    {errors.pickup_time_only && (
-                      <p className="mt-1.5 text-sm text-negative flex items-center gap-1">
-                        <AlertTriangle className="h-4 w-4" /> {errors.pickup_time_only.message}
-                      </p>
-                    )}
-                  </div>
-                 </div>
-              )}
-
-              {watch('pickup_type') === 'recurring' && (
-                <div className="space-y-4 mb-6">
-                   {/* == Recurring Weekly Inputs == */}
-                  <h3 className="text-md font-medium text-secondary">Select Day and Time Window</h3>
-                  {/* Day Buttons */}
-                  <div>
-                    <label className="block text-label font-semibold text-secondary mb-2">Day of Week</label>
-                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
-                        const dayValue = index + 1; // Assuming 1=Mon, 7=Sun - adjust if needed
-                        const isSelected = watch('pickup_day') === dayValue;
-                        return (
-                           <Button
-                            key={day}
-                            type="button"
-                            variant={isSelected ? 'primary' : 'secondary'}
-                            size="sm"
-                            onClick={() => setValue('pickup_day', dayValue, { shouldValidate: true })}
-                            disabled={isSubmitting}
-                          >
-                            {day}
-                          </Button>
-                        );
-                      })}
+              <div className="space-y-6 mb-6"> {/* Increased spacing */}
+                {/* Date Picker (Existing Code)*/}
+                <div>
+                   <label className="block text-label font-semibold text-secondary mb-2">
+                     Pickup Date
+                   </label>
+                   <Popover>
+                     <PopoverTrigger asChild>
+                       <Button
+                         variant={"secondary"}
+                         className={cn(
+                           "w-full justify-start text-left font-normal",
+                           !pickupDateValue && "text-inactive"
+                         )}
+                         disabled={isSubmitting}
+                       >
+                         <CalendarIcon className="mr-2 h-4 w-4" />
+                         {pickupDateValue ? format(pickupDateValue, "PPP") : <span>Pick a date</span>}
+                       </Button>
+                     </PopoverTrigger>
+                     <PopoverContent className="w-auto p-0 bg-white">
+                       <Calendar
+                         mode="single"
+                         selected={pickupDateValue}
+                         onSelect={(date: Date | undefined) => setValue('pickup_date', date, { shouldValidate: true })}
+                         disabled={(date: Date) => date < new Date(new Date().setHours(0, 0, 0, 0)) || date > new Date(Date.now() + 21 * 24 * 60 * 60 * 1000)}
+                         initialFocus
+                       />
+                     </PopoverContent>
+                   </Popover>
+                   {errors.pickup_date && (
+                     <p className="mt-1.5 text-sm text-negative flex items-center gap-1">
+                       <AlertTriangle className="h-4 w-4" /> {errors.pickup_date.message}
+                     </p>
+                   )}
+                </div>
+                 
+                {/* Time Slots Section */}
+                <div>
+                  <TooltipProvider>
+                    <div className="flex items-center gap-1 mb-3">
+                     <label className="block text-label font-semibold text-secondary">Available Time Slots</label>
+                     <Tooltip>
+                       <TooltipTrigger asChild>
+                         <Info className="h-3.5 w-3.5 text-inactive cursor-help" />
+                       </TooltipTrigger>
+                       <TooltipContent>
+                         <p className="text-xs">Start time must be between 7am-10pm.<br/>Slots cannot exceed 4 hours.</p>
+                       </TooltipContent>
+                     </Tooltip>
                     </div>
-                    {errors.pickup_day && (
-                      <p className="mt-1.5 text-sm text-negative flex items-center gap-1">
-                        <AlertTriangle className="h-4 w-4" /> {errors.pickup_day.message}
-                      </p>
-                    )}
-                  </div>
-                   {/* Time Range Inputs */}
-                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                       <label htmlFor="pickup_start_time" className="block text-label font-semibold text-secondary mb-2">
-                         Start Time
-                       </label>
-                       <Input
-                         id="pickup_start_time"
-                         type="time"
-                         {...register("pickup_start_time")}
-                         error={!!errors.pickup_start_time}
-                         disabled={isSubmitting}
-                       />
-                       {errors.pickup_start_time && (
-                        <p className="mt-1.5 text-sm text-negative flex items-center gap-1">
-                          <AlertTriangle className="h-4 w-4" /> {errors.pickup_start_time.message}
-                        </p>
-                       )}
+                     <div className="space-y-4">
+                      {slotFields.map((field, index) => (
+                        <div key={field.id} className="flex items-end gap-2 p-3 border rounded-lg bg-cream/30">
+                          <div className="flex-1">
+                             <label htmlFor={`pickup_slots.${index}.start`} className="block text-xs font-medium text-secondary mb-1">Start Time</label>
+                            <Input
+                              id={`pickup_slots.${index}.start`}
+                              type="time"
+                              {...register(`pickup_slots.${index}.start`, { 
+                                required: "Start time required",
+                                validate: (startTime) => {
+                                  if (!startTime) return true; // Don't validate if empty
+                                  const [startH, startM] = startTime.split(':').map(Number);
+                                  const startMinutes = startH * 60 + startM;
+                                  
+                                  if (startMinutes < 7 * 60) { // Before 7:00 AM
+                                    return "Start time cannot be before 7:00 AM";
+                                  }
+                                  if (startMinutes > 22 * 60) { // After 10:00 PM
+                                    return "Start time cannot be after 10:00 PM";
+                                  }
+                                  return true; // Validation passed
+                                }
+                              })}
+                              error={!!errors.pickup_slots?.[index]?.start}
+                              disabled={isSubmitting}
+                              className="py-2"
+                            />
+                            {errors.pickup_slots?.[index]?.start && (
+                              <p className="mt-1 text-xs text-negative flex items-center gap-1"><AlertTriangle className="h-3 w-3"/> {errors.pickup_slots[index]?.start?.message}</p>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                             <label htmlFor={`pickup_slots.${index}.end`} className="block text-xs font-medium text-secondary mb-1">End Time</label>
+                            <Input
+                              id={`pickup_slots.${index}.end`}
+                              type="time"
+                              {...register(`pickup_slots.${index}.end`, { 
+                                required: "End time required",
+                                validate: (endTime) => {
+                                  const startTime = getValues(`pickup_slots.${index}.start`);
+                                  if (!startTime || !endTime) return true; // Don't validate if either is missing
+                                  
+                                  const [startH, startM] = startTime.split(':').map(Number);
+                                  const [endH, endM] = endTime.split(':').map(Number);
+
+                                  const startMinutes = startH * 60 + startM;
+                                  const endMinutes = endH * 60 + endM;
+
+                                  if (endMinutes <= startMinutes) {
+                                    return "End time must be after start time";
+                                  }
+
+                                  if (endMinutes > startMinutes + 4 * 60) { // 4 hours = 240 minutes
+                                    return "Slot duration cannot exceed 4 hours";
+                                  }
+                                  
+                                  return true; // Validation passed
+                                }
+                               })}
+                              error={!!errors.pickup_slots?.[index]?.end}
+                              disabled={isSubmitting}
+                              className="py-2"
+                            />
+                            {errors.pickup_slots?.[index]?.end && (
+                               <p className="mt-1 text-xs text-negative flex items-center gap-1"><AlertTriangle className="h-3 w-3"/> {errors.pickup_slots[index]?.end?.message}</p>
+                             )}
+                           </div>
+                           {slotFields.length > 1 && (
+                             <Button 
+                               type="button" 
+                               variant="ghost" 
+                               size="sm"
+                               className="text-negative hover:bg-negative/10 p-1 h-auto self-center mb-1"
+                               onClick={() => removeSlot(index)}
+                               disabled={isSubmitting}
+                               aria-label="Remove time slot"
+                             >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                           )}
+                          </div>
+                       ))}
                      </div>
-                     <div>
-                       <label htmlFor="pickup_end_time" className="block text-label font-semibold text-secondary mb-2">
-                         End Time
-                       </label>
-                       <Input
-                         id="pickup_end_time"
-                         type="time"
-                         {...register("pickup_end_time")}
-                         error={!!errors.pickup_end_time}
-                         disabled={isSubmitting}
-                       />
-                       {errors.pickup_end_time && (
-                        <p className="mt-1.5 text-sm text-negative flex items-center gap-1">
-                          <AlertTriangle className="h-4 w-4" /> {errors.pickup_end_time.message}
-                        </p>
-                       )}
-                     </div>
-                   </div>
-                 </div>
-              )}
+                   </TooltipProvider>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-3 text-sm"
+                    onClick={() => appendSlot({ start: '', end: '' })}
+                    disabled={isSubmitting || slotFields.length >= 6}
+                  >
+                    + Add another time slot
+                  </Button>
+                </div>
+               </div>
 
               {/* Navigation Buttons (Existing Code) */}
               <div className="flex justify-between gap-2 pt-4">
@@ -751,7 +733,12 @@ export default function CreateDonationPage() {
                  <Button
                    type="button"
                    variant="primary"
-                   onClick={() => setStep(3)}
+                   onClick={async () => {
+                     const isValid = await trigger(["pickup_date", "pickup_slots"]);
+                     if (isValid) {
+                       setStep(3);
+                     }
+                   }}
                    disabled={isSubmitting}
                  >
                   Next
@@ -773,105 +760,74 @@ export default function CreateDonationPage() {
                    </ul>
                  </div>
 
-                {/* Pickup Summary */}
+                {/* Pickup Summary - Updated */}
                 <div className="p-4 rounded-lg border bg-cream/50">
                   <h3 className="text-md font-semibold mb-2 text-primary">Pickup Schedule</h3>
-                  {watch('pickup_type') === 'specific' ? (
-                    <p className="text-sm text-secondary">
-                      {pickupDateValue ? format(pickupDateValue, "PPP") : "No date"} at {watch('pickup_time_only') || "No time"}
-                    </p>
-                  ) : (
-                     <p className="text-sm text-secondary">
-                      Every {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][watch('pickup_day') || 0]} 
-                      between {watch('pickup_start_time') || "??"} and {watch('pickup_end_time') || "??"}
-                     </p>
-                  )}
+                  <p className="text-sm text-secondary mb-1">
+                    Date: {pickupDateValue ? format(pickupDateValue, "PPP") : "No date selected"}
+                  </p>
+                  <p className="text-sm text-secondary mb-1">Time Slots:</p>
+                  <ul className="space-y-1 list-disc list-inside ml-4 text-sm text-secondary">
+                    {watch('pickup_slots').map((slot, index) => (
+                      <li key={index}>
+                        {slot.start || "--:--"} - {slot.end || "--:--"}
+                      </li>
+                    ))}
+                    {watch('pickup_slots').length === 0 && <li>No time slots selected</li>}
+                  </ul>
                 </div>
 
-                {/* Expiry Date */} 
+                {/* Address */} 
                 <div>
-                  <label className="block text-label font-semibold text-secondary mb-2">
-                     Expiry Date (Last day item is usable)
+                  <label className="block text-label font-semibold text-secondary mb-1">Pickup Address</label>
+                 {loadingProfile ? (
+                   <p className="text-sm text-secondary italic">Loading address...</p>
+                 ) : profile?.address ? (
+                   <p className="text-sm text-primary bg-cream/50 p-3 rounded-md border">
+                      {profile.address}
+                   </p>
+                 ) : (
+                   <p className="text-sm text-negative italic">No address found on profile.</p>
+                 )}
+                  <Button 
+                    variant="ghost"
+                    size="sm" 
+                    className="text-xs h-auto p-0 mt-1 text-primary underline hover:text-primary/80"
+                   >
+                   <a href="/profile" target="_blank" className="block w-full h-full">Edit Address in Profile</a>
+                 </Button>
+                </div>
+
+                {/* Instructions */}
+                <div>
+                  <label htmlFor="instructions_for_driver" className="block text-label font-semibold text-secondary mb-2">
+                    Instructions for Driver (Optional)
                   </label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"secondary"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !expiryDateValue && "text-inactive"
-                        )}
-                        disabled={isSubmitting}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {expiryDateValue instanceof Date ? format(expiryDateValue, "PPP") : <span>Pick expiry date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 bg-white">
-                      <Calendar
-                        mode="single"
-                        selected={expiryDateValue}
-                        onSelect={(date: Date | undefined) => setValue('expiry_date', date)}
-                        disabled={(date: Date): boolean => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                   {/* Error display likely needs update if type changes */}
-                   {/* {errors.expiry_date && (...)} */}
-                 </div>
-
-                 {/* Address */} 
-                 <div>
-                   <label className="block text-label font-semibold text-secondary mb-1">Pickup Address</label>
-                  {loadingProfile ? (
-                    <p className="text-sm text-secondary italic">Loading address...</p>
-                  ) : profile?.address ? (
-                    <p className="text-sm text-primary bg-cream/50 p-3 rounded-md border">
-                       {profile.address}
-                    </p>
-                  ) : (
-                    <p className="text-sm text-negative italic">No address found on profile.</p>
+                  <Textarea
+                    id="instructions_for_driver"
+                    placeholder="e.g., Use the back entrance, call upon arrival, specific parking info..."
+                    rows={3}
+                    {...register("instructions_for_driver")}
+                    error={!!errors.instructions_for_driver}
+                    disabled={isSubmitting}
+                  />
+                  {errors.instructions_for_driver && (
+                   <p className="mt-1.5 text-sm text-negative flex items-center gap-1">
+                     <AlertTriangle className="h-4 w-4" /> {errors.instructions_for_driver.message}
+                   </p>
                   )}
-                   <Button 
-                     variant="ghost"
-                     size="sm" 
-                     className="text-xs h-auto p-0 mt-1 text-primary underline hover:text-primary/80"
-                    >
-                    <a href="/profile" target="_blank" className="block w-full h-full">Edit Address in Profile</a>
-                  </Button>
-                 </div>
-
-                 {/* Instructions */}
-                 <div>
-                   <label htmlFor="instructions_for_driver" className="block text-label font-semibold text-secondary mb-2">
-                     Instructions for Driver (Optional)
-                   </label>
-                   <Textarea
-                     id="instructions_for_driver"
-                     placeholder="e.g., Use the back entrance, call upon arrival, specific parking info..."
-                     rows={3}
-                     {...register("instructions_for_driver")}
-                     error={!!errors.instructions_for_driver}
-                     disabled={isSubmitting}
-                   />
-                   {errors.instructions_for_driver && (
-                    <p className="mt-1.5 text-sm text-negative flex items-center gap-1">
-                      <AlertTriangle className="h-4 w-4" /> {errors.instructions_for_driver.message}
-                    </p>
-                   )}
-                 </div>
-               </div>
+                </div>
+              </div>
 
               {/* Navigation Buttons */}
               <div className="flex justify-between gap-2 pt-4">
                 <Button type="button" variant="secondary" onClick={() => setStep(2)} disabled={isSubmitting}>Back</Button>
                 {/* Final Submit Button - For now, let's just use the existing onSubmit */}
                  <Button 
-                   type="submit" // Change type to submit
+                   type="submit"
                    variant="primary" 
-                   disabled={isSubmitting || loadingProfile} // Disable while loading profile too
-                   onClick={handleSubmit(onSubmit)} // Trigger RHF submit
+                   disabled={isSubmitting || loadingProfile}
+                   onClick={handleSubmit(onSubmit)}
                   >
                    {isSubmitting ? "Submitting..." : "Submit Donation"}
                  </Button>

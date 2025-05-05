@@ -13,7 +13,6 @@ type DonationFeed = {
     name: string;
     description: string;
     image_url: string | null;
-    expiry_date: string;
   };
   quantity: number;
   status: string;
@@ -58,8 +57,7 @@ export default function FeedPage(): React.ReactElement {
           food_item:food_items!inner(
             name,
             description,
-            image_url,
-            expiry_date
+            image_url
           ),
           donor:profiles!donations_donor_id_fkey!inner(
             organization_name,
@@ -146,10 +144,6 @@ export default function FeedPage(): React.ReactElement {
                   <div className="mt-4 space-y-2">
                     <p className="text-sm text-primary-75">
                       <span className="font-medium text-primary">Quantity:</span> {donation.quantity}
-                    </p>
-                    <p className="text-sm text-primary-75">
-                      <span className="font-medium text-primary">Expires:</span>{' '}
-                      {new Date(donation.food_item.expiry_date).toLocaleDateString()}
                     </p>
                     <p className="text-sm text-primary-75">
                       <span className="font-medium text-primary">Donor:</span>{' '}

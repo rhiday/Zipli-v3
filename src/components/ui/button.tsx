@@ -16,7 +16,7 @@ const button = cva(
       size: {
         sm: "h-8 px-3 text-label rounded-sm",
         md: "px-6 py-3 text-bodyLg",
-        lg: "h-[46px] w-[110px] px-6 text-bodyLg rounded-md"
+        lg: "h-[46px] px-6 text-bodyLg"
       }
     },
     defaultVariants: { variant: "primary", size: "md" }

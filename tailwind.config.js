@@ -9,6 +9,7 @@ module.exports = {
   		 * ───────────────────────────────────────── */
   		colors: {
   			primary:  { DEFAULT: '#021d13',  50:'#021d1399',  75:'#021d13cc' },
+  			'primary-foreground': '#ffffff',
   			earth:    '#024209',
   			lime:     '#18e170',
   			cream:    '#f5f9ef',
@@ -22,6 +23,8 @@ module.exports = {
   			secondary: '#021d13cc', // primary @ 80% opacity
   			tertiary:  '#021d1399', // primary @ 60% opacity
   			interactive: '#024209', // Same as earth
+  			accent: '#f5f9ef',
+  			'accent-foreground': '#021d13',
 
   			positive: {
   				DEFAULT: '#a6f175',

@@ -60,9 +60,6 @@ const DonationCard: React.FC<DonationCardProps> = ({ donation, onClick }) => {
         <p className="text-caption text-primary-75 mb-2 line-clamp-2">
           {donation.food_item.description}
         </p>
-        <p className="text-caption text-primary-50">
-          Expires: {new Date(donation.food_item.expiry_date).toLocaleDateString()}
-        </p>
       </div>
     </div>
   );

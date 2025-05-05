@@ -97,8 +97,7 @@ export default function DonorDashboardPage(): React.ReactElement {
           food_item:food_items!inner(
             name,
             description,
-            image_url,
-            expiry_date
+            image_url
           )
         `)
         .eq('donor_id', user.id)
