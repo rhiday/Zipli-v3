@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import BottomNav from '@/components/BottomNav';
-import { ArrowRight, ChevronRight, Languages, MessageSquare, Info, ChevronDown, UserCircle } from 'lucide-react';
+import { ArrowRight, ChevronRight, Languages, MessageSquare, Info, ChevronDown, UserCircle, PlusIcon } from 'lucide-react';
 import { Profile } from '@/lib/supabase/types';
 import DonationCard from '@/components/donations/DonationCard';
 import Header from '@/components/layout/Header';
@@ -212,6 +212,20 @@ export default function DonorDashboardPage(): React.ReactElement {
                 <p className="text-sm text-muted-foreground">Environmental and social impact data for reporting, and operation planning.</p>
            </div>
            <ArrowRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+        </section>
+
+        {/* Create New Request Section */}
+        <section
+          onClick={() => router.push('/request/new')}
+          role="button"
+          tabIndex={0}
+          className="rounded-xl border border-border bg-base p-4 flex items-center justify-between cursor-pointer hover:bg-muted/50"
+        >
+           <div className="flex-1 mr-4">
+                <h3 className="text-base font-semibold text-primary mb-1">Create Food Request</h3>
+                <p className="text-sm text-muted-foreground">Need specific items? Let others know what you're looking for.</p>
+           </div>
+           <PlusIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
         </section>
 
         <section>

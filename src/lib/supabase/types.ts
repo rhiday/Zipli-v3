@@ -274,7 +274,7 @@ export const Constants = {
   public: {
     Enums: {
       donation_status: ["available", "claimed", "picked_up", "cancelled"],
-      user_role: ["food_donor", "food_receiver", "city", "terminals"],
+      user_role: ["food_donor", "city", "terminals"],
     },
   },
 } as const

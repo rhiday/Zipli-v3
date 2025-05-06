@@ -149,7 +149,6 @@ export default function RegisterPage() {
                   className="mt-1 block w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</option>
-                  <option value="food_receiver">Food Receiver (Community Kitchens, Churches, Charities)</option>
                   <option value="terminals">Food Terminals (Large-scale Food Processing Centers)</option>
                   <option value="city">City Administration</option>
                 </select>
