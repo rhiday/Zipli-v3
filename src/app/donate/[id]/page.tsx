@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { ChevronLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { Donation, FoodItem } from '@/lib/supabase/types';
 import { DonationWithFoodItemResponse } from '@/lib/supabase/responses';
@@ -122,7 +123,17 @@ export default function DonationDetailPage(): React.ReactElement {
     <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-3xl space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-titleMd font-display text-primary">Donation Details</h1>
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              onClick={() => router.back()} 
+              className="mr-2 p-2 h-9 w-9 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center"
+              aria-label="Go back"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-titleMd font-display text-primary">Donation Details</h1>
+          </div>
           <Button
             onClick={() => router.push('/donate')}
             variant="secondary"

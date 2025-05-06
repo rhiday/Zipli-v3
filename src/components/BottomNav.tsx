@@ -6,14 +6,15 @@ import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutGrid, Plus, Search, ShoppingBag, FileText, ClipboardList } from 'lucide-react'; // Added ClipboardList
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose, // Added DialogClose
-} from "@/components/ui/dialog"
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
 import { Button } from '@/components/ui/button';
 
 // TODO: Define proper navigation items based on user role
@@ -46,13 +47,14 @@ export default function BottomNav() {
     const isActive = pathname === item.href && !item.isCentral;
     if (item.isCentral) {
       return (
-        <Dialog key={item.label}>
-          <DialogTrigger asChild>
+        <Drawer key={item.label}>
+          <DrawerTrigger asChild>
             <button
               className={cn(
                 'group inline-flex flex-col items-center justify-center text-center w-full',
                 '-mt-8' 
               )}
+              aria-label={item.label}
             >
               <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-lime text-primary shadow-md group-hover:bg-lime/90">
                 <item.icon className="h-7 w-7" aria-hidden="true" />
@@ -61,17 +63,17 @@ export default function BottomNav() {
                 {item.label}
               </span>
             </button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle className="text-center text-lg font-semibold text-primary">What would you like to do?</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <DialogClose asChild>
+          </DrawerTrigger>
+          <DrawerContent className="bg-base">
+            <DrawerHeader className="text-center">
+              <DrawerTitle className="text-lg font-semibold text-primary">What would you like to do?</DrawerTitle>
+            </DrawerHeader>
+            <div className="grid gap-3 p-4">
+              <DrawerClose asChild>
                 <Button 
                   variant="secondary" 
                   size="lg" 
-                  className="w-full justify-start py-6 text-left" 
+                  className="w-full justify-start py-5 text-left"
                   onClick={() => router.push('/donate/new')}
                 >
                   <ShoppingBag className="mr-3 h-5 w-5 text-primary" />
@@ -80,12 +82,12 @@ export default function BottomNav() {
                     <p className="text-xs text-secondary">Offer food items to others.</p>
                   </div>
                 </Button>
-              </DialogClose>
-              <DialogClose asChild>
+              </DrawerClose>
+              <DrawerClose asChild>
                 <Button 
                   variant="secondary" 
                   size="lg" 
-                  className="w-full justify-start py-6 text-left" 
+                  className="w-full justify-start py-5 text-left"
                   onClick={() => router.push('/request/new')}
                 >
                   <FileText className="mr-3 h-5 w-5 text-primary" />
@@ -94,10 +96,15 @@ export default function BottomNav() {
                     <p className="text-xs text-secondary">Create a request for specific items.</p>
                   </div>
                 </Button>
-              </DialogClose>
+              </DrawerClose>
             </div>
-          </DialogContent>
-        </Dialog>
+            <DrawerFooter className="pt-2">
+              <DrawerClose asChild>
+                <Button variant="ghost" size="sm">Cancel</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
       );
     }
     // Regular nav items

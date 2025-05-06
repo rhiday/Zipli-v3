@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { AlertTriangle, Camera, Trash2, Pencil, Plus, Minus, CalendarIcon, Info } from 'lucide-react';
+import { AlertTriangle, Camera, Trash2, Pencil, Plus, Minus, CalendarIcon, Info, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -321,8 +321,20 @@ export default function CreateDonationPage() {
   return (
     <div className="min-h-screen bg-base p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-lg">
+        <div className="px-2 md:px-4 mb-6 flex items-center">
+          <Button 
+            variant="ghost" 
+            onClick={() => router.back()} 
+            className="mr-2 p-2 h-9 w-9 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center"
+            aria-label="Go back"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-titleMd font-display text-primary">
+            Create New Donation
+          </h1>
+        </div>
         <div className="px-6">
-          <h1 className="mb-8 text-titleMd font-display text-primary text-left">Create New Donation</h1>
           <div className="w-full">
             <ProgressBar step={step} total={totalSteps} />
           </div>

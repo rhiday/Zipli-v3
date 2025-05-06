@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import { ChevronLeft } from 'lucide-react';
 
 export default function CreateRequestPage() {
   const router = useRouter();
@@ -68,7 +69,19 @@ export default function CreateRequestPage() {
   return (
     <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-2xl rounded-lg bg-base p-6 md:p-8 shadow">
-        <h1 className="mb-6 text-titleMd font-display text-primary">Create Food Request</h1>
+        <div className="mb-6 flex items-center">
+          <Button 
+            variant="ghost" 
+            onClick={() => router.back()} 
+            className="mr-2 p-2 h-9 w-9 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center"
+            aria-label="Go back"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-titleMd font-display text-primary">
+            Create Food Request
+          </h1>
+        </div>
 
         {error && (
           <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">

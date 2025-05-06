@@ -54,7 +54,7 @@ export default function DesktopGlobalNavbar() {
                     <item.icon className={cn('h-6 w-6')} aria-hidden="true" />
                   </button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md bg-base">
                   <DialogHeader>
                     <DialogTitle className="text-center text-lg font-semibold text-primary">What would you like to do?</DialogTitle>
                   </DialogHeader>

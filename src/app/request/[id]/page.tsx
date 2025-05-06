@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { UsersIcon, CalendarIcon, ClockIcon, CheckIcon, XIcon } from 'lucide-react';
+import { UsersIcon, CalendarIcon, ClockIcon, CheckIcon, XIcon, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type RequestDetail = {
@@ -136,13 +136,19 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
   return (
     <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-3xl space-y-6">
-        <Button
-          onClick={() => router.back()}
-          variant="secondary"
-          size="sm"
-        >
-          ← Back
-        </Button>
+        <div className="mb-6 flex items-center">
+          <Button 
+            variant="ghost" 
+            onClick={() => router.back()} 
+            className="mr-2 p-2 h-9 w-9 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center"
+            aria-label="Go back"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-titleMd font-display text-primary">
+            Request Details
+          </h1>
+        </div>
 
         {error && !loading && (
           <div className="rounded-md bg-rose/10 p-4 text-body text-negative">
