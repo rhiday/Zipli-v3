@@ -627,27 +627,25 @@ export default function CreateDonationPage() {
                         <div key={field.id} className="flex items-end gap-2 p-3 border rounded-lg bg-cream/30">
                           <div className="flex-1">
                              <label htmlFor={`pickup_slots.${index}.start`} className="block text-xs font-medium text-secondary mb-1">Start Time</label>
-                            <Input
+                            <input
                               id={`pickup_slots.${index}.start`}
                               type="time"
                               {...register(`pickup_slots.${index}.start`, { 
                                 required: "Start time required",
                                 validate: (startTime) => {
-                                  if (!startTime) return true; // Don't validate if empty
+                                  if (!startTime) return true;
                                   const [startH, startM] = startTime.split(':').map(Number);
                                   const startMinutes = startH * 60 + startM;
-                                  
-                                  if (startMinutes < 7 * 60) { // Before 7:00 AM
-                                    return "Start time cannot be before 7:00 AM";
-                                  }
-                                  if (startMinutes > 22 * 60) { // After 10:00 PM
-                                    return "Start time cannot be after 10:00 PM";
-                                  }
-                                  return true; // Validation passed
+                                  if (startMinutes < 7 * 60) { return "Start time cannot be before 7:00 AM"; }
+                                  if (startMinutes > 22 * 60) { return "Start time cannot be after 10:00 PM"; }
+                                  return true;
                                 }
                               })}
-                              error={!!errors.pickup_slots?.[index]?.start}
                               disabled={isSubmitting}
+                              className={cn(
+                                "w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30", // Basic styling
+                                errors.pickup_slots?.[index]?.start ? "border-negative" : "border-border" // Error border
+                              )}
                             />
                             {errors.pickup_slots?.[index]?.start && (
                               <p className="mt-1 text-xs text-negative flex items-center gap-1"><AlertTriangle className="h-3 w-3"/> {errors.pickup_slots[index]?.start?.message}</p>
@@ -655,34 +653,28 @@ export default function CreateDonationPage() {
                           </div>
                           <div className="flex-1">
                              <label htmlFor={`pickup_slots.${index}.end`} className="block text-xs font-medium text-secondary mb-1">End Time</label>
-                            <Input
+                            <input
                               id={`pickup_slots.${index}.end`}
                               type="time"
                               {...register(`pickup_slots.${index}.end`, { 
                                 required: "End time required",
                                 validate: (endTime) => {
                                   const startTime = getValues(`pickup_slots.${index}.start`);
-                                  if (!startTime || !endTime) return true; // Don't validate if either is missing
-                                  
+                                  if (!startTime || !endTime) return true;
                                   const [startH, startM] = startTime.split(':').map(Number);
                                   const [endH, endM] = endTime.split(':').map(Number);
-
                                   const startMinutes = startH * 60 + startM;
                                   const endMinutes = endH * 60 + endM;
-
-                                  if (endMinutes <= startMinutes) {
-                                    return "End time must be after start time";
-                                  }
-
-                                  if (endMinutes > startMinutes + 4 * 60) { // 4 hours = 240 minutes
-                                    return "Slot duration cannot exceed 4 hours";
-                                  }
-                                  
-                                  return true; // Validation passed
+                                  if (endMinutes <= startMinutes) { return "End time must be after start time"; }
+                                  if (endMinutes > startMinutes + 4 * 60) { return "Slot duration cannot exceed 4 hours"; }
+                                  return true;
                                 }
                                })}
-                              error={!!errors.pickup_slots?.[index]?.end}
                               disabled={isSubmitting}
+                              className={cn(
+                                "w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30", // Basic styling
+                                errors.pickup_slots?.[index]?.end ? "border-negative" : "border-border" // Error border
+                              )}
                             />
                             {errors.pickup_slots?.[index]?.end && (
                                <p className="mt-1 text-xs text-negative flex items-center gap-1"><AlertTriangle className="h-3 w-3"/> {errors.pickup_slots[index]?.end?.message}</p>
