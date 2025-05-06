@@ -23,6 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { logger } from '../../../../lib/logger';
 
 type ItemInput = {
   name: string;
@@ -88,6 +89,7 @@ export default function CreateDonationPage() {
   // Fetch profile data on mount
   useEffect(() => {
     const fetchProfile = async () => {
+      logger.debug('Attempting to fetch user profile for donation form.');
       setLoadingProfile(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -98,12 +100,14 @@ export default function CreateDonationPage() {
           .single();
         
         if (error) {
-          console.error('Error fetching profile:', error);
+          logger.error('Error fetching profile in donation form:', error, { userId: user.id });
           setServerError('Could not load profile data.');
         } else {
+          logger.debug('Profile data fetched successfully:', data);
           setProfile(data);
         }
       } else {
+        logger.warn('User not authenticated when trying to fetch profile for donation form.');
         setServerError('Not authenticated.'); // Should not happen if page is protected
       }
       setLoadingProfile(false);
@@ -185,7 +189,10 @@ export default function CreateDonationPage() {
   };
 
   const onSubmit = async (data: DonationFormInputs) => {
+    // Log a summary of the data, avoiding large FileList objects directly
+    logger.debug('Donation form onSubmit triggered. Items count:', data.items.length, 'Pickup date selected:', !!data.pickup_date, 'Slots count:', data.pickup_slots.length);
     setServerError(null);
+    let userIdForLog: string | undefined = 'N/A'; // Variable to hold user ID for logging in catch block
 
     // Check if date and at least one valid slot are provided
     if (!data.pickup_date || !data.pickup_slots || data.pickup_slots.length === 0 || !data.pickup_slots[0].start || !data.pickup_slots[0].end) {
@@ -223,6 +230,9 @@ export default function CreateDonationPage() {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
       if (!user) throw new Error('Not authenticated');
+      userIdForLog = user.id; // Assign user ID once authenticated
+      
+      logger.debug('Authenticated user for donation submission:', user.id);
 
       // Insert each item and its donation
       for (const [idx, item] of data.items.entries()) {
@@ -285,14 +295,21 @@ export default function CreateDonationPage() {
             }
           ]);
         if (insertError) {
-          console.error("Error inserting into donations:", insertError);
+          logger.error("Error inserting into donations table:", insertError, { food_item_id: foodItem.id, donor_id: user.id });
           throw insertError;
         }
       }
 
+      logger.info('Donation submitted successfully by user:', user.id, { itemCount: data.items.length });
       reset();
       router.push('/donate/thank-you');
     } catch (err: any) {
+      logger.error('Error during donation submission process:', {
+        message: err.message,
+        stack: err.stack, // Stack can be verbose, consider removing in production if too noisy
+        userId: userIdForLog, // Use the user ID captured from the try block
+        dataSummary: { itemCount: data.items.length, hasPickupDate: !!data.pickup_date, slotCount: data.pickup_slots.length }
+      });
       setServerError(err.message || 'An error occurred while creating the donation');
     }
   };
