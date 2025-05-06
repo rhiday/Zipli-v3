@@ -648,7 +648,6 @@ export default function CreateDonationPage() {
                               })}
                               error={!!errors.pickup_slots?.[index]?.start}
                               disabled={isSubmitting}
-                              className="py-2"
                             />
                             {errors.pickup_slots?.[index]?.start && (
                               <p className="mt-1 text-xs text-negative flex items-center gap-1"><AlertTriangle className="h-3 w-3"/> {errors.pickup_slots[index]?.start?.message}</p>
@@ -684,7 +683,6 @@ export default function CreateDonationPage() {
                                })}
                               error={!!errors.pickup_slots?.[index]?.end}
                               disabled={isSubmitting}
-                              className="py-2"
                             />
                             {errors.pickup_slots?.[index]?.end && (
                                <p className="mt-1 text-xs text-negative flex items-center gap-1"><AlertTriangle className="h-3 w-3"/> {errors.pickup_slots[index]?.end?.message}</p>
