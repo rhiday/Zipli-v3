@@ -643,8 +643,8 @@ export default function CreateDonationPage() {
                               })}
                               disabled={isSubmitting}
                               className={cn(
-                                "w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30", // Basic styling
-                                errors.pickup_slots?.[index]?.start ? "border-negative" : "border-border" // Error border
+                                "w-full p-2 border rounded-md", // Minimal styling: width, padding, border, rounding
+                                errors.pickup_slots?.[index]?.start ? "border-negative" : "border-gray-300" 
                               )}
                             />
                             {errors.pickup_slots?.[index]?.start && (
@@ -672,8 +672,8 @@ export default function CreateDonationPage() {
                                })}
                               disabled={isSubmitting}
                               className={cn(
-                                "w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30", // Basic styling
-                                errors.pickup_slots?.[index]?.end ? "border-negative" : "border-border" // Error border
+                                "w-full p-2 border rounded-md", // Minimal styling: width, padding, border, rounding
+                                errors.pickup_slots?.[index]?.end ? "border-negative" : "border-gray-300"
                               )}
                             />
                             {errors.pickup_slots?.[index]?.end && (
