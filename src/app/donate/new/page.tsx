@@ -71,7 +71,7 @@ export default function CreateDonationPage() {
     defaultValues: {
       items: [{ name: '', description: '', quantity: 0.5, allergens: '', displayState: 'editing', image: undefined }],
       pickup_date: undefined,
-      pickup_slots: [{ start: '', end: '' }],
+      pickup_slots: [{ start: '09:00', end: '10:00' }],
       instructions_for_driver: ''
     }
   });
