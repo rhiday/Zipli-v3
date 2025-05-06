@@ -394,61 +394,26 @@ export default function CreateDonationPage() {
                           <label htmlFor={`items.${idx}.quantity`} className="block text-label font-semibold text-secondary mb-2">
                             Quantity (kg)
                           </label>
-                          {/* Combine Counter and Presets into one flex row */}
-                          <div className="flex items-center gap-4 mt-1"> {/* Increased gap */} 
-                            {/* Counter Part */}
-                            <div className="flex items-center gap-2"> 
-                              <Button 
-                                type="button" 
-                                variant="secondary" 
-                                size="sm" 
-                                className="px-2" 
-                                onClick={() => {
-                                  const currentVal = getValues(`items.${idx}.quantity`);
-                                  if (currentVal > 0.5) {
-                                    setValue(`items.${idx}.quantity`, currentVal - 0.5);
-                                  }
-                                }}
-                                disabled={isSubmitting || watch(`items.${idx}.quantity`) <= 0.5}
-                                aria-label="Decrease quantity"
-                              >
-                                <Minus className="h-4 w-4" />
-                              </Button>
-                              <span className="text-bodyLg font-medium text-primary w-12 text-center">
-                                 {watch(`items.${idx}.quantity`)} kg
-                              </span>
-                               <Button 
-                                type="button" 
-                                variant="secondary" 
-                                size="sm" 
-                                className="px-2" 
-                                onClick={() => {
-                                  const currentVal = getValues(`items.${idx}.quantity`);
-                                  setValue(`items.${idx}.quantity`, currentVal + 0.5);
-                                }}
-                                disabled={isSubmitting}
-                                aria-label="Increase quantity"
-                              >
-                                <Plus className="h-4 w-4" />
-                              </Button>
-                             </div>
-                             {/* Preset Buttons Part */}
-                             <div className="flex items-center gap-2"> 
-                               {[2, 5, 10].map((amount) => (
-                                 <Button
-                                   key={amount}
-                                   type="button"
-                                   variant="secondary"
-                                   size="sm"
-                                   className="text-xs h-6 px-2"
-                                   onClick={() => setValue(`items.${idx}.quantity`, amount)}
-                                   disabled={isSubmitting}
-                                 >
-                                   {amount} kg
-                                 </Button>
-                               ))}
-                             </div>
-                           </div>
+                          {/* New simple number input for quantity */}
+                          <Input
+                            id={`items.${idx}.quantity`}
+                            type="number"
+                            step="0.1" // Allow decimal increments like 0.1, 0.5
+                            placeholder="e.g., 2.5"
+                            {...register(`items.${idx}.quantity`, {
+                              required: "Quantity is required",
+                              valueAsNumber: true, // Ensure the value is treated as a number
+                              min: { value: 0.1, message: "Quantity must be at least 0.1 kg" },
+                              // Możesz dodać max jeśli potrzebujesz
+                            })}
+                            error={!!errors.items?.[idx]?.quantity}
+                            disabled={isSubmitting}
+                          />
+                          {errors.items?.[idx]?.quantity && (
+                            <p className="mt-1.5 text-sm text-negative flex items-center gap-1">
+                              <AlertTriangle className="h-4 w-4" /> {errors.items[idx]?.quantity?.message}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-label font-semibold text-secondary mb-2">
@@ -492,7 +457,6 @@ export default function CreateDonationPage() {
                               id={`items.${idx}.image`}
                               type="file"
                               accept="image/*" 
-                              capture="environment"
                               className="hidden" // Hide the actual input
                               {...register(`items.${idx}.image`, {
                                 validate: {
@@ -567,11 +531,20 @@ export default function CreateDonationPage() {
                   + Add another item
                 </Button>
               </div>
-              <div className="flex justify-end gap-2 pt-4">
+              <div className="flex justify-between items-center gap-2 pt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => router.push('/donate')}
+                  disabled={isSubmitting} 
+                >
+                  Cancel
+                </Button>
                 <Button
                   type="button"
                   variant="primary"
                   onClick={() => setStep(2)}
+                  disabled={isSubmitting} 
                 >
                   Next
                 </Button>

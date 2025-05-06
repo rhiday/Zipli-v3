@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 const navItems = [
@@ -54,9 +55,12 @@ export default function DesktopGlobalNavbar() {
                     <item.icon className={cn('h-6 w-6')} aria-hidden="true" />
                   </button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md bg-base">
+                <DialogContent className="sm:max-w-md bg-base" aria-describedby="add-dialog-description">
                   <DialogHeader>
                     <DialogTitle className="text-center text-lg font-semibold text-primary">What would you like to do?</DialogTitle>
+                    <DialogDescription id="add-dialog-description" className="sr-only">
+                      Choose to create a new donation or sale listing, or create a new food request.
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <DialogClose asChild>
