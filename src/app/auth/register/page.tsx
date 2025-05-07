@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { UserRole } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/types';
 import clsx from 'clsx';
 
 export default function RegisterPage() {
@@ -18,7 +18,7 @@ export default function RegisterPage() {
     contactPerson: '',
     contactNumber: '',
     address: '',
-    role: 'food_donor' as UserRole,
+    role: 'food_donor' as Database['public']['Enums']['user_role'],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +80,6 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      // 1. Sign up the user with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -92,7 +91,6 @@ export default function RegisterPage() {
       if (authError) throw authError;
 
       if (authData.user) {
-        // Create the user profile with all the details
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
@@ -107,7 +105,6 @@ export default function RegisterPage() {
 
         if (profileError) throw profileError;
 
-        // Success - show confirmation message and redirect
         router.push('/auth/verify-email');
       }
     } catch (err: any) {
