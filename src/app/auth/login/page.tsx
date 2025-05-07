@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import type { UserRole } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/types';
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
 
 export default function LoginPage() {
@@ -23,23 +23,24 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (signInError) throw signInError;
       
       if (data.user) {
-        // Get user's role and redirect accordingly
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', data.user.id)
           .single();
 
+        if (profileError) throw profileError;
+
         if (profile) {
-          const role = profile.role as UserRole;
+          const role = profile.role as Database['public']['Enums']['user_role'];
           switch (role) {
             case 'food_donor':
               router.push('/donate');
@@ -52,9 +53,15 @@ export default function LoginPage() {
               router.push('/dashboard');
               break;
             default:
+              console.warn(`Unknown user role: ${role}, redirecting to generic dashboard.`);
               router.push('/dashboard');
           }
+        } else {
+          console.warn('Profile not found for user after login, redirecting to generic dashboard.');
+          router.push('/dashboard');
         }
+      } else {
+        throw new Error('User data not available after sign in.');
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');
@@ -149,7 +156,7 @@ export default function LoginPage() {
         </form>
 
         <div className="text-center text-body">
-          <span className="text-inactive">Don't have an account?</span>{' '}
+          <span className="text-inactive">Don\'t have an account?</span>{' '}
           <Link
             href="/auth/register"
             className="font-medium text-earth hover:text-primary"
