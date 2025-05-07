@@ -4,13 +4,14 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import type { UserRole } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/types';
+type UserRole = Database['public']['Enums']['user_role'];
 
 const testUsers = {
-  donor: { email: 'donor@zipli.test', password: 'password', role: 'food_donor' },
-  receiver: { email: 'receiver@zipli.test', password: 'password', role: 'food_receiver' },
-  city: { email: 'city@zipli.test', password: 'password', role: 'city' },
-  terminal: { email: 'terminal@zipli.test', password: 'password', role: 'terminals' },
+  donor: { email: 'donor@zipli.test', password: 'password', role: 'food_donor' as UserRole },
+  receiver: { email: 'receiver@zipli.test', password: 'password', role: 'food_receiver' as UserRole },
+  city: { email: 'city@zipli.test', password: 'password', role: 'city' as UserRole },
+  terminal: { email: 'terminal@zipli.test', password: 'password', role: 'terminals' as UserRole },
 };
 
 export default function DevLoginSwitcher() {
