@@ -32,7 +32,8 @@ type RequestFeedItem = {
   description: string;
   people_count: number;
   pickup_date: string;
-  pickup_time: string;
+  pickup_start_time: string;
+  pickup_end_time: string;
   status: string;
   user: {
     organization_name: string;
@@ -106,7 +107,7 @@ export default function FeedPage(): React.ReactElement {
         query = supabase
           .from('requests')
           .select(`
-            id, description, people_count, pickup_date, pickup_time, status, created_at,
+            id, description, people_count, pickup_date, pickup_start_time, pickup_end_time, status, created_at,
             user:profiles!inner(organization_name, address)
           `)
           .eq('status', 'active')
@@ -356,7 +357,11 @@ export default function FeedPage(): React.ReactElement {
                         <p className="text-primary-75"><span className="font-medium text-primary">People to Feed:</span> {request.people_count}</p>
                         <p className="text-primary-75"><span className="font-medium text-primary">Requester:</span> {request.user?.organization_name || 'N/A'}</p>
                         <p className="text-primary-75"><span className="font-medium text-primary">Location:</span> {request.user?.address || 'N/A'}</p>
-                        <p className="text-primary-75"><span className="font-medium text-primary">Needed By:</span> {new Date(request.pickup_date + 'T' + request.pickup_time).toLocaleString()}</p>
+                        <p className="text-primary-75">
+                          <span className="font-medium text-primary">Needed:</span>{' '}
+                          {new Date(request.pickup_date + 'T00:00:00Z').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}{' '}
+                          from {request.pickup_start_time} to {request.pickup_end_time}
+                        </p>
                       </div>
                       <Button
                         variant="secondary"

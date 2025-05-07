@@ -25,7 +25,8 @@ export default function CreateRequestPage() {
     description: '',
     people_count: 1,
     pickup_date: undefined as Date | undefined,
-    pickup_time: '09:00',
+    pickup_start_time: '09:00',
+    pickup_end_time: '10:00',
     is_recurring: false,
   });
 
@@ -59,8 +60,8 @@ export default function CreateRequestPage() {
       if (userError) throw userError;
       if (!user) throw new Error('Not authenticated');
 
-      if (!formData.description || !formData.pickup_date || !formData.pickup_time) {
-          setError('Please fill in description, date, and time.');
+      if (!formData.description || !formData.pickup_date || !formData.pickup_start_time || !formData.pickup_end_time) {
+          setError('Please fill in description, date, start time, and end time.');
           setLoading(false);
           return;
       }
@@ -80,7 +81,8 @@ export default function CreateRequestPage() {
             description: formData.description,
             people_count: formData.people_count,
             pickup_date: formattedPickupDate,
-            pickup_time: formData.pickup_time,
+            pickup_start_time: formData.pickup_start_time,
+            pickup_end_time: formData.pickup_end_time,
             status: 'active',
             is_recurring: formData.is_recurring,
           }
@@ -188,15 +190,30 @@ export default function CreateRequestPage() {
           </div>
 
           <div>
-            <Label htmlFor="pickup_time" className="block text-label font-medium text-primary mb-1">
+            <Label htmlFor="pickup_start_time" className="block text-label font-medium text-primary mb-1">
               Preferred Pickup/Delivery Start Time
             </Label>
             <Input
-              id="pickup_time"
-              name="pickup_time"
+              id="pickup_start_time"
+              name="pickup_start_time"
               type="time"
               required
-              value={formData.pickup_time}
+              value={formData.pickup_start_time}
+              onChange={handleChange}
+              className="border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="pickup_end_time" className="block text-label font-medium text-primary mb-1">
+              Preferred Pickup/Delivery End Time
+            </Label>
+            <Input
+              id="pickup_end_time"
+              name="pickup_end_time"
+              type="time"
+              required
+              value={formData.pickup_end_time}
               onChange={handleChange}
               className="border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400"
             />

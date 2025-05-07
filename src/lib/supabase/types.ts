@@ -161,9 +161,11 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          is_recurring: boolean
           people_count: number
           pickup_date: string
-          pickup_time: string
+          pickup_end_time: string
+          pickup_start_time: string
           status: Database["public"]["Enums"]["request_status"]
           updated_at: string
           user_id: string
@@ -172,9 +174,11 @@ export type Database = {
           created_at?: string
           description: string
           id?: string
+          is_recurring?: boolean
           people_count?: number
           pickup_date: string
-          pickup_time: string
+          pickup_end_time: string
+          pickup_start_time: string
           status?: Database["public"]["Enums"]["request_status"]
           updated_at?: string
           user_id: string
@@ -183,9 +187,11 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          is_recurring?: boolean
           people_count?: number
           pickup_date?: string
-          pickup_time?: string
+          pickup_end_time?: string
+          pickup_start_time?: string
           status?: Database["public"]["Enums"]["request_status"]
           updated_at?: string
           user_id?: string

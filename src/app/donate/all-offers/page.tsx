@@ -98,7 +98,7 @@ export default function AllItemsPage(): React.ReactElement {
       } else if (offerTypeFilter === 'requests') {
         let query = supabase
           .from('requests')
-          .select('*')
+          .select('id, created_at, description, is_recurring, people_count, pickup_date, pickup_end_time, pickup_start_time, status, updated_at, user_id')
           .eq('user_id', user.id);
 
         if (statusFilter) query = query.eq('status', statusFilter);
@@ -273,7 +273,12 @@ export default function AllItemsPage(): React.ReactElement {
                   <p className="text-xs text-muted-foreground mt-1">
                     {dateLabel}: {new Date(itemDate).toLocaleDateString()}
                     {isDonation && (item as DonationItem).pickup_time && ` | Pickup: ${new Date((item as DonationItem).pickup_time!).toLocaleDateString()}`}
-                    {!isDonation && (item as RequestItem).pickup_date && ` | Needed by: ${new Date((item as RequestItem).pickup_date).toLocaleDateString()}`}
+                    {!isDonation && (
+                      <> 
+                        | Needed on: {new Date((item as RequestItem).pickup_date + 'T00:00:00Z').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+                        {' from '}{(item as RequestItem).pickup_start_time} to {(item as RequestItem).pickup_end_time}
+                      </>
+                    )}
                   </p>
                 </Link>
               );

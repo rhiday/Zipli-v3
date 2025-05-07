@@ -12,7 +12,8 @@ type RequestDetail = {
   description: string;
   people_count: number;
   pickup_date: string;
-  pickup_time: string;
+  pickup_start_time: string;
+  pickup_end_time: string;
   status: 'active' | 'completed' | 'cancelled';
   created_at: string;
   user_id: string;
@@ -53,7 +54,7 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
       const { data, error } = await supabase
         .from('requests')
         .select(`
-          *,
+          id, description, people_count, pickup_date, pickup_start_time, pickup_end_time, status, created_at, user_id,
           user:profiles(email)
         `)
         .eq('id', params.id)
@@ -182,11 +183,11 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
                 </div>
                 <div className="flex items-center space-x-2 text-body text-primary-75">
                   <CalendarIcon className="h-5 w-5 flex-shrink-0 text-primary-50" />
-                  <span>{new Date(request.pickup_date).toLocaleDateString()}</span>
+                  <span>{new Date(request.pickup_date + 'T00:00:00Z').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-body text-primary-75">
                   <ClockIcon className="h-5 w-5 flex-shrink-0 text-primary-50" />
-                  <span>{request.pickup_time}</span>
+                  <span>From {request.pickup_start_time} to {request.pickup_end_time}</span>
                 </div>
               </div>
             </div>
