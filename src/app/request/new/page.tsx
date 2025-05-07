@@ -6,7 +6,16 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, CalendarIcon } from 'lucide-react';
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
+import { cn } from '@/lib/utils';
 
 export default function CreateRequestPage() {
   const router = useRouter();
@@ -15,16 +24,29 @@ export default function CreateRequestPage() {
   const [formData, setFormData] = useState({
     description: '',
     people_count: 1,
-    pickup_date: '',
-    pickup_time: '',
+    pickup_date: undefined as Date | undefined,
+    pickup_time: '09:00',
+    is_recurring: false,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? parseInt(value, 10) || 1 : value
-    }));
+    if (type === 'checkbox') {
+      const { checked } = e.target as HTMLInputElement;
+      setFormData(prev => ({
+        ...prev,
+        [name]: checked
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: name === 'people_count' ? parseInt(value, 10) || 1 : value
+      }));
+    }
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setFormData(prev => ({ ...prev, pickup_date: date }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,27 +60,42 @@ export default function CreateRequestPage() {
       if (!user) throw new Error('Not authenticated');
 
       if (!formData.description || !formData.pickup_date || !formData.pickup_time) {
-          setError('Please fill in all required fields.');
+          setError('Please fill in description, date, and time.');
           setLoading(false);
           return;
       }
+      
+      const formattedPickupDate = formData.pickup_date ? format(formData.pickup_date, "yyyy-MM-dd") : null;
+      if (!formattedPickupDate) {
+        setError('Pickup date is invalid.');
+        setLoading(false);
+        return;
+      }
 
-      const { error: insertError } = await supabase
+      const { data: newRequest, error: insertError } = await supabase
         .from('requests')
         .insert([
           {
             user_id: user.id,
             description: formData.description,
             people_count: formData.people_count,
-            pickup_date: formData.pickup_date,
+            pickup_date: formattedPickupDate,
             pickup_time: formData.pickup_time,
-            status: 'active'
+            status: 'active',
+            is_recurring: formData.is_recurring,
           }
-        ]);
+        ])
+        .select()
+        .single();
 
       if (insertError) throw insertError;
 
-      router.push('/feed');
+      if (newRequest) {
+        router.push('/request/success');
+      } else {
+        setError('Failed to create request, but no error was reported.');
+      }
+
     } catch (err: any) {
       setError(err.message || 'An error occurred while creating the request');
     } finally {
@@ -91,9 +128,9 @@ export default function CreateRequestPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="description" className="block text-label font-medium text-primary mb-1">
+            <Label htmlFor="description" className="block text-label font-medium text-primary mb-1">
               Description of Need
-            </label>
+            </Label>
             <Textarea
               id="description"
               name="description"
@@ -106,9 +143,9 @@ export default function CreateRequestPage() {
           </div>
 
           <div>
-            <label htmlFor="people_count" className="block text-label font-medium text-primary mb-1">
+            <Label htmlFor="people_count" className="block text-label font-medium text-primary mb-1">
               Number of People to Feed
-            </label>
+            </Label>
             <Input
               id="people_count"
               name="people_count"
@@ -121,33 +158,62 @@ export default function CreateRequestPage() {
           </div>
 
           <div>
-            <label htmlFor="pickup_date" className="block text-label font-medium text-primary mb-1">
+            <Label htmlFor="pickup_date_button" className="block text-label font-medium text-primary mb-1">
               Preferred Pickup/Delivery Date
-            </label>
-            <Input
-              id="pickup_date"
-              name="pickup_date"
-              type="date"
-              required
-              value={formData.pickup_date}
-              onChange={handleChange}
-              min={new Date().toISOString().split('T')[0]}
-            />
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="pickup_date_button"
+                  variant={"secondary"}
+                  className={cn(
+                    "w-full justify-start text-left font-normal border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400",
+                    !formData.pickup_date && "text-primary-50"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4 text-primary-75" />
+                  {formData.pickup_date ? format(formData.pickup_date, "PPP") : <span className="text-primary-75">Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-base border-primary-25" align="start">
+                <Calendar
+                  mode="single"
+                  selected={formData.pickup_date}
+                  onSelect={handleDateSelect}
+                  initialFocus
+                  disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div>
-            <label htmlFor="pickup_time" className="block text-label font-medium text-primary mb-1">
-              Preferred Pickup/Delivery Time Window
-            </label>
+            <Label htmlFor="pickup_time" className="block text-label font-medium text-primary mb-1">
+              Preferred Pickup/Delivery Start Time
+            </Label>
             <Input
               id="pickup_time"
               name="pickup_time"
-              type="text"
+              type="time"
               required
               value={formData.pickup_time}
               onChange={handleChange}
-              placeholder="e.g., Morning, Afternoon, 2-4 PM, Anytime"
+              className="border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400"
             />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="is_recurring"
+              name="is_recurring"
+              checked={formData.is_recurring}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-primary-30 text-primary focus:ring-primary-50"
+            />
+            <Label htmlFor="is_recurring" className="text-sm font-medium text-primary">
+              Weekly recurring request.
+            </Label>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">

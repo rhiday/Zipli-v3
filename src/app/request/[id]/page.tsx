@@ -54,7 +54,7 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
         .from('requests')
         .select(`
           *,
-          user:users(email)
+          user:profiles(email)
         `)
         .eq('id', params.id)
         .single<RequestDetail>();

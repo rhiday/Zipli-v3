@@ -20,7 +20,6 @@ import {
 const navItems = [
   { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
   { href: '/feed', label: 'Explore', icon: Search },
-  { href: '/request', label: 'Requests', icon: ClipboardList },
   { href: '#', label: 'Add', icon: Plus, isCentral: true },
 ];
 

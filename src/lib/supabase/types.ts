@@ -1,3 +1,6 @@
+Need to install the following packages:
+supabase@2.22.12
+Ok to proceed? (y) 
 export type Json =
   | string
   | number
@@ -16,7 +19,9 @@ export type Database = {
           donor_id: string
           food_item_id: string
           id: string
+          instructions_for_driver: string | null
           picked_up_at: string | null
+          pickup_slots: Json | null
           pickup_time: string | null
           quantity: number
           receiver_id: string | null
@@ -29,7 +34,9 @@ export type Database = {
           donor_id: string
           food_item_id: string
           id?: string
+          instructions_for_driver?: string | null
           picked_up_at?: string | null
+          pickup_slots?: Json | null
           pickup_time?: string | null
           quantity?: number
           receiver_id?: string | null
@@ -42,7 +49,9 @@ export type Database = {
           donor_id?: string
           food_item_id?: string
           id?: string
+          instructions_for_driver?: string | null
           picked_up_at?: string | null
+          pickup_slots?: Json | null
           pickup_time?: string | null
           quantity?: number
           receiver_id?: string | null
@@ -70,35 +79,35 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       food_items: {
         Row: {
+          allergens: string | null
           created_at: string
           description: string | null
           donor_id: string | null
-          expiry_date: string | null
           id: string
           image_url: string | null
           name: string
           updated_at: string
         }
         Insert: {
+          allergens?: string | null
           created_at?: string
           description?: string | null
           donor_id?: string | null
-          expiry_date?: string | null
           id?: string
           image_url?: string | null
           name: string
           updated_at?: string
         }
         Update: {
+          allergens?: string | null
           created_at?: string
           description?: string | null
           donor_id?: string | null
-          expiry_date?: string | null
           id?: string
           image_url?: string | null
           name?: string
@@ -111,7 +120,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       profiles: {
@@ -150,6 +159,50 @@ export type Database = {
         }
         Relationships: []
       }
+      requests: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          people_count: number
+          pickup_date: string
+          pickup_time: string
+          status: Database["public"]["Enums"]["request_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          people_count?: number
+          pickup_date: string
+          pickup_time: string
+          status?: Database["public"]["Enums"]["request_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          people_count?: number
+          pickup_date?: string
+          pickup_time?: string
+          status?: Database["public"]["Enums"]["request_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -159,6 +212,7 @@ export type Database = {
     }
     Enums: {
       donation_status: "available" | "claimed" | "picked_up" | "cancelled"
+      request_status: "active" | "fulfilled" | "cancelled"
       user_role: "food_donor" | "food_receiver" | "city" | "terminals"
     }
     CompositeTypes: {
@@ -178,7 +232,7 @@ export type Tables<
   }
     ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
   ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -188,13 +242,13 @@ export type Tables<
     : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
         DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] &
-      DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
@@ -204,7 +258,7 @@ export type TablesInsert<
     schema: keyof Database
   }
     ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
   ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
@@ -212,12 +266,12 @@ export type TablesInsert<
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
@@ -227,7 +281,7 @@ export type TablesUpdate<
     schema: keyof Database
   }
     ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
   ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
@@ -235,25 +289,27 @@ export type TablesUpdate<
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof Database },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
     ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
   ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
@@ -263,27 +319,19 @@ export type CompositeTypes<
     schema: keyof Database
   }
     ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {
     Enums: {
       donation_status: ["available", "claimed", "picked_up", "cancelled"],
-      user_role: ["food_donor", "city", "terminals"],
+      request_status: ["active", "fulfilled", "cancelled"],
+      user_role: ["food_donor", "food_receiver", "city", "terminals"],
     },
   },
 } as const
-
-// Convenience types for each table
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
-export type FoodItem = Database["public"]["Tables"]["food_items"]["Row"]
-export type Donation = Database["public"]["Tables"]["donations"]["Row"]
-
-// Enum types
-export type UserRole = Database["public"]["Enums"]["user_role"]
-export type DonationStatus = Database["public"]["Enums"]["donation_status"] 

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
-import { PlusIcon, SearchIcon, UsersIcon, CalendarIcon } from 'lucide-react';
+import { PlusIcon, SearchIcon, UsersIcon, CalendarIcon, HandshakeIcon } from 'lucide-react';
 
 type Request = {
   id: string;
@@ -36,7 +36,7 @@ export default function RequestsPage(): React.ReactElement {
         .from('requests')
         .select(`
           *,
-          user:users(email)
+          user:profiles(email)
         `)
         .order('created_at', { ascending: false });
 
@@ -126,16 +126,17 @@ export default function RequestsPage(): React.ReactElement {
                       ? 'bg-gray-100 text-gray-800'
                       : 'bg-red-100 text-red-800'
                   }`}>
-                    {request.status}
+                    {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                   </span>
                   <span className="text-sm text-gray-500">
                     {new Date(request.created_at).toLocaleDateString()}
                   </span>
                 </div>
 
-                <p className="mb-4 text-sm text-gray-600 line-clamp-3">
-                  {request.description}
-                </p>
+                <h3 className="mb-2 text-md font-semibold text-gray-800 flex items-center">
+                  <HandshakeIcon className="mr-2 h-4 w-4 text-blue-600 flex-shrink-0" />
+                  {request.description.substring(0, 50)}{request.description.length > 50 ? '...' : ''}
+                </h3>
 
                 <div className="space-y-2 text-sm text-gray-500">
                   <div className="flex items-center">

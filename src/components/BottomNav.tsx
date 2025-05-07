@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutGrid, Plus, Search, ShoppingBag, FileText, ClipboardList } from 'lucide-react'; // Added ClipboardList
+import { LayoutGrid, Plus, Search, ShoppingBag, FileText } from 'lucide-react'; // Removed ClipboardList
 import {
   Drawer,
   DrawerClose,
@@ -20,9 +20,8 @@ import { Button } from '@/components/ui/button';
 // TODO: Define proper navigation items based on user role
 const navItems = [
   { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
-  { href: '/feed', label: 'Explore', icon: Search },
-  { href: '/request', label: 'Requests', icon: ClipboardList }, // Added Requests link
   { href: '#', label: 'Add', icon: Plus, isCentral: true }, 
+  { href: '/feed', label: 'Explore', icon: Search },
 ];
 
 export default function BottomNav() {
@@ -33,11 +32,9 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 z-50 w-full h-[76px] border-t border-primary-10 bg-base shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.1)] md:hidden">
-      {/* Adjusted to explicitly handle 4 items + central button for layout purposes */}
-      <div className="mx-auto grid grid-cols-5 h-full max-w-lg items-center">
-        {navItems.filter(item => !item.isCentral).slice(0, 2).map(renderNavItem)} 
-        {navItems.find(item => item.isCentral) && renderNavItem(navItems.find(item => item.isCentral)!, -1)} {/* Render central item */}
-        {navItems.filter(item => !item.isCentral).slice(2).map(renderNavItem)}
+      {/* Adjusted grid to 3 columns for Dashboard, Add, Explore */}
+      <div className="mx-auto grid grid-cols-3 h-full max-w-lg items-center">
+        {navItems.map((item, index) => renderNavItem(item, index))} 
       </div>
     </nav>
   );
@@ -107,7 +104,7 @@ export default function BottomNav() {
         </Drawer>
       );
     }
-    // Regular nav items
+    // Regular nav items (Dashboard, Explore)
     return (
       <Link
         key={item.label}

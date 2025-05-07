@@ -5,12 +5,15 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
-import { Donation, FoodItem } from '@/lib/supabase/types';
+import { Database } from '@/lib/supabase/types';
 import { DonationWithFoodItemResponse } from '@/lib/supabase/responses';
 import { cn } from '@/lib/utils';
 
-type DonationWithFoodItem = Donation & {
-  food_item: FoodItem;
+type DonationRow = Database['public']['Tables']['donations']['Row'];
+type FoodItemRow = Database['public']['Tables']['food_items']['Row'];
+
+type DonationWithFoodItem = DonationRow & {
+  food_item: FoodItemRow;
   pickup_time: string;
 };
 
@@ -78,6 +81,9 @@ export default function DonationDetailPage(): React.ReactElement {
 
       if (error) throw error;
       await fetchDonation();
+      if (newStatus === 'cancelled') {
+        router.push('/donate');
+      }
     } catch (err: any) {
       console.error("Update Status Error:", err);
       setState(prev => ({ ...prev, error: err.message || 'Failed to update status.' }));

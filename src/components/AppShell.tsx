@@ -5,6 +5,7 @@ import React from 'react';
 import Header from './layout/Header'; // Assuming Header might be part of AppShell
 import BottomNav from './BottomNav'; // Assuming BottomNav might be part of AppShell
 import { usePathname } from 'next/navigation';
+import { logger } from '../../lib/logger';
 // Or import whatever components are actually used in AppShell
 
 const DesktopGlobalNavbar = dynamic(() => import('@/components/DesktopGlobalNavbar'), { ssr: false });
@@ -32,11 +33,10 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
           <div className="flex flex-col flex-1">
             {/* Optional Header if global */}
             {/* <Header /> */}
-            <main className="flex-grow px-0">
+            <main className="flex-grow px-0 pb-[76px] md:pb-0">
               {children}
             </main>
-            {/* Optional BottomNav for mobile */}
-            {/* <BottomNav /> */}
+            <BottomNav />
           </div>
         </div>
       )}

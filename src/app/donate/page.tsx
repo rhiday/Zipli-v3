@@ -6,8 +6,8 @@ import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import BottomNav from '@/components/BottomNav';
-import { ArrowRight, ChevronRight, Languages, MessageSquare, Info, ChevronDown, UserCircle, PlusIcon } from 'lucide-react';
-import { Profile } from '@/lib/supabase/types';
+import { ArrowRight, ChevronRight, Languages, MessageSquare, Info, ChevronDown, UserCircle, PlusIcon, PackageIcon } from 'lucide-react';
+import { Database } from '@/lib/supabase/types';
 import DonationCard from '@/components/donations/DonationCard';
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
@@ -33,8 +33,10 @@ type DonationWithFoodItem = {
   created_at: string;
 };
 
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+
 type DonorDashboardData = {
-    profile: Profile | null;
+    profile: ProfileRow | null;
     donations: DonationWithFoodItem[];
 }
 
@@ -80,7 +82,7 @@ export default function DonorDashboardPage(): React.ReactElement {
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single<Profile>();
+        .single<ProfileRow>();
         
       if (profileError && profileError.code !== 'PGRST116') {
         throw profileError;
@@ -142,6 +144,83 @@ export default function DonorDashboardPage(): React.ReactElement {
 
       <main className="relative z-20 -mt-6 rounded-t-3xl md:rounded-t-none bg-base py-4 px-6 md:px-12 space-y-6">
         <section>
+          <h2 className="text-titleXs font-medium text-primary mb-4">Active offer</h2>
+          {error && (
+            <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">
+              {error}
+            </div>
+          )}
+          <div className="md:flex md:items-end md:gap-4">
+            <div className="w-full md:max-w-sm">
+              {(() => {
+                const activeOffers = dashboardData.donations.filter(d => d.status === 'available').slice(0, 1);
+                if (activeOffers.length > 0) {
+                  return activeOffers.map((donation) => (
+                    <Link 
+                      key={donation.id} 
+                      href={`/donate/${donation.id}`} 
+                      className="block bg-base rounded-xl border border-border p-4 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-base font-medium text-primary flex items-center">
+                          <PackageIcon className="mr-2 h-4 w-4 text-green-600 flex-shrink-0" /> 
+                          {donation.food_item.name}
+                        </h3>
+                        <span
+                          className={cn(
+                            'px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap',
+                            donation.status === 'available'    ? 'bg-green-100 text-green-800' :
+                            donation.status === 'claimed'      ? 'bg-yellow-100 text-yellow-800' :
+                            donation.status === 'picked_up'    ? 'bg-blue-100 text-blue-800' :
+                            donation.status === 'cancelled'    ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          )}
+                        >
+                          {donation.status === 'picked_up'  ? 'Successful' :
+                           donation.status === 'cancelled'  ? 'Cancelled'  :
+                           donation.status === 'available'  ? 'Available'  :
+                           donation.status === 'claimed'    ? 'Claimed'    :
+                           donation.status.replace('_', ' ')
+                          }
+                        </span>
+                      </div>
+                      <p className="text-sm text-primary-75 mb-2">
+                        {donation.food_item.description}
+                      </p>
+                      <p className="text-sm text-primary-75">
+                        {donation.pickup_time 
+                          ? `Picked up: ${new Date(donation.pickup_time).toLocaleDateString()}`
+                          : 'Recurring Schedule'
+                         }
+                      </p>
+                    </Link>
+                  ));
+                } else {
+                  return (
+                    <div className="text-center py-8 bg-base rounded-lg border border-border">
+                      <p className="text-body text-primary-75 mb-4">No active offers at the moment.</p>
+                      <Button
+                        variant="primary"
+                        size="md"
+                        onClick={() => router.push('/donate/new')}
+                      >
+                        Create an Offer
+                      </Button>
+                    </div>
+                  );
+                }
+              })()}
+            </div>
+            <div className="mt-4 text-right md:mt-0">
+              <Link href="/donate/all-offers" className="inline-flex items-center text-sm font-semibold text-primary hover:underline">
+                See all offers
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section>
             <div className="flex justify-between items-center mb-3">
                 <h2 className="text-lg font-semibold text-primary">Your impact</h2>
                  <DropdownMenu>
@@ -201,95 +280,25 @@ export default function DonorDashboardPage(): React.ReactElement {
           </div>
         </section>
 
-        <section
-          onClick={handleExportPDF}
-          role="button"
-          tabIndex={0}
-          className="rounded-xl border border-border bg-base p-4 flex items-center justify-between cursor-pointer hover:bg-muted/50"
-        >
-           <div className="flex-1 mr-4">
-                <h3 className="text-base font-semibold text-primary mb-1">Export to PDF</h3>
-                <p className="text-sm text-muted-foreground">Environmental and social impact data for reporting, and operation planning.</p>
-           </div>
-           <ArrowRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-        </section>
-
-        {/* Create New Request Section */}
-        <section
-          onClick={() => router.push('/request/new')}
-          role="button"
-          tabIndex={0}
-          className="rounded-xl border border-border bg-base p-4 flex items-center justify-between cursor-pointer hover:bg-muted/50"
-        >
-           <div className="flex-1 mr-4">
-                <h3 className="text-base font-semibold text-primary mb-1">Create Food Request</h3>
-                <p className="text-sm text-muted-foreground">Need specific items? Let others know what you're looking for.</p>
-           </div>
-           <PlusIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-        </section>
-
-        <section>
-          <h2 className="text-titleXs font-medium text-primary mb-4">Past offers</h2>
-          {error && (
-            <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">
-              {error}
-            </div>
-          )}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {dashboardData.donations.length > 0 ? (
-              dashboardData.donations.map((donation) => (
-                <Link 
-                  key={donation.id} 
-                  href={`/donate/${donation.id}`} 
-                  className="block bg-base rounded-xl border border-border p-4 hover:shadow-md transition-shadow"
-                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-base font-medium text-primary">
-                      {donation.food_item.name}
-                    </h3>
-                    <span
-                      className={cn(
-                        'px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap',
-                        donation.status === 'available'    ? 'bg-green-100 text-green-800' :
-                        donation.status === 'claimed'      ? 'bg-yellow-100 text-yellow-800' :
-                        donation.status === 'picked_up'    ? 'bg-blue-100 text-blue-800' :
-                        donation.status === 'cancelled'    ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      )}
-                    >
-                      {donation.status === 'picked_up'  ? 'Successful' :
-                       donation.status === 'cancelled'  ? 'Cancelled'  :
-                       donation.status === 'available'  ? 'Available'  :
-                       donation.status === 'claimed'    ? 'Claimed'    :
-                       donation.status.replace('_', ' ')
-                      }
-                    </span>
-                  </div>
-                  <p className="text-sm text-primary-75 mb-2">
-                    {donation.food_item.description}
-                  </p>
-                  <p className="text-sm text-primary-75">
-                    {donation.pickup_time 
-                      ? `Picked up: ${new Date(donation.pickup_time).toLocaleDateString()}`
-                      : 'Recurring Schedule'
-                     }
-                  </p>
-                </Link>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-8 bg-base rounded-lg">
-                <p className="text-body text-primary-75 mb-4">No past offers found.</p>
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={() => router.push('/donate/new')}
-                >
-                  Create Your First Offer
-                </Button>
-              </div>
-            )}
-          </div>
-        </section>
+        {/* Wrapper for Export to PDF section to control its width on desktop */}
+        <div className="md:grid md:grid-cols-4 md:gap-3">
+            <section
+              onClick={handleExportPDF}
+              role="button"
+              tabIndex={0}
+              className="md:col-span-2 rounded-xl border border-border bg-base p-4 flex items-center justify-between cursor-pointer hover:bg-muted/50"
+            >
+               <div className="flex-1 mr-4">
+                    <h3 className="text-base font-semibold text-primary mb-1">Export to PDF</h3>
+                    <p className="text-sm text-muted-foreground">Environmental and social impact data for reporting, and operation planning.</p>
+               </div>
+               <ArrowRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            </section>
+            {/* Optional: If you want to strictly enforce that it only takes up the left half and the right is empty,
+                you could add an empty div for the remaining columns on md+ screens.
+                Otherwise, it will naturally take the first 2 columns and the rest of the row will be empty.
+            <div className="hidden md:block md:col-span-2"></div> */}
+        </div>
       </main>
 
       <BottomNav />
