@@ -6,15 +6,18 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { Profile } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/types';
+
+// Define ProfileRow using the Database type
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 
 export default function ProfilePage(): React.ReactElement {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [formData, setFormData] = useState<Partial<Profile>>({
+  const [profile, setProfile] = useState<ProfileRow | null>(null);
+  const [formData, setFormData] = useState<Partial<ProfileRow>>({
     full_name: '',
     organization_name: '',
     address: '',
@@ -42,20 +45,24 @@ export default function ProfilePage(): React.ReactElement {
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single<Profile>();
+        .single<ProfileRow>();
 
       if (profileError && profileError.code !== 'PGRST116') {
           throw profileError;
       }
 
-      setProfile(profileData);
-      setFormData({
-        full_name: profileData?.full_name || '',
-        organization_name: profileData?.organization_name || '',
-        address: profileData?.address || '',
-        contact_number: profileData?.contact_number || '',
-        role: profileData?.role,
-      });
+      if (profileData) {
+        setProfile(profileData);
+        setFormData({
+          full_name: profileData.full_name || '',
+          organization_name: profileData.organization_name || '',
+          address: profileData.address || '',
+          contact_number: profileData.contact_number || '',
+          role: profileData.role,
+        });
+      } else {
+        setError("Profile not found for the current user.");
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to load profile.');
     } finally {
@@ -67,7 +74,7 @@ export default function ProfilePage(): React.ReactElement {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'role' && value === '' ? undefined : value
+      [name]: name === 'role' && value === '' ? undefined : value 
     }));
   };
 
@@ -83,23 +90,30 @@ export default function ProfilePage(): React.ReactElement {
     }
 
     try {
-      const updateData: Partial<Profile> = {};
-      const validRoles: Profile['role'][] = ['food_donor', 'food_receiver', 'city', 'terminals'];
+      const updateData: Partial<ProfileRow> = {}; 
+      const validRoles: Array<Database['public']['Enums']['user_role']> = ['food_donor', 'food_receiver', 'city', 'terminals'];
 
+      // For string | null fields in DB (full_name, address, contact_number)
       if (formData.full_name !== profile.full_name) {
-        updateData.full_name = formData.full_name || undefined;
-      }
-      if (formData.organization_name !== profile.organization_name) {
-        updateData.organization_name = formData.organization_name || undefined;
+        updateData.full_name = formData.full_name || null;
       }
       if (formData.address !== profile.address) {
-        updateData.address = formData.address || undefined;
+        updateData.address = formData.address || null;
       }
       if (formData.contact_number !== profile.contact_number) {
-        updateData.contact_number = formData.contact_number || undefined;
+        updateData.contact_number = formData.contact_number || null;
       }
-      if (formData.role && formData.role !== profile.role && validRoles.includes(formData.role)) {
-        updateData.role = formData.role;
+
+      // For organization_name (string in Row, string? in Update)
+      // Send the string if it has a value, otherwise send undefined if it's optional in Update type.
+      // Since ProfileRow.organization_name is string, it should always have a value from formData if changed.
+      // If it was changed to an empty string, we still send empty string as it's not nullable in Row.
+      if (formData.organization_name !== profile.organization_name) {
+         updateData.organization_name = formData.organization_name; // formData.organization_name is string
+      }
+      
+      if (formData.role && formData.role !== profile.role && validRoles.includes(formData.role as Database['public']['Enums']['user_role'])) {
+        updateData.role = formData.role as Database['public']['Enums']['user_role'];
       }
 
       if (Object.keys(updateData).length === 0) {
@@ -110,14 +124,14 @@ export default function ProfilePage(): React.ReactElement {
 
       updateData.updated_at = new Date().toISOString();
 
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
-        .update(updateData)
+        .update(updateData as any) // Using 'as any' here to bypass strict type checking if mismatches persist from generated types vs. actual DB expectations for partial updates.
         .eq('id', profile.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
-      await fetchProfile();
+      await fetchProfile(); 
       setIsEditing(false);
     } catch (err: any) {
       setError(err.message || 'Failed to save profile.');
@@ -127,9 +141,9 @@ export default function ProfilePage(): React.ReactElement {
   };
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      setError("Failed to log out: " + error.message);
+    const { error: signOutError } = await supabase.auth.signOut();
+    if (signOutError) {
+      setError("Failed to log out: " + signOutError.message);
     } else {
       router.push('/auth/login');
     }
@@ -143,7 +157,7 @@ export default function ProfilePage(): React.ReactElement {
     );
   }
 
-  const formatRole = (role?: Profile['role']) => {
+  const formatRole = (role?: ProfileRow['role']) => {
       switch (role) {
           case 'food_donor': return 'Food Donor (Restaurants, Catering, etc.)';
           case 'food_receiver': return 'Food Receiver (Charities, Kitchens, etc.)';
