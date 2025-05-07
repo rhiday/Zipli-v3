@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import type { UserRole } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/types';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -15,21 +15,20 @@ function ConfirmPageContent() {
   useEffect(() => {
     const handleEmailConfirmation = async () => {
       try {
-        // Get the token hash from URL
         const tokenHash = searchParams.get('token_hash');
         const type = searchParams.get('type');
 
         if (tokenHash && type) {
-          const { error } = await supabase.auth.verifyOtp({
+          const { error: verifyError } = await supabase.auth.verifyOtp({
             token_hash: tokenHash,
             type: type as any,
           });
 
-          if (error) throw error;
+          if (verifyError) throw verifyError;
 
-          // Get user's role from profiles
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) throw new Error('User not found');
+          const { data: { user }, error: userError } = await supabase.auth.getUser();
+          if (userError) throw userError;
+          if (!user) throw new Error('User not found after OTP verification');
 
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
@@ -38,9 +37,9 @@ function ConfirmPageContent() {
             .single();
 
           if (profileError) throw profileError;
+          if (!profile) throw new Error('Profile not found for user.');
 
-          // Redirect based on role
-          const role = profile.role as UserRole;
+          const role = profile.role as Database['public']['Enums']['user_role'];
           switch (role) {
             case 'food_donor':
               router.push('/donate');
@@ -50,11 +49,17 @@ function ConfirmPageContent() {
               break;
             case 'terminals':
             case 'city':
+              router.push('/dashboard');
+              break;
             default:
+              console.warn(`Unknown user role: ${role}, redirecting to generic dashboard.`);
               router.push('/dashboard');
           }
+        } else {
+          setError('Invalid confirmation link. Missing token or type.');
         }
       } catch (err: any) {
+        console.error("Email confirmation error:", err);
         setError(err.message || 'An error occurred during email confirmation');
       }
     };
