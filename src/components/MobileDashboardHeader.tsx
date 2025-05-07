@@ -3,10 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/Avatar';
 import { Languages, MessageSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Profile } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/types';
+
+// Define ProfileRow using the Database type
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 
 interface MobileDashboardHeaderProps {
-  profile: Profile | null;
+  profile: ProfileRow | null;
   getInitials: (name?: string | null) => string;
 }
 
