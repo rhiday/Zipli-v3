@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import type { UserRole } from '@/lib/supabase/types';
+import type { Database } from '@/lib/supabase/types';
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function AuthCallback() {
           .single();
 
         if (profile) {
-          const role = profile.role as UserRole;
+          const role = profile.role as Database['public']['Enums']['user_role'];
           switch (role) {
             case 'food_donor':
               router.push('/donate');
@@ -52,6 +52,7 @@ export default function AuthCallback() {
               router.push('/dashboard');
               break;
             default:
+              console.warn(`Unknown user role: ${profile.role}, redirecting to generic dashboard.`);
               router.push('/dashboard');
           }
           return;
