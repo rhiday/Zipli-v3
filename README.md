@@ -42,3 +42,28 @@ For details on specific Supabase configurations, RLS debugging, and lessons lear
 
 - Implement end-to-end (E2E) and integration tests using Playwright (or a similar framework) to automate UI checks, component interactions, routing, and user flow validation.
 - This will help cover unit tests and edge cases for increased stability and faster development cycles.
+
+## Generating Food Item Images with DALL·E
+
+To bulk-generate images for all food items using OpenAI DALL·E and upload them to Supabase Storage:
+
+1. Set up your environment variables in `.env.local` or `.env`:
+   ```
+   OPENAI_API_KEY=sk-...
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+   SUPABASE_URL=https://vqtfcdnrgotgrnwwuryo.supabase.co
+   SUPABASE_STORAGE_BUCKET=donations
+   ```
+2. Install dependencies:
+   ```sh
+   pnpm install openai @supabase/supabase-js dotenv node-fetch
+   # or use npm/yarn
+   ```
+3. Run the script:
+   ```sh
+   node scripts/generate_food_images.js
+   ```
+
+- The script will skip items that already have an image.
+- Images are uploaded to the `donations` bucket in Supabase Storage.
+- The `image_url` field in the `food_items` table will be updated with the public URL.
