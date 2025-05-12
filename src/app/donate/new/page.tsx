@@ -211,13 +211,11 @@ export default function CreateDonationPage() {
     const threeWeeksFromNow = new Date(now.getTime() + 21 * 24 * 60 * 60 * 1000); // Use 21 days
 
     // Validate using the combined date and time of the first slot
-    /* Temporarily commented out for testing past dates
     if (firstPickupDateTime <= now) {
       setServerError('First pickup slot must start in the future.');
       setStep(2);
       return;
     }
-    */
     if (firstPickupDateTime > threeWeeksFromNow) {
       setServerError('Pickup date must be within 3 weeks.');
        setStep(2);
@@ -645,7 +643,7 @@ export default function CreateDonationPage() {
                          selected={pickupDateValue}
                          onSelect={(date: Date | undefined) => setValue('pickup_date', date, { shouldValidate: true })}
                          disabled={(date: Date) => 
-                           // date < new Date(new Date().setHours(0, 0, 0, 0)) || // Temporarily commented out for testing past dates
+                           date < new Date(new Date().setHours(0, 0, 0, 0)) || 
                            date > new Date(Date.now() + 21 * 24 * 60 * 60 * 1000)
                          }
                          initialFocus
