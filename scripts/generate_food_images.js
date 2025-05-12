@@ -1,7 +1,7 @@
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const { OpenAI } = require('openai');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const path = require('path');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -26,7 +26,7 @@ async function getFoodItems() {
 }
 
 function makePrompt(item) {
-  return `A high-quality, appetizing photo of ${item.name}. ${item.description || ''} Food photography, clean background.`;
+  return `create image of ${item.name}, natural and real style, in a setting so that it looks like placed on a restaurant table or a buffet. it will look like item is part of a buffet / table but the focus is stll on the item.`;
 }
 
 async function generateImage(prompt) {
