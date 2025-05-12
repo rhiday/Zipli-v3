@@ -21,6 +21,8 @@ type FoodItemDetails = {
 type DonationItem = Database['public']['Tables']['donations']['Row'] & {
   itemType: 'donation';
   food_item: FoodItemDetails;
+  unit?: string;
+  pickup_slots?: { start: string; end: string }[];
 };
 
 type RequestItem = Database['public']['Tables']['requests']['Row'] & {
@@ -74,6 +76,7 @@ export default function AllItemsPage(): React.ReactElement {
           .from('donations')
           .select(`
             *,
+            unit,
             food_item:food_items!inner(
               name, description, image_url
             )
@@ -135,6 +138,18 @@ export default function AllItemsPage(): React.ReactElement {
   const currentStatusOptions = offerTypeFilter === 'donations' ? donationStatuses : requestStatuses;
   const quantityLabel = offerTypeFilter === 'donations' ? "Min. Quantity" : "Min. People";
   const dateInputClassName = "mt-1 block w-full pl-3 pr-3 py-2 text-base border-primary-25 focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm rounded-md shadow-sm bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400";
+
+  const formatPickupWindow = (donation: DonationItem) => {
+    if (!donation.pickup_time) return '';
+    if (donation.pickup_slots && Array.isArray(donation.pickup_slots) && donation.pickup_slots.length > 0) {
+      const slot = donation.pickup_slots[0];
+      const date = new Date(donation.pickup_time as string);
+      const dateStr = date.toLocaleDateString();
+      return `Pickup: ${dateStr}, ${slot.start}–${slot.end}`;
+    }
+    const date = new Date(donation.pickup_time as string);
+    return `Pickup: ${date.toLocaleDateString()}, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+  };
 
   if (loading) {
     return (
@@ -250,7 +265,7 @@ export default function AllItemsPage(): React.ReactElement {
               const dateLabel = isDonation ? "Offered" : "Requested";
               const itemDate = item.created_at;
               const detailLink = isDonation ? `/donate/${item.id}` : `/request/${item.id}`;
-              const quantityOrPeople = isDonation ? `${(item as DonationItem).quantity} units` : `${(item as RequestItem).people_count} people`;
+              const quantityOrPeople = isDonation ? `${(item as DonationItem).quantity} ${(item as DonationItem).unit || 'kg'}` : `${(item as RequestItem).people_count} people`;
 
               return (
                 <Link key={item.id} href={detailLink} className="block transform rounded-xl border border-border bg-base p-4 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
@@ -271,11 +286,10 @@ export default function AllItemsPage(): React.ReactElement {
                   <p className="mb-1 text-sm text-muted-foreground line-clamp-3 h-12 overflow-hidden">{description || "No description."}</p>
                   <p className="text-xs text-muted-foreground mt-1">{isDonation ? "Quantity:" : "For:"} {quantityOrPeople}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {dateLabel}: {new Date(itemDate).toLocaleDateString()}
-                    {isDonation && (item as DonationItem).pickup_time && ` | Pickup: ${new Date((item as DonationItem).pickup_time!).toLocaleDateString()}`}
+                    {isDonation && (item as DonationItem).pickup_time && formatPickupWindow(item as DonationItem)}
                     {!isDonation && (
                       <> 
-                        | Needed on: {new Date((item as RequestItem).pickup_date + 'T00:00:00Z').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+                        Needed on: {new Date((item as RequestItem).pickup_date + 'T00:00:00Z').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
                         {' from '}{(item as RequestItem).pickup_start_time} to {(item as RequestItem).pickup_end_time}
                       </>
                     )}
