@@ -15,6 +15,7 @@ type FoodItemRow = Database['public']['Tables']['food_items']['Row'];
 type DonationWithFoodItem = DonationRow & {
   food_item: FoodItemRow;
   pickup_time: string;
+  instructions_for_driver: string;
 };
 
 export default function DonationDetailPage(): React.ReactElement {
@@ -47,6 +48,7 @@ export default function DonationDetailPage(): React.ReactElement {
         .from('donations')
         .select(`
           *,
+          instructions_for_driver,
           food_item:food_items(*)
         `)
         .eq('id', params.id)
@@ -185,12 +187,27 @@ export default function DonationDetailPage(): React.ReactElement {
               <div>
                  <h3 className="mb-1 text-label font-medium text-primary-75">Pickup Time</h3>
                  <p className="text-body text-primary">
-                    {donation.pickup_time 
-                    ? new Date(donation.pickup_time).toLocaleString() 
-                    : <span className="italic text-primary-50">Not specified</span>}
+                    {Array.isArray(donation.pickup_slots) && donation.pickup_slots.length > 0 && donation.pickup_slots[0] && typeof donation.pickup_slots[0] === 'object' && 'start' in donation.pickup_slots[0] && 'end' in donation.pickup_slots[0]
+                      ? (() => {
+                          const slot = donation.pickup_slots[0] as { start: string; end: string };
+                          const date = donation.pickup_time ? new Date(donation.pickup_time) : null;
+                          const dateStr = date ? date.toLocaleDateString() : '';
+                          return `Pickup: ${dateStr}, ${slot.start}–${slot.end}`;
+                        })()
+                      : (donation.pickup_time
+                          ? `Pickup: ${new Date(donation.pickup_time).toLocaleDateString()}, ${new Date(donation.pickup_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`
+                          : <span className="italic text-primary-50">Not specified</span>
+                        )}
                  </p>
               </div>
             </div>
+
+            {donation.instructions_for_driver && (
+              <div>
+                <h3 className="mb-1 text-label font-medium text-primary-75">Instructions for Driver</h3>
+                <p className="text-body text-primary whitespace-pre-wrap">{donation.instructions_for_driver}</p>
+              </div>
+            )}
             
             {donation.status === 'available' && (
               <div className="flex space-x-4 border-t border-primary-10 pt-5">
