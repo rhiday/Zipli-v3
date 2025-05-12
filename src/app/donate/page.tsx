@@ -6,11 +6,11 @@ import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import BottomNav from '@/components/BottomNav';
-import { ArrowRight, ChevronRight, Languages, MessageSquare, Info, ChevronDown, UserCircle, PlusIcon, PackageIcon } from 'lucide-react';
+import { ArrowRight, Info, ChevronDown, PlusIcon, PackageIcon } from 'lucide-react';
 import { Database } from '@/lib/supabase/types';
-import DonationCard from '@/components/donations/DonationCard';
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -144,7 +144,7 @@ export default function DonorDashboardPage(): React.ReactElement {
 
       <main className="relative z-20 -mt-6 rounded-t-3xl md:rounded-t-none bg-base py-4 px-6 md:px-12 space-y-6">
         <section>
-          <h2 className="text-titleXs font-medium text-primary mb-4">Active offer</h2>
+          <h2 className="text-titleXs font-medium text-primary mb-4">Your active offers</h2>
           {error && (
             <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">
               {error}
@@ -153,7 +153,7 @@ export default function DonorDashboardPage(): React.ReactElement {
           <div className="md:flex md:items-end md:gap-4">
             <div className="w-full md:max-w-sm">
               {(() => {
-                const activeOffers = dashboardData.donations.filter(d => d.status === 'available').slice(0, 1);
+                const activeOffers = dashboardData.donations.filter(d => d.status === 'available' || d.status === 'claimed').slice(0, 1);
                 if (activeOffers.length > 0) {
                   return activeOffers.map((donation) => (
                     <Link 
@@ -193,6 +193,18 @@ export default function DonorDashboardPage(): React.ReactElement {
                           : 'Recurring Schedule'
                          }
                       </p>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        className="mt-3 w-full"
+                        onClick={e => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          router.push(`/donate/${donation.id}/handover-confirm`);
+                        }}
+                      >
+                        Confirm Handover
+                      </Button>
                     </Link>
                   ));
                 } else {
@@ -212,8 +224,8 @@ export default function DonorDashboardPage(): React.ReactElement {
               })()}
             </div>
             <div className="mt-4 text-right md:mt-0">
-              <Link href="/donate/all-offers" className="inline-flex items-center text-sm font-semibold text-primary hover:underline">
-                See all offers
+              <Link href="/donate/all-offers?filter=active" className="inline-flex items-center text-sm font-semibold text-primary hover:underline">
+                See all of your active offers
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
@@ -299,6 +311,61 @@ export default function DonorDashboardPage(): React.ReactElement {
                 Otherwise, it will naturally take the first 2 columns and the rest of the row will be empty.
             <div className="hidden md:block md:col-span-2"></div> */}
         </div>
+        
+        {/* This is whom you've helped section */}
+        <section>
+          <h2 className="text-lg font-semibold text-primary mb-3">This is whom you've helped</h2>
+          
+          <div className="space-y-4">
+            {/* Recipient 1 - Tsänssi */}
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-full overflow-hidden relative">
+                <Image 
+                  src="/images/tsänssi.jpeg" 
+                  alt="Tsänssi logo" 
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-primary font-medium">Tsänssi</h3>
+                <p className="text-sm text-primary-75">3 kg · Warm food</p>
+              </div>
+            </div>
+            
+            {/* Recipient 2 - Red cross */}
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-full overflow-hidden relative">
+                <Image 
+                  src="/images/redcross.jpeg" 
+                  alt="Red Cross logo" 
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-primary font-medium">Red cross</h3>
+                <p className="text-sm text-primary-75">10 kg · Warm food; Cold food</p>
+              </div>
+            </div>
+            
+            {/* Recipient 3 - Andreas church */}
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-full overflow-hidden relative">
+                <Image 
+                  src="/images/kirkko.jpeg" 
+                  alt="Andreas church logo" 
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-primary font-medium">Andreas church</h3>
+                <p className="text-sm text-primary-75">7 kg · Cold food</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       <BottomNav />
