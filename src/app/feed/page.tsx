@@ -86,7 +86,6 @@ export default function FeedPage(): React.ReactElement {
             donor:profiles!donations_donor_id_fkey!inner(organization_name, address)
           `)
           .eq('status', 'available')
-          .neq('donor_id', user.id);
 
         if (allergenFilter) {
           query = query.ilike('food_items.allergens', `%${allergenFilter}%`);
