@@ -2,18 +2,24 @@ import { NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
-// Environment variables - in production, use process.env
-const SUPABASE_URL = 'https://vqtfcdnrgotgrnwwuryo.supabase.co';
-const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxdGZjZG5yZ290Z3Jud3d1cnlvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTkwODM3NiwiZXhwIjoyMDYxNDg0Mzc2fQ.nqHBc5b9VkUXp2qM-87AdHyiczgTZr0wn2qiPUnf15U';
-const SUPABASE_STORAGE_BUCKET = 'donations';
-const OPENAI_API_KEY = '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';
-
-// Initialize clients
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+// Initialize clients with environment variables that are set in .env.local
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);
+const openai = new OpenAI();
 
 export async function POST(request: Request) {
   try {
+    // Make sure we have required environment variables
+    if (!process.env.OPENAI_API_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Missing required environment variables');
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
     // Parse the request body
     const body = await request.json();
     const { name } = body;
@@ -47,7 +53,7 @@ export async function POST(request: Request) {
     const imageUrl = response.data[0].url;
     
     // Download the image
-    console.log(`Downloading image from: ${imageUrl}`);
+    console.log(`Downloading image from URL`);
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       return NextResponse.json(
@@ -63,7 +69,7 @@ export async function POST(request: Request) {
     console.log(`Uploading to Supabase: ${filePath}`);
     
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from(SUPABASE_STORAGE_BUCKET)
+      .from(process.env.SUPABASE_STORAGE_BUCKET || 'donations')
       .upload(filePath, imageBuffer, { contentType: 'image/png', upsert: true });
       
     if (uploadError) {
@@ -76,7 +82,7 @@ export async function POST(request: Request) {
     
     // Get the public URL
     const { data: urlData } = supabase.storage
-      .from(SUPABASE_STORAGE_BUCKET)
+      .from(process.env.SUPABASE_STORAGE_BUCKET || 'donations')
       .getPublicUrl(filePath);
       
     console.log(`Generated image URL: ${urlData.publicUrl}`);
