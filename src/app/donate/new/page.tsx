@@ -240,8 +240,30 @@ export default function CreateDonationPage() {
       for (const [idx, item] of data.items.entries()) {
         let item_image_url: string | null = null;
         const imageToUpload = item.image?.[0];
+        let foodItem: { id: string } | null = null;
 
+        // STEP 1: Create food item first without the image to get foodItem.id
+        const { data: foodItemData, error: foodItemError } = await supabase
+          .from('food_items')
+          .insert([
+            {
+              donor_id: user.id,
+              name: item.name,
+              description: item.description,
+              image_url: null, // Will update after we have an image
+              allergens: item.allergens,
+            }
+          ])
+          .select()
+          .single();
+  
+        if (foodItemError) throw foodItemError;
+        if (!foodItemData) throw new Error('Failed to create food item');
+        foodItem = foodItemData as { id: string };
+
+        // STEP 2: Handle user-uploaded image OR generate one with DALL-E
         if (imageToUpload) {
+          // Process user-uploaded image (existing code)
           if (imageToUpload.size > 5 * 1024 * 1024) {
             setServerError(`Image for item ${idx + 1} must be less than 5MB.`);
             return;
@@ -265,24 +287,46 @@ export default function CreateDonationPage() {
               .getPublicUrl(uploadData.path);
             item_image_url = publicUrl;
           }
+        } else {
+          // No image uploaded, call API to generate DALL-E image
+          try {
+            console.log(`Generating DALL-E image for: ${item.name}`);
+            const response = await fetch('/api/generate-food-image', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: item.name })
+            });
+            
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || 'Failed to generate image');
+            }
+            
+            const data = await response.json();
+            item_image_url = data.url;
+            console.log(`Generated image URL: ${item_image_url}`);
+          } catch (err: any) {
+            console.error('Error generating image:', err);
+            // Continue without image if generation fails
+            // Or optionally set an error
+            // setServerError(`Failed to generate image for ${item.name}: ${err.message}`);
+            // return;
+          }
         }
 
-        const { data: foodItem, error: foodItemError } = await supabase
-          .from('food_items')
-          .insert([
-            {
-              donor_id: user.id,
-              name: item.name,
-              description: item.description,
-              image_url: item_image_url,
-              allergens: item.allergens,
-            }
-          ])
-          .select()
-          .single();
-        if (foodItemError) throw foodItemError;
-        if (!foodItem) throw new Error('Failed to create food item');
+        // STEP 3: Update food item with image URL
+        if (item_image_url) {
+          const { error: updateError } = await supabase
+            .from('food_items')
+            .update({ image_url: item_image_url })
+            .eq('id', foodItem.id);
+            
+          if (updateError) {
+            console.error('Error updating food item with image:', updateError);
+          }
+        }
 
+        // STEP 4: Create donation (existing code)
         const { error: insertError } = await supabase
           .from('donations')
           .insert([
@@ -291,9 +335,9 @@ export default function CreateDonationPage() {
               donor_id: user.id,
               quantity: item.quantity,
               status: 'available',
-              pickup_time: finalPickupTimeISO, // Use the combined ISO string of date + first slot start time
+              pickup_time: finalPickupTimeISO,
               instructions_for_driver: data.instructions_for_driver,
-              pickup_slots: data.pickup_slots // Save the array of slots
+              pickup_slots: data.pickup_slots
             }
           ]);
         if (insertError) {
