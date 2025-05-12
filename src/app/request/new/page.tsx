@@ -28,6 +28,7 @@ export default function CreateRequestPage() {
     pickup_start_time: '09:00',
     pickup_end_time: '10:00',
     is_recurring: false,
+    pickup_instructions: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -85,6 +86,7 @@ export default function CreateRequestPage() {
             pickup_end_time: formData.pickup_end_time,
             status: 'active',
             is_recurring: formData.is_recurring,
+            pickup_instructions: formData.pickup_instructions,
           }
         ])
         .select()
@@ -216,6 +218,20 @@ export default function CreateRequestPage() {
               value={formData.pickup_end_time}
               onChange={handleChange}
               className="border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="pickup_instructions" className="block text-label font-medium text-primary mb-1">
+              Pickup Instructions (Optional)
+            </Label>
+            <Textarea
+              id="pickup_instructions"
+              name="pickup_instructions"
+              value={formData.pickup_instructions}
+              onChange={handleChange}
+              rows={3}
+              placeholder="e.g., Please ring the bell, items are fragile, etc."
             />
           </div>
 

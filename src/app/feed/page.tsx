@@ -16,6 +16,7 @@ type DonationFeed = {
     description: string;
     image_url: string | null;
     allergens: string | null;
+    food_type: string | null;
   };
   quantity: number;
   status: string;
@@ -27,6 +28,7 @@ type DonationFeed = {
   created_at: string;
   unit?: string;
   pickup_slots?: { start: string; end: string }[];
+  donor_id: string;
 };
 
 type RequestFeedItem = {
@@ -45,6 +47,7 @@ type RequestFeedItem = {
 };
 
 const COMMON_ALLERGENS = ["Lactose-Free", "Low-Lactose", "Gluten-Free", "Soy-Free"];
+const FOOD_TYPE_OPTIONS = ["Prepared meals", "Fresh produce", "Cold packaged foods", "Bakery and Pastry", "Other"];
 
 export default function FeedPage(): React.ReactElement {
   const router = useRouter();
@@ -55,14 +58,22 @@ export default function FeedPage(): React.ReactElement {
 
   const [itemTypeFilter, setItemTypeFilter] = useState<"donations" | "requests">("donations");
   const [allergenFilter, setAllergenFilter] = useState<string>("");
+  const [foodTypeFilter, setFoodTypeFilter] = useState<string>("");
   const [quantityFilter, setQuantityFilter] = useState<string>("");
   const [startDateFilter, setStartDateFilter] = useState<string>("");
   const [endDateFilter, setEndDateFilter] = useState<string>("");
   const [showAdditionalFilters, setShowAdditionalFilters] = useState(false);
 
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
   useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+    };
+    getCurrentUser();
     fetchFeedData();
-  }, [itemTypeFilter, allergenFilter, quantityFilter, startDateFilter, endDateFilter, showAdditionalFilters]);
+  }, [itemTypeFilter, allergenFilter, foodTypeFilter, quantityFilter, startDateFilter, endDateFilter, showAdditionalFilters]);
 
   const fetchFeedData = async () => {
     setLoading(true);
@@ -76,19 +87,23 @@ export default function FeedPage(): React.ReactElement {
       }
 
       let query;
+      let userId = user?.id;
 
       if (itemTypeFilter === "donations") {
         query = supabase
           .from('donations')
           .select(`
-            id, quantity, status, pickup_time, created_at,
-            food_item:food_items!inner(name, description, image_url, allergens),
+            id, quantity, status, pickup_time, created_at, donor_id,
+            food_item:food_items!inner(name, description, image_url, allergens, food_type),
             donor:profiles!donations_donor_id_fkey!inner(organization_name, address)
           `)
-          .eq('status', 'available')
+          .eq('status', 'available');
 
         if (allergenFilter) {
           query = query.ilike('food_items.allergens', `%${allergenFilter}%`);
+        }
+        if (foodTypeFilter) {
+          query = query.eq('food_items.food_type', foodTypeFilter);
         }
         if (quantityFilter && showAdditionalFilters) {
           const minQuantity = parseInt(quantityFilter);
@@ -145,6 +160,7 @@ export default function FeedPage(): React.ReactElement {
   const clearFilters = () => {
     setItemTypeFilter("donations");
     setAllergenFilter("");
+    setFoodTypeFilter("");
     setQuantityFilter("");
     setStartDateFilter("");
     setEndDateFilter("");
@@ -177,6 +193,26 @@ export default function FeedPage(): React.ReactElement {
     }
     const date = new Date(donation.pickup_time);
     return `Pickup: ${date.toLocaleDateString()}, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+  };
+
+  const handleClaimDonation = async (donationId: string) => {
+    if (!currentUserId) {
+      router.push('/auth/login');
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('donations')
+        .update({ status: 'claimed', receiver_id: currentUserId })
+        .eq('id', donationId)
+        .eq('status', 'available');
+
+      if (error) throw error;
+      fetchFeedData(); 
+    } catch (err: any) {
+      console.error("Error claiming donation:", err);
+      setError(err.message || 'Failed to claim donation.');
+    }
   };
 
   if (loading) {
@@ -250,6 +286,33 @@ export default function FeedPage(): React.ReactElement {
                     className="rounded-full px-4 py-1.5 text-sm capitalize"
                   >
                     {allergen}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {itemTypeFilter === "donations" && (
+            <div className="space-y-2 pt-2">
+              <Label className="block text-sm font-medium text-primary-75">Filter by Food Type</Label>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant={foodTypeFilter === "" ? 'primary' : 'secondary'} 
+                  size="sm"
+                  onClick={() => setFoodTypeFilter("")}
+                  className="rounded-full px-4 py-1.5 text-sm"
+                >
+                  All Food Types
+                </Button>
+                {FOOD_TYPE_OPTIONS.map(type => (
+                  <Button 
+                    key={type} 
+                    variant={foodTypeFilter === type ? 'primary' : 'secondary'} 
+                    size="sm"
+                    onClick={() => setFoodTypeFilter(type)}
+                    className="rounded-full px-4 py-1.5 text-sm capitalize"
+                  >
+                    {type}
                   </Button>
                 ))}
               </div>
@@ -339,6 +402,11 @@ export default function FeedPage(): React.ReactElement {
                       <p className="text-sm text-primary-75 mt-1">
                         {`${donation.quantity} ${donation.unit || 'kg'} · from ${donation.donor?.organization_name || 'Unknown Donor'}`}
                       </p>
+                      {donation.food_item.food_type && (
+                        <p className="text-xs text-primary-60 mt-0.5 italic">
+                          {donation.food_item.food_type}
+                        </p>
+                      )}
                       <p className="text-xs text-primary-60 mt-0.5">
                         {formatPickupWindow(donation)}
                       </p>
@@ -375,14 +443,16 @@ export default function FeedPage(): React.ReactElement {
                           from {request.pickup_start_time} to {request.pickup_end_time}
                         </p>
                       </div>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="mt-4 w-full"
-                        onClick={() => router.push(`/request/${request.id}`)} 
-                      >
-                        View Request Details
-                      </Button>
+                      {request.status === 'active' && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="mt-4 w-full"
+                          onClick={(e) => { e.stopPropagation(); router.push(`/request/${request.id}`); }} 
+                        >
+                          Rescue Food
+                        </Button>
+                      )}
                     </div>
                   </div>
                 );
@@ -391,7 +461,7 @@ export default function FeedPage(): React.ReactElement {
           ) : (
             <div className="col-span-full text-center py-12">
               <p className="text-body text-primary-75">
-                {searchTerm || allergenFilter || quantityFilter || startDateFilter || endDateFilter 
+                {searchTerm || allergenFilter || foodTypeFilter || quantityFilter || startDateFilter || endDateFilter 
                   ? `No ${itemTypeFilter} match your criteria` 
                   : `No ${itemTypeFilter} available at the moment`}
               </p>

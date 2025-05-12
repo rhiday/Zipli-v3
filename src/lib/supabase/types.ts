@@ -85,6 +85,7 @@ export type Database = {
           created_at: string
           description: string | null
           donor_id: string | null
+          food_type: string | null
           id: string
           image_url: string | null
           name: string
@@ -95,6 +96,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           donor_id?: string | null
+          food_type?: string | null
           id?: string
           image_url?: string | null
           name: string
@@ -105,6 +107,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           donor_id?: string | null
+          food_type?: string | null
           id?: string
           image_url?: string | null
           name?: string

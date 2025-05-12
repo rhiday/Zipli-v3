@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
 const { createClient } = require('@supabase/supabase-js');
 const { OpenAI } = require('openai');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
@@ -29,12 +29,14 @@ function makePrompt(item) {
   return `create image of ${item.name}, natural and real style, in a setting so that it looks like placed on a restaurant table or a buffet. it will look like item is part of a buffet / table but the focus is stll on the item.`;
 }
 
-async function generateImage(prompt) {
+async function generateImage(promptString) {
+  console.log(`Using DALL-E prompt: "${promptString}"`);
   const response = await openai.images.generate({
-    prompt,
+    model: "dall-e-3",
+    prompt: promptString,
     n: 1,
-    size: '512x512',
-    response_format: 'url',
+    size: "1024x1024",
+    response_format: "url",
   });
   return response.data[0].url;
 }
@@ -75,9 +77,8 @@ async function updateImageUrl(itemId, url) {
         console.log(`Skipping ${item.name} (already has image)`);
         continue;
       }
-      const prompt = makePrompt(item);
-      console.log(`Generating image for: ${item.name}`);
-      const imageUrl = await generateImage(prompt);
+      const imageGenerationPrompt = makePrompt(item);
+      const imageUrl = await generateImage(imageGenerationPrompt);
       const buffer = await downloadImage(imageUrl);
       const filePath = await uploadToSupabase(item.id, buffer);
       const publicUrl = await getPublicUrl(filePath);

@@ -73,6 +73,42 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
       
       {/* Export card */}
       <ExportCard />
+      
+      {/* This is whom you've helped section */}
+      <div className="mt-8 pb-4">
+        <h2 className="text-primary text-titleMd font-semibold mb-6">This is whom you've helped</h2>
+        
+        <div className="space-y-6">
+          {/* Recipient 1 */}
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-rose-100 flex items-center justify-center overflow-hidden">
+              <span className="text-rose-600 text-2xl font-bold">+</span>
+            </div>
+            <div>
+              <h3 className="text-primary text-titleXs font-semibold">Red cross</h3>
+              <p className="text-secondary text-bodyLg">500g · Beef stew</p>
+            </div>
+          </div>
+          
+          {/* Recipient 2 */}
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"></div>
+            <div>
+              <h3 className="text-primary text-titleXs font-semibold">Stadin Safka</h3>
+              <p className="text-secondary text-bodyLg">500g · Beef stew</p>
+            </div>
+          </div>
+          
+          {/* Recipient 3 */}
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"></div>
+            <div>
+              <h3 className="text-primary text-titleXs font-semibold">Recipient name</h3>
+              <p className="text-secondary text-bodyLg">500g · Beef stew</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

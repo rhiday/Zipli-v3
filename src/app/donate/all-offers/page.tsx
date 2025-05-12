@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Header from '@/components/layout/Header';
 import { ChevronLeft, FilterXIcon, PackageIcon, HandshakeIcon, SlidersHorizontalIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
-import { Database } from '@/lib/supabase/types';
+import { Database, Json } from '@/lib/supabase/types';
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 
@@ -16,13 +16,22 @@ type FoodItemDetails = {
   name: string;
   description: string | null;
   image_url: string | null;
+  food_type: string | null;
 };
 
-type DonationItem = Database['public']['Tables']['donations']['Row'] & {
+type DonationItem = {
+  id: string;
+  created_at: string;
+  donor_id: string;
+  food_item_id: string;
+  pickup_time: string | null;
+  pickup_slots: Json | null;
+  quantity: number;
+  status: string;
+  updated_at: string;
   itemType: 'donation';
   food_item: FoodItemDetails;
   unit?: string;
-  pickup_slots?: { start: string; end: string }[];
 };
 
 type RequestItem = Database['public']['Tables']['requests']['Row'] & {
@@ -30,6 +39,8 @@ type RequestItem = Database['public']['Tables']['requests']['Row'] & {
 };
 
 type DisplayItem = DonationItem | RequestItem;
+
+const FOOD_TYPE_OPTIONS = ["Prepared meals", "Fresh produce", "Cold packaged foods", "Bakery and Pastry", "Other"];
 
 export default function AllItemsPage(): React.ReactElement {
   const router = useRouter();
@@ -40,6 +51,7 @@ export default function AllItemsPage(): React.ReactElement {
 
   const [offerTypeFilter, setOfferTypeFilter] = useState<'donations' | 'requests'>('donations');
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [foodTypeFilter, setFoodTypeFilter] = useState<string>("");
   const [quantityFilter, setQuantityFilter] = useState<string>("");
   const [startDateFilter, setStartDateFilter] = useState<string>("");
   const [endDateFilter, setEndDateFilter] = useState<string>("");
@@ -47,7 +59,7 @@ export default function AllItemsPage(): React.ReactElement {
 
   useEffect(() => {
     fetchItems();
-  }, [offerTypeFilter, statusFilter, quantityFilter, startDateFilter, endDateFilter]);
+  }, [offerTypeFilter, statusFilter, foodTypeFilter, quantityFilter, startDateFilter, endDateFilter]);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -74,16 +86,13 @@ export default function AllItemsPage(): React.ReactElement {
       if (offerTypeFilter === 'donations') {
         let query = supabase
           .from('donations')
-          .select(`
-            *,
-            unit,
-            food_item:food_items!inner(
-              name, description, image_url
-            )
-          `)
+          .select('id, created_at, donor_id, food_item_id, pickup_time, pickup_slots, quantity, status, updated_at, food_item:food_items(name, description, image_url, food_type)')
           .eq('donor_id', user.id);
 
         if (statusFilter) query = query.eq('status', statusFilter);
+        if (foodTypeFilter) {
+          query = query.eq('food_items.food_type', foodTypeFilter);
+        }
         if (quantityFilter && showAdditionalFilters) {
           const minQty = parseInt(quantityFilter);
           if (!isNaN(minQty) && minQty > 0) query = query.gte('quantity', minQty);
@@ -96,7 +105,25 @@ export default function AllItemsPage(): React.ReactElement {
         }
         const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
-        fetchedItems = (data || []).map(d => ({ ...d, itemType: 'donation' } as DonationItem));
+        fetchedItems = (data || [])
+          .filter(d => d && d.food_item)
+          .map(d => {
+            const foodItem = Array.isArray(d.food_item) && d.food_item.length > 0 
+              ? d.food_item[0] 
+              : d.food_item;
+            
+            if (!foodItem) {
+              console.warn('Donation item has null food_item:', d.id);
+              return null;
+            }
+            
+            return {
+              ...d,
+              itemType: 'donation',
+              food_item: foodItem
+            };
+          })
+          .filter(Boolean) as DonationItem[];
 
       } else if (offerTypeFilter === 'requests') {
         let query = supabase
@@ -127,6 +154,7 @@ export default function AllItemsPage(): React.ReactElement {
 
   const clearFilters = () => {
     setStatusFilter("");
+    setFoodTypeFilter("");
     setQuantityFilter("");
     setStartDateFilter("");
     setEndDateFilter("");
@@ -140,15 +168,27 @@ export default function AllItemsPage(): React.ReactElement {
   const dateInputClassName = "mt-1 block w-full pl-3 pr-3 py-2 text-base border-primary-25 focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm rounded-md shadow-sm bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400";
 
   const formatPickupWindow = (donation: DonationItem) => {
-    if (!donation.pickup_time) return '';
-    if (donation.pickup_slots && Array.isArray(donation.pickup_slots) && donation.pickup_slots.length > 0) {
-      const slot = donation.pickup_slots[0];
-      const date = new Date(donation.pickup_time as string);
-      const dateStr = date.toLocaleDateString();
-      return `Pickup: ${dateStr}, ${slot.start}–${slot.end}`;
+    if (!donation || !donation.pickup_time) return '';
+    try {
+      if (donation.pickup_slots && 
+          Array.isArray(donation.pickup_slots) && 
+          donation.pickup_slots.length > 0 &&
+          typeof donation.pickup_slots[0] === 'object' &&
+          donation.pickup_slots[0] !== null &&
+          'start' in donation.pickup_slots[0] && 
+          'end' in donation.pickup_slots[0]) {
+        
+        const slot = donation.pickup_slots[0] as { start: string; end: string };
+        const date = new Date(donation.pickup_time);
+        const dateStr = date.toLocaleDateString();
+        return `Pickup: ${dateStr}, ${slot.start}–${slot.end}`;
+      }
+      const date = new Date(donation.pickup_time);
+      return `Pickup: ${date.toLocaleDateString()}, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+    } catch (error) {
+      console.error('Error formatting pickup window:', error);
+      return 'Pickup time not available';
     }
-    const date = new Date(donation.pickup_time as string);
-    return `Pickup: ${date.toLocaleDateString()}, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
   };
 
   if (loading) {
@@ -215,6 +255,33 @@ export default function AllItemsPage(): React.ReactElement {
           </div>
         </div>
         
+        {offerTypeFilter === 'donations' && (
+          <div className="space-y-2 mt-4">
+            <Label className="block text-sm font-medium text-primary-75">Food Type</Label>
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant={foodTypeFilter === "" ? 'primary' : 'secondary'} 
+                size="sm"
+                onClick={() => setFoodTypeFilter("")}
+                className="rounded-full px-4 py-1.5 text-sm"
+              >
+                All Types
+              </Button>
+              {FOOD_TYPE_OPTIONS.map(type => (
+                <Button 
+                  key={type} 
+                  variant={foodTypeFilter === type ? 'primary' : 'secondary'} 
+                  size="sm"
+                  onClick={() => setFoodTypeFilter(type)}
+                  className="rounded-full px-4 py-1.5 text-sm capitalize"
+                >
+                  {type}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <Button 
             variant="ghost" 
@@ -259,8 +326,21 @@ export default function AllItemsPage(): React.ReactElement {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
             {items.map((item) => {
               const isDonation = item.itemType === 'donation';
-              const title = isDonation ? (item as DonationItem).food_item.name : (item as RequestItem).description.substring(0, 30) + ((item as RequestItem).description.length > 30 ? '...':'');
-              const description = isDonation ? (item as DonationItem).food_item.description : (item as RequestItem).description;
+              
+              if (isDonation && !(item as DonationItem).food_item) {
+                return null;
+              }
+              
+              const title = isDonation && (item as DonationItem).food_item 
+                ? (item as DonationItem).food_item.name 
+                : !isDonation ? (item as RequestItem).description.substring(0, 30) + ((item as RequestItem).description.length > 30 ? '...' : '') 
+                : 'No title';
+                
+              const description = isDonation && (item as DonationItem).food_item
+                ? (item as DonationItem).food_item.description 
+                : !isDonation ? (item as RequestItem).description 
+                : null;
+              
               const displayStatus = item.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
               const dateLabel = isDonation ? "Offered" : "Requested";
               const itemDate = item.created_at;
@@ -284,6 +364,9 @@ export default function AllItemsPage(): React.ReactElement {
                       )}>{displayStatus}</span>
                   </div>
                   <p className="mb-1 text-sm text-muted-foreground line-clamp-3 h-12 overflow-hidden">{description || "No description."}</p>
+                  {isDonation && (item as DonationItem).food_item && (item as DonationItem).food_item.food_type && (
+                    <p className="text-xs text-muted-foreground mt-1 italic">Type: {(item as DonationItem).food_item.food_type}</p>
+                  )}
                   <p className="text-xs text-muted-foreground mt-1">{isDonation ? "Quantity:" : "For:"} {quantityOrPeople}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {isDonation && (item as DonationItem).pickup_time && formatPickupWindow(item as DonationItem)}

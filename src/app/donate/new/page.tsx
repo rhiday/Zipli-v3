@@ -30,6 +30,7 @@ type ItemInput = {
   description: string;
   quantity: number;
   allergens: string;
+  food_type: string;
   displayState: 'editing' | 'summary';
   image?: FileList;
 };
@@ -49,6 +50,14 @@ type DonationFormInputs = {
 interface ProfileData {
   address?: string;
 }
+
+const FOOD_TYPE_OPTIONS = [
+  'Prepared meals',
+  'Fresh produce',
+  'Cold packaged foods',
+  'Bakery and Pastry',
+  'Other',
+];
 
 export default function CreateDonationPage() {
   const router = useRouter();
@@ -70,7 +79,7 @@ export default function CreateDonationPage() {
     control,
   } = useForm<DonationFormInputs>({
     defaultValues: {
-      items: [{ name: '', description: '', quantity: 0.5, allergens: '', displayState: 'editing', image: undefined }],
+      items: [{ name: '', description: '', quantity: 0.5, allergens: '', food_type: 'Other', displayState: 'editing', image: undefined }],
       pickup_date: undefined,
       pickup_slots: [{ start: '09:00', end: '10:00' }],
       instructions_for_driver: ''
@@ -121,7 +130,7 @@ export default function CreateDonationPage() {
     const updatedItems = currentItems.map(item => ({ ...item, displayState: 'summary' as const }));
     setValue('items', [
       ...updatedItems,
-      { name: '', description: '', quantity: 1, allergens: '', displayState: 'editing', image: undefined },
+      { name: '', description: '', quantity: 1, allergens: '', food_type: 'Other', displayState: 'editing', image: undefined },
     ]);
   };
 
@@ -152,7 +161,7 @@ export default function CreateDonationPage() {
 
     // If deleting the only item, reset to a single new editing item
     if (updatedItems.length === 0) {
-      setValue('items', [{ name: '', description: '', quantity: 1, allergens: '', displayState: 'editing', image: undefined }]);
+      setValue('items', [{ name: '', description: '', quantity: 1, allergens: '', food_type: 'Other', displayState: 'editing', image: undefined }]);
     } else {
       // If the deleted item was the one being edited, make the last item editable
       const isEditingDeleted = currentItems[index]?.displayState === 'editing';
@@ -250,6 +259,7 @@ export default function CreateDonationPage() {
               description: item.description,
               image_url: null, // Will update after we have an image
               allergens: item.allergens,
+              food_type: item.food_type || 'Other',
             }
           ])
           .select()
@@ -499,6 +509,29 @@ export default function CreateDonationPage() {
                                 </Button>
                               );
                              })}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-label font-semibold text-secondary mb-2">
+                            Type of Food
+                          </label>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {FOOD_TYPE_OPTIONS.map((type) => {
+                              const isSelected = (watch(`items.${idx}.food_type`) || 'Other') === type;
+                              return (
+                                <Button
+                                  key={type}
+                                  type="button"
+                                  variant={isSelected ? "primary" : "secondary"}
+                                  size="sm"
+                                  className="text-xs h-7 px-2.5 capitalize"
+                                  onClick={() => setValue(`items.${idx}.food_type`, type)}
+                                  disabled={isSubmitting}
+                                >
+                                  {type}
+                                </Button>
+                              );
+                            })}
                           </div>
                         </div>
                         {/* Add Image Input */}

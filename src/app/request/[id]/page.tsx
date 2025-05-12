@@ -20,6 +20,7 @@ type RequestDetail = {
   user: {
     email: string;
   } | null;
+  pickup_instructions?: string;
 };
 
 export default function RequestDetailPage({ params }: { params: { id: string } }): React.ReactElement {
@@ -55,6 +56,7 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
         .from('requests')
         .select(`
           id, description, people_count, pickup_date, pickup_start_time, pickup_end_time, status, created_at, user_id,
+          pickup_instructions,
           user:profiles(email)
         `)
         .eq('id', params.id)
@@ -191,6 +193,13 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
                 </div>
               </div>
             </div>
+
+            {request.pickup_instructions && (
+              <div className="mb-6 pt-4 border-t border-primary-10">
+                <h2 className="mb-1 text-label font-semibold text-primary">Pickup Instructions</h2>
+                <p className="text-body text-primary-75 whitespace-pre-wrap">{request.pickup_instructions}</p>
+              </div>
+            )}
 
             {request.user && (
               <div className="mb-6 rounded-md border border-primary-10 bg-primary-10/50 p-4">

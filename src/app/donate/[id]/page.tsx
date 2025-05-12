@@ -13,7 +13,9 @@ type DonationRow = Database['public']['Tables']['donations']['Row'];
 type FoodItemRow = Database['public']['Tables']['food_items']['Row'];
 
 type DonationWithFoodItem = DonationRow & {
-  food_item: FoodItemRow;
+  food_item: FoodItemRow & {
+    food_type?: string | null;
+  };
   pickup_time: string;
   instructions_for_driver: string;
 };
@@ -27,6 +29,7 @@ export default function DonationDetailPage(): React.ReactElement {
     loading: true
   });
   const [actionLoading, setActionLoading] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (params.id) {
@@ -43,6 +46,7 @@ export default function DonationDetailPage(): React.ReactElement {
         router.push('/auth/login');
         return;
       }
+      setCurrentUserId(user.id);
 
       const { data, error } = await supabase
         .from('donations')
@@ -89,6 +93,28 @@ export default function DonationDetailPage(): React.ReactElement {
     } catch (err: any) {
       console.error("Update Status Error:", err);
       setState(prev => ({ ...prev, error: err.message || 'Failed to update status.' }));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleClaimDonation = async () => {
+    if (!state.data || !currentUserId) return;
+
+    try {
+      setActionLoading(true);
+      const { error } = await supabase
+        .from('donations')
+        .update({ status: 'claimed', receiver_id: currentUserId, updated_at: new Date().toISOString() })
+        .eq('id', params.id)
+        .eq('status', 'available')
+        .neq('donor_id', currentUserId);
+
+      if (error) throw error;
+      await fetchDonation();
+    } catch (err: any) {
+      console.error("Claim Donation Error:", err);
+      setState(prev => ({ ...prev, error: err.message || 'Failed to claim donation.' }));
     } finally {
       setActionLoading(false);
     }
@@ -200,6 +226,12 @@ export default function DonationDetailPage(): React.ReactElement {
                         )}
                  </p>
               </div>
+              <div>
+                <h3 className="mb-1 text-label font-medium text-primary-75">Food Type</h3>
+                <p className="text-body text-primary">
+                  {donation.food_item.food_type || <span className="italic text-primary-50">Not specified</span>}
+                </p>
+              </div>
             </div>
 
             {donation.instructions_for_driver && (
@@ -209,8 +241,8 @@ export default function DonationDetailPage(): React.ReactElement {
               </div>
             )}
             
-            {donation.status === 'available' && (
-              <div className="flex space-x-4 border-t border-primary-10 pt-5">
+            <div className="flex space-x-4 border-t border-primary-10 pt-5">
+              {donation.status === 'available' && currentUserId === donation.donor_id && (
                 <Button
                   onClick={() => handleStatusUpdate('cancelled')}
                   variant="negative"
@@ -220,8 +252,19 @@ export default function DonationDetailPage(): React.ReactElement {
                 >
                   {actionLoading ? 'Cancelling...' : 'Cancel Donation'}
                 </Button>
-              </div>
-            )}
+              )}
+              {donation.status === 'available' && currentUserId && currentUserId !== donation.donor_id && (
+                <Button
+                  onClick={handleClaimDonation}
+                  variant="primary"
+                  size="md"
+                  disabled={actionLoading}
+                  className="flex-1"
+                >
+                  {actionLoading ? 'Claiming...' : 'Claim Food'}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
