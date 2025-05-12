@@ -25,6 +25,8 @@ type DonationFeed = {
   };
   pickup_time: string;
   created_at: string;
+  unit?: string;
+  pickup_slots?: { start: string; end: string }[];
 };
 
 type RequestFeedItem = {
@@ -167,6 +169,17 @@ export default function FeedPage(): React.ReactElement {
   
   const dateInputClassName = "mt-1 block w-full pl-3 pr-3 py-2 text-base border-primary-25 focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm rounded-md shadow-sm bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400";
 
+  const formatPickupWindow = (donation: DonationFeed) => {
+    if (donation.pickup_slots && Array.isArray(donation.pickup_slots) && donation.pickup_slots.length > 0) {
+      const slot = donation.pickup_slots[0];
+      const date = new Date(donation.pickup_time);
+      const dateStr = date.toLocaleDateString();
+      return `Pickup: ${dateStr}, ${slot.start}–${slot.end}`;
+    }
+    const date = new Date(donation.pickup_time);
+    return `Pickup: ${date.toLocaleDateString()}, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-cream">
@@ -301,7 +314,7 @@ export default function FeedPage(): React.ReactElement {
                   <div
                     key={donation.id}
                     className="overflow-hidden rounded-lg bg-base shadow-md transition-shadow hover:shadow-lg cursor-pointer group"
-                    onClick={() => router.push(`/feed/donation/${donation.id}`)}
+                    onClick={() => router.push(`/donate/${donation.id}`)}
                   >
                     <div className="relative h-48 w-full">
                       {donation.food_item.image_url ? (
@@ -325,10 +338,10 @@ export default function FeedPage(): React.ReactElement {
                         {donation.food_item.name}
                       </h3>
                       <p className="text-sm text-primary-75 mt-1">
-                        {`${donation.quantity} units · from ${donation.donor?.organization_name || 'Unknown Donor'}`}
+                        {`${donation.quantity} ${donation.unit || 'kg'} · from ${donation.donor?.organization_name || 'Unknown Donor'}`}
                       </p>
                       <p className="text-xs text-primary-60 mt-0.5">
-                        Until {new Date(donation.pickup_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                        {formatPickupWindow(donation)}
                       </p>
                     </div>
                   </div>
@@ -367,7 +380,7 @@ export default function FeedPage(): React.ReactElement {
                         variant="secondary"
                         size="sm"
                         className="mt-4 w-full"
-                        onClick={() => router.push(`/feed/request/${request.id}`)} 
+                        onClick={() => router.push(`/request/${request.id}`)} 
                       >
                         View Request Details
                       </Button>
