@@ -24,7 +24,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { logger } from '../../../../lib/logger';
-import sharp from 'sharp';
 
 type ItemInput = {
   name: string;
@@ -280,21 +279,28 @@ export default function CreateDonationPage() {
             setServerError(`File for item ${idx + 1} must be an image.`);
             return;
           }
-          
-          // Compress and resize image to 512x512 JPEG
-          const arrayBuffer = await imageToUpload.arrayBuffer();
-          const compressedBuffer = await sharp(Buffer.from(arrayBuffer))
-            .resize(512, 512)
-            .jpeg({ quality: 80 })
-            .toBuffer();
+
+          // Compress and resize image to 512x512 JPEG using API route
+          const formData = new FormData();
+          formData.append('image', imageToUpload);
+          const res = await fetch('/api/compress-image', {
+            method: 'POST',
+            body: formData,
+          });
+          if (!res.ok) {
+            setServerError(`Failed to compress image for item ${idx + 1}.`);
+            return;
+          }
+          const compressedBlob = await res.blob();
+          const compressedFile = new File([compressedBlob], `item_${idx}_${Date.now()}.jpg`, { type: 'image/jpeg' });
 
           const fileName = `${user.id}/item_${idx}_${Date.now()}.jpg`;
           const { error: uploadError, data: uploadData } = await supabase.storage
             .from('donations')
-            .upload(fileName, compressedBuffer, { contentType: 'image/jpeg' });
-            
+            .upload(fileName, compressedFile, { contentType: 'image/jpeg' });
+
           if (uploadError) throw uploadError;
-          
+
           if (uploadData) {
             const { data: { publicUrl } } = supabase.storage
               .from('donations')
