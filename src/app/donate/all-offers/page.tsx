@@ -83,7 +83,7 @@ export default function AllItemsPage(): React.ReactElement {
         setUserName(profileData.organization_name || profileData.full_name || 'User');
       }
 
-      let fetchedItems = [];
+      let fetchedItems: DisplayItem[] = [];
       if (filters.type === 'donations') {
         let query = supabase
           .from('donations')
