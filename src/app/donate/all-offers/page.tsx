@@ -11,6 +11,7 @@ import { ChevronLeft, FilterXIcon, PackageIcon, HandshakeIcon, SlidersHorizontal
 import { Database, Json } from '@/lib/supabase/types';
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
+import FilterBar from '@/components/ui/FilterBar';
 
 type FoodItemDetails = {
   name: string;
@@ -49,17 +50,19 @@ export default function AllItemsPage(): React.ReactElement {
   const [error, setError] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>('User');
 
-  const [offerTypeFilter, setOfferTypeFilter] = useState<'donations' | 'requests'>('donations');
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [foodTypeFilter, setFoodTypeFilter] = useState<string>("");
-  const [quantityFilter, setQuantityFilter] = useState<string>("");
-  const [startDateFilter, setStartDateFilter] = useState<string>("");
-  const [endDateFilter, setEndDateFilter] = useState<string>("");
-  const [showAdditionalFilters, setShowAdditionalFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    type: 'donations',
+    allergens: [],
+    foodType: '',
+    status: '',
+    minQty: '',
+    dateFrom: '',
+    dateTo: '',
+  });
 
   useEffect(() => {
     fetchItems();
-  }, [offerTypeFilter, statusFilter, foodTypeFilter, quantityFilter, startDateFilter, endDateFilter]);
+  }, [filters]);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -75,31 +78,26 @@ export default function AllItemsPage(): React.ReactElement {
         .from('profiles')
         .select('organization_name, full_name')
         .eq('id', user.id)
-        .single<Pick<Database['public']['Tables']['profiles']['Row'], 'organization_name' | 'full_name'>>();
-      
+        .single();
       if (profileData) {
         setUserName(profileData.organization_name || profileData.full_name || 'User');
       }
 
-      let fetchedItems: DisplayItem[] = [];
-
-      if (offerTypeFilter === 'donations') {
+      let fetchedItems = [];
+      if (filters.type === 'donations') {
         let query = supabase
           .from('donations')
           .select('id, created_at, donor_id, food_item_id, pickup_time, pickup_slots, quantity, status, updated_at, food_item:food_items(name, description, image_url, food_type)')
           .eq('donor_id', user.id);
-
-        if (statusFilter) query = query.eq('status', statusFilter);
-        if (foodTypeFilter) {
-          query = query.eq('food_items.food_type', foodTypeFilter);
-        }
-        if (quantityFilter && showAdditionalFilters) {
-          const minQty = parseInt(quantityFilter);
+        if (filters.status) query = query.eq('status', filters.status);
+        if (filters.foodType) query = query.eq('food_items.food_type', filters.foodType);
+        if (filters.minQty) {
+          const minQty = parseInt(filters.minQty);
           if (!isNaN(minQty) && minQty > 0) query = query.gte('quantity', minQty);
         }
-        if (startDateFilter && showAdditionalFilters) query = query.gte('pickup_time', new Date(startDateFilter).toISOString());
-        if (endDateFilter && showAdditionalFilters) {
-          const adjustedEndDate = new Date(endDateFilter);
+        if (filters.dateFrom) query = query.gte('pickup_time', new Date(filters.dateFrom).toISOString());
+        if (filters.dateTo) {
+          const adjustedEndDate = new Date(filters.dateTo);
           adjustedEndDate.setHours(23, 59, 59, 999);
           query = query.lte('pickup_time', adjustedEndDate.toISOString());
         }
@@ -111,37 +109,29 @@ export default function AllItemsPage(): React.ReactElement {
             const foodItem = Array.isArray(d.food_item) && d.food_item.length > 0 
               ? d.food_item[0] 
               : d.food_item;
-            
-            if (!foodItem) {
-              console.warn('Donation item has null food_item:', d.id);
-              return null;
-            }
-            
+            if (!foodItem) return null;
             return {
               ...d,
               itemType: 'donation',
               food_item: foodItem
             };
           })
-          .filter(Boolean) as DonationItem[];
-
-      } else if (offerTypeFilter === 'requests') {
+          .filter(Boolean);
+      } else if (filters.type === 'requests') {
         let query = supabase
           .from('requests')
           .select('id, created_at, description, is_recurring, people_count, pickup_date, pickup_end_time, pickup_start_time, status, updated_at, user_id')
           .eq('user_id', user.id);
-
-        if (statusFilter) query = query.eq('status', statusFilter);
-        if (quantityFilter && showAdditionalFilters) {
-          const minPeople = parseInt(quantityFilter);
+        if (filters.status) query = query.eq('status', filters.status);
+        if (filters.minQty) {
+          const minPeople = parseInt(filters.minQty);
           if (!isNaN(minPeople) && minPeople > 0) query = query.gte('people_count', minPeople);
         }
-        if (startDateFilter && showAdditionalFilters) query = query.gte('pickup_date', startDateFilter);
-        if (endDateFilter && showAdditionalFilters) query = query.lte('pickup_date', endDateFilter);
-        
+        if (filters.dateFrom) query = query.gte('pickup_date', filters.dateFrom);
+        if (filters.dateTo) query = query.lte('pickup_date', filters.dateTo);
         const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
-        fetchedItems = (data || []).map(r => ({ ...r, itemType: 'request' } as RequestItem));
+        fetchedItems = (data || []).map(r => ({ ...r, itemType: 'request' }));
       }
       setItems(fetchedItems);
     } catch (err: any) {
@@ -153,18 +143,21 @@ export default function AllItemsPage(): React.ReactElement {
   };
 
   const clearFilters = () => {
-    setStatusFilter("");
-    setFoodTypeFilter("");
-    setQuantityFilter("");
-    setStartDateFilter("");
-    setEndDateFilter("");
-    setShowAdditionalFilters(false);
+    setFilters({
+      type: 'donations',
+      allergens: [],
+      foodType: '',
+      status: '',
+      minQty: '',
+      dateFrom: '',
+      dateTo: '',
+    });
   };
 
   const donationStatuses = ["available", "claimed", "picked_up", "cancelled"];
   const requestStatuses = ["active", "fulfilled", "cancelled"];
-  const currentStatusOptions = offerTypeFilter === 'donations' ? donationStatuses : requestStatuses;
-  const quantityLabel = offerTypeFilter === 'donations' ? "Min. Quantity" : "Min. People";
+  const currentStatusOptions = filters.type === 'donations' ? donationStatuses : requestStatuses;
+  const quantityLabel = filters.type === 'donations' ? "Min. Quantity" : "Min. People";
   const dateInputClassName = "mt-1 block w-full pl-3 pr-3 py-2 text-base border-primary-25 focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm rounded-md shadow-sm bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400";
 
   const formatPickupWindow = (donation: DonationItem) => {
@@ -201,124 +194,24 @@ export default function AllItemsPage(): React.ReactElement {
 
   return (
     <div className="min-h-screen bg-base pb-20">
-      <Header title={`All ${offerTypeFilter === 'donations' ? 'Donations' : 'Requests'} by ${userName}`} />
+      <Header title={`All ${filters.type === 'donations' ? 'Donations' : 'Requests'} by ${userName}`} />
 
       <main className="relative z-20 -mt-6 rounded-t-3xl md:rounded-t-none bg-base py-6 px-4 md:px-8 space-y-6">
         <Button variant="ghost" onClick={() => router.back()} className="inline-flex items-center text-primary hover:text-primary/80 mb-4">
           <ChevronLeft className="mr-2 h-4 w-4" /> Back
         </Button>
 
-        <div className="space-y-2">
-          <Label className="block text-sm font-medium text-primary-75">Item Type</Label>
-          <div className="flex flex-wrap gap-2">
-            <Button 
-              variant={offerTypeFilter === 'donations' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => { setOfferTypeFilter('donations'); setStatusFilter(""); setShowAdditionalFilters(false); }}
-              className="rounded-full px-4 py-1.5 text-sm"
-            >
-              <PackageIcon className="mr-2 h-4 w-4" /> Donations
-            </Button>
-            <Button 
-              variant={offerTypeFilter === 'requests' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => { setOfferTypeFilter('requests'); setStatusFilter(""); setShowAdditionalFilters(false); }}
-              className="rounded-full px-4 py-1.5 text-sm"
-            >
-              <HandshakeIcon className="mr-2 h-4 w-4" /> Requests
-            </Button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="block text-sm font-medium text-primary-75">Status</Label>
-          <div className="flex flex-wrap gap-2">
-            <Button 
-              variant={statusFilter === "" ? 'primary' : 'secondary'} 
-              size="sm"
-              onClick={() => setStatusFilter("")}
-              className="rounded-full px-4 py-1.5 text-sm"
-            >
-              All Statuses
-            </Button>
-            {currentStatusOptions.map(status => (
-              <Button 
-                key={status} 
-                variant={statusFilter === status ? 'primary' : 'secondary'} 
-                size="sm"
-                onClick={() => setStatusFilter(status)}
-                className="rounded-full px-4 py-1.5 text-sm capitalize"
-              >
-                {status.replace('_',' ')}
-              </Button>
-            ))}
-          </div>
-        </div>
-        
-        {offerTypeFilter === 'donations' && (
-          <div className="space-y-2 mt-4">
-            <Label className="block text-sm font-medium text-primary-75">Food Type</Label>
-            <div className="flex flex-wrap gap-2">
-              <Button 
-                variant={foodTypeFilter === "" ? 'primary' : 'secondary'} 
-                size="sm"
-                onClick={() => setFoodTypeFilter("")}
-                className="rounded-full px-4 py-1.5 text-sm"
-              >
-                All Types
-              </Button>
-              {FOOD_TYPE_OPTIONS.map(type => (
-                <Button 
-                  key={type} 
-                  variant={foodTypeFilter === type ? 'primary' : 'secondary'} 
-                  size="sm"
-                  onClick={() => setFoodTypeFilter(type)}
-                  className="rounded-full px-4 py-1.5 text-sm capitalize"
-                >
-                  {type}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <Button 
-            variant="ghost" 
-            onClick={() => setShowAdditionalFilters(!showAdditionalFilters)}
-            className="text-primary hover:text-primary/90 text-xs p-1 sm:text-sm sm:p-2 flex items-center self-start"
-          >
-            {showAdditionalFilters ? <ChevronUpIcon className="mr-1 sm:mr-2 h-4 w-4" /> : <ChevronDownIcon className="mr-1 sm:mr-2 h-4 w-4" />}
-            {showAdditionalFilters ? 'Less' : 'More'} Filters
-          </Button>
-          <Button 
-            onClick={clearFilters} 
-            variant="ghost" 
-            className="text-primary hover:text-primary/80 text-xs p-1 sm:text-sm sm:size-auto flex items-center self-end"
-          >
-              <FilterXIcon className="mr-1 sm:mr-2 h-4 w-4" /> Clear All Filters
-          </Button>
-        </div>
-
-        {showAdditionalFilters && (
-          <div className="space-y-4 pt-4 border-t border-border">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 items-end">
-              <div>
-                <Label htmlFor="quantity-filter" className="block text-sm font-medium text-primary-75 mb-1">{quantityLabel}</Label>
-                <Input id="quantity-filter" type="number" placeholder="e.g., 10" value={quantityFilter} onChange={(e) => setQuantityFilter(e.target.value)} />
-              </div>
-              <div></div>
-              <div>
-                <Label htmlFor="start-date-filter" className="block text-sm font-medium text-primary-75 mb-1">Date From</Label>
-                <Input id="start-date-filter" type="date" value={startDateFilter} onChange={(e) => setStartDateFilter(e.target.value)} className={dateInputClassName} />
-              </div>
-              <div>
-                <Label htmlFor="end-date-filter" className="block text-sm font-medium text-primary-75 mb-1">Date Until</Label>
-                <Input id="end-date-filter" type="date" value={endDateFilter} onChange={(e) => setEndDateFilter(e.target.value)} className={dateInputClassName} />
-              </div>
-            </div>
-          </div>
-        )}
+        <FilterBar
+          onFilterChange={(key, value) => setFilters(f => ({ ...f, [key]: value }))}
+          activeFilters={filters}
+          showStatus={true}
+          statusOptions={filters.type === 'donations' ? ["available", "claimed", "picked_up", "cancelled"] : ["active", "fulfilled", "cancelled"]}
+          showType={true}
+          showAllergens={false}
+          showFoodType={true}
+          showMinQty={true}
+          showDateRange={true}
+        />
 
         {error && <div className="mb-6 rounded-md bg-red-100 p-4 text-sm text-red-700"><p>Error: {error}</p></div>}
 

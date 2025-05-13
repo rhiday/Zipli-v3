@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { SearchIcon, FilterXIcon, ChevronDownIcon, ChevronUpIcon, PackageIcon, HandshakeIcon, MapPinIcon, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import FilterBar from '@/components/ui/FilterBar';
 
 type DonationFeed = {
   id: string;
@@ -57,13 +58,14 @@ export default function FeedPage(): React.ReactElement {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [itemTypeFilter, setItemTypeFilter] = useState<"donations" | "requests">("donations");
-  const [allergenFilter, setAllergenFilter] = useState<string>("");
-  const [foodTypeFilter, setFoodTypeFilter] = useState<string>("");
-  const [quantityFilter, setQuantityFilter] = useState<string>("");
-  const [startDateFilter, setStartDateFilter] = useState<string>("");
-  const [endDateFilter, setEndDateFilter] = useState<string>("");
-  const [showAdditionalFilters, setShowAdditionalFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    type: 'donations',
+    allergens: [],
+    foodType: '',
+    minQty: '',
+    dateFrom: '',
+    dateTo: '',
+  });
 
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
@@ -74,7 +76,7 @@ export default function FeedPage(): React.ReactElement {
     };
     getCurrentUser();
     fetchFeedData();
-  }, [itemTypeFilter, allergenFilter, foodTypeFilter, quantityFilter, startDateFilter, endDateFilter, showAdditionalFilters]);
+  }, [filters]);
 
   const fetchFeedData = async () => {
     setLoading(true);
@@ -88,9 +90,7 @@ export default function FeedPage(): React.ReactElement {
       }
 
       let query;
-      let userId = user?.id;
-
-      if (itemTypeFilter === "donations") {
+      if (filters.type === 'donations') {
         query = supabase
           .from('donations')
           .select(`
@@ -100,23 +100,25 @@ export default function FeedPage(): React.ReactElement {
           `)
           .eq('status', 'available');
 
-        if (allergenFilter) {
-          query = query.ilike('food_items.allergens', `%${allergenFilter}%`);
+        if (filters.allergens.length > 0) {
+          for (const allergen of filters.allergens) {
+            query = query.ilike('food_items.allergens', `%${allergen}%`);
+          }
         }
-        if (foodTypeFilter) {
-          query = query.eq('food_items.food_type', foodTypeFilter);
+        if (filters.foodType) {
+          query = query.eq('food_items.food_type', filters.foodType);
         }
-        if (quantityFilter && showAdditionalFilters) {
-          const minQuantity = parseInt(quantityFilter);
+        if (filters.minQty) {
+          const minQuantity = parseInt(filters.minQty);
           if (!isNaN(minQuantity) && minQuantity > 0) {
             query = query.gte('quantity', minQuantity);
           }
         }
-        if (startDateFilter && showAdditionalFilters) {
-          query = query.gte('pickup_time', new Date(startDateFilter).toISOString());
+        if (filters.dateFrom) {
+          query = query.gte('pickup_time', new Date(filters.dateFrom).toISOString());
         }
-        if (endDateFilter && showAdditionalFilters) {
-          const adjustedEndDate = new Date(endDateFilter);
+        if (filters.dateTo) {
+          const adjustedEndDate = new Date(filters.dateTo);
           adjustedEndDate.setHours(23, 59, 59, 999);
           query = query.lte('pickup_time', adjustedEndDate.toISOString());
         }
@@ -130,17 +132,17 @@ export default function FeedPage(): React.ReactElement {
           .eq('status', 'active')
           .neq('user_id', user.id);
 
-        if (quantityFilter && showAdditionalFilters) {
-          const minPeople = parseInt(quantityFilter);
+        if (filters.minQty) {
+          const minPeople = parseInt(filters.minQty);
           if (!isNaN(minPeople) && minPeople > 0) {
             query = query.gte('people_count', minPeople);
           }
         }
-        if (startDateFilter && showAdditionalFilters) {
-          query = query.gte('pickup_date', startDateFilter);
+        if (filters.dateFrom) {
+          query = query.gte('pickup_date', filters.dateFrom);
         }
-        if (endDateFilter && showAdditionalFilters) {
-          query = query.lte('pickup_date', endDateFilter);
+        if (filters.dateTo) {
+          query = query.lte('pickup_date', filters.dateTo);
         }
       }
 
@@ -152,27 +154,26 @@ export default function FeedPage(): React.ReactElement {
       setFeedItems(data || []);
     } catch (err: any) {
       console.error("Error fetching feed data:", err);
-      setError(err.message || `Failed to fetch ${itemTypeFilter}.`);
+      setError(err.message || `Failed to fetch ${filters.type}.`);
     } finally {
       setLoading(false);
     }
   };
 
   const clearFilters = () => {
-    setItemTypeFilter("donations");
-    setAllergenFilter("");
-    setFoodTypeFilter("");
-    setQuantityFilter("");
-    setStartDateFilter("");
-    setEndDateFilter("");
-    setShowAdditionalFilters(false);
+    setFilters({
+      type: 'donations',
+      allergens: [],
+      foodType: '',
+      minQty: '',
+      dateFrom: '',
+      dateTo: '',
+    });
   };
 
   const filteredItems = feedItems.filter(item => {
     const isDonation = 'food_item' in item;
-
     const itemDescription = isDonation ? (item as DonationFeed).food_item.description : (item as RequestFeedItem).description;
-
     const matchesSearch = searchTerm === '' ||
       (isDonation && (item as DonationFeed).food_item.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       itemDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -229,7 +230,7 @@ export default function FeedPage(): React.ReactElement {
       <div className="mx-auto max-w-7xl space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-titleLg font-display text-primary">
-            Marketplace
+            Explore all available offers
           </h1>
           <div className="relative flex-1 sm:max-w-xs">
             <SearchIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary-50" />
@@ -243,123 +244,16 @@ export default function FeedPage(): React.ReactElement {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label className="block text-sm font-medium text-primary-75">Show</Label>
-            <div className="flex flex-wrap gap-2">
-              <Button 
-                variant={itemTypeFilter === "donations" ? 'primary' : 'secondary'} 
-                size="sm"
-                onClick={() => setItemTypeFilter("donations")}
-                className="rounded-full px-4 py-1.5 text-sm"
-              >
-                Donations
-              </Button>
-              <Button 
-                variant={itemTypeFilter === "requests" ? 'primary' : 'secondary'} 
-                size="sm"
-                onClick={() => setItemTypeFilter("requests")}
-                className="rounded-full px-4 py-1.5 text-sm"
-              >
-                Requests
-              </Button>
-            </div>
-          </div>
-          
-          {itemTypeFilter === "donations" && (
-            <div className="space-y-2 pt-2">
-              <Label className="block text-sm font-medium text-primary-75">Filter by Dietary Preference</Label>
-              <div className="flex flex-wrap gap-2">
-                <Button 
-                  variant={allergenFilter === "" ? 'primary' : 'secondary'} 
-                  size="sm"
-                  onClick={() => setAllergenFilter("")}
-                  className="rounded-full px-4 py-1.5 text-sm"
-                >
-                  All Preferences
-                </Button>
-                {COMMON_ALLERGENS.map(allergen => (
-                  <Button 
-                    key={allergen} 
-                    variant={allergenFilter === allergen ? 'primary' : 'secondary'} 
-                    size="sm"
-                    onClick={() => setAllergenFilter(allergen)}
-                    className="rounded-full px-4 py-1.5 text-sm capitalize"
-                  >
-                    {allergen}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {itemTypeFilter === "donations" && (
-            <div className="space-y-2 pt-2">
-              <Label className="block text-sm font-medium text-primary-75">Filter by Food Type</Label>
-              <div className="flex flex-wrap gap-2">
-                <Button 
-                  variant={foodTypeFilter === "" ? 'primary' : 'secondary'} 
-                  size="sm"
-                  onClick={() => setFoodTypeFilter("")}
-                  className="rounded-full px-4 py-1.5 text-sm"
-                >
-                  All Food Types
-                </Button>
-                {FOOD_TYPE_OPTIONS.map(type => (
-                  <Button 
-                    key={type} 
-                    variant={foodTypeFilter === type ? 'primary' : 'secondary'} 
-                    size="sm"
-                    onClick={() => setFoodTypeFilter(type)}
-                    className="rounded-full px-4 py-1.5 text-sm capitalize"
-                  >
-                    {type}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          <div className="pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <Button 
-              variant="ghost" 
-              onClick={() => setShowAdditionalFilters(!showAdditionalFilters)}
-              className="text-primary hover:text-primary/90 text-xs p-1 sm:text-sm sm:p-2 flex items-center self-start"
-            >
-              {showAdditionalFilters ? <ChevronUpIcon className="mr-1 sm:mr-2 h-4 w-4" /> : <ChevronDownIcon className="mr-1 sm:mr-2 h-4 w-4" />}
-              {showAdditionalFilters ? 'Less' : 'More'} Filters
-            </Button>
-            <Button onClick={clearFilters} variant="ghost" className="text-primary hover:text-primary/80 text-xs p-1 sm:text-sm sm:size-auto flex items-center self-end">
-                <FilterXIcon className="mr-1 sm:mr-2 h-4 w-4" /> Clear All Filters
-            </Button>
-          </div>
-
-          {showAdditionalFilters && (
-            <div className="space-y-4 pt-4 border-t border-border">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 items-end">
-                <div>
-                  <Label htmlFor="quantity-filter" className="block text-sm font-medium text-primary-75 mb-1">
-                    {itemTypeFilter === 'donations' ? 'Min. Quantity' : 'Min. People to Feed'}
-                  </Label>
-                  <Input id="quantity-filter" type="number" placeholder="e.g., 10" value={quantityFilter} onChange={(e) => setQuantityFilter(e.target.value)} />
-                </div>
-                <div></div>
-                <div>
-                  <Label htmlFor="start-date-filter" className="block text-sm font-medium text-primary-75 mb-1">
-                    {itemTypeFilter === 'donations' ? 'Pickup From' : 'Needed From'}
-                  </Label>
-                  <Input id="start-date-filter" type="date" value={startDateFilter} onChange={(e) => setStartDateFilter(e.target.value)} className={dateInputClassName} />
-                </div>
-                <div>
-                  <Label htmlFor="end-date-filter" className="block text-sm font-medium text-primary-75 mb-1">
-                    {itemTypeFilter === 'donations' ? 'Pickup Until' : 'Needed Until'}
-                  </Label>
-                  <Input id="end-date-filter" type="date" value={endDateFilter} onChange={(e) => setEndDateFilter(e.target.value)} className={dateInputClassName} />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        <FilterBar
+          onFilterChange={(key, value) => setFilters(f => ({ ...f, [key]: value }))}
+          activeFilters={filters}
+          showStatus={false}
+          showType={true}
+          showAllergens={true}
+          showFoodType={true}
+          showMinQty={true}
+          showDateRange={true}
+        />
 
         {error && (
           <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">
@@ -463,9 +357,9 @@ export default function FeedPage(): React.ReactElement {
           ) : (
             <div className="col-span-full text-center py-12">
               <p className="text-body text-primary-75">
-                {searchTerm || allergenFilter || foodTypeFilter || quantityFilter || startDateFilter || endDateFilter 
-                  ? `No ${itemTypeFilter} match your criteria` 
-                  : `No ${itemTypeFilter} available at the moment`}
+                {searchTerm || filters.allergens.length > 0 || filters.foodType || filters.minQty || filters.dateFrom || filters.dateTo 
+                  ? `No ${filters.type} match your criteria` 
+                  : `No ${filters.type} available at the moment`}
               </p>
             </div>
           )}

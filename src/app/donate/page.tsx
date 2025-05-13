@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { jsPDF } from 'jspdf';
+import SummaryOverview from '@/components/SummaryOverview';
 
 type DonationWithFoodItem = {
   id: string;
@@ -144,92 +145,13 @@ export default function DonorDashboardPage(): React.ReactElement {
 
       <main className="relative z-20 -mt-6 rounded-t-3xl md:rounded-t-none bg-base py-4 px-6 md:px-12 space-y-6">
         <section>
-          <h2 className="text-titleXs font-medium text-primary mb-4">Your active offers</h2>
+          <h2 className="text-titleXs font-medium text-primary mb-4">Your active offers and requests</h2>
           {error && (
             <div className="mb-6 rounded-md bg-rose/10 p-4 text-body text-negative">
               {error}
             </div>
           )}
-          <div className="md:flex md:items-end md:gap-4">
-            <div className="w-full md:max-w-sm">
-              {(() => {
-                const activeOffers = dashboardData.donations.filter(d => d.status === 'available' || d.status === 'claimed').slice(0, 1);
-                if (activeOffers.length > 0) {
-                  return activeOffers.map((donation) => (
-                    <Link 
-                      key={donation.id} 
-                      href={`/donate/${donation.id}`} 
-                      className="block bg-base rounded-xl border border-border p-4 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-base font-medium text-primary flex items-center">
-                          <PackageIcon className="mr-2 h-4 w-4 text-green-600 flex-shrink-0" /> 
-                          {donation.food_item.name}
-                        </h3>
-                        <span
-                          className={cn(
-                            'px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap',
-                            donation.status === 'available'    ? 'bg-green-100 text-green-800' :
-                            donation.status === 'claimed'      ? 'bg-yellow-100 text-yellow-800' :
-                            donation.status === 'picked_up'    ? 'bg-blue-100 text-blue-800' :
-                            donation.status === 'cancelled'    ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          )}
-                        >
-                          {donation.status === 'picked_up'  ? 'Successful' :
-                           donation.status === 'cancelled'  ? 'Cancelled'  :
-                           donation.status === 'available'  ? 'Available'  :
-                           donation.status === 'claimed'    ? 'Claimed'    :
-                           donation.status.replace('_', ' ')
-                          }
-                        </span>
-                      </div>
-                      <p className="text-sm text-primary-75 mb-2">
-                        {donation.food_item.description}
-                      </p>
-                      <p className="text-sm text-primary-75">
-                        {donation.pickup_time 
-                          ? `Picked up: ${new Date(donation.pickup_time).toLocaleDateString()}`
-                          : 'Recurring Schedule'
-                         }
-                      </p>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        className="mt-3 w-full"
-                        onClick={e => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          router.push(`/donate/${donation.id}/handover-confirm`);
-                        }}
-                      >
-                        Confirm Handover
-                      </Button>
-                    </Link>
-                  ));
-                } else {
-                  return (
-                    <div className="text-center py-8 bg-base rounded-lg border border-border">
-                      <p className="text-body text-primary-75 mb-4">No active offers at the moment.</p>
-                      <Button
-                        variant="primary"
-                        size="md"
-                        onClick={() => router.push('/donate/new')}
-                      >
-                        Create an Offer
-                      </Button>
-                    </div>
-                  );
-                }
-              })()}
-            </div>
-            <div className="mt-4 text-right md:mt-0">
-              <Link href="/donate/all-offers?filter=active" className="inline-flex items-center text-sm font-semibold text-primary hover:underline">
-                See all of your active offers
-                <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </div>
-          </div>
+          <SummaryOverview userId={dashboardData.profile?.id} donations={dashboardData.donations} />
         </section>
 
         <section>
@@ -251,11 +173,16 @@ export default function DonorDashboardPage(): React.ReactElement {
                   </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="mb-4 flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-green-800 mr-0">46kg</span>
-                <span className="text-base text-primary-75">Total food offered</span>
-            </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 mt-6">
+                <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
+                    <div className="flex justify-between items-start">
+                        <p className="text-2xl font-semibold text-green-800">46kg</p>
+                        <button className="p-0.5 text-primary-50 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
+                            <Info className="h-3.5 w-3.5" />
+                        </button>
+                    </div>
+                    <p className="text-sm font-normal text-primary-75">Total food offered</p>
+                </div>
                 <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
                     <div className="flex justify-between items-start">
                         <p className="text-2xl font-semibold text-green-800">131</p>
@@ -265,20 +192,11 @@ export default function DonorDashboardPage(): React.ReactElement {
                     </div>
                     <p className="text-sm font-normal text-primary-75">Portions offered</p>
                 </div>
-                 <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
-                     <div className="flex justify-between items-start">
+                <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
+                    <div className="flex justify-between items-start">
                         <p className="text-2xl font-semibold text-green-800">125€</p>
                     </div>
                     <p className="text-sm font-normal text-primary-75">Saved in food disposal costs</p>
-                </div>
-                 <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
-                     <div className="flex justify-between items-start">
-                        <p className="text-2xl font-semibold text-green-800">89%</p>
-                        <button className="p-0.5 text-primary-50 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-                            <Info className="h-3.5 w-3.5" />
-                        </button>
-                    </div>
-                    <p className="text-sm font-normal text-primary-75">Emission reduction</p>
                 </div>
                 <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
                     <div className="flex justify-between items-start">
