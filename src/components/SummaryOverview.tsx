@@ -26,7 +26,7 @@ const SummaryOverview: React.FC<SummaryOverviewProps> = ({ userId, donations }) 
       .eq('status', 'active')
       .then((res: { count?: number }) => {
         setActiveRequests(res.count || 0);
-        setLoading(false);
+        setLoading(false); //test reemove
       });
   }, [userId]);
 
