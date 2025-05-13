@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
 import { SearchIcon, FilterXIcon, ChevronDownIcon, ChevronUpIcon, PackageIcon, HandshakeIcon, MapPinIcon, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type DonationFeed = {
   id: string;
@@ -380,9 +381,10 @@ export default function FeedPage(): React.ReactElement {
                   >
                     <div className="relative h-48 w-full">
                       {donation.food_item.image_url ? (
-                        <img
+                        <Image
                           src={donation.food_item.image_url}
                           alt={donation.food_item.name}
+                          fill
                           className="h-full w-full object-cover"
                         />
                       ) : (

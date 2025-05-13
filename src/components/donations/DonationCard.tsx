@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type DonationWithFoodItem = {
   id: string;
@@ -37,10 +38,11 @@ const DonationCard: React.FC<DonationCardProps> = ({ donation, onClick }) => {
       onClick={onClick}
     >
       {donation.food_item.image_url && (
-        <img
+        <Image
           src={donation.food_item.image_url}
           alt={donation.food_item.name}
-          className="h-32 w-full object-cover"
+          fill
+          className="h-full w-full object-cover"
         />
       )}
       <div className="p-4">

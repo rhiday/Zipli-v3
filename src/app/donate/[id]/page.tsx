@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Database } from '@/lib/supabase/types';
 import { DonationWithFoodItemResponse } from '@/lib/supabase/responses';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type DonationRow = Database['public']['Tables']['donations']['Row'];
 type FoodItemRow = Database['public']['Tables']['food_items']['Row'];
@@ -180,9 +181,10 @@ export default function DonationDetailPage(): React.ReactElement {
         <div className="overflow-hidden rounded-lg bg-base shadow">
           {donation.food_item.image_url && (
             <div className="aspect-video w-full bg-primary-10">
-              <img
+              <Image
                 src={donation.food_item.image_url}
                 alt={donation.food_item.name}
+                fill
                 className="h-full w-full object-cover"
               />
             </div>

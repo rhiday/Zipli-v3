@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
 import { createClient } from '@supabase/supabase-js';
+import sharp from 'sharp';
 
 // Initialize clients with environment variables that are set in .env.local
 const supabase = createClient(
@@ -64,13 +65,18 @@ export async function POST(request: Request) {
     
     const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
     
+    // Compress and resize image to 512x512 JPEG
+    const compressedBuffer = await sharp(imageBuffer)
+      .resize(512, 512)
+      .jpeg({ quality: 80 })
+      .toBuffer();
+
     // Upload to Supabase
-    const filePath = `dalle_${Date.now()}.png`;
+    const filePath = `dalle_${Date.now()}.jpg`;
     console.log(`Uploading to Supabase: ${filePath}`);
-    
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(process.env.SUPABASE_STORAGE_BUCKET || 'donations')
-      .upload(filePath, imageBuffer, { contentType: 'image/png', upsert: true });
+      .upload(filePath, compressedBuffer, { contentType: 'image/jpeg', upsert: true });
       
     if (uploadError) {
       console.error('Upload error:', uploadError);

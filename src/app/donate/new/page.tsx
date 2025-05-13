@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { AlertTriangle, Camera, Trash2, Pencil, Plus, Minus, CalendarIcon, Info, ChevronLeft } from 'lucide-react';
+import { AlertTriangle, Trash2, Pencil, Plus, Minus, CalendarIcon, Info, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { logger } from '../../../../lib/logger';
+import sharp from 'sharp';
 
 type ItemInput = {
   name: string;
@@ -271,7 +272,6 @@ export default function CreateDonationPage() {
 
         // STEP 2: Handle user-uploaded image OR generate one with DALL-E
         if (imageToUpload) {
-          // Process user-uploaded image (existing code)
           if (imageToUpload.size > 5 * 1024 * 1024) {
             setServerError(`Image for item ${idx + 1} must be less than 5MB.`);
             return;
@@ -281,11 +281,17 @@ export default function CreateDonationPage() {
             return;
           }
           
-          const fileExt = imageToUpload.name.split('.').pop();
-          const fileName = `${user.id}/item_${idx}_${Date.now()}.${fileExt}`;
+          // Compress and resize image to 512x512 JPEG
+          const arrayBuffer = await imageToUpload.arrayBuffer();
+          const compressedBuffer = await sharp(Buffer.from(arrayBuffer))
+            .resize(512, 512)
+            .jpeg({ quality: 80 })
+            .toBuffer();
+
+          const fileName = `${user.id}/item_${idx}_${Date.now()}.jpg`;
           const { error: uploadError, data: uploadData } = await supabase.storage
             .from('donations')
-            .upload(fileName, imageToUpload);
+            .upload(fileName, compressedBuffer, { contentType: 'image/jpeg' });
             
           if (uploadError) throw uploadError;
           

@@ -3,6 +3,7 @@ const { createClient } = require('@supabase/supabase-js');
 const { OpenAI } = require('openai');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const path = require('path');
+const sharp = require('sharp');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -48,10 +49,15 @@ async function downloadImage(url) {
 }
 
 async function uploadToSupabase(itemId, buffer) {
-  const filePath = `${itemId}/dalle_${Date.now()}.png`;
+  // Compress and resize image to 512x512 JPEG
+  const compressed = await sharp(buffer)
+    .resize(512, 512, { fit: 'inside' })
+    .jpeg({ quality: 80 })
+    .toBuffer();
+  const filePath = `${itemId}/dalle_${Date.now()}.jpg`;
   const { data, error } = await supabase.storage
     .from(SUPABASE_STORAGE_BUCKET)
-    .upload(filePath, buffer, { contentType: 'image/png', upsert: true });
+    .upload(filePath, compressed, { contentType: 'image/jpeg', upsert: true });
   if (error) throw error;
   return data.path;
 }

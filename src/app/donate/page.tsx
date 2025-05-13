@@ -321,7 +321,7 @@ export default function DonorDashboardPage(): React.ReactElement {
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full overflow-hidden relative">
                 <Image 
-                  src="/images/tsänssi.jpeg" 
+                  src="/images/tsänssi.jpg" 
                   alt="Tsänssi logo" 
                   fill
                   className="object-cover"
@@ -337,7 +337,7 @@ export default function DonorDashboardPage(): React.ReactElement {
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full overflow-hidden relative">
                 <Image 
-                  src="/images/redcross.jpeg" 
+                  src="/images/redcross.jpg" 
                   alt="Red Cross logo" 
                   fill
                   className="object-cover"
@@ -353,7 +353,7 @@ export default function DonorDashboardPage(): React.ReactElement {
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full overflow-hidden relative">
                 <Image 
-                  src="/images/kirkko.jpeg" 
+                  src="/images/kirkko.jpg" 
                   alt="Andreas church logo" 
                   fill
                   className="object-cover"
