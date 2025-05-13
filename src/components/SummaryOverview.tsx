@@ -35,16 +35,16 @@ const SummaryOverview: React.FC<SummaryOverviewProps> = ({ userId, donations }) 
   return (
     <div className="flex flex-col md:flex-row items-stretch gap-2 md:gap-6 py-4 px-4 bg-base rounded-xl border border-border">
       <div className="flex-1 flex flex-col items-center justify-center py-2">
-        <Link href="/donate/all-offers?filter=active&type=donations" className="focus:outline-none group">
+        <Link href="/donate/all-offers?filter=active&type=donations" className="focus:outline-none group flex flex-col items-center">
           <span className="text-2xl font-bold text-primary group-hover:underline cursor-pointer">{activeOffers}</span>
+          <span className="text-sm text-primary-75 block group-hover:underline cursor-pointer">Active offers</span>
         </Link>
-        <span className="text-sm text-primary-75">Active offers</span>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center py-2">
-        <Link href="/donate/all-offers?filter=active&type=requests" className="focus:outline-none group">
+        <Link href="/donate/all-offers?filter=active&type=requests" className="focus:outline-none group flex flex-col items-center">
           <span className="text-2xl font-bold text-primary group-hover:underline cursor-pointer">{loading ? '…' : activeRequests}</span>
+          <span className="text-sm text-primary-75 block group-hover:underline cursor-pointer">Active requests</span>
         </Link>
-        <span className="text-sm text-primary-75">Active requests</span>
       </div>
       <div className="flex-1 flex flex-col justify-end items-center md:items-end py-2">
         <Link href="/donate/all-offers?filter=active" className="inline-flex items-center text-sm font-semibold text-primary hover:underline">

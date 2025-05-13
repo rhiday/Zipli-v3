@@ -242,7 +242,8 @@ export default function DonorDashboardPage(): React.ReactElement {
                   src="/images/tsänssi.jpg" 
                   alt="Tsänssi logo" 
                   fill
-                  className="object-cover"
+                  className="object-contain bg-white"
+                  sizes="64px"
                 />
               </div>
               <div>
