@@ -76,7 +76,7 @@ const FilterBar: FC<FilterBarProps> = ({
       {showType && (
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="min-w-[110px] flex-shrink-0">
+            <Button variant="secondary" className="min-w-[110px] flex-shrink-0">
               Type
             </Button>
           </PopoverTrigger>
@@ -99,7 +99,7 @@ const FilterBar: FC<FilterBarProps> = ({
       {showAllergens && (
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="min-w-[110px] flex-shrink-0">
+            <Button variant="secondary" className="min-w-[110px] flex-shrink-0">
               Dietary
             </Button>
           </PopoverTrigger>
@@ -128,7 +128,7 @@ const FilterBar: FC<FilterBarProps> = ({
       {showFoodType && (
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="min-w-[110px] flex-shrink-0">
+            <Button variant="secondary" className="min-w-[110px] flex-shrink-0">
               Food Type
             </Button>
           </PopoverTrigger>
@@ -151,7 +151,7 @@ const FilterBar: FC<FilterBarProps> = ({
       {showStatus && (
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="min-w-[110px] flex-shrink-0">
+            <Button variant="secondary" className="min-w-[110px] flex-shrink-0">
               Status
             </Button>
           </PopoverTrigger>
@@ -174,7 +174,7 @@ const FilterBar: FC<FilterBarProps> = ({
       <Dialog open={showAllFilters} onOpenChange={setShowAllFilters}>
         <DialogTrigger asChild>
           <Button
-            variant="outline"
+            variant="secondary"
             className="min-w-[110px] flex-shrink-0 font-semibold"
             onClick={() => setShowAllFilters(true)}
           >
