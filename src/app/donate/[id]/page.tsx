@@ -39,7 +39,7 @@ export default function DonationDetailPage(): React.ReactElement {
   }, [params.id]);
 
   const fetchDonation = async () => {
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev: DonationWithFoodItemResponse) => ({ ...prev, loading: true, error: null }));
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
@@ -64,7 +64,7 @@ export default function DonationDetailPage(): React.ReactElement {
       setState({ data, error: null, loading: false });
     } catch (err: any) {
       console.error("Fetch Donation Error:", err);
-      setState({ data: null, error: err.message || 'Failed to load donation details.', loading: false });
+      setState((prev: DonationWithFoodItemResponse) => ({ ...prev, data: null, error: err.message || 'Failed to load donation details.', loading: false }));
     }
   };
 
@@ -180,12 +180,13 @@ export default function DonationDetailPage(): React.ReactElement {
 
         <div className="overflow-hidden rounded-lg bg-base shadow">
           {donation.food_item.image_url && (
-            <div className="aspect-video w-full bg-primary-10">
+            <div className="mx-auto max-w-[400px] aspect-[4/3] relative bg-primary-10">
               <Image
                 src={donation.food_item.image_url}
                 alt={donation.food_item.name}
                 fill
-                className="h-full w-full object-cover"
+                className="object-contain rounded-xl"
+                sizes="(max-width: 600px) 100vw, 400px"
               />
             </div>
           )}
