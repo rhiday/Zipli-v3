@@ -4,21 +4,6 @@ import { tokens } from '@/lib/tokens';
 // Specific user account that will be used for QR code login
 const QR_LOGIN_USER_EMAIL = 'helsinki.airport@sodexo.com'; // Specific account for Helsinki Airport
 
-// Create a persistent token storage that won't be reset by Hot Module Replacement (HMR)
-// This is a better approach for development, though in production you should use a database
-// @ts-ignore - Define the global tokens object
-if (typeof global !== 'undefined' && !global.tokens) {
-  // @ts-ignore
-  global.tokens = {};
-}
-
-// Fallback for client-side rendering or Edge runtime
-let localTokens = {};
-
-// Get the appropriate tokens storage
-// @ts-ignore
-const getTokens = () => typeof global !== 'undefined' ? global.tokens : localTokens;
-
 export async function GET(request: Request) {
   try {
     // Generate a unique token - simplified version without uuid dependency

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
@@ -16,7 +16,19 @@ const isLoading = (status: StatusType): status is typeof LOADING => status === L
 const isSuccess = (status: StatusType): status is typeof SUCCESS => status === SUCCESS;
 const isError = (status: StatusType): status is typeof ERROR => status === ERROR;
 
-export default function QRLoginPage() {
+// Loading component to display while suspense is resolving
+function QRLoginLoading() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+      <div className="flex items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-earth border-r-transparent" />
+      </div>
+    </div>
+  );
+}
+
+// The actual QR login component that uses the searchParams
+function QRLoginContent() {
   const [status, setStatus] = useState<StatusType>(LOADING);
   const [message, setMessage] = useState<string>('Processing QR code login...');
   const [debug, setDebug] = useState<string>('');
@@ -169,5 +181,13 @@ export default function QRLoginPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function QRLoginPage() {
+  return (
+    <Suspense fallback={<QRLoginLoading />}>
+      <QRLoginContent />
+    </Suspense>
   );
 } 
