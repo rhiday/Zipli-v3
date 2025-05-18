@@ -402,7 +402,7 @@ export default function CreateDonationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-base p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
       <div className="mx-auto max-w-lg">
         <div className="px-2 md:px-4 mb-6 flex items-center">
           <Button 

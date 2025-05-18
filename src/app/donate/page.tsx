@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import BottomNav from '@/components/BottomNav';
-import { ArrowRight, Info, ChevronDown, PlusIcon, PackageIcon } from 'lucide-react';
+import { ArrowRight, Info, ChevronDown, PlusIcon, PackageIcon, Scale, Utensils, Euro, Leaf } from 'lucide-react';
 import { Database } from '@/lib/supabase/types';
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { jsPDF } from 'jspdf';
 import SummaryOverview from '@/components/SummaryOverview';
+import DonationCard from '@/components/donations/DonationCard';
 
 type DonationWithFoodItem = {
   id: string;
@@ -140,10 +141,10 @@ export default function DonorDashboardPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen bg-base pb-20">
+    <div className="min-h-screen pb-20">
       <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'} />
 
-      <main className="relative z-20 -mt-6 rounded-t-3xl md:rounded-t-none bg-base py-4 px-6 md:px-12 space-y-6">
+      <main className="relative z-20 mt-4 rounded-t-3xl md:rounded-t-none py-4 px-4 md:px-12 space-y-6">
         <section>
           <h2 className="text-titleXs font-medium text-primary mb-4">Your active offers and requests</h2>
           {error && (
@@ -151,12 +152,30 @@ export default function DonorDashboardPage(): React.ReactElement {
               {error}
             </div>
           )}
-          <SummaryOverview userId={dashboardData.profile?.id} donations={dashboardData.donations} />
+          <div className="flex flex-col gap-4 sm:flex-row sm:gap-4 items-stretch">
+            {/* Show latest donation as active offer */}
+            {dashboardData.donations && dashboardData.donations.length > 0 ? (
+              <DonationCard donation={dashboardData.donations[0]} />
+            ) : (
+              <div className="rounded-lg bg-base p-6 text-center text-primary-75 border border-border w-full sm:max-w-md">
+                No active offers yet.
+              </div>
+            )}
+            {/* See all offers and requests card */}
+            <a
+              href="/donate/all-offers?filter=active"
+              className="flex items-center justify-center rounded-lg border-2 border-dashed border-primary-10 text-primary-75 font-medium w-full sm:max-w-md min-h-[120px] p-6 transition hover:border-primary-50 hover:text-primary cursor-pointer"
+              style={{ minWidth: '0' }}
+            >
+              See all offers and requests
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </a>
+          </div>
         </section>
 
         <section>
-            <div className="flex justify-between items-center mb-3">
-                <h2 className="text-lg font-semibold text-primary">Your impact</h2>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-primary mb-4">Your impact</h2>
                  <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="underline underline-offset-4 inline-flex items-center gap-1 text-primary text-lg font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-1">
@@ -173,61 +192,55 @@ export default function DonorDashboardPage(): React.ReactElement {
                   </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 mt-6">
-                <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
-                    <div className="flex justify-between items-start">
-                        <p className="text-2xl font-semibold text-green-800">46kg</p>
-                        <button className="p-0.5 text-primary-50 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-                            <Info className="h-3.5 w-3.5" />
-                        </button>
-                    </div>
-                    <p className="text-sm font-normal text-primary-75">Total food offered</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              {/* Total food offered */}
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full">
+                <div className="flex items-center gap-2 mb-2">
+                  <Scale className="w-5 h-5 text-primary-50" />
+                  <span className="text-2xl font-semibold text-green-800">46kg</span>
                 </div>
-                <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
-                    <div className="flex justify-between items-start">
-                        <p className="text-2xl font-semibold text-green-800">131</p>
-                        <button className="p-0.5 text-primary-50 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-                            <Info className="h-3.5 w-3.5" />
-                        </button>
-                    </div>
-                    <p className="text-sm font-normal text-primary-75">Portions offered</p>
+                <span className="text-sm text-primary-75">Total food offered</span>
+              </div>
+              {/* Portions offered */}
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full">
+                <div className="flex items-center gap-2 mb-2">
+                  <Utensils className="w-5 h-5 text-primary-50" />
+                  <span className="text-2xl font-semibold text-green-800">131</span>
                 </div>
-                <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
-                    <div className="flex justify-between items-start">
-                        <p className="text-2xl font-semibold text-green-800">125€</p>
-                    </div>
-                    <p className="text-sm font-normal text-primary-75">Saved in food disposal costs</p>
+                <span className="text-sm text-primary-75">Portions offered</span>
+              </div>
+              {/* Saved in food disposal costs */}
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full">
+                <div className="flex items-center gap-2 mb-2">
+                  <Euro className="w-5 h-5 text-primary-50" />
+                  <span className="text-2xl font-semibold text-green-800">125€</span>
                 </div>
-                <div className="flex flex-col justify-between rounded-xl bg-cream p-3 space-y-1 aspect-square sm:aspect-auto">
-                    <div className="flex justify-between items-start">
-                        <p className="text-2xl font-semibold text-green-800">10t</p>
-                        <button className="p-0.5 text-primary-50 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-                            <Info className="h-3.5 w-3.5" />
-                        </button>
-                    </div>
-                    <p className="text-sm font-normal text-primary-75">CO2 Avoided</p>
+                <span className="text-sm text-primary-75">Saved in food disposal costs</span>
+              </div>
+              {/* CO2 Avoided */}
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full">
+                <div className="flex items-center gap-2 mb-2">
+                  <Leaf className="w-5 h-5 text-primary-50" />
+                  <span className="text-2xl font-semibold text-green-800">10t</span>
                 </div>
-          </div>
+                <span className="text-sm text-primary-75">CO2 Avoided</span>
+              </div>
+            </div>
         </section>
 
-        {/* Wrapper for Export to PDF section to control its width on desktop */}
-        <div className="md:grid md:grid-cols-4 md:gap-3">
-            <section
-              onClick={handleExportPDF}
-              role="button"
-              tabIndex={0}
-              className="md:col-span-2 rounded-xl border border-border bg-base p-4 flex items-center justify-between cursor-pointer hover:bg-muted/50"
-            >
-               <div className="flex-1 mr-4">
-                    <h3 className="text-base font-semibold text-primary mb-1">Export to PDF</h3>
-                    <p className="text-sm text-muted-foreground">Environmental and social impact data for reporting, and operation planning.</p>
-               </div>
-               <ArrowRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-            </section>
-            {/* Optional: If you want to strictly enforce that it only takes up the left half and the right is empty,
-                you could add an empty div for the remaining columns on md+ screens.
-                Otherwise, it will naturally take the first 2 columns and the rest of the row will be empty.
-            <div className="hidden md:block md:col-span-2"></div> */}
+        {/* Export to PDF as a text link */}
+        <div className="my-4">
+          <a
+            onClick={handleExportPDF}
+            className="text-primary underline font-semibold cursor-pointer"
+            tabIndex={0}
+            role="button"
+          >
+            Export to PDF
+          </a>
+          <span className="block text-sm text-primary-75 mt-1">
+            Environmental and social impact data for reporting, and operation planning.
+          </span>
         </div>
         
         {/* This is whom you've helped section */}

@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => (
           </button>
           <Link 
             href="/profile" 
-            className="w-10 h-10 border border-[#F3F4ED] rounded-full flex items-center justify-center" 
+            className="w-10 h-10 border border-[#F3F4ED] rounded-full flex items-center justify-center"
             aria-label="View Profile"
            >
             <UserCircle className="w-5 h-5 text-white" />

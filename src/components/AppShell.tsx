@@ -26,7 +26,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
         </>
       ) : (
         /* Layout: flex container on md for sidebar + content */
-        <div className="min-h-screen md:flex">
+        <div className="min-h-screen bg-cream md:flex">
           {/* Sidebar for desktop */}
           <DesktopGlobalNavbar />
           {/* Main content container */}

@@ -30,7 +30,7 @@ export default function DesktopGlobalNavbar() {
   if (!user) return null;
 
   return (
-    <nav className="hidden md:flex flex-col items-center h-screen w-20 bg-base border-r border-primary-10 py-6">
+    <nav className="hidden md:flex flex-col items-center w-20 bg-base border-r border-primary-10 py-6">
       {/* Logo at top */}
       <Link href="/" className="mb-8 inline-flex items-center justify-center">
         <h1 className="text-lg font-bold text-primary">Zipli</h1>
