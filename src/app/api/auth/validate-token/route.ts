@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { tokens } from '../qr-token/route';
+import { tokens } from '@/lib/tokens';
 
 export async function GET(request: Request) {
   try {

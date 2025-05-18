@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { tokens } from '@/lib/tokens';
 
 // Specific user account that will be used for QR code login
 const QR_LOGIN_USER_EMAIL = 'helsinki.airport@sodexo.com'; // Specific account for Helsinki Airport
@@ -28,7 +29,6 @@ export async function GET(request: Request) {
     expiresAt.setMinutes(expiresAt.getMinutes() + 10); // Token valid for 10 minutes
     
     // Store the token
-    const tokens = getTokens();
     tokens[token] = {
       user_email: QR_LOGIN_USER_EMAIL,
       expires_at: expiresAt.toISOString(),
@@ -89,7 +89,4 @@ export async function OPTIONS() {
       'Access-Control-Max-Age': '86400'
     }
   });
-}
-
-// Export tokens for use in the QR code login handler
-export const tokens = getTokens(); 
+} 
