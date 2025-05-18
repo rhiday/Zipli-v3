@@ -12,6 +12,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 // Removed resolveConfig and tailwindConfig imports
 
 // Removed getColor helper function and theme color extraction
@@ -106,6 +107,11 @@ export default function CityDashboard() {
       <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <h1 className="text-titleMd font-display text-primary">Dashboard</h1> {/* Use new typography */}
         <div className="flex items-center gap-4">
+        <Link href="/admin/qr-login">
+  <span className="text-body text-primary-75 cursor-pointer">
+    QR Login phone
+  </span>
+  </Link>
           <span className="text-body text-primary-75">City of Helsinki</span> {/* Use new text colors */}
           <span className="text-body text-primary-75">Liisa Helme</span>
           {/* Replace placeholder with an actual Avatar component if available, or style a div */}
