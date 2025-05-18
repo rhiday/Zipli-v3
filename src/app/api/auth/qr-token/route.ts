@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
-import { tokens } from '@/lib/tokens';
+import { tokens, saveTokens } from '@/lib/tokens';
 
 // Specific user account that will be used for QR code login
 const QR_LOGIN_USER_EMAIL = 'helsinki.airport@sodexo.com'; // Specific account for Helsinki Airport
 
 export async function GET(request: Request) {
   try {
+    const url = new URL(request.url);
+    console.log('QR token request from origin:', url.origin);
+    
     // Generate a unique token - simplified version without uuid dependency
     const token = Math.random().toString(36).substring(2, 15) + 
                  Math.random().toString(36).substring(2, 15);
@@ -21,6 +24,9 @@ export async function GET(request: Request) {
       created_at: new Date().toISOString()
     };
     
+    // Save tokens to localStorage if on client
+    saveTokens(tokens);
+    
     // Clean up expired tokens
     const now = new Date();
     Object.keys(tokens).forEach(key => {
@@ -29,13 +35,19 @@ export async function GET(request: Request) {
       }
     });
     
+    // Save again after cleanup
+    saveTokens(tokens);
+    
     // Debug log
     console.log(`Token generated: ${token}`);
     console.log('Current tokens:', JSON.stringify(tokens, null, 2));
     
     // Return CORS headers for cross-origin requests
     return new NextResponse(
-      JSON.stringify({ token }), 
+      JSON.stringify({ 
+        token,
+        appUrl: process.env.NEXT_PUBLIC_APP_URL || url.origin
+      }), 
       { 
         status: 200,
         headers: {

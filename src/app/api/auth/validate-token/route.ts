@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
-import { tokens } from '@/lib/tokens';
+import { tokens, saveTokens } from '@/lib/tokens';
 
 export async function GET(request: Request) {
   try {
     // Get token from URL
     const url = new URL(request.url);
     const token = url.searchParams.get('token');
-
-    console.log(`Validating token: ${token}`);
+    
+    console.log(`Validating token from origin: ${url.origin}`);
+    console.log(`Token to validate: ${token}`);
     console.log('Current tokens:', JSON.stringify(tokens, null, 2));
 
     if (!token) {
@@ -67,6 +68,8 @@ export async function GET(request: Request) {
     if (expiresAt < new Date()) {
       // Remove expired token
       delete tokens[token];
+      saveTokens(tokens);
+      
       console.log(`Token expired: ${token}`);
       return new NextResponse(
         JSON.stringify({ 
@@ -86,6 +89,8 @@ export async function GET(request: Request) {
 
     // Mark token as used
     tokenData.used = true;
+    saveTokens(tokens);
+    
     console.log(`Token validated successfully: ${token}`);
 
     // Return success

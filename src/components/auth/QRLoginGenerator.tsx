@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 
 export default function QRLoginGenerator() {
   const [token, setToken] = useState<string | null>(null);
+  const [appUrl, setAppUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retries, setRetries] = useState(0);
@@ -29,6 +30,7 @@ export default function QRLoginGenerator() {
       
       console.log('QR token fetched successfully');
       setToken(data.token);
+      setAppUrl(data.appUrl || window.location.origin);
       // Reset retries on success
       setRetries(0);
     } catch (err) {
@@ -59,9 +61,16 @@ export default function QRLoginGenerator() {
   }, [fetchToken]);
   
   // Create the URL that will be encoded in the QR code
-  const qrValue = token 
-    ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/qr-login?token=${token}` 
+  const qrValue = token && appUrl
+    ? `${appUrl}/auth/qr-login?token=${token}` 
     : '';
+    
+  // Log the generated URL for debugging
+  useEffect(() => {
+    if (token && appUrl) {
+      console.log('Generated QR URL:', `${appUrl}/auth/qr-login?token=${token}`);
+    }
+  }, [token, appUrl]);
   
   return (
     <div className="flex flex-col items-center p-6 bg-base rounded-lg border border-muted">
@@ -93,6 +102,13 @@ export default function QRLoginGenerator() {
             size={200}
             level="H"
           />
+          
+          {/* Small debug display of the domain being used - remove in production */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-2 text-xs text-center text-gray-500">
+              {appUrl ? new URL(appUrl).hostname : window.location.hostname}
+            </div>
+          )}
         </div>
       ) : (
         <div className="h-[200px] w-[200px] bg-muted flex items-center justify-center">
