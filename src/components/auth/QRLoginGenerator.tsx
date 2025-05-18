@@ -60,7 +60,7 @@ export default function QRLoginGenerator() {
   
   // Create the URL that will be encoded in the QR code
   const qrValue = token 
-    ? `${window.location.origin}/auth/qr-login?token=${token}` 
+    ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/qr-login?token=${token}` 
     : '';
   
   return (
