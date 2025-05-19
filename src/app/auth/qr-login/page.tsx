@@ -35,6 +35,33 @@ function QRLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
+  // Check if we've been redirected to Vercel.com
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Log the current URL
+      setDebug(prev => prev + `Current URL: ${window.location.href}\n`);
+      
+      // Check if we're on vercel.com
+      if (window.location.hostname.includes('vercel.com')) {
+        setDebug(prev => prev + `Detected Vercel.com domain - this is not correct\n`);
+        setStatus(ERROR);
+        setMessage('Invalid redirect to Vercel.com. Please contact support.');
+        
+        // Try to redirect back to the app
+        if (process.env.NEXT_PUBLIC_APP_URL) {
+          const token = searchParams.get('token');
+          const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/qr-login?token=${token}`;
+          setDebug(prev => prev + `Attempting to redirect to: ${redirectUrl}\n`);
+          
+          // Redirect after a short delay
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 1000);
+        }
+      }
+    }
+  }, [searchParams]);
+  
   useEffect(() => {
     // Flag to prevent double processing
     let processed = false;
@@ -118,7 +145,10 @@ function QRLoginContent() {
       }
     };
     
-    processQRLogin();
+    // Only proceed if we're not on vercel.com
+    if (typeof window !== 'undefined' && !window.location.hostname.includes('vercel.com')) {
+      processQRLogin();
+    }
     
     // Clean up if component unmounts
     return () => {
@@ -174,9 +204,13 @@ function QRLoginContent() {
         
         <p className="text-body text-primary-75">{message}</p>
         
-        {process.env.NODE_ENV === 'development' && isError(status) && (
-          <div className="mt-4 p-4 bg-gray-100 rounded text-left overflow-auto max-h-40 text-xs">
+        {/* Always show debug in vercel.com environment to help diagnose issues */}
+        {(process.env.NODE_ENV === 'development' || typeof window !== 'undefined' && window.location.hostname.includes('vercel.com')) && (
+          <div className="mt-4 p-4 bg-gray-100 rounded text-left overflow-auto max-h-60 text-xs">
             <pre>{debug}</pre>
+            <p className="mt-2 font-bold">Current location: {typeof window !== 'undefined' ? window.location.href : 'unknown'}</p>
+            <p>Environment: {process.env.NODE_ENV}</p>
+            <p>App URL: {process.env.NEXT_PUBLIC_APP_URL || 'not set'}</p>
           </div>
         )}
       </div>
