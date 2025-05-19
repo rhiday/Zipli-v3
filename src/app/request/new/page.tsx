@@ -160,7 +160,10 @@ export default function CreateRequestPage() {
           const transcribeResponse = await fetch('/api/transcribe-audio', { method: 'POST', body: audioFormData });
           if (!transcribeResponse.ok) throw new Error((await transcribeResponse.json()).error || 'Transcription API call failed');
           transcript = (await transcribeResponse.json()).transcript;
-          if (!transcript) throw new Error('Empty transcript received.');
+          console.log('[CLIENT DEBUG] Request Page - Transcript received:', transcript);
+          if (!transcript || transcript.trim() === '.' || transcript.trim().toLowerCase() === 'you') {
+            throw new Error('Transcription was empty or unclear. Please try speaking again clearly.');
+          }
 
           setIsTranscribing(false);
           setIsProcessingDetails(true);

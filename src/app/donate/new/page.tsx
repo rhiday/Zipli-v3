@@ -274,7 +274,10 @@ export default function CreateDonationPage() {
           const transcribeResponse = await fetch('/api/transcribe-audio', { method: 'POST', body: audioFormData });
           if (!transcribeResponse.ok) throw new Error((await transcribeResponse.json()).error || 'Transcription API call failed');
           transcript = (await transcribeResponse.json()).transcript;
-          if (!transcript) throw new Error('Empty transcript received.');
+          console.log('[CLIENT DEBUG] Donate Page - Transcript received:', transcript); // Log the transcript
+          if (!transcript || transcript.trim() === '.' || transcript.trim().toLowerCase() === 'you') { // Added more checks for poor/empty transcripts
+            throw new Error('Transcription was empty or unclear. Please try speaking again clearly.');
+          }
 
           setIsTranscribing(false);
           setIsProcessingDetails(true);
