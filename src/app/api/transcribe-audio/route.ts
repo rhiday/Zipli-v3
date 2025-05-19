@@ -36,9 +36,13 @@ export async function POST(req: NextRequest) {
     // Log the received file details for debugging
     console.log(`[API /transcribe-audio] Received file: name='${audioFileFromFormData.name}', size=${audioFileFromFormData.size}, type='${audioFileFromFormData.type}'`);
 
+    const whisperPrompt = "This audio describes food items for donation or request, including names like apples, rice, bread, milk, soup, pasta, chicken, beef, vegetables, fruits, and quantities like kilograms, pounds, pieces, items, boxes, cans. It may also include descriptions, pickup details, or reasons for need.";
+
     const transcription = await openai.audio.transcriptions.create({
       file: audioFileFromFormData,
       model: 'whisper-1',
+      prompt: whisperPrompt,
+      language: "en" // Explicitly setting language can also help
     });
 
     const transcriptText = transcription.text;
