@@ -53,8 +53,8 @@ export default function AdminQRLoginPage() {
             <ol className="space-y-4 text-body text-primary-75 list-decimal pl-5">
               <li>Display this QR code on a tablet or screen at your terminal location.</li>
               <li>Users can scan this code with their phone camera to instantly log in.</li>
-              <li>The QR code refreshes automatically every 9 minutes for security.</li>
-              <li>Each code is valid for 10 minutes after generation.</li>
+              <li>The QR code refreshes automatically every day for security.</li>
+              <li>Each code is valid for 1 day after generation.</li>
               <li>For security reasons, each code can only be used once.</li>
             </ol>
           </div>

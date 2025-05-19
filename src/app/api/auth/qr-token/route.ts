@@ -14,7 +14,7 @@ export async function GET(request: Request) {
                  Math.random().toString(36).substring(2, 15);
     
     const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 10); // Token valid for 10 minutes
+    expiresAt.setHours(expiresAt.getHours() + 24); // Token valid for 24 hours
     
     // Store the token
     tokens[token] = {
