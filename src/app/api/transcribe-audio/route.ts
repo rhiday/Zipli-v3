@@ -26,23 +26,23 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const formData = await req.formData();
-    const audioFile = formData.get('audio') as File | null;
+    const audioFormData = await req.formData();
+    const audioFileFromFormData = audioFormData.get('audio') as File;
 
-    if (!audioFile) {
-      return NextResponse.json({ error: 'No audio file provided' }, { status: 400 });
+    if (!audioFileFromFormData || audioFileFromFormData.size === 0) {
+      return NextResponse.json({ error: 'No audio file uploaded or file is empty' }, { status: 400 });
     }
-    
-    // The OpenAI SDK expects a File object or a ReadStream.
-    // For Next.js Edge Runtime or similar environments, directly passing the File from FormData is preferred.
-    // If audioFile were a Node.js stream, we'd convert it. Since it's from FormData, it should be File-like.
+
+    // Log the received file details for debugging
+    console.log(`[API /transcribe-audio] Received file: name='${audioFileFromFormData.name}', size=${audioFileFromFormData.size}, type='${audioFileFromFormData.type}'`);
 
     const transcription = await openai.audio.transcriptions.create({
-      file: audioFile, // Directly use the File object from FormData
+      file: audioFileFromFormData,
       model: 'whisper-1',
     });
 
-    return NextResponse.json({ transcript: transcription.text });
+    const transcriptText = transcription.text;
+    return NextResponse.json({ transcript: transcriptText });
 
   } catch (error: any) {
     console.error('Error transcribing audio:', error);
