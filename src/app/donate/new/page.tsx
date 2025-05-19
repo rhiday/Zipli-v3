@@ -192,7 +192,7 @@ export default function CreateDonationPage() {
       // Log supported MIME types for debugging
       const supportedTypes = ['audio/webm', 'audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/mp4', 'audio/aac'];
       supportedTypes.forEach(type => {
-        logger.debug(`MediaRecorder.isTypeSupported('${type}') on donate page: ${MediaRecorder.isTypeSupported(type)}`);
+        console.log(`[CLIENT DEBUG] MediaRecorder.isTypeSupported('${type}') on donate page: ${MediaRecorder.isTypeSupported(type)}`);
       });
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -209,7 +209,7 @@ export default function CreateDonationPage() {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         stream.getTracks().forEach(track => track.stop());
 
-        logger.debug('Donate Page - Audio Blob Created', { type: audioBlob.type, size: audioBlob.size });
+        console.log('[CLIENT DEBUG] Donate Page - Audio Blob Created', { type: audioBlob.type, size: audioBlob.size });
 
         if (audioBlob.size === 0) {
           logger.warn('Audio blob is empty for donation item, skipping transcription.');
