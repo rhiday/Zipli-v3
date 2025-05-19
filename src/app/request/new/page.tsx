@@ -19,6 +19,38 @@ import { Label } from "@/components/ui/label";
 import { cn } from '@/lib/utils';
 import { logger } from '../../../../lib/logger';
 
+// Helper function to detect iOS
+const isIOS = () => {
+  if (typeof window === 'undefined') return false;
+  return [
+    'iPad Simulator',
+    'iPhone Simulator',
+    'iPod Simulator',
+    'iPad',
+    'iPhone',
+    'iPod'
+  ].includes(navigator.platform) || 
+  // iPad on iOS 13 detection
+  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+};
+
+const getRecordingMimeType = () => {
+  if (isIOS()) {
+    if (MediaRecorder.isTypeSupported('audio/mp4')) {
+      return 'audio/mp4';
+    } else if (MediaRecorder.isTypeSupported('audio/aac')) { // Fallback
+      return 'audio/aac';
+    }
+  }
+  if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+    return 'audio/webm;codecs=opus';
+  }
+  if (MediaRecorder.isTypeSupported('audio/webm')) {
+    return 'audio/webm';
+  }
+  return ''; 
+};
+
 // Define Form Input Types
 type RequestFormInputs = {
   itemName: string; 
@@ -83,9 +115,15 @@ export default function CreateRequestPage() {
       supportedTypes.forEach(type => {
         console.log(`[CLIENT DEBUG] MediaRecorder.isTypeSupported('${type}') on request page: ${MediaRecorder.isTypeSupported(type)}`);
       });
+      const recordingMimeType = getRecordingMimeType();
+      console.log(`[CLIENT DEBUG] Request Page - Using MIME Type: ${recordingMimeType}`);
+      if (!recordingMimeType) {
+        setServerError('Audio recording format not supported on this browser.');
+        return;
+      }
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: recordingMimeType });
       audioChunksRef.current = [];
 
       mediaRecorderRef.current.ondataavailable = (event) => {
@@ -95,7 +133,8 @@ export default function CreateRequestPage() {
       mediaRecorderRef.current.onstop = async () => {
         setIsRecording(false);
         setIsTranscribing(true);
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const recordingMimeType = getRecordingMimeType(); // Get it again
+        const audioBlob = new Blob(audioChunksRef.current, { type: recordingMimeType || 'audio/webm' });
         stream.getTracks().forEach(track => track.stop());
 
         console.log('[CLIENT DEBUG] Request Page - Audio Blob Created', { type: audioBlob.type, size: audioBlob.size });
@@ -110,7 +149,11 @@ export default function CreateRequestPage() {
         }
 
         const audioFormData = new FormData();
-        audioFormData.append('audio', audioBlob, 'request_item.webm');
+        let fileExtension = '.webm';
+        if (audioBlob.type.includes('mp4')) fileExtension = '.mp4';
+        else if (audioBlob.type.includes('aac')) fileExtension = '.aac';
+
+        audioFormData.append('audio', audioBlob, `request_item${fileExtension}`);
 
         let transcript = '';
         try {

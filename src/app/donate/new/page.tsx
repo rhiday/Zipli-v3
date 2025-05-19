@@ -64,6 +64,39 @@ interface ProfileData {
   address?: string;
 }
 
+// Helper function to detect iOS
+const isIOS = () => {
+  if (typeof window === 'undefined') return false;
+  return [
+    'iPad Simulator',
+    'iPhone Simulator',
+    'iPod Simulator',
+    'iPad',
+    'iPhone',
+    'iPod'
+  ].includes(navigator.platform) || 
+  // iPad on iOS 13 detection
+  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+};
+
+const getRecordingMimeType = () => {
+  if (isIOS()) {
+    if (MediaRecorder.isTypeSupported('audio/mp4')) {
+      return 'audio/mp4';
+    } else if (MediaRecorder.isTypeSupported('audio/aac')) { // Fallback, though your logs say false
+      return 'audio/aac';
+    }
+  }
+  // Default for other browsers or if mp4 not supported on iOS (unlikely)
+  if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+    return 'audio/webm;codecs=opus';
+  }
+  if (MediaRecorder.isTypeSupported('audio/webm')) {
+    return 'audio/webm';
+  }
+  return ''; // Should indicate an error or unsupported browser
+};
+
 export default function CreateDonationPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -194,9 +227,15 @@ export default function CreateDonationPage() {
       supportedTypes.forEach(type => {
         console.log(`[CLIENT DEBUG] MediaRecorder.isTypeSupported('${type}') on donate page: ${MediaRecorder.isTypeSupported(type)}`);
       });
+      const recordingMimeType = getRecordingMimeType();
+      console.log(`[CLIENT DEBUG] Donate Page - Using MIME Type: ${recordingMimeType}`);
+      if (!recordingMimeType) {
+        setServerError('Audio recording format not supported on this browser.');
+        return;
+      }
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: recordingMimeType });
       audioChunksRef.current = [];
 
       mediaRecorderRef.current.ondataavailable = (event) => {
@@ -206,7 +245,8 @@ export default function CreateDonationPage() {
       mediaRecorderRef.current.onstop = async () => {
         setIsRecording(false);
         setIsTranscribing(true);
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const recordingMimeType = getRecordingMimeType(); // Get it again to be sure
+        const audioBlob = new Blob(audioChunksRef.current, { type: recordingMimeType || 'audio/webm' });
         stream.getTracks().forEach(track => track.stop());
 
         console.log('[CLIENT DEBUG] Donate Page - Audio Blob Created', { type: audioBlob.type, size: audioBlob.size });
@@ -221,7 +261,13 @@ export default function CreateDonationPage() {
         }
 
         const audioFormData = new FormData();
-        audioFormData.append('audio', audioBlob, 'initial_donation_item.webm');
+        // Determine file extension based on MIME type for OpenAI
+        let fileExtension = '.webm';
+        if (audioBlob.type.includes('mp4')) fileExtension = '.mp4';
+        else if (audioBlob.type.includes('aac')) fileExtension = '.aac';
+        // Add other mappings if necessary based on getRecordingMimeType
+
+        audioFormData.append('audio', audioBlob, `initial_donation_item${fileExtension}`);
 
         let transcript = '';
         try {
