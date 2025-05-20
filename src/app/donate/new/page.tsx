@@ -507,7 +507,10 @@ export default function CreateDonationPage() {
 
         if (item_image_url) {
           const { error: updateError } = await supabase.from('food_items').update({ image_url: item_image_url }).eq('id', foodItem.id);
-          if (updateError) console.error('Error updating food item with image:', updateError);
+          if (updateError) {
+            logger.error('Failed to update food item with image URL:', updateError, { foodItemId: foodItem.id });
+            throw new Error(`Failed to save image details for item "${item.itemName || 'Unnamed Item'}". Please try again.`);
+          }
         }
 
         const { error: insertError } = await supabase.from('donations').insert([
