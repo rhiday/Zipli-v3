@@ -5,9 +5,11 @@ import QRLoginGenerator from '@/components/auth/QRLoginGenerator';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function AdminQRLoginPage() {
   const { user, isLoading } = useAuth();
+  const router = useRouter();
   
   // Check if user is logged in and has admin access
   const isAuthorized = !isLoading && user && 
