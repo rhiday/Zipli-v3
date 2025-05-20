@@ -9,6 +9,8 @@ type UserRole = Database['public']['Enums']['user_role'];
 
 const testUsers = {
   donor: { email: 'donor@zipli.test', password: 'password', role: 'food_donor' as UserRole },
+  sodexoHelsinki: { email: 'helsinki.airport@sodexo.com', password: 'password', role: 'food_donor' as UserRole },
+  redCross: { email: 'helsinki.community@redcross.org', password: 'password', role: 'food_receiver' as UserRole },
   receiver: { email: 'receiver@zipli.test', password: 'password', role: 'food_receiver' as UserRole },
   city: { email: 'city@zipli.test', password: 'password', role: 'city' as UserRole },
   terminal: { email: 'terminal@zipli.test', password: 'password', role: 'terminals' as UserRole },
@@ -67,7 +69,9 @@ export default function DevLoginSwitcher() {
       <h4 className="text-sm font-semibold border-b border-gray-600 pb-1 mb-2">Dev Quick Login</h4>
       {error && <p className="text-xs text-red-400 break-words">Error: {error}</p>}
       <div className="grid grid-cols-2 gap-2">
-        {(Object.keys(testUsers) as Array<keyof typeof testUsers>).map((key) => (
+        {(Object.keys(testUsers) as Array<keyof typeof testUsers>)
+          .filter(key => key === 'donor' || key === 'sodexoHelsinki' || key === 'redCross' || key === 'terminal')
+          .map((key) => (
           <Button 
             key={key}
             size="sm"
