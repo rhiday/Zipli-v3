@@ -61,7 +61,10 @@ type DonationFormInputs = {
 };
 
 interface ProfileData {
-  address?: string;
+  street_address?: string;
+  postal_code?: string;
+  city?: string;
+  country?: string;
 }
 
 // Helper function to detect iOS
@@ -190,13 +193,20 @@ export default function CreateDonationPage() {
         if (user) {
           const { data, error } = await supabase
             .from('profiles')
-            .select('address')
+            .select('street_address, postal_code, city, country') // Fetch detailed address fields
             .eq('id', user.id)
             .single();
           
           if (error) {
-            logger.error('Error fetching profile in donation form:', error, { userId: user.id });
-            setServerError('Could not load profile data.');
+            // If error is PGRST116, it means no profile found, which is handled by UI
+            if (error.code === 'PGRST116') {
+              logger.info('Profile not found for user (PGRST116), will prompt to update.', { userId: user.id });
+              setProfile(null); // Ensure profile state is null
+            } else {
+              // For other errors, set the serverError message
+              logger.error('Error fetching profile in donation form:', error, { userId: user.id });
+              setServerError('Could not load profile data.');
+            }
           } else {
             logger.debug('Profile data fetched successfully:', data);
             setProfile(data);
@@ -264,7 +274,7 @@ export default function CreateDonationPage() {
         // Determine file extension based on MIME type for OpenAI
         let fileExtension = '.webm';
         if (audioBlob.type.includes('mp4')) fileExtension = '.mp4';
-        else if (audioBlob.type.includes('aac')) fileExtension = '.aac';
+        else if (audioBlob.type.includes('aac')) fileExtension = '.m4a';
         // Add other mappings if necessary based on getRecordingMimeType
 
         audioFormData.append('audio', audioBlob, `initial_donation_item${fileExtension}`);
@@ -583,7 +593,17 @@ export default function CreateDonationPage() {
                 {serverError}
               </div>
             )}
-            <Button variant="ghost" onClick={() => router.push('/donate')} className="mt-12 text-secondary hover:text-primary">
+            <Button 
+              variant="secondary" 
+              onClick={() => {
+                setCurrentView('formDetails');
+                setStep(1);
+              }}
+              className="mt-6 px-8 py-6 text-lg rounded-full flex items-center gap-3 border border-primary"
+            >
+              Enter Details Manually
+            </Button>
+            <Button variant="ghost" onClick={() => router.push('/donate')} className="mt-8 text-secondary hover:text-primary">
                 Or, go back to dashboard
             </Button>
           </div>
@@ -753,6 +773,28 @@ export default function CreateDonationPage() {
               {step === 2 && (
                  <>
                     <h2 className="text-lg font-semibold mb-4 text-primary">Pickup Scheduling</h2>
+
+                    {/* Inserted Pickup Address Display Here */}
+                    <div className="mb-4 p-4 rounded-lg bg-white border border-primary-10 shadow-sm">
+                        <h3 className="text-md font-semibold text-secondary mb-1">Default Pickup Address:</h3>
+                        {loadingProfile && <p className="text-sm text-gray-500">Loading address...</p>}
+                        {!loadingProfile && profile && profile.street_address && (
+                             <p className="text-sm text-gray-700">{profile.street_address}, {profile.city}, {profile.postal_code}, {profile.country}</p>
+                        )}
+                        {!loadingProfile && (!profile || !profile.street_address) && (
+                            <div className="p-3 rounded-md bg-warning/10 text-warning-700 border border-warning/30 text-sm">
+                                Your pickup address is not set in your profile. 
+                                <Button 
+                                    variant="ghost"
+                                    className="p-0 h-auto text-sm text-warning-700 hover:text-warning-800 hover:bg-transparent underline ml-1"
+                                    onClick={() => router.push('/profile/edit')}
+                                >
+                                    Update profile to set a default.
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="mb-4">
                         <label htmlFor="pickup_date" className="block text-label font-semibold text-secondary mb-2">Pickup Date</label>
                         <Popover>
@@ -850,13 +892,13 @@ export default function CreateDonationPage() {
                         </div>
 
                         {loadingProfile && <p>Loading address...</p>}
-                        {!loadingProfile && profile && profile.address && (
+                        {!loadingProfile && profile && profile.street_address && (
                              <div>
                                 <h3 className="text-md font-semibold text-secondary mb-2">Pickup Address:</h3>
-                                <p>{profile.address}</p>
+                                <p>{profile.street_address}, {profile.city}, {profile.postal_code}, {profile.country}</p>
                             </div>
                         )}
-                        {!loadingProfile && (!profile || !profile.address) && (
+                        {!loadingProfile && (!profile || !profile.street_address) && (
                             <div className="p-3 rounded-md bg-warning/10 text-warning border border-warning/30">
                                 <p className="text-sm">Your pickup address is not set. Please <Button variant="ghost" className="p-0 h-auto text-sm text-warning hover:underline" onClick={() => router.push('/profile/edit')}>update your profile</Button>.</p>
                             </div>
@@ -865,7 +907,7 @@ export default function CreateDonationPage() {
 
                     <div className="flex justify-between gap-2 pt-4">
                         <Button type="button" variant="secondary" onClick={() => setStep(2)} disabled={isSubmitting}>Back to Pickup</Button>
-                        <Button type="submit" variant="primary" disabled={isSubmitting || loadingProfile || (!profile?.address && !loadingProfile)} onClick={handleSubmit(onSubmit)}>{isSubmitting ? "Submitting..." : "Submit Donation"}</Button>
+                        <Button type="submit" variant="primary" disabled={isSubmitting || loadingProfile || (!profile?.street_address && !loadingProfile)} onClick={handleSubmit(onSubmit)}>{isSubmitting ? "Submitting..." : "Submit Donation"}</Button>
                     </div>
                 </>
               )}

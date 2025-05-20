@@ -152,19 +152,19 @@ export default function DonorDashboardPage(): React.ReactElement {
               {error}
             </div>
           )}
-          <div className="flex flex-col gap-4 sm:flex-row sm:gap-4 items-stretch">
+          <div className="flex flex-row gap-4 items-stretch">
             {/* Show latest donation as active offer */}
             {dashboardData.donations && dashboardData.donations.length > 0 ? (
-              <DonationCard donation={dashboardData.donations[0]} />
+              <DonationCard donation={dashboardData.donations[0]} className="w-1/2" />
             ) : (
-              <div className="rounded-lg bg-base p-6 text-center text-primary-75 border border-border w-full sm:max-w-md">
+              <div className="rounded-lg bg-base p-6 text-center text-primary-75 border border-border w-1/2">
                 No active offers yet.
               </div>
             )}
             {/* See all offers and requests card */}
             <a
               href="/donate/all-offers?filter=active"
-              className="flex items-center justify-center rounded-lg border-2 border-dashed border-primary-10 text-primary-75 font-medium w-full sm:max-w-md min-h-[120px] p-6 transition hover:border-primary-50 hover:text-primary cursor-pointer"
+              className="flex items-center justify-center rounded-lg border-2 border-dashed border-primary-10 text-primary-75 font-medium w-1/2 min-h-[120px] p-6 transition hover:border-primary-50 hover:text-primary cursor-pointer"
               style={{ minWidth: '0' }}
             >
               See all offers and requests
@@ -192,9 +192,9 @@ export default function DonorDashboardPage(): React.ReactElement {
                   </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
               {/* Total food offered */}
-              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full">
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
                 <div className="flex items-center gap-2 mb-2">
                   <Scale className="w-5 h-5 text-primary-50" />
                   <span className="text-2xl font-semibold text-green-800">46kg</span>
@@ -202,7 +202,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                 <span className="text-sm text-primary-75">Total food offered</span>
               </div>
               {/* Portions offered */}
-              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full">
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
                 <div className="flex items-center gap-2 mb-2">
                   <Utensils className="w-5 h-5 text-primary-50" />
                   <span className="text-2xl font-semibold text-green-800">131</span>
@@ -210,7 +210,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                 <span className="text-sm text-primary-75">Portions offered</span>
               </div>
               {/* Saved in food disposal costs */}
-              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full">
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
                 <div className="flex items-center gap-2 mb-2">
                   <Euro className="w-5 h-5 text-primary-50" />
                   <span className="text-2xl font-semibold text-green-800">125€</span>
@@ -218,7 +218,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                 <span className="text-sm text-primary-75">Saved in food disposal costs</span>
               </div>
               {/* CO2 Avoided */}
-              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full">
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
                 <div className="flex items-center gap-2 mb-2">
                   <Leaf className="w-5 h-5 text-primary-50" />
                   <span className="text-2xl font-semibold text-green-800">10t</span>

@@ -151,7 +151,7 @@ export default function CreateRequestPage() {
         const audioFormData = new FormData();
         let fileExtension = '.webm';
         if (audioBlob.type.includes('mp4')) fileExtension = '.mp4';
-        else if (audioBlob.type.includes('aac')) fileExtension = '.aac';
+        else if (audioBlob.type.includes('aac')) fileExtension = '.m4a';
 
         audioFormData.append('audio', audioBlob, `request_item${fileExtension}`);
 
