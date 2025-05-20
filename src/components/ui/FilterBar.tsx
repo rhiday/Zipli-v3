@@ -49,22 +49,20 @@ const FilterBar: FC<FilterBarProps> = ({
   showDateRange = true,
 }) => {
   const [showAllFilters, setShowAllFilters] = useState(false);
-  const [modalAllergens, setModalAllergens] = useState<string[]>(Array.isArray(activeFilters.allergens) ? activeFilters.allergens : []);
+  const [modalFoodType, setModalFoodType] = useState(activeFilters.foodType ? String(activeFilters.foodType) : '');
   const [modalMinQty, setModalMinQty] = useState(activeFilters.minQty ? String(activeFilters.minQty) : '');
   const [modalDateFrom, setModalDateFrom] = useState(activeFilters.dateFrom ? String(activeFilters.dateFrom) : '');
   const [modalDateTo, setModalDateTo] = useState(activeFilters.dateTo ? String(activeFilters.dateTo) : '');
 
-  // Helper for multi-select allergens
-  const toggleAllergen = (allergen: string) => {
-    setModalAllergens((prev) =>
-      prev.includes(allergen)
-        ? prev.filter((a) => a !== allergen)
-        : [...prev, allergen]
-    );
-  };
+  React.useEffect(() => {
+    setModalFoodType(activeFilters.foodType ? String(activeFilters.foodType) : '');
+    setModalMinQty(activeFilters.minQty ? String(activeFilters.minQty) : '');
+    setModalDateFrom(activeFilters.dateFrom ? String(activeFilters.dateFrom) : '');
+    setModalDateTo(activeFilters.dateTo ? String(activeFilters.dateTo) : '');
+  }, [activeFilters.foodType, activeFilters.minQty, activeFilters.dateFrom, activeFilters.dateTo]);
 
   const applyModalFilters = () => {
-    onFilterChange?.('allergens', modalAllergens);
+    onFilterChange?.('foodType', modalFoodType);
     onFilterChange?.('minQty', modalMinQty);
     onFilterChange?.('dateFrom', modalDateFrom);
     onFilterChange?.('dateTo', modalDateTo);
@@ -72,82 +70,7 @@ const FilterBar: FC<FilterBarProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap gap-2 overflow-x-auto py-2 md:grid md:grid-cols-5 md:gap-3">
-      {showType && (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="secondary" className="min-w-[110px] flex-shrink-0">
-              Type
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-48 p-2 bg-white border rounded shadow">
-            <div className="flex flex-col gap-1">
-              {TYPE_OPTIONS.map(opt => (
-                <Button
-                  key={opt.value}
-                  variant={activeFilters.type === opt.value ? 'primary' : 'ghost'}
-                  className="justify-start"
-                  onClick={() => onFilterChange?.('type', opt.value)}
-                >
-                  {opt.label}
-                </Button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
-      )}
-      {showAllergens && (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="secondary" className="min-w-[110px] flex-shrink-0">
-              Dietary
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-56 p-2 bg-white border rounded shadow">
-            <div className="flex flex-wrap gap-1">
-              {ALLERGENS.map(allergen => (
-                <Button
-                  key={allergen}
-                  variant={Array.isArray(activeFilters.allergens) && activeFilters.allergens.includes(allergen) ? 'primary' : 'ghost'}
-                  className="text-xs px-2 py-1"
-                  onClick={() => {
-                    const current = Array.isArray(activeFilters.allergens) ? activeFilters.allergens : [];
-                    const next = current.includes(allergen)
-                      ? current.filter(a => a !== allergen)
-                      : [...current, allergen];
-                    onFilterChange?.('allergens', next);
-                  }}
-                >
-                  {allergen}
-                </Button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
-      )}
-      {showFoodType && (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="secondary" className="min-w-[110px] flex-shrink-0">
-              Food Type
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-48 p-2 bg-white border rounded shadow">
-            <div className="flex flex-col gap-1">
-              {FOOD_TYPE_OPTIONS.map(opt => (
-                <Button
-                  key={opt}
-                  variant={activeFilters.foodType === opt ? 'primary' : 'ghost'}
-                  className="justify-start"
-                  onClick={() => onFilterChange?.('foodType', opt)}
-                >
-                  {opt}
-                </Button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
-      )}
+    <div className="flex gap-2 overflow-x-auto py-2">
       {showStatus && (
         <Popover>
           <PopoverTrigger asChild>
@@ -184,21 +107,30 @@ const FilterBar: FC<FilterBarProps> = ({
         </DialogTrigger>
         <DialogContent className="max-w-lg w-full bg-white p-6 rounded shadow">
           <h2 className="text-lg font-semibold mb-4">All Filters</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {showAllergens && (
+          <div className="space-y-4">
+            {showFoodType && (
               <div>
-                <label className="block text-sm font-medium mb-1">Dietary Preferences</label>
-                <div className="flex flex-wrap gap-1">
-                  {ALLERGENS.map(allergen => (
+                <label className="block text-sm font-medium mb-1">Food Type</label>
+                <div className="flex flex-col gap-1">
+                  {FOOD_TYPE_OPTIONS.map(opt => (
                     <Button
-                      key={allergen}
-                      variant={modalAllergens.includes(allergen) ? 'primary' : 'ghost'}
-                      className="text-xs px-2 py-1"
-                      onClick={() => toggleAllergen(allergen)}
+                      key={opt}
+                      variant={modalFoodType === opt ? 'primary' : 'ghost'}
+                      className="justify-start w-full text-left"
+                      onClick={() => setModalFoodType(opt)}
                     >
-                      {allergen}
+                      {opt}
                     </Button>
                   ))}
+                  {modalFoodType && (
+                    <Button
+                      variant='ghost'
+                      className="justify-start w-full text-left text-xs text-gray-500 mt-1"
+                      onClick={() => setModalFoodType('')}
+                    >
+                      Clear food type
+                    </Button>
+                  )}
                 </div>
               </div>
             )}

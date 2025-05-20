@@ -58,9 +58,9 @@ export default function FeedPage(): React.ReactElement {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [activeViewType, setActiveViewType] = useState<'donations' | 'requests'>('donations');
+
   const [filters, setFilters] = useState({
-    type: 'donations',
-    allergens: [],
     foodType: '',
     minQty: '',
     dateFrom: '',
@@ -75,8 +75,11 @@ export default function FeedPage(): React.ReactElement {
       setCurrentUserId(user?.id || null);
     };
     getCurrentUser();
+  }, []);
+
+  useEffect(() => {
     fetchFeedData();
-  }, [filters]);
+  }, [activeViewType, filters]);
 
   const fetchFeedData = async () => {
     setLoading(true);
@@ -90,7 +93,7 @@ export default function FeedPage(): React.ReactElement {
       }
 
       let query;
-      if (filters.type === 'donations') {
+      if (activeViewType === 'donations') {
         query = supabase
           .from('donations')
           .select(`
@@ -100,11 +103,6 @@ export default function FeedPage(): React.ReactElement {
           `)
           .eq('status', 'available');
 
-        if (filters.allergens.length > 0) {
-          for (const allergen of filters.allergens) {
-            query = query.ilike('food_items.allergens', `%${allergen}%`);
-          }
-        }
         if (filters.foodType) {
           query = query.eq('food_items.food_type', filters.foodType);
         }
@@ -154,16 +152,15 @@ export default function FeedPage(): React.ReactElement {
       setFeedItems(data || []);
     } catch (err: any) {
       console.error("Error fetching feed data:", err);
-      setError(err.message || `Failed to fetch ${filters.type}.`);
+      setError(err.message || `Failed to fetch ${activeViewType}.`);
     } finally {
       setLoading(false);
     }
   };
 
   const clearFilters = () => {
+    setActiveViewType('donations');
     setFilters({
-      type: 'donations',
-      allergens: [],
       foodType: '',
       minQty: '',
       dateFrom: '',
@@ -244,12 +241,32 @@ export default function FeedPage(): React.ReactElement {
           </div>
         </div>
 
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant={activeViewType === 'donations' ? 'primary' : 'secondary'}
+            onClick={() => setActiveViewType('donations')}
+            className="flex-1 sm:flex-none"
+          >
+            <PackageIcon className="mr-2 h-4 w-4" /> Donations
+          </Button>
+          <Button
+            variant={activeViewType === 'requests' ? 'primary' : 'secondary'}
+            onClick={() => setActiveViewType('requests')}
+            className="flex-1 sm:flex-none"
+          >
+            <HandshakeIcon className="mr-2 h-4 w-4" /> Requests
+          </Button>
+        </div>
+
         <FilterBar
-          onFilterChange={(key, value) => setFilters(f => ({ ...f, [key]: value }))}
+          onFilterChange={(key, value) => {
+            if (key === 'type') return;
+            setFilters(f => ({ ...f, [key]: value as string | string[] }));
+          }}
           activeFilters={filters}
           showStatus={false}
-          showType={true}
-          showAllergens={true}
+          showType={false}
+          showAllergens={false}
           showFoodType={true}
           showMinQty={true}
           showDateRange={true}
@@ -357,9 +374,9 @@ export default function FeedPage(): React.ReactElement {
           ) : (
             <div className="col-span-full text-center py-12">
               <p className="text-body text-primary-75">
-                {searchTerm || filters.allergens.length > 0 || filters.foodType || filters.minQty || filters.dateFrom || filters.dateTo 
-                  ? `No ${filters.type} match your criteria` 
-                  : `No ${filters.type} available at the moment`}
+                {searchTerm || filters.foodType || filters.minQty || filters.dateFrom || filters.dateTo 
+                  ? `No ${activeViewType} match your criteria` 
+                  : `No ${activeViewType} available at the moment`}
               </p>
             </div>
           )}
