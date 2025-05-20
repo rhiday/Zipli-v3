@@ -54,8 +54,8 @@ export default function QRLoginGenerator() {
   useEffect(() => {
     fetchToken();
     
-    // Regenerate token every 24 hours to ensure it's always valid
-    const intervalId = setInterval(fetchToken, 24 * 60 * 60 * 1000);
+    // Regenerate token every 10 minutes to ensure it's always valid
+    const intervalId = setInterval(fetchToken, 10 * 60 * 1000);
     
     return () => clearInterval(intervalId);
   }, [fetchToken]);
