@@ -61,10 +61,7 @@ type DonationFormInputs = {
 };
 
 interface ProfileData {
-  street_address?: string;
-  postal_code?: string;
-  city?: string;
-  country?: string;
+  address?: string;
 }
 
 // Helper function to detect iOS
@@ -193,17 +190,15 @@ export default function CreateDonationPage() {
         if (user) {
           const { data, error } = await supabase
             .from('profiles')
-            .select('street_address, postal_code, city, country') // Fetch detailed address fields
+            .select('address') // Changed to select only 'address'
             .eq('id', user.id)
             .single();
           
           if (error) {
-            // If error is PGRST116, it means no profile found, which is handled by UI
             if (error.code === 'PGRST116') {
               logger.info('Profile not found for user (PGRST116), will prompt to update.', { userId: user.id });
-              setProfile(null); // Ensure profile state is null
+              setProfile(null);
             } else {
-              // For other errors, set the serverError message
               logger.error('Error fetching profile in donation form:', error, { userId: user.id });
               setServerError('Could not load profile data.');
             }
@@ -294,30 +289,28 @@ export default function CreateDonationPage() {
 
           const processResponse = await fetch('/api/process-item-details', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ transcript }) });
           if (!processResponse.ok) throw new Error((await processResponse.json()).error || 'Processing details API call failed');
-          const result = await processResponse.json(); // Expected: { itemName, description, quantity, unit, foodType }
+          const result = await processResponse.json(); // Expected: { itemName }
 
           // Check if AI successfully extracted an item name
-          if (!result.itemName || result.itemName.trim().toLowerCase() === 'not provided' || result.itemName.trim() === '') {
-            throw new Error('Could not understand the item details from your voice input. Please try describing the item again, including its name, description, and quantity.');
+          if (!result.itemName || result.itemName.trim().toLowerCase() === 'not provided' || result.itemName.trim().toLowerCase() === '' || result.itemName.trim().toLowerCase() === 'unknown item') {
+            throw new Error('Could not understand the item name from your voice input. Please try describing the item again.');
           }
 
           const currentItems = getValues('items');
-          // Check if this is the very first item being added (i.e., items array has 1 default placeholder)
           const isFirstEverItem = currentItems.length === 1 && 
                                 !currentItems[0].itemName && 
                                 currentItems[0].description === '' && 
-                                currentItems[0].quantity === 1 && // Default quantity
+                                currentItems[0].quantity === 1 &&
                                 currentItems[0].displayState === 'editing';
 
           if (isFirstEverItem) {
             setValue('items.0.itemName', result.itemName || '', { shouldValidate: true });
-            setValue('items.0.description', result.description || '', { shouldValidate: true });
-            setValue('items.0.quantity', result.quantity || 1, { shouldValidate: true });
-            setValue('items.0.foodType', result.foodType || 'Other', { shouldValidate: true });
-            setValue('items.0.allergens', []); // Allergens are manual for now after voice
+            setValue('items.0.description', transcript, { shouldValidate: true }); // Use full transcript for description
+            setValue('items.0.quantity', 1, { shouldValidate: true }); // Default quantity
+            setValue('items.0.foodType', 'Other', { shouldValidate: true }); // Default food type
+            setValue('items.0.allergens', []);
             setValue('items.0.displayState', 'editing');
           } else {
-            // It's a new item to be appended. Set all existing items to summary.
             const updatedExistingItems = currentItems.map(item => ({ ...item, displayState: 'summary' as const }));
             
             setValue('items', [
@@ -325,9 +318,9 @@ export default function CreateDonationPage() {
               {
                 id: uuidv4(),
                 itemName: result.itemName || '',
-                description: result.description || '',
-                quantity: result.quantity || 1,
-                foodType: result.foodType || 'Other',
+                description: transcript, // Use full transcript for description
+                quantity: 1, // Default quantity
+                foodType: 'Other', // Default food type
                 displayState: 'editing',
                 image: null,
               }
@@ -650,11 +643,6 @@ export default function CreateDonationPage() {
                               {errors.items?.[idx]?.itemName && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.items[idx]?.itemName?.message}</p>}
                             </div>
                             <div>
-                              <label htmlFor={`items.${idx}.description`} className="block text-label font-semibold text-secondary mb-2">Description</label>
-                              <Textarea id={`items.${idx}.description`} placeholder="Details about the item..." rows={4} {...register(`items.${idx}.description`, { required: "Description is required" })} error={!!errors.items?.[idx]?.description} disabled={isSubmitting} />
-                              {errors.items?.[idx]?.description && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.items[idx]?.description?.message}</p>}
-                            </div>
-                            <div>
                               <label htmlFor={`items.${idx}.quantity`} className="block text-label font-semibold text-secondary mb-2">Quantity (kg)</label>
                               <Input id={`items.${idx}.quantity`} type="number" step="0.1" placeholder="e.g., 2.5" {...register(`items.${idx}.quantity`, { valueAsNumber: true, required: "Qty is required", min: { value: 1, message: "Min 1" } })} error={!!errors.items?.[idx]?.quantity} disabled={isSubmitting} />
                               {errors.items?.[idx]?.quantity && <p className="mt-1.5 text-sm text-negative"><AlertTriangle className="h-4 w-4 inline" /> {errors.items[idx]?.quantity?.message}</p>}
@@ -725,6 +713,11 @@ export default function CreateDonationPage() {
                               {errors.items?.[idx]?.image?.type === 'lessThan5MB' && <p className="mt-1.5 text-sm text-negative"><AlertTriangle className="h-4 w-4 inline" /> Image must be less than 5MB.</p>}
                               {errors.items?.[idx]?.image?.type === 'isImage' && <p className="mt-1.5 text-sm text-negative"><AlertTriangle className="h-4 w-4 inline" /> File must be an image.</p>}
                             </div>
+                            <div>
+                              <label htmlFor={`items.${idx}.description`} className="block text-label font-semibold text-secondary mb-2">Additional Details (Optional)</label>
+                              <Textarea id={`items.${idx}.description`} placeholder="Details about the item..." rows={4} {...register(`items.${idx}.description`)} error={!!errors.items?.[idx]?.description} disabled={isSubmitting} />
+                              {errors.items?.[idx]?.description && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.items[idx]?.description?.message}</p>}
+                            </div>
                           </div>
                           <div className="flex justify-end items-center gap-2 mt-6">
                             <Button type="button" variant="ghost" size="sm" className="text-negative hover:bg-negative/10" onClick={() => handleDeleteItem(idx)}><Trash2 className="h-4 w-4" /><span className="sr-only">Delete Item</span></Button>
@@ -773,27 +766,6 @@ export default function CreateDonationPage() {
               {step === 2 && (
                  <>
                     <h2 className="text-lg font-semibold mb-4 text-primary">Pickup Scheduling</h2>
-
-                    {/* Inserted Pickup Address Display Here */}
-                    <div className="mb-4 p-4 rounded-lg bg-white border border-primary-10 shadow-sm">
-                        <h3 className="text-md font-semibold text-secondary mb-1">Default Pickup Address:</h3>
-                        {loadingProfile && <p className="text-sm text-gray-500">Loading address...</p>}
-                        {!loadingProfile && profile && profile.street_address && (
-                             <p className="text-sm text-gray-700">{profile.street_address}, {profile.city}, {profile.postal_code}, {profile.country}</p>
-                        )}
-                        {!loadingProfile && (!profile || !profile.street_address) && (
-                            <div className="p-3 rounded-md bg-warning/10 text-warning-700 border border-warning/30 text-sm">
-                                Your pickup address is not set in your profile. 
-                                <Button 
-                                    variant="ghost"
-                                    className="p-0 h-auto text-sm text-warning-700 hover:text-warning-800 hover:bg-transparent underline ml-1"
-                                    onClick={() => router.push('/profile/edit')}
-                                >
-                                    Update profile to set a default.
-                                </Button>
-                            </div>
-                        )}
-                    </div>
 
                     <div className="mb-4">
                         <label htmlFor="pickup_date" className="block text-label font-semibold text-secondary mb-2">Pickup Date</label>
@@ -854,6 +826,38 @@ export default function CreateDonationPage() {
                         <Textarea id="instructions_for_driver" placeholder="e.g., 'Ring the bell', 'Leave at front desk'" {...register('instructions_for_driver')} className="rounded-lg border-border bg-white" disabled={isSubmitting}/>
                     </div>
 
+                    {/* Inserted Pickup Address Display Here (at the bottom of Step 2) */}
+                    <div className="mb-4 p-4 rounded-lg bg-white border border-primary-10 shadow-sm">
+                        <h3 className="text-md font-semibold text-secondary mb-1">Default Pickup Address:</h3>
+                        {loadingProfile && <p className="text-sm text-gray-500">Loading address...</p>}
+                        {!loadingProfile && profile && profile.address && (
+                             <div className="flex items-center justify-between">
+                               <p className="text-sm text-gray-700">{profile.address}</p>
+                               <Button
+                                   type="button"
+                                   variant="ghost"
+                                   size="sm"
+                                   className="p-1 h-auto text-xs text-primary hover:bg-primary/10"
+                                   onClick={() => router.push('/profile')}
+                               >
+                                   Edit
+                               </Button>
+                             </div>
+                        )}
+                        {!loadingProfile && (!profile || !profile.address) && ( // Check profile.address
+                            <div className="p-3 rounded-md bg-warning/10 text-warning-700 border border-warning/30 text-sm">
+                                Your pickup address is not set in your profile. 
+                                <Button 
+                                    variant="ghost"
+                                    className="p-0 h-auto text-sm text-warning-700 hover:text-warning-800 hover:bg-transparent underline ml-1"
+                                    onClick={() => router.push('/profile')}
+                                >
+                                    Update profile to set a default.
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+
                      <div className="flex justify-between gap-2 pt-4">
                         <Button type="button" variant="secondary" onClick={() => setStep(1)} disabled={isSubmitting}>Back to Item Details</Button>
                         <Button type="button" variant="primary" onClick={async () => { const isValid = await trigger(["pickup_date", "pickup_slots"]); if (isValid) setStep(3); }} disabled={isSubmitting}>Next: Review & Submit</Button>
@@ -892,22 +896,33 @@ export default function CreateDonationPage() {
                         </div>
 
                         {loadingProfile && <p>Loading address...</p>}
-                        {!loadingProfile && profile && profile.street_address && (
+                        {!loadingProfile && profile && profile.address && ( // Check profile.address
                              <div>
                                 <h3 className="text-md font-semibold text-secondary mb-2">Pickup Address:</h3>
-                                <p>{profile.street_address}, {profile.city}, {profile.postal_code}, {profile.country}</p>
+                                <div className="flex items-center justify-between">
+                                  <p>{profile.address}</p>
+                                  <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      className="p-1 h-auto text-xs text-primary hover:bg-primary/10"
+                                      onClick={() => router.push('/profile')}
+                                  >
+                                      Edit
+                                  </Button>
+                                </div>
                             </div>
                         )}
-                        {!loadingProfile && (!profile || !profile.street_address) && (
+                        {!loadingProfile && (!profile || !profile.address) && ( // Check profile.address
                             <div className="p-3 rounded-md bg-warning/10 text-warning border border-warning/30">
-                                <p className="text-sm">Your pickup address is not set. Please <Button variant="ghost" className="p-0 h-auto text-sm text-warning hover:underline" onClick={() => router.push('/profile/edit')}>update your profile</Button>.</p>
+                                <p className="text-sm">Your pickup address is not set. Please <Button variant="ghost" className="p-0 h-auto text-sm text-warning hover:underline" onClick={() => router.push('/profile')}>update your profile</Button>.</p>
                             </div>
                         )}
                     </div>
 
                     <div className="flex justify-between gap-2 pt-4">
                         <Button type="button" variant="secondary" onClick={() => setStep(2)} disabled={isSubmitting}>Back to Pickup</Button>
-                        <Button type="submit" variant="primary" disabled={isSubmitting || loadingProfile || (!profile?.street_address && !loadingProfile)} onClick={handleSubmit(onSubmit)}>{isSubmitting ? "Submitting..." : "Submit Donation"}</Button>
+                        <Button type="submit" variant="primary" disabled={isSubmitting || loadingProfile || (!profile?.address && !loadingProfile)} onClick={handleSubmit(onSubmit)}>{isSubmitting ? "Submitting..." : "Submit Donation"}</Button> {/* Check profile.address */}
                     </div>
                 </>
               )}

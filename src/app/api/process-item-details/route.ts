@@ -28,22 +28,16 @@ export async function POST(req: NextRequest) {
     }
 
     const systemPrompt = `You are an intelligent assistant helping to fill out a food donation form.
-Based on the user's spoken description of a food item, your task is to extract key details.
+Based on the user's spoken description of a food item, your main task is to extract the **Item Name (itemName)**.
 
-1.  **Item Name (itemName):** A concise name for the item (e.g., "Apples", "Canned Corn", "Whole Wheat Bread").
-2.  **Description (description):** Any additional details like brand, specific type, or condition (e.g., "Organic Fuji apples", "Low sodium canned corn", "Freshly baked today"). If not specified, use an empty string.
-3.  **Quantity (quantity):** The numerical amount of the item. If the user mentions a range, pick the lower number. If no specific number, try to infer or default to 1. Output as a number. The user understands this quantity is implicitly in kilograms (kg) if applicable, but you should only extract the number.
-4.  **Food Type (foodType):** Categorize the item. Valid options are: "Produce", "Canned Goods", "Baked Goods", "Dairy", "Meat/Protein", "Frozen", "Meals", "Snacks", "Beverages", "Grains/Pasta", "Other". If unsure, default to "Other".
+1.  **Item Name (itemName):** Identify the primary food item being described (e.g., "Apples", "Canned Corn", "Whole Wheat Bread"). Be as concise as possible. If multiple items are mentioned, try to pick the most prominent one or the first one clearly described as a distinct item.
 
 Respond ONLY with a JSON object in the following format:
 {
-  "itemName": "<extracted item name>",
-  "description": "<extracted description>",
-  "quantity": <extracted quantity as a number>,
-  "foodType": "<extracted food type>"
+  "itemName": "<extracted item name>"
 }
-Ensure quantity is a number. Do not include any other text, explanations, or markdown formatting before or after the JSON object.
-If a piece of information isn't clearly available, use a sensible default (e.g., quantity 1, foodType "Other", empty string for description).`;
+If you cannot confidently identify an item name, return an empty string or "unknown item" for the itemName.
+Do not include any other text, explanations, or markdown formatting before or after the JSON object.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo-0125',
@@ -63,25 +57,14 @@ If a piece of information isn't clearly available, use a sensible default (e.g.,
 
     try {
       const parsedContent = JSON.parse(content);
-      // Basic validation for the presence of new fields
-      if (
-        !parsedContent.itemName ||
-        typeof parsedContent.description === 'undefined' || // Can be empty string
-        typeof parsedContent.quantity !== 'number' ||
-        !parsedContent.foodType
-      ) {
-        logger.error('OpenAI response missing or has invalid types for key fields:', content);
-        // Attempt to provide sensible defaults
-        const finalResponse = {
-            itemName: parsedContent.itemName || "Unknown Item",
-            description: parsedContent.description || "No description provided.",
-            quantity: typeof parsedContent.quantity === 'number' ? parsedContent.quantity : 1,
-            foodType: parsedContent.foodType || "Other"
-        };
-        logger.warn('Returning response with some defaults due to missing/invalid fields from AI:', finalResponse);
-        return NextResponse.json(finalResponse);
+      // Basic validation for the presence of itemName
+      if (typeof parsedContent.itemName === 'undefined') {
+        logger.error('OpenAI response missing itemName:', content);
+        // Return a default structure if itemName is missing
+        return NextResponse.json({ itemName: "Unknown Item" });
       }
-      return NextResponse.json(parsedContent);
+      // Return only itemName, even if AI provides more
+      return NextResponse.json({ itemName: parsedContent.itemName });
     } catch (parseError) {
       console.error('Error parsing OpenAI JSON response:', parseError, 'Raw content:', content);
       return NextResponse.json({ error: 'Failed to parse AI response.', details: content }, { status: 500 });
