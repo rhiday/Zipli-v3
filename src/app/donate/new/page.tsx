@@ -464,8 +464,12 @@ export default function CreateDonationPage() {
       logger.debug('Authenticated user for donation submission:', user.id);
 
       for (const [idx, item] of data.items.entries()) {
-        let item_image_url: string | null = null;
+        logger.debug(`Processing item ${idx + 1} ('${item.itemName}') raw data:`, { itemData: JSON.parse(JSON.stringify(item)) }); // Log the whole item
         const imageToUpload = item.image?.[0];
+        logger.debug(`For item ${idx + 1} ('${item.itemName}'), the direct value of item.image?.[0] (imageToUpload) is:`, imageToUpload);
+
+        let item_image_url: string | null = null;
+        const imageToUploadFile = item.image?.[0]; // Keep original variable name for clarity in existing code if needed
         let foodItem: { id: string } | null = null;
 
         const { data: foodItemData, error: foodItemError } = await supabase
@@ -485,27 +489,45 @@ export default function CreateDonationPage() {
         if (!foodItemData) throw new Error('Failed to create food item');
         foodItem = foodItemData as { id: string };
 
-        if (imageToUpload) {
+        if (imageToUploadFile) {
           const formData = new FormData();
-          formData.append('image', imageToUpload);
+          formData.append('image', imageToUploadFile);
           const res = await fetch('/api/compress-image', { method: 'POST', body: formData });
-          if (!res.ok) { setServerError(`Failed to compress image for item ${idx + 1}.`); return; }
+          if (!res.ok) { 
+            logger.error('Compression API call failed:', { status: res.status, item: item.itemName });
+            setServerError(`Failed to compress image for item ${item.itemName || 'Unnamed Item'}.`); 
+            return; 
+          }
           const compressedBlob = await res.blob();
+          logger.debug('Image compressed successfully', { itemName: item.itemName, blobSize: compressedBlob.size, blobType: compressedBlob.type });
+
           const compressedFile = new File([compressedBlob], `item_${idx}_${Date.now()}.jpg`, { type: 'image/jpeg' });
           const fileName = `${user.id}/item_${idx}_${Date.now()}.jpg`;
+          
+          logger.debug('Attempting to upload image to Supabase storage', { itemName: item.itemName, fileName });
           const { error: uploadError, data: uploadData } = await supabase.storage.from('donations').upload(fileName, compressedFile, { contentType: 'image/jpeg' });
-          if (uploadError) throw uploadError;
-          if (uploadData) item_image_url = supabase.storage.from('donations').getPublicUrl(uploadData.path).data.publicUrl;
+          
+          logger.debug('Supabase storage upload response:', { uploadData, uploadError, itemName: item.itemName });
 
-        } else {
-          try {
-            const response = await fetch('/api/generate-food-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: item.itemName }) });
-            if (!response.ok) throw new Error((await response.json()).error || 'Failed to generate image');
-            item_image_url = (await response.json()).url;
-          } catch (err: any) { console.error('Error generating image:', err); }
+          if (uploadError) {
+            logger.error('Supabase storage upload failed:', uploadError, { itemName: item.itemName });
+            throw uploadError;
+          }
+          if (uploadData) {
+            logger.debug('Upload successful, attempting to get public URL', { path: uploadData.path, itemName: item.itemName });
+            const publicUrlResult = supabase.storage.from('donations').getPublicUrl(uploadData.path);
+            logger.debug('Supabase getPublicUrl result:', { publicUrlData: publicUrlResult.data, itemName: item.itemName }); // Log the whole result
+            item_image_url = publicUrlResult.data.publicUrl;
+            logger.debug('Retrieved item_image_url value:', item_image_url, { itemName: item.itemName }); // Explicitly log the URL value
+          } else {
+            logger.warn('uploadData was null or undefined after storage upload, cannot get public URL', { itemName: item.itemName });
+          }
+
         }
 
+        logger.debug('Final check before updating food_item with image URL:', { item_image_url, foodItemId: foodItem.id, itemName: item.itemName });
         if (item_image_url) {
+          logger.debug('Attempting to update food_item with id:', foodItem.id, 'to set image_url:', item_image_url);
           const { error: updateError } = await supabase.from('food_items').update({ image_url: item_image_url }).eq('id', foodItem.id);
           if (updateError) {
             logger.error('Failed to update food item with image URL:', updateError, { foodItemId: foodItem.id });
@@ -813,11 +835,30 @@ export default function CreateDonationPage() {
                                 </Tooltip>
                             </TooltipProvider>
                         </div>
+                        {/* Header Labels for Time Slots */}
+                        {slotFields.length > 0 && (
+                            <div className="flex items-center gap-2 mb-1 px-1">
+                                <div className="w-1/2">
+                                    <Label className="text-xs font-medium text-gray-600">Start Time</Label>
+                                </div>
+                                <div className="w-1/2">
+                                    <Label className="text-xs font-medium text-gray-600">End Time</Label>
+                                </div>
+                                <div className="w-auto p-1.5"> {/* Placeholder for alignment with delete button */}
+                                    <div className="h-5 w-5" /> {/* Invisible spacer */}
+                                </div>
+                            </div>
+                        )}
+
                         {slotFields.map((field, index) => (
-                            <div key={field.id} className="flex items-center gap-2 mb-2">
-                                <Input type="time" {...register(`pickup_slots.${index}.start`, { required: 'Start time required' })} className="w-1/2 h-11 px-4 py-3 rounded-lg border-border bg-white" disabled={isSubmitting}/>
-                                <Input type="time" {...register(`pickup_slots.${index}.end`, { required: 'End time required' })} className="w-1/2 h-11 px-4 py-3 rounded-lg border-border bg-white" disabled={isSubmitting}/>
-                                <Button type="button" variant="ghost" size="sm" className="text-negative hover:bg-negative/10 p-1.5" onClick={() => removeSlot(index)} disabled={slotFields.length <= 1 || isSubmitting}><Minus className="h-4 w-4" /></Button>
+                            <div key={field.id} className="flex items-center gap-2 mb-2"> {/* Reverted to items-center, mb-3 to mb-2 */}
+                                <div className="w-1/2"> {/* Removed space-y-1.5, direct input */}
+                                    <Input type="time" id={`pickup_slots.${index}.start`} {...register(`pickup_slots.${index}.start`, { required: 'Start time required' })} className="w-full h-11 px-4 py-3 rounded-lg border-border bg-white" disabled={isSubmitting}/>
+                                </div>
+                                <div className="w-1/2"> {/* Removed space-y-1.5, direct input */}
+                                    <Input type="time" id={`pickup_slots.${index}.end`} {...register(`pickup_slots.${index}.end`, { required: 'End time required' })} className="w-full h-11 px-4 py-3 rounded-lg border-border bg-white" disabled={isSubmitting}/>
+                                </div>
+                                <Button type="button" variant="ghost" size="sm" className="text-negative hover:bg-negative/10 p-1.5" onClick={() => removeSlot(index)} disabled={slotFields.length <= 1 || isSubmitting}><Trash2 className="h-5 w-5" /></Button> {/* Increased icon size, removed mt adjustment */}
                             </div>
                         ))}
                          {errors.pickup_slots && <p className="mt-1.5 text-sm text-negative"><AlertTriangle className="h-4 w-4 inline" /> Please ensure all time slots are valid.</p>}
