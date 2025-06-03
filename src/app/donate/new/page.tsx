@@ -81,13 +81,17 @@ const isIOS = () => {
 
 const getRecordingMimeType = () => {
   if (isIOS()) {
+    // Prioritize webm/opus for iOS as well, if supported, as an experiment
+    if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+      return 'audio/webm;codecs=opus';
+    }
     if (MediaRecorder.isTypeSupported('audio/mp4')) {
       return 'audio/mp4';
-    } else if (MediaRecorder.isTypeSupported('audio/aac')) { // Fallback, though your logs say false
+    } else if (MediaRecorder.isTypeSupported('audio/aac')) { // Fallback
       return 'audio/aac';
     }
   }
-  // Default for other browsers or if mp4 not supported on iOS (unlikely)
+  // Default for other browsers
   if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
     return 'audio/webm;codecs=opus';
   }
@@ -227,20 +231,25 @@ export default function CreateDonationPage() {
     setServerError(null);
 
     try {
-      // Log supported MIME types for debugging
+      // Log device type and supported MIME types for debugging
+      logger.debug('Device isiOS:', isIOS()); // ADDED: Log if device is iOS
       const supportedTypes = ['audio/webm', 'audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/mp4', 'audio/aac'];
       supportedTypes.forEach(type => {
-        console.log(`[CLIENT DEBUG] MediaRecorder.isTypeSupported('${type}') on donate page: ${MediaRecorder.isTypeSupported(type)}`);
+        // Use logger.debug for consistency, though console.log is also fine for quick client checks
+        logger.debug(`MediaRecorder.isTypeSupported('${type}') on donate page: ${MediaRecorder.isTypeSupported(type)}`);
       });
       const recordingMimeType = getRecordingMimeType();
-      console.log(`[CLIENT DEBUG] Donate Page - Using MIME Type: ${recordingMimeType}`);
+      logger.debug(`Selected recordingMimeType by getRecordingMimeType(): ${recordingMimeType}`); // ADDED: Log selected MIME type
+
       if (!recordingMimeType) {
-        setServerError('Audio recording format not supported on this browser.');
+        setServerError('Audio recording format not supported on this browser. Please try typing details manually.');
+        logger.error('No suitable recordingMimeType found for this browser.'); // ADDED: Log error if no MIME type
         return;
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: recordingMimeType });
+      logger.debug('MediaRecorder instance created with mimeType:', mediaRecorderRef.current.mimeType); // ADDED: Log actual mimeType used by MediaRecorder
       audioChunksRef.current = [];
 
       mediaRecorderRef.current.ondataavailable = (event) => {
@@ -250,11 +259,15 @@ export default function CreateDonationPage() {
       mediaRecorderRef.current.onstop = async () => {
         setIsRecording(false);
         setIsTranscribing(true);
-        const recordingMimeType = getRecordingMimeType(); // Get it again to be sure
-        const audioBlob = new Blob(audioChunksRef.current, { type: recordingMimeType || 'audio/webm' });
+        // const recordingMimeType = getRecordingMimeType(); // Get it again to be sure - Redundant, already have it
+        const audioBlob = new Blob(audioChunksRef.current, { type: recordingMimeType || 'audio/webm' }); // Ensure a fallback type if recordingMimeType was somehow empty
         stream.getTracks().forEach(track => track.stop());
 
-        console.log('[CLIENT DEBUG] Donate Page - Audio Blob Created', { type: audioBlob.type, size: audioBlob.size });
+        logger.debug('Audio Blob Created for transcription:', { // CHANGED: from console.log to logger.debug and added more details
+          type: audioBlob.type,
+          size: audioBlob.size,
+          recordingMimeTypeUsed: recordingMimeType // Log the MIME type state variable used for blob creation
+        });
 
         if (audioBlob.size === 0) {
           logger.warn('Audio blob is empty for donation item, skipping transcription.');
@@ -271,6 +284,7 @@ export default function CreateDonationPage() {
         if (audioBlob.type.includes('mp4')) fileExtension = '.mp4';
         else if (audioBlob.type.includes('aac')) fileExtension = '.m4a';
         // Add other mappings if necessary based on getRecordingMimeType
+        logger.debug('Determined fileExtension for OpenAI API:', fileExtension, { blobType: audioBlob.type }); // ADDED: Log determined file extension
 
         audioFormData.append('audio', audioBlob, `initial_donation_item${fileExtension}`);
 
