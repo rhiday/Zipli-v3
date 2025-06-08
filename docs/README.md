@@ -5,6 +5,8 @@ Welcome to the central documentation hub for the Zipli project. This directory c
 ## Documentation Index
 
 ### 1. Project & Feature Planning
+- [**V2 Redesign & Refactor Plan**](./refactor_plan.md)
+  - _The master checklist and plan for the V2 redesign effort._
 - [**Product Requirements Document (PRD)**](./product_requirements.md)
   - _Outlines the goals, features, and requirements for Version 2 of the application._
 
