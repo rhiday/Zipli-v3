@@ -4,6 +4,8 @@
 
 Zipli is a platform connecting food donors with people in need, reducing food waste and helping communities.
 
+> **[📚 View Full Project Documentation](./docs/README.md)**
+
 ---
 
 ## V2 Redesign Progress
