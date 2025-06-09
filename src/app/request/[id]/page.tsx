@@ -222,7 +222,7 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
                 </Button>
                 <Button
                   onClick={() => handleStatusUpdate('cancelled')}
-                  variant="negative"
+                  variant="destructive"
                   size="md"
                   className="flex-1"
                   disabled={actionLoading}

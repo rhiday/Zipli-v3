@@ -4,26 +4,16 @@ import { cn } from '@/lib/utils';
 
 // Define CVA variants for the Textarea, mirroring Input styles
 const textareaVariants = cva(
-  [
-    // Base styles
-    "flex min-h-[80px] w-full input-default border-2 border-[var(--zipli-border-light,#F3F4F6)] bg-white text-[var(--zipli-text-primary)] rounded-[12px] px-4 py-3 text-bodyLg placeholder:text-inactive transition-colors duration-150 ease-in-out",
-    // Hover (only color changes)
-    "hover:input-hover hover:border-2 hover:border-[var(--zipli-border-light,#F3F4F6)] hover:shadow-[0_0_0_2px_rgba(0,128,0,0.1)]",
-    // Focus (color changes)
-    "focus:input-focus focus:border-2 focus:border-[var(--zipli-interactive,#014421)] focus:outline-none focus:bg-white",
-    // Disabled
-    "disabled:cursor-not-allowed disabled:opacity-50 disabled:border-border"
-  ],
+  "flex min-h-[80px] w-full rounded-md border bg-base px-4 py-3.5 text-bodyLg ring-offset-background placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
-      error: {
-        true: [
-          "input-error border-2 border-[var(--zipli-error,#EF4444)] bg-[#fff5f5] hover:border-[var(--zipli-error,#EF4444)] focus:border-[var(--zipli-error,#EF4444)] focus:ring-0"
-        ]
-      }
+      variant: {
+        default: "border-border focus-visible:ring-interactive",
+        error: "border-negative text-negative focus-visible:ring-negative",
+      },
     },
     defaultVariants: {
-      error: false
+      variant: "default",
     },
   }
 );
@@ -31,16 +21,14 @@ const textareaVariants = cva(
 // Define props interface, extending HTML textarea attributes and CVA variants
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-    VariantProps<typeof textareaVariants> {
-      error?: boolean;
-    }
+    VariantProps<typeof textareaVariants> {}
 
 // Textarea component using forwardRef and cva
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, error, ...props }, ref) => {
+  ({ className, variant, ...props }, ref) => {
     return (
       <textarea
-        className={cn(textareaVariants({ error }), className)} // Apply cva variants
+        className={cn(textareaVariants({ variant }), className)} // Apply cva variants
         ref={ref}
         {...props}
       />

@@ -3,10 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/Select';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
+import { CardFooter } from '@/components/ui/card';
 
 // Define ProfileRow using the Database type
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
@@ -25,6 +32,7 @@ export default function ProfilePage(): React.ReactElement {
     role: undefined,
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -141,12 +149,14 @@ export default function ProfilePage(): React.ReactElement {
   };
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     const { error: signOutError } = await supabase.auth.signOut();
     if (signOutError) {
       setError("Failed to log out: " + signOutError.message);
     } else {
       router.push('/auth/login');
     }
+    setIsLoggingOut(false);
   };
 
   if (loading) {
@@ -214,17 +224,19 @@ export default function ProfilePage(): React.ReactElement {
                     Role
                   </label>
                   <Select
-                    id="role"
-                    name="role"
                     value={formData.role || ''}
-                    onChange={handleChange}
+                    onValueChange={(value) => handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLSelectElement>)}
                     required
                   >
-                    <option value="" disabled>Select your role...</option>
-                    <option value="food_donor">Food Donor (Restaurants, Catering, etc.)</option>
-                    <option value="food_receiver">Food Receiver (Charities, Kitchens, etc.)</option>
-                    <option value="terminals">Food Terminal (Processing Centers)</option>
-                    <option value="city">City Administration</option>
+                    <SelectTrigger id="role" name="role">
+                      <SelectValue placeholder="Select your role..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="food_donor">Food Donor (Restaurants, Catering, etc.)</SelectItem>
+                      <SelectItem value="food_receiver">Food Receiver (Charities, Kitchens, etc.)</SelectItem>
+                      <SelectItem value="terminals">Food Terminal (Processing Centers)</SelectItem>
+                      <SelectItem value="city">City Administration</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
 
@@ -345,16 +357,15 @@ export default function ProfilePage(): React.ReactElement {
             )}
 
             {/* Add Logout Button */}
-            <div className="mt-8 border-t border-primary-10 pt-6">
-              <Button
-                variant="negative"
-                size="md"
+            <CardFooter className="flex justify-end">
+              <Button 
+                variant="destructive"
                 onClick={handleLogout}
-                className="w-full"
+                disabled={isLoggingOut}
               >
                 Log Out
               </Button>
-            </div>
+            </CardFooter>
 
           </div>
         </div>

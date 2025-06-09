@@ -13,6 +13,10 @@ import {
 } from 'recharts';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Progress } from '@/components/ui/progress';
+import { ActionButton } from '@/components/ui/action-button';
+import { Download, Store } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 // Removed resolveConfig and tailwindConfig imports
 
 // Removed getColor helper function and theme color extraction
@@ -170,74 +174,108 @@ export default function CityDashboard() {
           </div>
         </div>
 
-        {/* Surplus Breakdown */}
-        <div className="rounded-lg bg-base p-6 shadow"> {/* Use new bg/shadow */}
-          <h3 className="mb-4 text-titleXs font-display text-primary">Surplus breakdown</h3> {/* Use new typography */}
-          <div className="space-y-6">
-            {surplusData.map((item) => (
-              <div key={item.category}>
-                <div className="mb-2 flex justify-between text-body text-primary"> {/* Use new typography */}
-                  <span>{item.category}</span>
-                  <span className="font-semibold">{item.percentage}%</span>
-                </div>
-                {/* Use new colors for progress bar */}
-                <div className="h-2 rounded-full bg-primary-10">
-                  <div
-                    className="h-full rounded-full bg-earth" // Use theme color class
-                    style={{ width: `${item.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Climate Goals and Recommended Actions Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6"> {/* Adjust grid/gap */}
-        {/* Climate Goals */}
-        <div className="rounded-lg bg-base p-6 shadow"> {/* Use new bg/shadow */}
-          <h3 className="mb-4 text-titleXs font-display text-primary">Climate goals development</h3> {/* Use new typography */}
-          <div className="space-y-6">
-            {climateGoals.map((goal) => (
-              <div key={goal.title}>
-                <div className="mb-2">
-                  <div className="text-body text-primary">{goal.title}</div> {/* Use new typography */}
-                  <div className="text-bodyLg font-semibold text-primary">{goal.percentage}%</div> {/* Use new typography */}
-                </div>
-                 {/* Use new colors for progress bar */}
-                <div className="h-2 rounded-full bg-primary-10">
-                  <div
-                    className="h-full rounded-full bg-ocean" // Use theme color class
-                    style={{ width: `${goal.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Recommended Actions */}
-        <div className="rounded-lg bg-base p-6 shadow"> {/* Use new bg/shadow */}
-          <h3 className="mb-4 text-titleXs font-display text-primary">Recommended actions for next 6 months</h3> {/* Use new typography */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Adjust grid/gap */}
-            {recommendedActions.map((action) => (
-              // Style the action card container
-              <div
-                key={action.id}
-                className="rounded-lg bg-sky-10 p-4 flex flex-col justify-between" // Use new theme color/layout
-              >
+        {/* This div is now a container for the tabs */}
+        <div className="rounded-lg bg-base p-6 shadow">
+          <Tabs defaultValue="breakdown">
+            <TabsList>
+              <TabsTrigger value="breakdown">Breakdown</TabsTrigger>
+              <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
+              <TabsTrigger value="reports">Reports</TabsTrigger>
+            </TabsList>
+            <TabsContent value="breakdown">
+              <div className="space-y-6 mt-4">
                 <div>
-                  <h4 className="mb-2 text-label font-semibold text-primary">{action.title}</h4> {/* Use new typography */}
-                  <p className="mb-4 text-caption text-primary-75">{action.description}</p> {/* Use new typography */}
+                  <h3 className="mb-4 text-titleXs font-display text-primary">Surplus breakdown</h3>
+                  {surplusData.map((item) => (
+                    <div key={item.category} className="mb-4">
+                      <div className="mb-2 flex justify-between text-body text-primary">
+                        <span>{item.category}</span>
+                        <span className="font-semibold">{item.percentage}%</span>
+                      </div>
+                      <Progress value={item.percentage} />
+                    </div>
+                  ))}
                 </div>
-                {/* Use the new Button component */}
-                <Button variant="secondary" size="sm">
-                  {action.action}
-                </Button>
+                <div>
+                  <h3 className="mb-4 text-titleXs font-display text-primary">Climate goals development</h3>
+                  {climateGoals.map((goal) => (
+                    <div key={goal.title} className="mb-4">
+                       <div className="mb-2">
+                        <div className="text-body text-primary">{goal.title}</div>
+                        <div className="text-bodyLg font-semibold text-primary">{goal.percentage}%</div>
+                      </div>
+                      <Progress value={goal.percentage} className="[&>*]:bg-blue" />
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
+            </TabsContent>
+            <TabsContent value="recommendations">
+              <div className="mt-4">
+                <h3 className="mb-4 text-titleXs font-display text-primary">Recommended actions for next 6 months</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recommendedActions.map((action) => (
+                    <div
+                      key={action.id}
+                      className="rounded-lg bg-sky-10 p-4 flex flex-col justify-between"
+                    >
+                      <div>
+                        <h4 className="mb-2 text-label font-semibold text-primary">{action.title}</h4>
+                        <p className="mb-4 text-caption text-primary-75">{action.description}</p>
+                      </div>
+                      <Button variant="secondary" size="sm">
+                        {action.action}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="reports">
+              <div className="mt-4">
+                <h3 className="mb-4 text-titleXs font-display text-primary">Reports & Actions</h3>
+                <div className="mb-6">
+                  <Link href="#" passHref>
+                    <Button variant="tertiary" asChild>
+                      <a>Export to PDF</a>
+                    </Button>
+                  </Link>
+                  <p className="mt-2 text-body text-primary-75">
+                    Environmental and social impact data for reporting, and operation planning.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ActionButton
+                    href="#"
+                    title="Export Surplus Data to PDF"
+                    description="Environmental and social impact data for reporting, and operation planning."
+                    icon={<Download />}
+                    variant="highlighted"
+                  />
+                  <ActionButton
+                    href="#"
+                    title="Manage Partner Stores"
+                    description="View and manage connected food donors and receivers."
+                    icon={<Store />}
+                  />
+                  <ActionButton
+                    href="#"
+                    title="Generate Annual Impact Report"
+                    description="This feature is coming soon."
+                    icon={<Download />}
+                    disabled
+                  />
+                  <ActionButton
+                    href="#"
+                    title="Onboard New Store"
+                    description="This feature is coming soon."
+                    icon={<Store />}
+                    disabled
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { Database } from '@/lib/supabase/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import clsx from 'clsx';
 
 export default function RegisterPage() {
@@ -137,18 +138,21 @@ export default function RegisterPage() {
                 <label htmlFor="role" className="block text-label font-medium text-primary mb-1">
                   I am registering as
                 </label>
-                <select
-                  id="role"
+                <Select
                   name="role"
                   required
                   value={formData.role}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30"
+                  onValueChange={(value) => handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLSelectElement>)}
                 >
-                  <option value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</option>
-                  <option value="terminals">Food Terminals (Large-scale Food Processing Centers)</option>
-                  <option value="city">City Administration</option>
-                </select>
+                  <SelectTrigger id="role">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="food_donor">Food Donor (Restaurants, Catering, Large Kitchens)</SelectItem>
+                    <SelectItem value="terminals">Food Terminals (Large-scale Food Processing Centers)</SelectItem>
+                    <SelectItem value="city">City Administration</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           ) : (
@@ -203,19 +207,21 @@ export default function RegisterPage() {
                    'Organization Name'}
                 </label>
                 {formData.role === 'city' ? (
-                  <select
-                    id="organizationName"
+                  <Select
                     name="organizationName"
                     required
                     value={formData.organizationName}
-                    onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-border bg-base px-3 py-2 text-body placeholder:text-inactive focus:border-primary focus:ring-2 focus:ring-primary/30"
+                    onValueChange={(value) => handleChange({ target: { name: 'organizationName', value } } as React.ChangeEvent<HTMLSelectElement>)}
                   >
-                    <option value="">Select a city</option>
-                    <option value="Helsinki">Helsinki</option>
-                    <option value="Espoo">Espoo</option>
-                    <option value="Vantaa">Vantaa</option>
-                  </select>
+                    <SelectTrigger id="organizationName">
+                      <SelectValue placeholder="Select a city" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Helsinki">Helsinki</SelectItem>
+                      <SelectItem value="Espoo">Espoo</SelectItem>
+                      <SelectItem value="Vantaa">Vantaa</SelectItem>
+                    </SelectContent>
+                  </Select>
                 ) : (
                     <Input
                     id="organizationName"

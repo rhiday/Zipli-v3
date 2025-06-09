@@ -9,6 +9,7 @@ import { Database } from '@/lib/supabase/types';
 import { DonationWithFoodItemResponse } from '@/lib/supabase/responses';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { DialogFooter } from '@/components/ui/dialog';
 
 type DonationRow = Database['public']['Tables']['donations']['Row'];
 type FoodItemRow = Database['public']['Tables']['food_items']['Row'];
@@ -31,6 +32,8 @@ export default function DonationDetailPage(): React.ReactElement {
   });
   const [actionLoading, setActionLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -118,6 +121,28 @@ export default function DonationDetailPage(): React.ReactElement {
       setState(prev => ({ ...prev, error: err.message || 'Failed to claim donation.' }));
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleCancelDonation = async () => {
+    if (!state.data || !currentUserId) return;
+
+    try {
+      setIsCancelling(true);
+      const { error } = await supabase
+        .from('donations')
+        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+        .eq('id', params.id)
+        .eq('donor_id', currentUserId);
+
+      if (error) throw error;
+      await fetchDonation();
+      router.push('/donate');
+    } catch (err: any) {
+      console.error("Cancel Donation Error:", err);
+      setState(prev => ({ ...prev, error: err.message || 'Failed to cancel donation.' }));
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -247,8 +272,8 @@ export default function DonationDetailPage(): React.ReactElement {
             <div className="flex space-x-4 border-t border-primary-10 pt-5">
               {donation.status === 'available' && currentUserId === donation.donor_id && (
                 <Button
-                  onClick={() => handleStatusUpdate('cancelled')}
-                  variant="negative"
+                  onClick={() => setShowCancelDialog(true)}
+                  variant="destructive"
                   size="md"
                   disabled={actionLoading}
                   className="flex-1"
@@ -271,6 +296,19 @@ export default function DonationDetailPage(): React.ReactElement {
           </div>
         </div>
       </div>
+
+      {showCancelDialog && (
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setShowCancelDialog(false)}>Cancel</Button>
+          <Button 
+            variant="destructive" 
+            onClick={handleCancelDonation} 
+            disabled={isCancelling}
+          >
+            Confirm
+          </Button>
+        </DialogFooter>
+      )}
     </div>
   );
 }

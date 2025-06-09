@@ -326,137 +326,118 @@ export default function CreateRequestPage() {
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div>
-                <Label htmlFor="itemName" className="block text-label font-medium text-primary mb-1">
-                  Requested Item Name
-                </Label>
-                <Input
-                  id="itemName"
-                  {...register('itemName', { required: "Item name is required" })}
-                  placeholder="e.g., Rice, Blankets"
-                  error={!!errors.itemName}
-                />
-                {errors.itemName && <p className="mt-1 text-sm text-negative">{errors.itemName.message}</p>}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div>
-                  <Label htmlFor="quantity" className="block text-label font-medium text-primary mb-1">
-                    Quantity
-                  </Label>
-                  <Input
-                    id="quantity"
-                    type="number"
-                    min="1"
-                    {...register('quantity', { required: "Quantity is required", valueAsNumber: true, min: { value: 1, message: "Minimum 1"} })}
-                    error={!!errors.quantity}
+                  <Label htmlFor="itemName" className="block text-label font-semibold text-secondary mb-2">What do you need?</Label>
+                  <Input id="itemName" placeholder="e.g., Canned beans, bread, etc." {...register('itemName', { required: "Item name is required." })} variant={errors.itemName ? 'error' : 'default'} disabled={isSubmitting}/>
+                  {errors.itemName && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.itemName.message}</p>}
+                </div>
+
+                <div>
+                  <Label htmlFor="notes" className="block text-label font-semibold text-secondary mb-2">Description / Notes</Label>
+                  <Textarea
+                    id="notes"
+                    placeholder="Any specific details? e.g., 'Need about 5 cans of beans for a school event.'"
+                    {...register('notes', { required: 'A brief description is required.' })}
+                    variant={errors.notes ? 'error' : 'default'}
+                    disabled={isSubmitting}
                   />
-                  {errors.quantity && <p className="mt-1 text-sm text-negative">{errors.quantity.message}</p>}
+                  {errors.notes && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.notes.message}</p>}
                 </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="notes" className="block text-label font-medium text-primary mb-1">
-                  Notes / Description of Need
-                </Label>
-                <Textarea
-                  id="notes"
-                  {...register('notes', { required: "Description is required" })}
-                  rows={4}
-                  placeholder="Please describe the item needed, dietary restrictions, urgency, etc."
-                  error={!!errors.notes}
-                />
-                {errors.notes && <p className="mt-1 text-sm text-negative">{errors.notes.message}</p>}
-              </div>
 
-              <div>
-                <Label htmlFor="people_count" className="block text-label font-medium text-primary mb-1">
-                  Number of People to Feed (if applicable)
-                </Label>
-                <Input
-                  id="people_count"
-                  type="number"
-                  min="1"
-                  {...register('people_count', { valueAsNumber: true, min: { value: 1, message: "Minimum 1"} })}
-                  error={!!errors.people_count}
-                />
-                 {errors.people_count && <p className="mt-1 text-sm text-negative">{errors.people_count.message}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="pickup_date_button" className="block text-label font-medium text-primary mb-1">
-                  Preferred Pickup/Delivery Date
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="pickup_date_button"
-                      variant={"secondary"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400",
-                        !pickupDateValue && "text-primary-50"
-                      )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="quantity" className="block text-label font-semibold text-secondary mb-2">Quantity</Label>
+                    <Input
+                      id="quantity"
+                      type="number"
+                      min="1"
+                      {...register('quantity', { required: "Quantity is required", valueAsNumber: true, min: { value: 1, message: "Minimum 1"} })}
+                      variant={errors.quantity ? 'error' : 'default'}
                       disabled={isSubmitting}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-primary-75" />
-                      {pickupDateValue ? format(pickupDateValue, "PPP") : <span className="text-primary-75">Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-base border-primary-25" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={pickupDateValue}
-                      onSelect={(date) => setValue('pickup_date', date, { shouldValidate: true })}
-                      initialFocus
-                      disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
                     />
-                  </PopoverContent>
-                </Popover>
-                {errors.pickup_date && <p className="mt-1 text-sm text-negative">{errors.pickup_date.message}</p>}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <Label htmlFor="pickup_start_time" className="block text-label font-medium text-primary mb-1">
-                    Start Time
-                    </Label>
+                    {errors.quantity && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.quantity.message}</p>}
+                  </div>
+                  <div>
+                    <Label htmlFor="people_count" className="block text-label font-semibold text-secondary mb-2">Number of People to Feed (if applicable)</Label>
                     <Input
-                    id="pickup_start_time"
-                    type="time"
-                    {...register('pickup_start_time', { required: "Start time is required" })}
-                    className="border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400"
-                    error={!!errors.pickup_start_time}
-                    disabled={isSubmitting}
+                      id="people_count"
+                      type="number"
+                      min="1"
+                      {...register('people_count', { valueAsNumber: true, min: { value: 1, message: "Minimum 1"} })}
+                      variant={errors.people_count ? 'error' : 'default'}
+                      disabled={isSubmitting}
                     />
-                    {errors.pickup_start_time && <p className="mt-1 text-sm text-negative">{errors.pickup_start_time.message}</p>}
+                    {errors.people_count && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.people_count.message}</p>}
+                  </div>
                 </div>
-                <div>
-                    <Label htmlFor="pickup_end_time" className="block text-label font-medium text-primary mb-1">
-                    End Time
-                    </Label>
-                    <Input
-                    id="pickup_end_time"
-                    type="time"
-                    {...register('pickup_end_time', { required: "End time is required" })}
-                    className="border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400"
-                    error={!!errors.pickup_end_time}
-                    disabled={isSubmitting}
-                    />
-                    {errors.pickup_end_time && <p className="mt-1 text-sm text-negative">{errors.pickup_end_time.message}</p>}
-                </div>
-              </div>
 
-              <div>
-                <Label htmlFor="pickup_instructions" className="block text-label font-medium text-primary mb-1">
-                  Pickup Instructions (Optional)
-                </Label>
-                <Textarea
-                  id="pickup_instructions"
-                  {...register('pickup_instructions')}
-                  rows={3}
-                  placeholder="e.g., Please ring the bell, items are fragile, etc."
-                  disabled={isSubmitting}
-                />
+                <div>
+                  <Label htmlFor="pickup_date_button" className="block text-label font-semibold text-secondary mb-2">Preferred Pickup/Delivery Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="pickup_date_button"
+                        variant={"secondary"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400",
+                          !pickupDateValue && "text-primary-50"
+                        )}
+                        disabled={isSubmitting}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4 text-primary-75" />
+                        {pickupDateValue ? format(pickupDateValue, "PPP") : <span className="text-primary-75">Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-base border-primary-25" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={pickupDateValue}
+                        onSelect={(date) => setValue('pickup_date', date, { shouldValidate: true })}
+                        initialFocus
+                        disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {errors.pickup_date && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.pickup_date.message}</p>}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="pickup_start_time" className="block text-label font-semibold text-secondary mb-2">Start Time</Label>
+                    <Input
+                      id="pickup_start_time"
+                      type="time"
+                      {...register('pickup_start_time', { required: "Start time is required" })}
+                      className="border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400"
+                      variant={errors.pickup_start_time ? 'error' : 'default'}
+                      disabled={isSubmitting}
+                    />
+                    {errors.pickup_start_time && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.pickup_start_time.message}</p>}
+                  </div>
+                  <div>
+                    <Label htmlFor="pickup_end_time" className="block text-label font-semibold text-secondary mb-2">End Time</Label>
+                    <Input
+                      id="pickup_end_time"
+                      type="time"
+                      {...register('pickup_end_time', { required: "End time is required" })}
+                      className="border-primary-25 hover:bg-primary-5 focus:ring-1 focus:ring-primary bg-base dark:bg-gray-700 dark:border-gray-600 dark:text-primary dark:placeholder-gray-400"
+                      variant={errors.pickup_end_time ? 'error' : 'default'}
+                      disabled={isSubmitting}
+                    />
+                    {errors.pickup_end_time && <p className="mt-1.5 text-sm text-negative flex items-center gap-1"><AlertTriangle className="h-4 w-4" /> {errors.pickup_end_time.message}</p>}
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="pickup_instructions" className="block text-label font-semibold text-secondary mb-2">Pickup/Delivery Instructions (Optional)</Label>
+                  <Textarea
+                    id="pickup_instructions"
+                    placeholder="e.g., 'Please leave at the front desk' or 'Call upon arrival.'"
+                    {...register('pickup_instructions')}
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -472,8 +453,7 @@ export default function CreateRequestPage() {
                 </Label>
               </div>
 
-              <div className="flex justify-between items-center pt-4">
-                 <Button type="button" variant="secondary" onClick={() => { setCurrentView('voiceInput'); reset(); }} disabled={isSubmitting}>Start Over with Voice</Button>
+              <div className="flex justify-end pt-6">
                 <Button type="submit" variant="primary" disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting Request...' : 'Submit Request'}
                 </Button>

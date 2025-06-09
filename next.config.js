@@ -3,8 +3,13 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: [
-      'vqtfcdnrgotgrnwwuryo.supabase.co', // Supabase Storage domain
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'vqtfcdnrgotgrnwwuryo.supabase.co',
+        port: '',
+        pathname: '**',
+      },
     ],
   },
 }
