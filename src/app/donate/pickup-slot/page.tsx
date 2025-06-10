@@ -237,7 +237,7 @@ export default function PickupSlotPage() {
           className="flex items-center justify-center gap-2 text-interactive font-semibold text-base py-1 border-b border-interactive self-center"
         >
           <span className="text-xl">+</span>
-          Add another time slot
+          Save slot and add another
         </button>
       </main>
       
