@@ -27,17 +27,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No transcript provided' }, { status: 400 });
     }
 
-    const systemPrompt = `You are an intelligent assistant helping to fill out a food donation form.
-Based on the user's spoken description of a food item, your main task is to extract the **Item Name (itemName)**.
-
-1.  **Item Name (itemName):** Identify the primary food item being described (e.g., "Apples", "Canned Corn", "Whole Wheat Bread"). Be as concise as possible. If multiple items are mentioned, try to pick the most prominent one or the first one clearly described as a distinct item.
-
-Respond ONLY with a JSON object in the following format:
-{
-  "itemName": "<extracted item name>"
-}
-If you cannot confidently identify an item name, return an empty string or "unknown item" for the itemName.
-Do not include any other text, explanations, or markdown formatting before or after the JSON object.`;
+    const systemPrompt = `You are an intelligent assistant helping to fill out a food donation form.\nYour job is to extract the following information from the user's spoken description, even if the input is complex, ambiguous, or in a language other than English (translate to English if needed):\n\n1. items: An array of food items being donated. For each item, extract:\n   - name: The name of the food item (e.g., \"Apples\", \"Whole Wheat Bread\"). If missing or unclear, respond with \"missing\".\n   - quantity: The amount in kilograms (e.g., \"5 kg\", \"2 kg\"). If the user mentions a different unit, try to convert to kg if possible; otherwise, respond with \"missing\".\n   - allergens: An array of allergens mentioned for the item (e.g., [\"gluten\", \"nuts\"]). If none are mentioned, use an empty array. If unclear, respond with \"missing\".\n\n2. pickup_date: The date for pickup in YYYY-MM-DD format. If not specified or unclear, respond with \"missing\".\n\n3. pickup_time_start: The start time for pickup in HH:MM (24-hour) format. If not specified or unclear, respond with \"missing\".\n\n4. pickup_time_end: The end time for pickup in HH:MM (24-hour) format. If not specified or unclear, respond with \"missing\".\n\nIf the user speaks in a language other than English, translate all extracted fields to English.\nIf you cannot confidently extract a field, respond with \"missing\" for that field.\nIf the user mentions multiple items, extract each as a separate object in the items array.\nIf the input is ambiguous, do your best to infer the most likely values, but use \"missing\" if not confident.\n\nRespond ONLY with a JSON object in the following format (no extra text):\n{\n  \"items\": [\n    { \"name\": \"Apples\", \"quantity\": \"5 kg\", \"allergens\": [] },\n    { \"name\": \"missing\", \"quantity\": \"missing\", \"allergens\": \"missing\" }\n  ],\n  \"pickup_date\": \"2024-06-20\",\n  \"pickup_time_start\": \"10:00\",\n  \"pickup_time_end\": \"missing\"\n}\n\nDo not include any explanations, markdown, or extra text—just the JSON object.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo-0125',
@@ -57,14 +47,13 @@ Do not include any other text, explanations, or markdown formatting before or af
 
     try {
       const parsedContent = JSON.parse(content);
-      // Basic validation for the presence of itemName
-      if (typeof parsedContent.itemName === 'undefined') {
-        logger.error('OpenAI response missing itemName:', content);
-        // Return a default structure if itemName is missing
-        return NextResponse.json({ itemName: "Unknown Item" });
+      // Basic validation for the presence of required fields
+      if (!parsedContent.items || !Array.isArray(parsedContent.items)) {
+        logger.error('OpenAI response missing items array:', content);
+        return NextResponse.json({ error: 'Missing items array in AI response.' }, { status: 500 });
       }
-      // Return only itemName, even if AI provides more
-      return NextResponse.json({ itemName: parsedContent.itemName });
+      // Return the full parsed content as-is
+      return NextResponse.json(parsedContent);
     } catch (parseError) {
       console.error('Error parsing OpenAI JSON response:', parseError, 'Raw content:', content);
       return NextResponse.json({ error: 'Failed to parse AI response.', details: content }, { status: 500 });
