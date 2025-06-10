@@ -300,7 +300,7 @@ export default function DonorDashboardPage(): React.ReactElement {
         </section>
       </main>
 
-      <BottomNav />
+      {/* <BottomNav /> Removed as per request */}
     </div>
   );
 }
