@@ -20,7 +20,7 @@ export default function DonationThankYouPage() {
       <p className="text-center text-base text-black mb-10 max-w-xs">
         Your donation offer has been submitted successfully. We appreciate your contribution to reducing food waste!
       </p>
-      <Link href="/">
+      <Link href="/donate">
         <button className="bg-[#C6FFB7] text-black rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-[#A8F5A0] transition">
           Back to dashboard
         </button>
