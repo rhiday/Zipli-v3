@@ -20,6 +20,7 @@ import {
 import { jsPDF } from 'jspdf';
 import SummaryOverview from '@/components/SummaryOverview';
 import DonationCard from '@/components/donations/DonationCard';
+import { useDonationStore } from '@/store/donation';
 
 type DonationWithFoodItem = {
   id: string;
@@ -44,6 +45,7 @@ type DonorDashboardData = {
 
 export default function DonorDashboardPage(): React.ReactElement {
   const router = useRouter();
+  const { donationItems } = useDonationStore();
   const [dashboardData, setDashboardData] = useState<DonorDashboardData>({ profile: null, donations: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -143,6 +145,25 @@ export default function DonorDashboardPage(): React.ReactElement {
   return (
     <div className="min-h-screen pb-20">
       <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'} />
+
+      {/* Submitted Donations List (from state) */}
+      <section className="mt-4">
+        <h2 className="text-titleXs font-medium text-primary mb-2">Submitted Donations (local state)</h2>
+        {donationItems.length === 0 ? (
+          <div className="rounded-lg bg-base p-4 text-center text-primary-75 border border-border">
+            No donations submitted yet.
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {donationItems.map(item => (
+              <li key={item.id} className="rounded-lg border border-primary-10 bg-white p-3 flex flex-col">
+                <span className="font-semibold text-primary">{item.name}</span>
+                <span className="text-primary-75 text-sm">Quantity: {item.quantity}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <main className="relative z-20 mt-4 rounded-t-3xl md:rounded-t-none py-4 px-4 md:px-12 space-y-6">
         {/* Figma: Active Offers & Requests Section Replacement */}
