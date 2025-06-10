@@ -8,6 +8,7 @@ import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import { PhotoUpload } from '@/components/ui/PhotoUpload';
 import { ItemPreview } from '@/components/ui/ItemPreview';
 import { useDonationStore } from '@/store/donation';
+import { Suspense } from 'react';
 
 interface DonationItem {
   id: string;
@@ -267,5 +268,14 @@ export default function ManualDonationPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Wrap in Suspense for Next.js App Router compliance
+export function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ManualDonationPage />
+    </Suspense>
   );
 } 
