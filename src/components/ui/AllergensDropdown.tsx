@@ -40,64 +40,54 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
     <div className="w-full">
       <label className="block text-label font-semibold mb-2">{label}</label>
       <div className="relative">
-        <div
-          className={[
-            'flex items-center min-h-12 w-full rounded-md border px-4 py-1.5 bg-base cursor-pointer',
-            error ? 'border-negative' : 'border-border',
-            disabled ? 'opacity-50 pointer-events-none' : '',
-            open ? 'ring-2 ring-interactive ring-offset-2' : '',
-          ].join(' ')}
-          tabIndex={0}
-          onClick={() => !disabled && setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 100)}
-        >
-          <div className="flex flex-wrap gap-2 flex-1 overflow-x-auto scrollbar-hide">
-            {value.length === 0 && (
-              <span className="text-tertiary select-none">{placeholder}</span>
-            )}
-            {value.map((item) => (
+        <Input
+          ref={inputRef}
+          readOnly
+          value={''}
+          placeholder={placeholder}
+          variant={error ? 'error' : 'default'}
+          disabled={disabled}
+          className="cursor-pointer"
+          onFocus={() => setOpen(true)}
+          onBlur={() => setOpen(false)}
+          onClick={() => setOpen((v) => !v)}
+        />
+        {value.length > 0 && (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex gap-2 max-w-[80%] overflow-x-auto">
+            {value.map((v) => (
               <Chip
-                key={item}
-                label={item}
+                key={v}
+                label={v}
                 selected
-                onRemove={() => handleToggle(item)}
-                className="shrink-0"
+                onRemove={() => handleToggle(v)}
               />
             ))}
           </div>
-          <span className="ml-2 flex items-center pointer-events-none">
-            <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><path d="M5 8l5 5 5-5" stroke="#021d13" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </span>
-        </div>
+        )}
         {open && (
-          <div className="absolute z-10 mt-2 w-full rounded-md border bg-white shadow-lg p-2">
-            {options.map((option) => {
-              const checked = value.includes(option);
-              return (
-                <div
-                  key={option}
-                  className="flex items-center gap-2 px-3 py-2 rounded cursor-pointer hover:bg-cloud"
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => handleToggle(option)}
-                >
-                  <span className={`inline-block w-5 h-5 border rounded flex items-center justify-center transition-colors ${checked ? 'bg-[#021d13] border-[#021d13]' : 'bg-white border-[#021d13]'}`}>
-                    {checked && (
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 8.5L7 11.5L12 5.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </span>
-                  <span className="text-body text-[#021d13]">{option}</span>
-                </div>
-              );
-            })}
+          <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+            {options.map((option) => (
+              <div
+                key={option}
+                className={`flex items-center px-4 py-2 cursor-pointer transition-colors ${value.includes(option) ? 'bg-[#eafcd6]' : 'hover:bg-gray-50'}`}
+                onMouseDown={() => handleToggle(option)}
+              >
+                <input
+                  type="checkbox"
+                  checked={value.includes(option)}
+                  readOnly
+                  className="mr-2 accent-[#a6f175]"
+                />
+                <span className="text-[14px] font-manrope text-[#021d13]">{option}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>
       {error ? (
-        <div className="mt-1 text-negative text-sm">{error}</div>
+        <div className="mt-1 text-[14px] font-manrope text-negative">{error}</div>
       ) : hint ? (
-        <div className="mt-1 text-secondary text-sm">{hint}</div>
+        <div className="mt-1 text-[14px] font-manrope text-[rgba(2,29,19,0.60)]" style={{fontWeight: 400, fontStyle: 'normal', lineHeight: 'normal'}}>{hint}</div>
       ) : null}
     </div>
   );

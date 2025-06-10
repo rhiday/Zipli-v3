@@ -3,4 +3,5 @@ export * from './button';
 export * from './Input';
 export * from './card';
 export * from './Chip';
-export * from './Tabs'; 
+export * from './Tabs';
+export * from './AllergensDropdown'; 
