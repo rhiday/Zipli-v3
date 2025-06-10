@@ -166,6 +166,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
         icon: <StopCircle className="h-12 w-12" />,
         action: handleVoiceInput,
         disabled: false,
+        className: 'flex w-[103px] h-[103px] p-[14px_22px] justify-center items-center gap-2.5 shrink-0 rounded-[100px] bg-[#A6F175]',
       };
     }
     if (isTranscribing) {
@@ -174,6 +175,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
         icon: <Loader2 className="h-12 w-12 animate-spin" />,
         action: () => {},
         disabled: true,
+        className: 'flex w-[103px] h-[103px] p-[14px_22px] justify-center items-center gap-2.5 shrink-0 rounded-[100px] bg-[#A6F175]',
       };
     }
     if (isProcessingDetails) {
@@ -182,6 +184,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
         icon: <Brain className="h-12 w-12" />,
         action: () => {},
         disabled: true,
+        className: 'flex w-[103px] h-[103px] p-[14px_22px] justify-center items-center gap-2.5 shrink-0 rounded-[100px] bg-[#A6F175]',
       };
     }
     return {
@@ -201,9 +204,13 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
           onClick={buttonState.action}
           disabled={buttonState.disabled}
           className={cn(
-            'w-40 h-40 rounded-full text-white transition-all duration-300 flex items-center justify-center bg-green-500 hover:bg-green-600',
-            { 'bg-red-500 hover:bg-red-600': isRecording }
+            'transition-all duration-300 flex items-center justify-center',
+            buttonState.className || 'w-40 h-40 rounded-full text-white',
+            !isRecording && !buttonState.className && 'bg-blue-500 hover:bg-blue-600',
+            isTranscribing && 'bg-yellow-500 hover:bg-yellow-600',
+            isProcessingDetails && 'bg-purple-500 hover:bg-purple-600',
           )}
+          aria-label={isRecording ? 'Stop recording' : 'Start recording'}
         >
           {buttonState.icon}
         </Button>
