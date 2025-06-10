@@ -19,7 +19,7 @@ interface DonationItem {
   imageUrl?: string;
 }
 
-function ManualDonationPage() {
+function ManualDonationPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { donationItems, addDonationItem, updateDonationItem, deleteDonationItem } = useDonationStore();
@@ -272,12 +272,12 @@ function ManualDonationPage() {
   );
 }
 
-function ManualDonationPageWithSuspense() {
+function ManualDonationPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <ManualDonationPage />
+      <ManualDonationPageInner />
     </Suspense>
   );
 }
 
-export default ManualDonationPageWithSuspense; 
+export default ManualDonationPage; 
