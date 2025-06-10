@@ -70,4 +70,4 @@ To bulk-generate images for all food items using OpenAI DALL·E and upload them 
 
 - The script will skip items that already have an image.
 - Images are uploaded to the `donations` bucket in Supabase Storage.
-- The `image_url` field in the `food_items` table will be updated with the public URL.
+- The `image_url` field in the `food_items` table will be updated with the public URL..
