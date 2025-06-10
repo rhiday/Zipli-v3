@@ -17,6 +17,7 @@ interface AppShellProps {
 const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const pathname = usePathname();
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
+  const hideBottomNav = pathname.startsWith('/donate/new') || pathname.startsWith('/donate/manual');
   
   return (
     <AuthProvider>
@@ -36,7 +37,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
             <main className="flex-grow px-0 pb-[76px] md:pb-0">
               {children}
             </main>
-            {/* <BottomNav /> Removed globally as per request */}
+            {!hideBottomNav && <BottomNav />}
           </div>
         </div>
       )}
