@@ -21,7 +21,7 @@ export const SecondaryNavbar: React.FC<SecondaryNavbarProps> = ({ title, backHre
           <BackArrowIcon />
         </Link>
       )}
-      <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-black leading-normal">
+      <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-black leading-normal whitespace-nowrap">
         {title}
       </h1>
     </div>

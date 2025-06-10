@@ -1,12 +1,13 @@
 'use client'
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Input } from '@/components/ui/Input';
 import { Progress } from '@/components/ui/progress';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import { PhotoUpload } from '@/components/ui/PhotoUpload';
 import { ItemPreview } from '@/components/ui/ItemPreview';
+import { useDonationStore } from '@/store/donation';
 
 interface DonationItem {
   id: string;
@@ -18,7 +19,9 @@ interface DonationItem {
 
 export default function ManualDonationPage() {
   const router = useRouter();
-  const [donationItems, setDonationItems] = useState<DonationItem[]>([]);
+  const searchParams = useSearchParams();
+  const { donationItems, addDonationItem, updateDonationItem, deleteDonationItem } = useDonationStore();
+  
   const [currentItem, setCurrentItem] = useState<Omit<DonationItem, 'id'> & { id: string | 'new' }>({
     id: 'new',
     name: '',
@@ -28,6 +31,21 @@ export default function ManualDonationPage() {
   });
   const [showItemList, setShowItemList] = useState(false);
   const [showAddAnotherForm, setShowAddAnotherForm] = useState(false);
+
+  useEffect(() => {
+    if (donationItems.length > 0) {
+      setShowItemList(true);
+    } else {
+      setShowItemList(false);
+    }
+  }, [donationItems]);
+
+  useEffect(() => {
+    const editItemId = searchParams.get('edit');
+    if (editItemId) {
+      handleEditItem(editItemId);
+    }
+  }, [searchParams]);
 
   const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
     setCurrentItem(prev => ({ ...prev, [field]: value }));
@@ -41,22 +59,18 @@ export default function ManualDonationPage() {
     if (!currentItem.name.trim() || !currentItem.quantity.trim()) return;
 
     if (currentItem.id === 'new') {
-      const newItem: DonationItem = {
+      addDonationItem({
         ...currentItem,
-        id: Date.now().toString(),
         quantity: `${currentItem.quantity} kg`,
-      };
-      setDonationItems(prev => [...prev, newItem]);
+      });
     } else {
-      const updatedItem: DonationItem = {
+      updateDonationItem({
         ...currentItem,
         id: currentItem.id,
         quantity: `${currentItem.quantity} kg`,
-      };
-      setDonationItems(prev => prev.map(item => (item.id === updatedItem.id ? updatedItem : item)));
+      });
     }
     
-    setShowItemList(true);
     setShowAddAnotherForm(false);
     
     // Clear form
@@ -90,14 +104,7 @@ export default function ManualDonationPage() {
   };
 
   const handleDeleteItem = (id: string) => {
-    setDonationItems(prev => {
-      const newItems = prev.filter(item => item.id !== id);
-      if (newItems.length === 0) {
-        setShowItemList(false);
-      }
-      return newItems;
-    });
-
+    deleteDonationItem(id);
     if (currentItem.id === id) {
       setCurrentItem({
         id: 'new',

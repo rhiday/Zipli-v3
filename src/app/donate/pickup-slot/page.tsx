@@ -1,5 +1,6 @@
 'use client'
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { EditIcon } from '@/components/ui/icons/EditIcon';
 import { DeleteIcon } from '@/components/ui/icons/DeleteIcon';
+import { useDonationStore } from '@/store/donation';
 
 const timeOptions = Array.from({ length: 48 }, (_, i) => {
   const hours = Math.floor(i / 2);
@@ -25,8 +27,9 @@ interface PickupSlot {
 }
 
 export default function PickupSlotPage() {
-  const [pickupSlots, setPickupSlots] = useState<PickupSlot[]>([]);
-  const [currentSlot, setCurrentSlot] = useState<PickupSlot>({
+  const router = useRouter();
+  const { pickupSlots, addPickupSlot, updatePickupSlot, deletePickupSlot } = useDonationStore();
+  const [currentSlot, setCurrentSlot] = useState<Omit<PickupSlot, 'id'> & { id: string | 'new' }>({
     id: 'new',
     date: undefined,
     startTime: '09:00',
@@ -47,10 +50,9 @@ export default function PickupSlotPage() {
     if (!currentSlot.date) return; // Basic validation
 
     if (currentSlot.id === 'new') {
-      const newSlot = { ...currentSlot, id: Date.now().toString() };
-      setPickupSlots(prev => [...prev, newSlot]);
+      addPickupSlot(currentSlot);
     } else {
-      setPickupSlots(prev => prev.map(slot => (slot.id === currentSlot.id ? currentSlot : slot)));
+      updatePickupSlot(currentSlot as PickupSlot);
     }
     
     // Reset form for the next entry
@@ -64,7 +66,7 @@ export default function PickupSlotPage() {
   };
 
   const handleDeleteSlot = (id: string) => {
-    setPickupSlots(prev => prev.filter(slot => slot.id !== id));
+    deletePickupSlot(id);
   };
   
   const handleEditSlot = (id: string) => {
@@ -241,7 +243,7 @@ export default function PickupSlotPage() {
       
       <div className="sticky bottom-0 left-0 w-full bg-white pt-4 pb-10 pr-6 flex justify-end z-10">
         <button 
-          onClick={() => { /* TODO: Navigate to next step */ }}
+          onClick={() => router.push('/donate/summary')}
           disabled={pickupSlots.length === 0}
           className="bg-[#a6f175] text-[#021d13] font-manrope font-semibold rounded-full px-8 py-3 text-lg shadow-md hover:bg-[#c2f7a1] transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
