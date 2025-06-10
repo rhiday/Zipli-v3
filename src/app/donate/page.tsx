@@ -146,9 +146,9 @@ export default function DonorDashboardPage(): React.ReactElement {
     <div className="min-h-screen pb-20">
       <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'} />
 
-      {/* Submitted Donations List (from state) */}
-      <section className="mt-4">
-        <h2 className="text-titleXs font-medium text-primary mb-2">Submitted Donations (local state)</h2>
+      {/* Your activity section (from state) */}
+      <section className="mt-4 px-4 md:px-12">
+        <h2 className="text-titleXs font-medium text-primary mb-2">Your activity</h2>
         {donationItems.length === 0 ? (
           <div className="rounded-lg bg-base p-4 text-center text-primary-75 border border-border">
             No donations submitted yet.
