@@ -18,51 +18,96 @@ interface DonationItem {
 
 export default function ManualDonationPage() {
   const router = useRouter();
-  const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [foodName, setFoodName] = useState('');
-  const [quantity, setQuantity] = useState('');
   const [donationItems, setDonationItems] = useState<DonationItem[]>([]);
+  const [currentItem, setCurrentItem] = useState<Omit<DonationItem, 'id'> & { id: string | 'new' }>({
+    id: 'new',
+    name: '',
+    quantity: '',
+    allergens: [],
+    imageUrl: undefined,
+  });
   const [showItemList, setShowItemList] = useState(false);
   const [showAddAnotherForm, setShowAddAnotherForm] = useState(false);
 
-  const handleImageUpload = (imageUrl: string) => {
-    setUploadedImage(imageUrl || null);
+  const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
+    setCurrentItem(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleAddItem = () => {
-    if (!foodName.trim() || !quantity.trim()) return;
+  const handleImageUpload = (imageUrl: string) => {
+    handleCurrentItemChange('imageUrl', imageUrl || undefined);
+  };
+
+  const handleSaveItem = () => {
+    if (!currentItem.name.trim() || !currentItem.quantity.trim()) return;
+
+    if (currentItem.id === 'new') {
+      const newItem: DonationItem = {
+        ...currentItem,
+        id: Date.now().toString(),
+        quantity: `${currentItem.quantity} kg`,
+      };
+      setDonationItems(prev => [...prev, newItem]);
+    } else {
+      const updatedItem: DonationItem = {
+        ...currentItem,
+        id: currentItem.id,
+        quantity: `${currentItem.quantity} kg`,
+      };
+      setDonationItems(prev => prev.map(item => (item.id === updatedItem.id ? updatedItem : item)));
+    }
     
-    const newItem: DonationItem = {
-      id: Date.now().toString(),
-      name: foodName,
-      quantity: `${quantity} kg`,
-      allergens: selectedAllergens,
-      imageUrl: uploadedImage || undefined,
-    };
-    
-    setDonationItems(prev => [...prev, newItem]);
     setShowItemList(true);
     setShowAddAnotherForm(false);
     
     // Clear form
-    setFoodName('');
-    setQuantity('');
-    setSelectedAllergens([]);
-    setUploadedImage(null);
+    setCurrentItem({
+      id: 'new',
+      name: '',
+      quantity: '',
+      allergens: [],
+      imageUrl: undefined,
+    });
   };
 
   const handleAddAnotherItem = () => {
+    // Reset current item when adding a new one
+    setCurrentItem({
+      id: 'new',
+      name: '',
+      quantity: '',
+      allergens: [],
+      imageUrl: undefined,
+    });
     setShowAddAnotherForm(true);
   };
 
   const handleEditItem = (id: string) => {
-    // TODO: Implement edit functionality
-    console.log('Edit item:', id);
+    const itemToEdit = donationItems.find(item => item.id === id);
+    if (itemToEdit) {
+      setCurrentItem({ ...itemToEdit, quantity: itemToEdit.quantity.replace(' kg', '') });
+      setShowAddAnotherForm(true);
+    }
   };
 
   const handleDeleteItem = (id: string) => {
-    setDonationItems(prev => prev.filter(item => item.id !== id));
+    setDonationItems(prev => {
+      const newItems = prev.filter(item => item.id !== id);
+      if (newItems.length === 0) {
+        setShowItemList(false);
+      }
+      return newItems;
+    });
+
+    if (currentItem.id === id) {
+      setCurrentItem({
+        id: 'new',
+        name: '',
+        quantity: '',
+        allergens: [],
+        imageUrl: undefined,
+      });
+      setShowAddAnotherForm(false);
+    }
   };
 
   const handleBackClick = () => {
@@ -106,14 +151,16 @@ export default function ManualDonationPage() {
           {showAddAnotherForm ? (
             // Add Another Item Form
             <div className="flex flex-col gap-6 mt-6">
-              <h3 className="text-lg font-semibold text-[#021d13]">Add another food item</h3>
+              <h3 className="text-lg font-semibold text-[#021d13]">
+                {currentItem.id === 'new' ? 'Add another food item' : 'Edit food item'}
+              </h3>
               <div>
                 <label htmlFor="food-name-2" className="block text-label font-semibold mb-2">Name of food</label>
                 <Input 
                   id="food-name-2" 
                   placeholder="e.g. Bread, Rice, etc." 
-                  value={foodName}
-                  onChange={(e) => setFoodName(e.target.value)}
+                  value={currentItem.name}
+                  onChange={(e) => handleCurrentItemChange('name', e.target.value)}
                 />
               </div>
               <div>
@@ -123,23 +170,23 @@ export default function ManualDonationPage() {
                   type="number" 
                   min={1} 
                   placeholder="e.g. 5 (kg)" 
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  value={currentItem.quantity}
+                  onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
                 />
               </div>
               <div className="mb-8">
                 <AllergensDropdown
                   label="Allergies, intolerances & diets"
                   options={["Lactose-free", "Vegan", "Halal", "Low-lactose"]}
-                  value={selectedAllergens}
-                  onChange={setSelectedAllergens}
+                  value={currentItem.allergens}
+                  onChange={(value) => handleCurrentItemChange('allergens', value)}
                   hint="Select all that apply."
                 />
               </div>
               <div>
                 <PhotoUpload 
                   onImageUpload={handleImageUpload} 
-                  uploadedImage={uploadedImage}
+                  uploadedImage={currentItem.imageUrl || null}
                 />
               </div>
             </div>
@@ -161,8 +208,8 @@ export default function ManualDonationPage() {
             <Input 
               id="food-name" 
               placeholder="e.g. Bread, Rice, etc." 
-              value={foodName}
-              onChange={(e) => setFoodName(e.target.value)}
+              value={currentItem.name}
+              onChange={(e) => handleCurrentItemChange('name', e.target.value)}
             />
           </div>
           <div>
@@ -172,23 +219,23 @@ export default function ManualDonationPage() {
               type="number" 
               min={1} 
               placeholder="e.g. 5 (kg)" 
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
+              value={currentItem.quantity}
+              onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
             />
           </div>
           <div className="mb-8">
             <AllergensDropdown
               label="Allergies, intolerances & diets"
               options={["Lactose-free", "Vegan", "Halal", "Low-lactose"]}
-              value={selectedAllergens}
-              onChange={setSelectedAllergens}
+              value={currentItem.allergens}
+              onChange={(value) => handleCurrentItemChange('allergens', value)}
               hint="Select all that apply."
             />
           </div>
           <div>
             <PhotoUpload 
               onImageUpload={handleImageUpload} 
-              uploadedImage={uploadedImage}
+              uploadedImage={currentItem.imageUrl || null}
             />
           </div>
         </main>
@@ -204,11 +251,11 @@ export default function ManualDonationPage() {
           </button>
         ) : (
           <button 
-            onClick={handleAddItem}
-            disabled={!foodName.trim() || !quantity.trim()}
+            onClick={handleSaveItem}
+            disabled={!currentItem.name.trim() || !currentItem.quantity.trim()}
             className="bg-[#a6f175] text-[#021d13] font-manrope font-semibold rounded-full px-8 py-3 text-lg shadow-md hover:bg-[#c2f7a1] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add item
+            {currentItem.id === 'new' ? 'Add item' : 'Save changes'}
           </button>
         )}
       </div>
