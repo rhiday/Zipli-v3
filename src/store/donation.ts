@@ -18,8 +18,12 @@ interface PickupSlot {
 interface DonationState {
   donationItems: DonationItem[];
   pickupSlots: PickupSlot[];
+  address: string;
+  driverInstructions: string;
   setDonationItems: (items: DonationItem[]) => void;
   setPickupSlots: (slots: PickupSlot[]) => void;
+  setAddress: (address: string) => void;
+  setDriverInstructions: (instructions: string) => void;
   
   // Actions for donation items
   addDonationItem: (item: Omit<DonationItem, 'id'>) => void;
@@ -35,8 +39,12 @@ interface DonationState {
 export const useDonationStore = create<DonationState>((set) => ({
   donationItems: [],
   pickupSlots: [],
+  address: '',
+  driverInstructions: '',
   setDonationItems: (items) => set({ donationItems: items }),
   setPickupSlots: (slots) => set({ pickupSlots: slots }),
+  setAddress: (address) => set({ address }),
+  setDriverInstructions: (instructions) => set({ driverInstructions: instructions }),
   
   // Item actions
   addDonationItem: (item) => set((state) => ({

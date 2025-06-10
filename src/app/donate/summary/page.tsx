@@ -10,9 +10,7 @@ import { useDonationStore } from '@/store/donation';
 
 export default function DonationSummaryPage() {
   const router = useRouter();
-  const { donationItems, pickupSlots } = useDonationStore();
-  const [address, setAddress] = useState('');
-  const [driverInstructions, setDriverInstructions] = useState('');
+  const { donationItems, pickupSlots, address, driverInstructions, setAddress, setDriverInstructions } = useDonationStore();
 
   const handleEditItem = (id: string) => {
     // Navigate to manual page with item id to edit
@@ -21,6 +19,11 @@ export default function DonationSummaryPage() {
 
   const handleEditSchedule = () => {
     router.push('/donate/pickup-slot');
+  };
+
+  const handleConfirmDonation = () => {
+    // Data is already in store, so just route
+    router.push('/donate/thank-you');
   };
 
   return (
@@ -90,7 +93,7 @@ export default function DonationSummaryPage() {
 
       <div className="sticky bottom-0 left-0 w-full bg-white pt-4 pb-10 pr-6 flex justify-end z-10">
         <button 
-          onClick={() => { /* TODO: Implement confirmation logic */ }}
+          onClick={handleConfirmDonation}
           disabled={!address.trim()}
           className="bg-[#a6f175] text-[#021d13] font-manrope font-semibold rounded-full px-8 py-3 text-lg shadow-md hover:bg-[#c2f7a1] transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
