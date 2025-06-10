@@ -39,7 +39,7 @@ export default function PickupSlotPage() {
   const [showAddForm, setShowAddForm] = useState(true);
 
   const handleBackClick = () => {
-    window.history.back();
+    router.back();
   };
   
   const handleCurrentSlotChange = (field: keyof Omit<PickupSlot, 'id'>, value: any) => {
