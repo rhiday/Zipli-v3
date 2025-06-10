@@ -39,7 +39,7 @@ export default function PickupSlotPage() {
   const [showAddForm, setShowAddForm] = useState(true);
 
   const handleBackClick = () => {
-    window.history.back();
+    router.back();
   };
   
   const handleCurrentSlotChange = (field: keyof Omit<PickupSlot, 'id'>, value: any) => {
@@ -98,7 +98,7 @@ export default function PickupSlotPage() {
         
         <div className="flex flex-col gap-4">
           {pickupSlots.map(slot => (
-            <div key={slot.id} className="flex items-center justify-between p-3 rounded-lg bg-[#F5F9EF] border border-[#D9DBD5]">
+            <div key={slot.id} className="flex items-center justify-between p-3 h-[56px] rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
               <span className="font-semibold text-interactive">
                 {slot.date ? `${format(slot.date, 'dd.M.yyyy')}, ${slot.startTime} - ${slot.endTime}` : ''}
               </span>
@@ -137,7 +137,7 @@ export default function PickupSlotPage() {
                 <PopoverTrigger asChild>
                   <Button
                     variant="secondary"
-                    className="rounded-full border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
+                    className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
                   >
                     {currentSlot.date ? (
                       <span className="text-primary">{format(currentSlot.date, 'dd/MM/yyyy')}</span>
@@ -168,7 +168,7 @@ export default function PickupSlotPage() {
                 <label className="block text-label font-semibold mb-2">Start time</label>
                 <Popover open={openPopover === 'start'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'start' : null)}>
                   <PopoverTrigger asChild>
-                    <Button variant="secondary" className="rounded-full border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
+                    <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
                       <span className="text-primary">{currentSlot.startTime}</span>
                       <div className="pointer-events-none">
                         <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
@@ -200,7 +200,7 @@ export default function PickupSlotPage() {
                 <label className="block text-label font-semibold mb-2">End time</label>
                 <Popover open={openPopover === 'end'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'end' : null)}>
                   <PopoverTrigger asChild>
-                    <Button variant="secondary" className="rounded-full border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
+                    <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
                       <span className="text-primary">{currentSlot.endTime}</span>
                       <div className="pointer-events-none">
                         <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
@@ -237,7 +237,7 @@ export default function PickupSlotPage() {
           className="flex items-center justify-center gap-2 text-interactive font-semibold text-base py-1 border-b border-interactive self-center"
         >
           <span className="text-xl">+</span>
-          Add another time slot
+          Save slot and add another
         </button>
       </main>
       

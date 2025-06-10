@@ -1,3 +1,23 @@
+# V2 Refactor Checklist (Simplified & Re-ordered)
+
+1. **Design System & UI Flow**  
+   ✅ Done
+
+2. **Voice Input Integration**
+   - [ ] Implement voice input for donation/request flows
+   - [ ] Test voice-to-text accuracy and UX
+   - [ ] Add error handling and fallback for unsupported browsers
+
+3. **Backend & Core Logic**
+   - [ ] Identify any required schema changes
+   - [ ] Create Supabase migrations if needed
+   - [ ] Update or add API endpoints for new features
+   - [ ] Connect UI to backend logic and endpoints
+
+4. **Testing & QA**
+   - [ ] End-to-end test of all flows (UI, voice, backend)
+   - [ ] Fix bugs and polish UX
+
 # V2 Redesign & Refactor Plan
 
 This document outlines the strategy and steps for the V2 redesign of the Zipli application. All work for this redesign should be committed to the `epic/v2-redesign` branch.

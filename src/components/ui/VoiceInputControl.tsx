@@ -99,10 +99,19 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
         formData.append('audio', audioBlob, 'recording.webm');
 
         try {
-          const transcribeResponse = await fetch('/api/transcribe-audio', {
+          // Add timeout for fetch
+          const transcribePromise = fetch('/api/transcribe-audio', {
             method: 'POST',
             body: formData,
           });
+          const transcribeResponse = await Promise.race([
+            transcribePromise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Transcription timed out.')), 20000)),
+          ]);
+
+          if (!(transcribeResponse instanceof Response)) {
+            throw new Error('Unexpected error during transcription.');
+          }
 
           if (!transcribeResponse.ok) {
             throw new Error('Failed to transcribe audio.');
@@ -112,20 +121,29 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
           setIsTranscribing(false);
           setIsProcessingDetails(true);
 
-          const processResponse = await fetch('/api/process-item-details', {
+          // Add timeout for process fetch
+          const processPromise = fetch('/api/process-item-details', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ transcript }),
           });
+          const processResponse = await Promise.race([
+            processPromise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Processing timed out.')), 20000)),
+          ]);
+
+          if (!(processResponse instanceof Response)) {
+            throw new Error('Unexpected error during processing.');
+          }
 
           if (!processResponse.ok) {
             throw new Error('Failed to process item details.');
           }
           const data = await processResponse.json();
           onProcessComplete(data);
-        } catch (error) {
+        } catch (error: any) {
           logger.error('Error during voice processing pipeline:', error);
-          setServerError('An error occurred. Please try again.');
+          setServerError(error?.message || 'An error occurred. Please try again.');
           setIsTranscribing(false);
           setIsProcessingDetails(false);
         }
@@ -192,6 +210,21 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
         <p className="mt-6 text-lg font-medium text-gray-700">
           {buttonState.text || 'Press for voice input'}
         </p>
+        {isRecording && (
+          <p className="mt-2 text-sm text-gray-500 animate-pulse">Recording... Speak now and press again to stop.</p>
+        )}
+        {isTranscribing && (
+          <div className="mt-4 flex flex-col items-center">
+            <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+            <span className="mt-2 text-sm text-gray-500">Transcribing your voice...</span>
+          </div>
+        )}
+        {isProcessingDetails && (
+          <div className="mt-4 flex flex-col items-center">
+            <Brain className="h-8 w-8 animate-bounce text-green-500" />
+            <span className="mt-2 text-sm text-gray-500">Extracting donation details...</span>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -9,13 +9,30 @@ import { Progress } from '@/components/ui/progress';
 import { BackArrowIcon } from '@/components/ui/icons/BackArrowIcon';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { ActionButton } from '@/components/ui/action-button';
+import { useRouter } from 'next/navigation';
+import { useDonationStore } from '@/store/donation';
 
 export default function NewDonationPage() {
   const [serverError, setServerError] = useState<string | null>(null);
+  const router = useRouter();
+  const { donationItems, setDonationItems, setPickupSlots } = useDonationStore();
 
   const handleProcessComplete = (data: any) => {
-    console.log('Donation data processed:', data);
-    // TODO: Redirect to the next step with the data
+    if (!data || !Array.isArray(data.items)) {
+      setServerError('Could not extract donation items from your voice input. Please try again or type manually.');
+      return;
+    }
+    // Map new items
+    const newItems = data.items.map((item: any, idx: number) => ({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${idx}`,
+      name: item.name,
+      quantity: item.quantity,
+      allergens: Array.isArray(item.allergens) ? item.allergens : [],
+      imageUrl: undefined,
+    }));
+    // Append to existing items
+    setDonationItems([...donationItems, ...newItems]);
+    router.push('/donate/manual');
   };
 
     return (
