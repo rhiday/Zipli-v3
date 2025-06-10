@@ -147,27 +147,23 @@ export default function DonorDashboardPage(): React.ReactElement {
       <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'} />
 
       <main className="relative z-20 mt-4 rounded-t-3xl md:rounded-t-none py-4 px-4 md:px-12 space-y-6">
-        {/* Figma: Active Offers & Requests Section Replacement */}
-        <section>
-          <div className="rounded-2xl border border-primary-10 bg-white p-4 flex flex-col gap-4 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-[#F5F9EF] flex items-center justify-center">
-                <PackageIcon className="w-6 h-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-primary text-base">Salmon Soup and Tomato Pasta 1kg</span>
-                  <span className="bg-[#FFE5E5] text-[#CB0003] text-xs font-semibold rounded-full px-2 py-0.5">Cancelled</span>
-                </div>
-                <div className="text-primary-75 text-xs mt-1">Pickup time: 6/16/2025, 9:00:00 AM</div>
-                <div className="text-primary-75 text-xs">Quantity: 1</div>
-              </div>
+        {/* The old Figma donation card section is now removed. Only the new 'Your activity' section remains. */}
+        <section className="mt-4 px-4 md:px-12">
+          <h2 className="text-titleXs font-medium text-primary mb-2">Your activity</h2>
+          {donationItems.length === 0 ? (
+            <div className="rounded-lg bg-base p-4 text-center text-primary-75 border border-border">
+              No donations submitted yet.
             </div>
-            <div className="flex items-center justify-center border-2 border-dashed border-primary-10 rounded-xl py-6 cursor-pointer hover:border-primary-50 transition">
-              <span className="text-primary-75 font-medium mr-2">See all offers and requests</span>
-              <ArrowRight className="w-5 h-5 text-primary-75" />
-            </div>
-          </div>
+          ) : (
+            <ul className="space-y-2">
+              {donationItems.map(item => (
+                <li key={item.id} className="rounded-lg border border-primary-10 bg-white p-3 flex flex-col">
+                  <span className="font-semibold text-primary">{item.name}</span>
+                  <span className="text-primary-75 text-sm">Quantity: {item.quantity}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section>
@@ -298,6 +294,9 @@ export default function DonorDashboardPage(): React.ReactElement {
       </main>
 
       <BottomNav />
+
+      {/* Force-hide any rogue Figma card section if it still exists */}
+      <style>{`.rogue-donation-card { display: none !important; }`}</style>
     </div>
   );
 }
