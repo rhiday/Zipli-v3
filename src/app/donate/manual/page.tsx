@@ -1,7 +1,7 @@
 // pumpkin: test commit to trigger push
 'use client'
 export const dynamic = "force-dynamic";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Input } from '@/components/ui/Input';
@@ -19,7 +19,7 @@ interface DonationItem {
   imageUrl?: string;
 }
 
-export default function ManualDonationPage() {
+function ManualDonationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { donationItems, addDonationItem, updateDonationItem, deleteDonationItem } = useDonationStore();
@@ -270,4 +270,14 @@ export default function ManualDonationPage() {
       </div>
     </div>
   );
-} 
+}
+
+function ManualDonationPageWithSuspense() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ManualDonationPage />
+    </Suspense>
+  );
+}
+
+export default ManualDonationPageWithSuspense; 
