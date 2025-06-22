@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import Image from 'next/image';
-import { ArrowLeft, ShoppingBag, MapPin } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, MapPin, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Tag from '@/components/ui/Tag';
@@ -43,7 +43,8 @@ export default function DonationDetailPage() {
               description,
               image_url,
               allergens
-            )
+            ),
+            donor:profiles!donor_id(address, full_name, organization_name)
           `
           )
           .eq('id', id as string)
@@ -101,7 +102,10 @@ export default function DonationDetailPage() {
     );
   }
   
-  const donorName = 'Anonymous Donor'; // Placeholder
+  const donorName =
+    donation.donor?.organization_name ||
+    donation.donor?.full_name ||
+    'Anonymous Donor';
 
   return (
     <div className="min-h-screen bg-white pb-24 font-sans max-w-md mx-auto">
@@ -147,13 +151,15 @@ export default function DonationDetailPage() {
 
         <div className="mt-4 flex items-start gap-3 text-gray-600">
           <MapPin className="h-5 w-5 flex-shrink-0" />
-          {/* Hardcoded address as per Figma */}
-          <span className="font-medium">Esimerkkikatu 1 A 12, 00100 HELSINKI</span>
+          <span className="font-medium">{donation.donor?.address || 'Address not provided'}</span>
         </div>
         
-        <Button size="lg" className="mt-6 h-14 w-full rounded-xl bg-green-500 text-lg font-semibold text-white hover:bg-green-600">
-          + Add to cart
-        </Button>
+        <div className="mt-6 flex justify-end">
+          <Button variant="primary" size="cta" className="text-bodyLg">
+            <Plus className="h-5 w-5" />
+            Add to cart
+          </Button>
+        </div>
       </div>
       
       {/* Divider */}
