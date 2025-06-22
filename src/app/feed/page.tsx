@@ -10,6 +10,7 @@ import { SearchIcon, FilterXIcon, ChevronDownIcon, ChevronUpIcon, PackageIcon, H
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import FilterBar from '@/components/ui/FilterBar';
+import Link from 'next/link';
 
 type DonationFeed = {
   id: string;
@@ -285,46 +286,44 @@ export default function FeedPage(): React.ReactElement {
               if (isDonation) {
                 const donation = item as DonationFeed;
                 return (
-                  <div
-                    key={donation.id}
-                    className="overflow-hidden rounded-lg bg-base shadow-md transition-shadow hover:shadow-lg cursor-pointer group"
-                    onClick={() => router.push(`/donate/${donation.id}`)}
-                  >
-                    <div className="relative h-48 w-full">
-                      {donation.food_item.image_url ? (
-                        <Image
-                          src={donation.food_item.image_url}
-                          alt={donation.food_item.name}
-                          fill
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                          <ImageIcon className="w-16 h-16 text-gray-400" />
+                  <Link href={`/donate/detail/${donation.id}`} key={donation.id} className="block group">
+                    <div className="overflow-hidden rounded-xl border border-primary-10 bg-white shadow-sm transition-all duration-200 ease-in-out group-hover:shadow-lg group-hover:-translate-y-1">
+                      <div className="relative h-48 w-full">
+                        {donation.food_item.image_url ? (
+                          <Image
+                            src={donation.food_item.image_url}
+                            alt={donation.food_item.name}
+                            fill
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+                            <ImageIcon className="w-16 h-16 text-gray-400" />
+                          </div>
+                        )}
+                        <div className="absolute top-3 left-3 bg-white/90 text-primary font-semibold px-3 py-1.5 rounded-full text-xs flex items-center shadow">
+                          <MapPinIcon className="w-3.5 h-3.5 mr-1" />
+                          500m
                         </div>
-                      )}
-                      <div className="absolute top-3 left-3 bg-white/90 text-primary font-semibold px-3 py-1.5 rounded-full text-xs flex items-center shadow">
-                        <MapPinIcon className="w-3.5 h-3.5 mr-1" />
-                        500m
+                      </div>
+                      <div className="p-4">
+                        <h3 className="text-lg font-bold text-primary truncate group-hover:text-primary-700">
+                          {donation.food_item.name}
+                        </h3>
+                        <p className="text-sm text-primary-75 mt-1">
+                          {`${donation.quantity} ${donation.unit || 'kg'} · from ${donation.donor?.organization_name || 'Unknown Donor'}`}
+                        </p>
+                        {donation.food_item.food_type && (
+                          <p className="text-xs text-primary-60 mt-0.5 italic">
+                            {donation.food_item.food_type}
+                          </p>
+                        )}
+                        <p className="text-xs text-primary-60 mt-0.5">
+                          {formatPickupWindow(donation)}
+                        </p>
                       </div>
                     </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-bold text-primary truncate group-hover:text-primary-700">
-                        {donation.food_item.name}
-                      </h3>
-                      <p className="text-sm text-primary-75 mt-1">
-                        {`${donation.quantity} ${donation.unit || 'kg'} · from ${donation.donor?.organization_name || 'Unknown Donor'}`}
-                      </p>
-                      {donation.food_item.food_type && (
-                        <p className="text-xs text-primary-60 mt-0.5 italic">
-                          {donation.food_item.food_type}
-                        </p>
-                      )}
-                      <p className="text-xs text-primary-60 mt-0.5">
-                        {formatPickupWindow(donation)}
-                      </p>
-                    </div>
-                  </div>
+                  </Link>
                 );
               } else {
                 const request = item as RequestFeedItem;

@@ -34,7 +34,7 @@ const DonationCard: React.FC<DonationCardProps> = ({ donation, className }) => {
   })();
 
   return (
-    <Link href={`/donate/${donation.id}`} className={cn("block max-w-md w-full", className)}>
+    <Link href={`/donate/detail/${donation.id}`} className={cn("block max-w-md w-full", className)}>
       <div
         className="overflow-hidden rounded-lg bg-base shadow-[0_2px_4px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.04)] border border-primary-10 cursor-pointer max-w-md w-full"
       >

@@ -4,6 +4,7 @@ interface DonationItem {
   id: string;
   name: string;
   quantity: string;
+  description: string | null;
   allergens: string[];
   imageUrl?: string;
 }
