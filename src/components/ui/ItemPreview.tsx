@@ -1,14 +1,17 @@
 import React from 'react';
+import { EditIcon } from './icons/EditIcon';
+import { DeleteIcon } from './icons/DeleteIcon';
 
 interface ItemPreviewProps {
   name: string;
   quantity: string;
+  description?: string;
   imageUrl?: string;
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
-export const ItemPreview: React.FC<ItemPreviewProps> = ({ name, quantity, imageUrl, onEdit, onDelete }) => {
+export const ItemPreview: React.FC<ItemPreviewProps> = ({ name, quantity, description, imageUrl, onEdit, onDelete }) => {
   return (
     <div className="flex justify-center items-center w-full p-[12px_14px_12px_12px] gap-[18px] rounded-[12px] border border-[#D9DBD5] bg-[#F5F9EF]">
       <div 
@@ -26,8 +29,10 @@ export const ItemPreview: React.FC<ItemPreviewProps> = ({ name, quantity, imageU
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="font-manrope font-semibold text-[#021d13] text-[16px] truncate">{name}</div>
-        <div className="font-manrope text-[14px] text-[#021d13] opacity-60 mt-1">Qty: {quantity}</div>
+        <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+        <p className="text-sm text-gray-500 truncate">
+          {description ? `${description} · Qty: ${quantity}` : `Qty: ${quantity}`}
+        </p>
       </div>
       <div className="flex flex-row gap-2 items-center shrink-0">
         <button

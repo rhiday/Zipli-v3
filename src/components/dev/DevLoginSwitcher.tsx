@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { Database } from '@/lib/supabase/types';
+import { useDatabaseActions } from '@/store/databaseStore';
 type UserRole = Database['public']['Enums']['user_role'];
 
 const testUsers = {
@@ -20,40 +21,34 @@ export default function DevLoginSwitcher() {
   const router = useRouter();
   const [loading, setLoading] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const { setCurrentUser } = useDatabaseActions();
 
-  const handleDevLogin = async (roleKey: keyof typeof testUsers) => {
+  const handleDevLogin = (roleKey: keyof typeof testUsers) => {
     const user = testUsers[roleKey];
     setLoading(roleKey);
     setError(null);
 
-    try {
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: user.password,
-      });
+    console.log(`Bypassing Supabase login. Simulating login for: ${roleKey}`);
+    setCurrentUser(user.email);
 
-      if (loginError) throw loginError;
-
-      if (data.user) {
-        // Redirect based on role (simplified from login page)
-        switch (user.role) {
-          case 'food_donor': router.push('/donate'); break;
-          case 'food_receiver': router.push('/feed'); break;
-          case 'city':
-          case 'terminals':
-          default: router.push('/dashboard'); break;
-        }
-        // Force reload to ensure state clears if needed
-        router.refresh(); 
-      } else {
-        throw new Error('Dev login failed, user data not found.');
+    // Simulate a short delay for UX, then redirect
+    setTimeout(() => {
+      // Redirect based on role
+      switch (user.role) {
+        case 'food_donor':
+          router.push('/donate');
+          break;
+        case 'food_receiver':
+          router.push('/feed');
+          break;
+        case 'city':
+        case 'terminals':
+        default:
+          router.push('/dashboard');
+          break;
       }
-    } catch (err: any) {
-      console.error('Dev Login Error:', err);
-      setError(`Failed to log in as ${roleKey}: ${err.message}`);
-    } finally {
       setLoading(null);
-    }
+    }, 500);
   };
 
   // Only render in development

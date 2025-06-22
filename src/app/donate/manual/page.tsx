@@ -10,12 +10,22 @@ import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import { PhotoUpload } from '@/components/ui/PhotoUpload';
 import { ItemPreview } from '@/components/ui/ItemPreview';
 import { useDonationStore } from '@/store/donation';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { useDatabase, useDatabaseActions, DonationWithFoodItem } from '@/store/databaseStore';
 
 interface DonationItem {
   id: string;
   name: string;
   quantity: string;
   allergens: string[];
+  description: string | null;
   imageUrl?: string;
 }
 
@@ -23,31 +33,51 @@ function ManualDonationPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { donationItems, addDonationItem, updateDonationItem, deleteDonationItem } = useDonationStore();
-  
+  const { getDonationById, updateDonation, updateFoodItem } = useDatabaseActions();
+
   const [currentItem, setCurrentItem] = useState<Omit<DonationItem, 'id'> & { id: string | 'new' }>({
     id: 'new',
     name: '',
     quantity: '',
     allergens: [],
+    description: null,
     imageUrl: undefined,
   });
   const [showItemList, setShowItemList] = useState(false);
   const [showAddAnotherForm, setShowAddAnotherForm] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   useEffect(() => {
-    if (donationItems.length > 0) {
+    if (donationItems.length > 0 && !isEditMode) {
       setShowItemList(true);
     } else {
       setShowItemList(false);
     }
-  }, [donationItems]);
+  }, [donationItems, isEditMode]);
 
   useEffect(() => {
-    const editItemId = searchParams.get('edit');
+    const editItemId = searchParams.get('id');
     if (editItemId) {
-      handleEditItem(editItemId);
+      setIsEditMode(true);
+      const donation = getDonationById(editItemId);
+      
+      if (donation) {
+        const { food_item, quantity, id } = donation;
+        setCurrentItem({
+          id,
+          name: food_item.name,
+          quantity: quantity.toString(),
+          allergens: food_item.allergens ? food_item.allergens.split(',') : [],
+          description: food_item.description || null,
+          imageUrl: food_item.image_url,
+        });
+        setShowItemList(true); 
+        setShowAddAnotherForm(true);
+      }
     }
-  }, [searchParams]);
+  }, [searchParams, getDonationById]);
 
   const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
     setCurrentItem(prev => ({ ...prev, [field]: value }));
@@ -57,32 +87,60 @@ function ManualDonationPageInner() {
     handleCurrentItemChange('imageUrl', imageUrl || undefined);
   };
 
-  const handleSaveItem = () => {
+  const handleSaveItem = async () => {
     if (!currentItem.name.trim() || !currentItem.quantity.trim()) return;
+    setIsSaving(true);
 
-    if (currentItem.id === 'new') {
-      addDonationItem({
-        ...currentItem,
-        quantity: `${currentItem.quantity} kg`,
-      });
-    } else {
-      updateDonationItem({
-        ...currentItem,
-        id: currentItem.id,
-        quantity: `${currentItem.quantity} kg`,
-      });
+    try {
+      if (isEditMode && currentItem.id !== 'new') {
+        const donation = getDonationById(currentItem.id);
+        if (!donation) throw new Error('Donation not found');
+
+        updateFoodItem({
+          id: donation.food_item_id,
+          name: currentItem.name,
+          allergens: currentItem.allergens.join(','),
+          description: currentItem.description || undefined,
+          image_url: currentItem.imageUrl,
+        });
+
+        updateDonation({
+          id: currentItem.id,
+          quantity: currentItem.quantity,
+        });
+
+        setShowSuccessDialog(true);
+      } else {
+        // This is for adding a new item, not editing.
+        if (currentItem.id === 'new') {
+          // This part uses the old zustand store, which you might want to refactor later
+          addDonationItem({
+            ...currentItem,
+            quantity: `${currentItem.quantity} kg`,
+          });
+        } else {
+          updateDonationItem({
+            ...currentItem,
+            id: currentItem.id,
+            quantity: `${currentItem.quantity} kg`,
+          });
+        }
+        setShowAddAnotherForm(false);
+        setCurrentItem({
+          id: 'new',
+          name: '',
+          quantity: '',
+          allergens: [],
+          description: null,
+          imageUrl: undefined,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to save changes:', error);
+      // We can add a user-facing error message here later.
+    } finally {
+      setIsSaving(false);
     }
-    
-    setShowAddAnotherForm(false);
-    
-    // Clear form
-    setCurrentItem({
-      id: 'new',
-      name: '',
-      quantity: '',
-      allergens: [],
-      imageUrl: undefined,
-    });
   };
 
   const handleAddAnotherItem = () => {
@@ -92,6 +150,7 @@ function ManualDonationPageInner() {
       name: '',
       quantity: '',
       allergens: [],
+      description: null,
       imageUrl: undefined,
     });
     setShowAddAnotherForm(true);
@@ -100,7 +159,11 @@ function ManualDonationPageInner() {
   const handleEditItem = (id: string) => {
     const itemToEdit = donationItems.find(item => item.id === id);
     if (itemToEdit) {
-      setCurrentItem({ ...itemToEdit, quantity: itemToEdit.quantity.replace(' kg', '') });
+      setCurrentItem({
+        ...itemToEdit,
+        description: itemToEdit.description ?? '',
+        quantity: itemToEdit.quantity.replace(' kg', ''),
+      });
       setShowAddAnotherForm(true);
     }
   };
@@ -113,6 +176,7 @@ function ManualDonationPageInner() {
         name: '',
         quantity: '',
         allergens: [],
+        description: null,
         imageUrl: undefined,
       });
       setShowAddAnotherForm(false);
@@ -137,19 +201,22 @@ function ManualDonationPageInner() {
         onBackClick={showItemList || showAddAnotherForm ? handleBackClick : undefined}
       />
       <div className="px-6 pt-2">
-        <Progress value={25} className="h-2 w-full" />
+        <Progress value={isEditMode ? 100 : 25} className="h-2 w-full" />
       </div>
       
       {showItemList ? (
         // Item List View (with optional add another form)
         <main className="flex-1 flex flex-col gap-6 p-6">
-          <h2 className="text-lg font-semibold text-[#021d13]">Your donation:</h2>
+          <h2 className="text-lg font-semibold text-[#021d13]">
+            {isEditMode ? 'Edit food item' : 'Your donation:'}
+          </h2>
           <div className="flex flex-col gap-4">
-            {donationItems.map((item) => (
+            {isEditMode ? null : donationItems.map((item) => (
               <ItemPreview
                 key={item.id}
                 name={item.name}
                 quantity={item.quantity}
+                description={item.description ?? undefined}
                 imageUrl={item.imageUrl}
                 onEdit={() => handleEditItem(item.id)}
                 onDelete={() => handleDeleteItem(item.id)}
@@ -170,6 +237,15 @@ function ManualDonationPageInner() {
                   placeholder="e.g. Bread, Rice, etc." 
                   value={currentItem.name}
                   onChange={(e) => handleCurrentItemChange('name', e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="description" className="block text-label font-semibold mb-2">Description</label>
+                <Input 
+                  id="description" 
+                  placeholder="e.g. A delicious and healthy meal."
+                  value={currentItem.description ?? ''}
+                  onChange={(e) => handleCurrentItemChange('description', e.target.value)}
                 />
               </div>
               <div>
@@ -200,13 +276,15 @@ function ManualDonationPageInner() {
               </div>
             </div>
           ) : (
-            <button 
-              onClick={handleAddAnotherItem}
-              className="flex items-center justify-center gap-2 text-interactive font-semibold text-base py-1 border-b border-interactive self-center"
-            >
-              <span className="text-xl">+</span>
-              Add another item
-            </button>
+            !isEditMode && (
+              <button 
+                onClick={handleAddAnotherItem}
+                className="flex items-center justify-center gap-2 text-interactive font-semibold text-base py-1 border-b border-interactive self-center"
+              >
+                <span className="text-xl">+</span>
+                Add another item
+              </button>
+            )
           )}
         </main>
       ) : (
@@ -219,6 +297,15 @@ function ManualDonationPageInner() {
               placeholder="e.g. Bread, Rice, etc." 
               value={currentItem.name}
               onChange={(e) => handleCurrentItemChange('name', e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="description" className="block text-label font-semibold mb-2">Description</label>
+            <Input 
+              id="description" 
+              placeholder="e.g. A delicious and healthy meal."
+              value={currentItem.description ?? ''}
+              onChange={(e) => handleCurrentItemChange('description', e.target.value)}
             />
           </div>
           <div>
@@ -250,24 +337,35 @@ function ManualDonationPageInner() {
         </main>
       )}
       
-      <div className="sticky bottom-0 left-0 w-full bg-white pt-4 pb-10 pr-6 flex justify-end z-10">
-        {showItemList && !showAddAnotherForm ? (
-          <button 
-            onClick={() => router.push('/donate/pickup-slot')}
-            className="bg-[#a6f175] text-[#021d13] font-manrope font-semibold rounded-full px-8 py-3 text-lg shadow-md hover:bg-[#c2f7a1] transition"
-          >
-            Continue
-          </button>
-        ) : (
-          <button 
-            onClick={handleSaveItem}
-            disabled={!currentItem.name.trim() || !currentItem.quantity.trim()}
-            className="bg-[#a6f175] text-[#021d13] font-manrope font-semibold rounded-full px-8 py-3 text-lg shadow-md hover:bg-[#c2f7a1] transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {currentItem.id === 'new' ? 'Add item' : 'Save changes'}
-          </button>
-        )}
+      <div className="flex-grow" />
+
+      <div className="p-6">
+        <Button
+          onClick={handleSaveItem}
+          disabled={isSaving || !currentItem.name.trim() || !currentItem.quantity.trim()}
+          variant="primary"
+          size="lg"
+          className="w-full"
+        >
+          {isSaving ? 'Saving...' : isEditMode ? 'Save changes' : 'Add to donation'}
+        </Button>
       </div>
+
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Changes saved</DialogTitle>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => router.push('/donor/dashboard')}
+              className="w-full"
+            >
+              Go back to Dashboard
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

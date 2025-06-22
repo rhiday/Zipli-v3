@@ -1,11 +1,12 @@
 'use client';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import dynamic from 'next/dynamic';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from './layout/Header'; // Assuming Header might be part of AppShell
 import BottomNav from './BottomNav'; // Assuming BottomNav might be part of AppShell
 import { usePathname } from 'next/navigation';
 import { logger } from '../../lib/logger';
+import { useDatabaseActions } from '@/store/databaseStore';
 // Or import whatever components are actually used in AppShell
 
 const DesktopGlobalNavbar = dynamic(() => import('@/components/DesktopGlobalNavbar'), { ssr: false });
@@ -16,6 +17,12 @@ interface AppShellProps {
 
 const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const pathname = usePathname();
+  const { init } = useDatabaseActions();
+
+  useEffect(() => {
+    init();
+  }, [init]);
+
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
   const hideBottomNav = pathname.startsWith('/donate/new') || pathname.startsWith('/donate/manual');
   

@@ -4,68 +4,49 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import type { Database } from '@/lib/supabase/types';
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
+import { useDatabase, useDatabaseActions } from '@/store/databaseStore';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('hasan@zipli.test');
+  const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
+  const { users } = useDatabase();
+  const { setCurrentUser } = useDatabaseActions();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    // Find the user in our mock database
+    const user = users.find(u => u.email === email);
 
-      if (signInError) throw signInError;
+    if (user) {
+      // Set the current user in the global store
+      setCurrentUser(user.email);
       
-      if (data.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-
-        if (profileError) throw profileError;
-
-        if (profile) {
-          const role = profile.role as Database['public']['Enums']['user_role'];
-          switch (role) {
-            case 'food_donor':
-              router.push('/donate');
-              break;
-            case 'food_receiver':
-              router.push('/feed');
-              break;
-            case 'terminals':
-            case 'city':
-              router.push('/dashboard');
-              break;
-            default:
-              console.warn(`Unknown user role: ${role}, redirecting to generic dashboard.`);
-              router.push('/dashboard');
-          }
-        } else {
-          console.warn('Profile not found for user after login, redirecting to generic dashboard.');
+      // Redirect based on role
+      switch (user.role) {
+        case 'donor':
+          router.push('/donate');
+          break;
+        case 'receiver':
+          router.push('/feed');
+          break;
+        case 'city':
           router.push('/dashboard');
-        }
-      } else {
-        throw new Error('User data not available after sign in.');
+          break;
+        default:
+          console.warn(`Unknown user role: ${user.role}, redirecting to generic dashboard.`);
+          router.push('/dashboard');
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during login');
-    } finally {
+    } else {
+      setError('Invalid email or password.');
       setLoading(false);
     }
   };

@@ -4,16 +4,31 @@ import React from 'react';
 import Image from 'next/image';
 import { Languages, MessageSquare, UserCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useDonationStore } from '@/store/donation';
 import { useRouter } from 'next/navigation';
+import { useDatabase } from '@/store/databaseStore';
 
 interface HeaderProps {
   title?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({ title }) => {
-  const donationItems = useDonationStore(state => state.donationItems);
+  const { currentUser, isInitialized, donations: allDonations, foodItems } = useDatabase();
   const router = useRouter();
+
+  // Get donations for the current user
+  const userDonations = isInitialized && currentUser
+    ? allDonations.filter(d => d.donor_id === currentUser.id)
+    : [];
+
+  // We need to enrich the donations with food item names for display
+  const donationItems = userDonations.map(donation => {
+    const foodItem = foodItems.find(fi => fi.id === donation.food_item_id);
+    return {
+      ...donation,
+      name: foodItem?.name || 'Unknown Item',
+    };
+  });
+
   return (
     <div className="bg-earth flex flex-col px-6 md:px-12 pt-8 pb-14 min-h-[160px] relative overflow-hidden">
       {/* Background SVG Shape REMOVED */}
