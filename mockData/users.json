@@ -1,1 +1,11 @@
-[{"email":"alice@zipli.test","password":"password","role":"donor","full_name":"Alice's Restaurant"},{"email":"bob@zipli.test","password":"password","role":"receiver","full_name":"Bob's Charity House"},{"email":"helsinki@zipli.test","password":"password","role":"city","full_name":"City of Helsinki"}]
+[
+  {"email":"alice@zipli.test","password":"password","role":"food_donor","full_name":"Alice's Restaurant"},
+  {"email":"bob@zipli.test","password":"password","role":"food_receiver","full_name":"Bob's Charity House"},
+  {"email":"helsinki@zipli.test","password":"password","role":"city","full_name":"City of Helsinki"},
+  {"email":"donor@zipli.test","password":"password","role":"food_donor","full_name":"Test Donor"},
+  {"email":"helsinki.airport@sodexo.com","password":"password","role":"food_donor","full_name":"Sodexo Helsinki"},
+  {"email":"helsinki.community@redcross.org","password":"password","role":"food_receiver","full_name":"Red Cross Helsinki"},
+  {"email":"receiver@zipli.test","password":"password","role":"food_receiver","full_name":"Test Receiver"},
+  {"email":"city@zipli.test","password":"password","role":"city","full_name":"Test City"},
+  {"email":"terminal@zipli.test","password":"password","role":"terminals","full_name":"Test Terminal"}
+]

@@ -4,8 +4,9 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { ImageIcon, MapPinIcon } from 'lucide-react';
+import { ImageIcon, MapPinIcon, ShoppingBag } from 'lucide-react';
 import { DonationWithFoodItem } from '@/store/databaseStore';
+import { CardContent } from '@/components/ui/card';
 
 interface DonationCardProps {
   donation: DonationWithFoodItem;
@@ -55,9 +56,17 @@ const DonationCard: React.FC<DonationCardProps> = ({ donation, className }) => {
           <h3 className="truncate font-semibold text-gray-800">
             {food_item.name || 'Untitled Item'}
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {quantity || '0'} kg · {food_item.allergens?.split(',').length || 0} Allergens
-          </p>
+          <div className="mt-2 flex items-center text-sm text-gray-500">
+            <ShoppingBag className="mr-1.5 h-4 w-4" />
+            <span>
+              {quantity || '0'} kg ·{' '}
+              {
+                Array.isArray(food_item.allergens)
+                  ? food_item.allergens.length
+                  : (food_item.allergens?.split(',').length || 0)
+              } Allergens
+            </span>
+          </div>
           <p className="mt-1.5 text-sm text-gray-500">
             {formatPickupTime(undefined)}
           </p>

@@ -18,7 +18,8 @@ import {
 import { jsPDF } from 'jspdf';
 import SummaryOverview from '@/components/SummaryOverview';
 import DonationCard from '@/components/donations/DonationCard';
-import { useDatabase, useDatabaseActions, DonationWithFoodItem } from '@/store/databaseStore';
+import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 type ProfileRow = {
     id: string;
@@ -34,7 +35,9 @@ type DonorDashboardData = {
 export default function DonorDashboardPage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized } = useDatabase();
-  const { getDonationsByDonor } = useDatabaseActions();
+  const allDonations = useDatabase(state => state.donations);
+  const foodItems = useDatabase(state => state.foodItems);
+  const { user } = useAuth();
 
   const [dashboardData, setDashboardData] = useState<DonorDashboardData>({ profile: null, donations: [] });
   const [loading, setLoading] = useState(true);
@@ -70,12 +73,17 @@ export default function DonorDashboardPage(): React.ReactElement {
       organization_name: null, // Not available in mock user
     };
     
-    const donations = getDonationsByDonor(currentUser.id);
+    const userDonations = allDonations
+      .filter(d => d.donor_id === currentUser.id)
+      .map(d => {
+        const foodItem = foodItems.find(fi => fi.id === d.food_item_id);
+        return { ...d, food_item: foodItem! };
+      });
     
-    setDashboardData({ profile, donations });
+    setDashboardData({ profile, donations: userDonations });
     setLoading(false);
 
-  }, [isInitialized, currentUser, router, getDonationsByDonor]);
+  }, [isInitialized, currentUser, router, allDonations, foodItems]);
 
   // Placeholder PDF generation function
   const handleExportPDF = () => {

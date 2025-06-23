@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
-import { useDatabase, useDatabaseActions } from '@/store/databaseStore';
+import { useDatabase } from '@/store/databaseStore';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('hasan@zipli.test');
@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const { users } = useDatabase();
-  const { setCurrentUser } = useDatabaseActions();
+  const setCurrentUser = useDatabase(state => state.setCurrentUser);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +32,10 @@ export default function LoginPage() {
       
       // Redirect based on role
       switch (user.role) {
-        case 'donor':
+        case 'food_donor':
           router.push('/donate');
           break;
-        case 'receiver':
+        case 'food_receiver':
           router.push('/feed');
           break;
         case 'city':

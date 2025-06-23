@@ -91,4 +91,6 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
       ) : null}
     </div>
   );
-}; 
+};
+
+AllergensDropdown.displayName = 'AllergensDropdown'; 

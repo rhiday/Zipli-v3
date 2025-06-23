@@ -19,14 +19,15 @@ import {
   DialogFooter,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useDatabase, useDatabaseActions, DonationWithFoodItem } from '@/store/databaseStore';
+import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
+import { useAuth } from '@/components/auth/AuthProvider';
 
-export default function DonationDetailPage() {
-  const { id } = useParams();
+export default function DonationDetailPage({ params }: { params: { id: string } }) {
+  const { user } = useAuth();
   const router = useRouter();
-  const { getDonationById, getDonationsByDonor, deleteDonation } = useDatabaseActions();
-  const { currentUser } = useDatabase();
-
+  const donations = useDatabase(state => state.donations);
+  const foodItems = useDatabase(state => state.foodItems);
+  const deleteDonation = useDatabase(state => state.deleteDonation);
   const [donation, setDonation] = useState<DonationWithFoodItem | null>(null);
   const [otherDonations, setOtherDonations] = useState<DonationWithFoodItem[]>([]);
   const [totalDonations, setTotalDonations] = useState(0);
@@ -36,38 +37,32 @@ export default function DonationDetailPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      setError('No ID provided.');
-      return;
-    }
+    if (user && params.id) {
+      const userDonations = donations.filter(d => d.donor_id === user.id);
+      const mainDonation = userDonations.find(d => d.id === params.id);
 
-    setLoading(true);
-    const donationData = getDonationById(id as string);
+      if (mainDonation) {
+        const foodItem = foodItems.find(fi => fi.id === mainDonation.food_item_id);
+        if (foodItem) {
+          setDonation({ ...mainDonation, food_item: foodItem });
+          setIsOwner(true);
 
-    if (donationData) {
-      setDonation(donationData);
-      if (currentUser && donationData.donor_id === currentUser.id) {
-        setIsOwner(true);
+          const otherDons = userDonations
+            .filter(d => d.id !== params.id)
+            .map(d => ({ ...d, food_item: foodItems.find(fi => fi.id === d.food_item_id)! }))
+            .slice(0, 4);
+          setOtherDonations(otherDons);
+          setTotalDonations(userDonations.length);
+        }
       }
-
-      // Fetch other donations from the same (mock) donor
-      const otherDons = getDonationsByDonor(donationData.donor_id).filter(d => d.id !== id);
-      setOtherDonations(otherDons.slice(0, 4));
-
-      // Get total donations count
-      setTotalDonations(getDonationsByDonor(donationData.donor_id).length);
-    } else {
-      setError('Donation not found.');
     }
-
     setLoading(false);
-  }, [id, currentUser, getDonationById, getDonationsByDonor]);
+  }, [user, params.id, donations, foodItems]);
 
   const handleRemoveListing = () => {
     if (!donation) return;
     deleteDonation(donation.id);
-    router.push('/donor/dashboard');
+    router.push('/donate');
   };
 
   if (loading) {
@@ -129,11 +124,16 @@ export default function DonationDetailPage() {
 
         {/* Tags */}
         <div className="mt-4 flex flex-wrap gap-2">
-          {donation.food_item.allergens?.split(',').map((tag: string) => (
-            <Tag key={tag}>
-              {tag.trim()}
-            </Tag>
-          ))}
+          {donation.food_item.allergens && (
+            (Array.isArray(donation.food_item.allergens)
+              ? donation.food_item.allergens
+              : String(donation.food_item.allergens).split(',')
+            ).map((tag: string) => (
+              <Tag key={tag}>
+                {tag.trim()}
+              </Tag>
+            ))
+          )}
         </div>
 
         <p className="mt-4 text-gray-600 leading-relaxed">{donation.food_item.description}</p>
@@ -183,7 +183,7 @@ export default function DonationDetailPage() {
               variant="primary"
               size="cta"
               className="w-full"
-              onClick={() => router.push(`/request/${id}`)}
+              onClick={() => router.push(`/request/${params.id}`)}
             >
               Request this donation
             </Button>

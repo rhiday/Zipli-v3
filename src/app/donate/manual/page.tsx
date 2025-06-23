@@ -18,7 +18,10 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useDatabase, useDatabaseActions, DonationWithFoodItem } from '@/store/databaseStore';
+import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
+import { PlusIcon } from 'lucide-react';
+import { useAuth } from '@/components/auth/AuthProvider';
+import DonationCard from '@/components/donations/DonationCard';
 
 interface DonationItem {
   id: string;
@@ -33,7 +36,11 @@ function ManualDonationPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { donationItems, addDonationItem, updateDonationItem, deleteDonationItem } = useDonationStore();
-  const { getDonationById, updateDonation, updateFoodItem } = useDatabaseActions();
+  const updateDonation = useDatabase(state => state.updateDonation);
+  const updateFoodItem = useDatabase(state => state.updateFoodItem);
+  const donations = useDatabase(state => state.donations);
+  const foodItems = useDatabase(state => state.foodItems);
+  const { user } = useAuth();
 
   const [currentItem, setCurrentItem] = useState<Omit<DonationItem, 'id'> & { id: string | 'new' }>({
     id: 'new',
@@ -43,41 +50,39 @@ function ManualDonationPageInner() {
     description: null,
     imageUrl: undefined,
   });
-  const [showItemList, setShowItemList] = useState(false);
   const [showAddAnotherForm, setShowAddAnotherForm] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-
-  useEffect(() => {
-    if (donationItems.length > 0 && !isEditMode) {
-      setShowItemList(true);
-    } else {
-      setShowItemList(false);
-    }
-  }, [donationItems, isEditMode]);
+  
+  const hasItems = donationItems.length > 0;
 
   useEffect(() => {
     const editItemId = searchParams.get('id');
-    if (editItemId) {
+    if (editItemId && user) {
       setIsEditMode(true);
-      const donation = getDonationById(editItemId);
+      const foundDonation = donations
+        .filter(d => d.id === editItemId && d.donor_id === user.id)
+        .map(d => {
+          const foodItem = foodItems.find(fi => fi.id === d.food_item_id);
+          return { ...d, food_item: foodItem! };
+        })[0];
       
-      if (donation) {
-        const { food_item, quantity, id } = donation;
+      if (foundDonation) {
+        const { food_item, quantity, id } = foundDonation;
+        const currentAllergens = food_item.allergens || [];
         setCurrentItem({
           id,
           name: food_item.name,
-          quantity: quantity.toString(),
-          allergens: food_item.allergens ? food_item.allergens.split(',') : [],
+          quantity: quantity,
+          allergens: Array.isArray(currentAllergens) ? currentAllergens : String(currentAllergens).split(','),
           description: food_item.description || null,
           imageUrl: food_item.image_url,
         });
-        setShowItemList(true); 
         setShowAddAnotherForm(true);
       }
     }
-  }, [searchParams, getDonationById]);
+  }, [searchParams, user, donations, foodItems]);
 
   const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
     setCurrentItem(prev => ({ ...prev, [field]: value }));
@@ -93,7 +98,7 @@ function ManualDonationPageInner() {
 
     try {
       if (isEditMode && currentItem.id !== 'new') {
-        const donation = getDonationById(currentItem.id);
+        const donation = donations.find(d => d.id === currentItem.id);
         if (!donation) throw new Error('Donation not found');
 
         updateFoodItem({
@@ -186,32 +191,32 @@ function ManualDonationPageInner() {
   const handleBackClick = () => {
     if (showAddAnotherForm) {
       setShowAddAnotherForm(false);
-    } else if (showItemList) {
-      setShowItemList(false);
     } else {
       window.history.back();
     }
   };
+
+  const isFormVisible = !hasItems || showAddAnotherForm;
 
   return (
     <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto">
       <SecondaryNavbar 
         title="Add food item" 
         backHref="/donate"
-        onBackClick={showItemList || showAddAnotherForm ? handleBackClick : undefined}
+        onBackClick={hasItems || showAddAnotherForm ? handleBackClick : undefined}
       />
       <div className="px-6 pt-2">
         <Progress value={isEditMode ? 100 : 25} className="h-2 w-full" />
       </div>
       
-      {showItemList ? (
-        // Item List View (with optional add another form)
+      {hasItems && !showAddAnotherForm ? (
+        // Item List View
         <main className="flex-1 flex flex-col gap-6 p-6">
           <h2 className="text-lg font-semibold text-[#021d13]">
-            {isEditMode ? 'Edit food item' : 'Your donation:'}
+            Your donation:
           </h2>
           <div className="flex flex-col gap-4">
-            {isEditMode ? null : donationItems.map((item) => (
+            {donationItems.map((item) => (
               <ItemPreview
                 key={item.id}
                 name={item.name}
@@ -223,132 +228,89 @@ function ManualDonationPageInner() {
               />
             ))}
           </div>
-          
-          {showAddAnotherForm ? (
-            // Add Another Item Form
-            <div className="flex flex-col gap-6 mt-6">
-              <h3 className="text-lg font-semibold text-[#021d13]">
-                {currentItem.id === 'new' ? 'Add another food item' : 'Edit food item'}
-              </h3>
-              <div>
-                <label htmlFor="food-name-2" className="block text-label font-semibold mb-2">Name of food</label>
-                <Input 
-                  id="food-name-2" 
-                  placeholder="e.g. Bread, Rice, etc." 
-                  value={currentItem.name}
-                  onChange={(e) => handleCurrentItemChange('name', e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="description" className="block text-label font-semibold mb-2">Description</label>
-                <Input 
-                  id="description" 
-                  placeholder="e.g. A delicious and healthy meal."
-                  value={currentItem.description ?? ''}
-                  onChange={(e) => handleCurrentItemChange('description', e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="quantity-2" className="block text-label font-semibold mb-2">Quantity</label>
-                <Input 
-                  id="quantity-2" 
-                  type="number" 
-                  min={1} 
-                  placeholder="e.g. 5 (kg)" 
-                  value={currentItem.quantity}
-                  onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
-                />
-              </div>
-              <div className="mb-8">
-                <AllergensDropdown
-                  label="Allergies, intolerances & diets"
-                  options={["Lactose-free", "Vegan", "Halal", "Low-lactose"]}
-                  value={currentItem.allergens}
-                  onChange={(value) => handleCurrentItemChange('allergens', value)}
-                  hint="Select all that apply."
-                />
-              </div>
-              <div>
-                <PhotoUpload 
-                  onImageUpload={handleImageUpload} 
-                  uploadedImage={currentItem.imageUrl || null}
-                />
-              </div>
-            </div>
-          ) : (
-            !isEditMode && (
-              <button 
-                onClick={handleAddAnotherItem}
-                className="flex items-center justify-center gap-2 text-interactive font-semibold text-base py-1 border-b border-interactive self-center"
-              >
-                <span className="text-xl">+</span>
-                Add another item
-              </button>
-            )
-          )}
+
+          <button
+            onClick={handleAddAnotherItem}
+            className="flex items-center justify-center gap-2 py-2 text-interactive font-semibold border-b border-interactive"
+          >
+            <PlusIcon className="w-4 h-4" />
+            Add another item
+          </button>
         </main>
       ) : (
-        // Form View
+        // Add/Edit Form View
         <main className="flex-1 flex flex-col gap-6 p-6">
+          <h2 className="text-lg font-semibold text-[#021d13]">
+            {isEditMode ? 'Edit food item' : 'Add food item'}
+          </h2>
           <div>
             <label htmlFor="food-name" className="block text-label font-semibold mb-2">Name of food</label>
-            <Input 
-              id="food-name" 
-              placeholder="e.g. Bread, Rice, etc." 
+            <Input
+              id="food-name"
+              placeholder="e.g. Bread, Rice, etc."
               value={currentItem.name}
               onChange={(e) => handleCurrentItemChange('name', e.target.value)}
             />
           </div>
           <div>
             <label htmlFor="description" className="block text-label font-semibold mb-2">Description</label>
-            <Input 
-              id="description" 
+            <Input
+              id="description"
               placeholder="e.g. A delicious and healthy meal."
               value={currentItem.description ?? ''}
               onChange={(e) => handleCurrentItemChange('description', e.target.value)}
             />
           </div>
           <div>
-            <label htmlFor="quantity" className="block text-label font-semibold mb-2">Quantity</label>
-            <Input 
-              id="quantity" 
-              type="number" 
-              min={1} 
-              placeholder="e.g. 5 (kg)" 
+            <label htmlFor="quantity" className="block text-label font-semibold mb-2">Quantity (kg)</label>
+            <Input
+              id="quantity"
+              placeholder="e.g. 10"
               value={currentItem.quantity}
               onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
             />
           </div>
-          <div className="mb-8">
-            <AllergensDropdown
-              label="Allergies, intolerances & diets"
-              options={["Lactose-free", "Vegan", "Halal", "Low-lactose"]}
-              value={currentItem.allergens}
-              onChange={(value) => handleCurrentItemChange('allergens', value)}
-              hint="Select all that apply."
-            />
-          </div>
-          <div>
-            <PhotoUpload 
-              onImageUpload={handleImageUpload} 
-              uploadedImage={currentItem.imageUrl || null}
-            />
-          </div>
+
+          <AllergensDropdown
+            label="Allergens (optional)"
+            options={['Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
+            value={currentItem.allergens}
+            onChange={(v) => handleCurrentItemChange('allergens', v)}
+            placeholder="Select allergens"
+          />
+
+          <PhotoUpload
+            onImageUpload={handleImageUpload}
+            uploadedImage={currentItem.imageUrl}
+          />
         </main>
       )}
-      
-      <div className="flex-grow" />
 
-      <div className="p-6">
-        <Button
-          onClick={handleSaveItem}
-          disabled={isSaving || !currentItem.name.trim() || !currentItem.quantity.trim()}
-          variant="primary"
-          size="lg"
-          className="w-full"
+      <div className="sticky bottom-0 left-0 w-full bg-white p-6 mt-auto flex gap-4">
+        <Button 
+          variant="secondary" 
+          className="flex-1"
+          onClick={() => router.push('/donate')}
         >
-          {isSaving ? 'Saving...' : isEditMode ? 'Save changes' : 'Add to donation'}
+          Cancel
         </Button>
+        {isFormVisible ? (
+          <Button
+            onClick={handleSaveItem}
+            disabled={isSaving || !currentItem.name.trim() || !currentItem.quantity.trim()}
+            className="flex-1"
+          >
+            {isSaving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Add to donation'}
+          </Button>
+        ) : (
+          <Button
+            onClick={() => router.push('/donate/pickup-slot')}
+            disabled={isSaving || donationItems.length === 0}
+            className="flex-1"
+          >
+            Continue
+          </Button>
+        )}
       </div>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
@@ -358,7 +320,7 @@ function ManualDonationPageInner() {
           </DialogHeader>
           <DialogFooter>
             <Button
-              onClick={() => router.push('/donor/dashboard')}
+              onClick={() => router.push('/donate')}
               className="w-full"
             >
               Go back to Dashboard

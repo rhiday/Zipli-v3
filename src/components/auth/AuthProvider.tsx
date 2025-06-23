@@ -5,45 +5,45 @@
  * Provides authentication context and handles user session management
  */
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useDatabase, useDatabaseActions } from '@/store/databaseStore';
+import { usePathname, useRouter } from 'next/navigation';
+import { useDatabase } from '@/store/databaseStore';
+import type { User } from '@/store/databaseStore';
 
 // We can keep the Supabase types for compatibility if needed, or create our own
-import { Session, User } from '@supabase/supabase-js';
+import { Session } from '@supabase/supabase-js';
 
-interface AuthContextType {
-  user: any; // Using `any` for now to match our mock user structure
-  session: Session | null; // Session is not mocked, so it can remain null
-  isLoading: boolean;
-  signOut: () => Promise<void>;
+interface AuthProviderProps {
+  children: React.ReactNode;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  session: null,
-  isLoading: true,
-  signOut: async () => {},
-});
+interface AuthContextType {
+  user: User | null;
+  session: any;
+  isLoading: boolean;
+  signOut: () => Promise<void> | void;
+}
 
-export const useAuth = () => useContext(AuthContext);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+export const AuthProvider: React.FC<AuthProviderProps> = ({
   children,
 }) => {
-  const { currentUser, isInitialized } = useDatabase();
-  const { logout } = useDatabaseActions();
+  const currentUser = useDatabase(state => state.currentUser);
+  const isInitialized = useDatabase(state => state.isInitialized);
+  const logout = useDatabase(state => state.logout);
+  const pathname = usePathname();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // We are no longer loading from Supabase, but from our store.
-    // We are "loading" until the store is initialized.
     if (isInitialized) {
       setIsLoading(false);
     }
   }, [isInitialized]);
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     logout();
-    // No need to call supabase.auth.signOut() anymore
+    router.push('/auth/login');
   };
 
   const value = {
@@ -54,4 +54,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

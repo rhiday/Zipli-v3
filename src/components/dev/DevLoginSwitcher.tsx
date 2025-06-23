@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { Database } from '@/lib/supabase/types';
-import { useDatabaseActions } from '@/store/databaseStore';
+import { useDatabase } from '@/store/databaseStore';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 type UserRole = Database['public']['Enums']['user_role'];
 
 const testUsers = {
@@ -19,22 +25,19 @@ const testUsers = {
 
 export default function DevLoginSwitcher() {
   const router = useRouter();
-  const [loading, setLoading] = React.useState<string | null>(null);
+  const users = useDatabase(state => state.users);
+  const currentUser = useDatabase(state => state.currentUser);
+  const setCurrentUser = useDatabase(state => state.setCurrentUser);
+  const [loggingInAs, setLoggingInAs] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const { setCurrentUser } = useDatabaseActions();
 
-  const handleDevLogin = (roleKey: keyof typeof testUsers) => {
-    const user = testUsers[roleKey];
-    setLoading(roleKey);
-    setError(null);
+  React.useEffect(() => {
+    if (!loggingInAs || !currentUser) return;
 
-    console.log(`Bypassing Supabase login. Simulating login for: ${roleKey}`);
-    setCurrentUser(user.email);
+    const targetEmail = testUsers[loggingInAs as keyof typeof testUsers]?.email;
 
-    // Simulate a short delay for UX, then redirect
-    setTimeout(() => {
-      // Redirect based on role
-      switch (user.role) {
+    if (currentUser.email === targetEmail) {
+      switch (currentUser.role) {
         case 'food_donor':
           router.push('/donate');
           break;
@@ -47,8 +50,16 @@ export default function DevLoginSwitcher() {
           router.push('/dashboard');
           break;
       }
-      setLoading(null);
-    }, 500);
+      setLoggingInAs(null);
+    }
+  }, [currentUser, loggingInAs, router]);
+
+  const handleDevLogin = (roleKey: keyof typeof testUsers) => {
+    const user = testUsers[roleKey];
+    setError(null);
+    console.log(`Bypassing Supabase login. Simulating login for: ${roleKey}`);
+    setLoggingInAs(roleKey);
+    setCurrentUser(user.email);
   };
 
   // Only render in development
@@ -72,10 +83,10 @@ export default function DevLoginSwitcher() {
             size="sm"
             variant="secondary"
             onClick={() => handleDevLogin(key)}
-            disabled={loading === key}
+            disabled={loggingInAs === key}
             className="text-xs capitalize bg-gray-700 hover:bg-gray-600 text-white"
           >
-            {loading === key ? 'Logging in...' : key}
+            {loggingInAs === key ? 'Logging in...' : key}
           </Button>
         ))}
       </div>

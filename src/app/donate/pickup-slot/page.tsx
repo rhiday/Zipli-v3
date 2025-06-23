@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { EditIcon } from '@/components/ui/icons/EditIcon';
 import { DeleteIcon } from '@/components/ui/icons/DeleteIcon';
 import { useDonationStore } from '@/store/donation';
+import { useDatabase } from '@/store/databaseStore';
 
 const timeOptions = Array.from({ length: 48 }, (_, i) => {
   const hours = Math.floor(i / 2);
@@ -28,7 +29,8 @@ interface PickupSlot {
 
 export default function PickupSlotPage() {
   const router = useRouter();
-  const { pickupSlots, addPickupSlot, updatePickupSlot, deletePickupSlot } = useDonationStore();
+  const addFullDonation = useDatabase(state => state.addFullDonation);
+  const { donationItems, pickupSlots, addPickupSlot, updatePickupSlot, deletePickupSlot, clearDonation } = useDonationStore();
   const [currentSlot, setCurrentSlot] = useState<Omit<PickupSlot, 'id'> & { id: string | 'new' }>({
     id: 'new',
     date: undefined,
@@ -80,9 +82,17 @@ export default function PickupSlotPage() {
   const handleAddTimeSlotClick = () => {
     if (currentSlot.date && showAddForm) {
       handleSaveSlot();
+    } else {
+      setShowAddForm(true);
     }
-    setShowAddForm(true);
-  }
+  };
+
+  const handleSubmitDonation = () => {
+    if (pickupSlots.length === 0) return;
+    addFullDonation(donationItems, pickupSlots);
+    clearDonation();
+    router.push('/donate/summary');
+  };
 
   const isFormValid = currentSlot.date && currentSlot.startTime && currentSlot.endTime;
 
@@ -241,15 +251,15 @@ export default function PickupSlotPage() {
         </button>
       </main>
       
-      <div className="sticky bottom-0 left-0 w-full bg-white pt-4 pb-10 pr-6 flex justify-end z-10">
-        <button 
-          onClick={() => router.push('/donate/summary')}
+      <footer className="sticky bottom-0 left-0 w-full bg-white p-6 mt-auto">
+        <Button 
+          onClick={handleSubmitDonation}
           disabled={pickupSlots.length === 0}
-          className="bg-[#a6f175] text-[#021d13] font-manrope font-semibold rounded-full px-8 py-3 text-lg shadow-md hover:bg-[#c2f7a1] transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full"
         >
           Continue
-        </button>
-      </div>
+        </Button>
+      </footer>
     </div>
   );
 } 

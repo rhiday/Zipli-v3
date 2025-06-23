@@ -35,13 +35,20 @@ interface DonationState {
   addPickupSlot: (slot: Omit<PickupSlot, 'id'>) => void;
   updatePickupSlot: (slot: PickupSlot) => void;
   deletePickupSlot: (id: string) => void;
+
+  // Action to clear the store
+  clearDonation: () => void;
 }
 
-export const useDonationStore = create<DonationState>((set) => ({
+const initialState = {
   donationItems: [],
   pickupSlots: [],
   address: '',
   driverInstructions: '',
+};
+
+export const useDonationStore = create<DonationState>((set) => ({
+  ...initialState,
   setDonationItems: (items) => set({ donationItems: items }),
   setPickupSlots: (slots) => set({ pickupSlots: slots }),
   setAddress: (address) => set({ address }),
@@ -68,4 +75,7 @@ export const useDonationStore = create<DonationState>((set) => ({
   deletePickupSlot: (id) => set((state) => ({
     pickupSlots: state.pickupSlots.filter(slot => slot.id !== id),
   })),
+
+  // Clear action implementation
+  clearDonation: () => set({ ...initialState }),
 })); 
