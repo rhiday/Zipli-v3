@@ -19,7 +19,6 @@ import { jsPDF } from 'jspdf';
 import SummaryOverview from '@/components/SummaryOverview';
 import DonationCard from '@/components/donations/DonationCard';
 import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
-import { useAuth } from '@/components/auth/AuthProvider';
 
 type ProfileRow = {
     id: string;
@@ -37,7 +36,6 @@ export default function DonorDashboardPage(): React.ReactElement {
   const { currentUser, isInitialized } = useDatabase();
   const allDonations = useDatabase(state => state.donations);
   const foodItems = useDatabase(state => state.foodItems);
-  const { user } = useAuth();
 
   const [dashboardData, setDashboardData] = useState<DonorDashboardData>({ profile: null, donations: [] });
   const [loading, setLoading] = useState(true);
@@ -110,7 +108,7 @@ export default function DonorDashboardPage(): React.ReactElement {
     <div className="min-h-screen pb-20">
       <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'} />
 
-      <main className="relative z-20 mt-4 rounded-t-3xl md:rounded-t-none py-4 px-4 md:px-12 space-y-6">
+      <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         {/* This section is being removed as it's redundant with the header */}
         <section>
             <div className="flex justify-between items-center mb-4">
@@ -131,7 +129,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                   </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div className="grid grid-cols-2 gap-4 mt-6">
               {/* Total food offered */}
               <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
                 <div className="flex items-center gap-2 mb-2">

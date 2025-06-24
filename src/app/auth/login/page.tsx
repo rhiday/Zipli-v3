@@ -15,38 +15,43 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
-  const { users } = useDatabase();
-  const setCurrentUser = useDatabase(state => state.setCurrentUser);
+  const login = useDatabase(state => state.login);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Find the user in our mock database
-    const user = users.find(u => u.email === email);
-
-    if (user) {
-      // Set the current user in the global store
-      setCurrentUser(user.email);
+    try {
+      const response = await login(email, password);
       
-      // Redirect based on role
-      switch (user.role) {
-        case 'food_donor':
-          router.push('/donate');
-          break;
-        case 'food_receiver':
-          router.push('/feed');
-          break;
-        case 'city':
-          router.push('/dashboard');
-          break;
-        default:
-          console.warn(`Unknown user role: ${user.role}, redirecting to generic dashboard.`);
-          router.push('/dashboard');
+      if (response.error) {
+        setError(response.error);
+        setLoading(false);
+        return;
       }
-    } else {
-      setError('Invalid email or password.');
+
+      if (response.data?.user) {
+        const user = response.data.user;
+        
+        // Redirect based on role
+        switch (user.role) {
+          case 'food_donor':
+            router.push('/donate');
+            break;
+          case 'food_receiver':
+            router.push('/feed');
+            break;
+          case 'city':
+            router.push('/dashboard');
+            break;
+          default:
+            console.warn(`Unknown user role: ${user.role}, redirecting to generic dashboard.`);
+            router.push('/dashboard');
+        }
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
       setLoading(false);
     }
   };

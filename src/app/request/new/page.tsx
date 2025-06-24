@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { useDatabase } from '@/store/databaseStore';
 import { useForm } from 'react-hook-form';
 import { ChevronLeft, CalendarIcon, Mic, StopCircle, Brain, AlertTriangle } from 'lucide-react';
 import { format } from "date-fns";
@@ -68,6 +68,8 @@ export default function CreateRequestPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'voiceInput' | 'formDetails'>('voiceInput');
+  
+  const { currentUser, addRequest, isInitialized } = useDatabase();
 
   // Voice input states
   const [isRecording, setIsRecording] = useState(false);
@@ -205,9 +207,10 @@ export default function CreateRequestPage() {
     setServerError(null);
 
     try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-      if (!user) throw new Error('Not authenticated');
+      if (!currentUser) {
+        setServerError('You must be logged in to create a request.');
+        return;
+      }
 
       if (!data.notes || !data.pickup_date || !data.pickup_start_time || !data.pickup_end_time || !data.itemName) {
           setServerError('Please fill in item name, description/notes, date, start time, and end time.');
@@ -220,45 +223,34 @@ export default function CreateRequestPage() {
         return;
       }
 
-      const payload = {
-        user_id: user.id,
-        item_name: data.itemName,
-        quantity: data.quantity,
-        description: data.notes,
+      const requestData = {
+        user_id: currentUser.id,
+        description: `${data.itemName} - ${data.notes}`, // Combine item name and notes
         people_count: data.people_count,
         pickup_date: formattedPickupDate,
         pickup_start_time: data.pickup_start_time,
         pickup_end_time: data.pickup_end_time,
-        status: 'active',
+        status: 'active' as const,
         is_recurring: data.is_recurring,
-        pickup_instructions: data.pickup_instructions,
       };
 
-      const { data: newRequest, error: insertError } = await supabase
-        .from('requests')
-        .insert([payload])
-        .select()
-        .single();
+      const response = await addRequest(requestData);
 
-      if (insertError) {
-        logger.error('Supabase insert error for request:', { error: insertError, requestPayload: payload });
-        throw insertError;
+      if (response.error) {
+        setServerError(response.error);
+        return;
       }
 
-      if (newRequest) {
+      if (response.data) {
         router.push('/request/success');
       } else {
-        setServerError('Failed to create request, but no error was reported from insert.');
-        logger.warn('Request creation attempt returned no newRequest and no insertError.', { payload });
+        setServerError('Failed to create request, but no error was reported.');
       }
 
     } catch (err: any) {
       let displayedMessage = 'An error occurred while creating the request.';
       if (err && err.message) {
         displayedMessage = err.message;
-        // Append details and hint if they exist (common in Supabase errors)
-        if (typeof err.details === 'string' && err.details) displayedMessage += ` --- Details: ${err.details}`;
-        if (typeof err.hint === 'string' && err.hint) displayedMessage += ` --- Hint: ${err.hint}`;
       }
       logger.error('Error in onSubmit for request:', { error: err, formData: data });
       setServerError(displayedMessage);

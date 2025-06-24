@@ -2,20 +2,23 @@
 
 import React from "react";
 import QRLoginGenerator from "@/components/auth/QRLoginGenerator";
-import { useAuth } from "@/components/auth/AuthProvider";
+import { useDatabase } from "@/store/databaseStore";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function AdminQRLoginPage() {
-  const { user, isLoading } = useAuth();
+  const currentUser = useDatabase(state => state.currentUser);
+  const isInitialized = useDatabase(state => state.isInitialized);
   const router = useRouter();
+
+  const isLoading = !isInitialized;
 
   // Check if user is logged in and has admin access
   const isAuthorized =
     !isLoading &&
-    user &&
-    (user.email?.includes("city@zipli") || user.email?.includes("admin@zipli"));
+    currentUser &&
+    (currentUser.email?.includes("city@zipli") || currentUser.email?.includes("admin@zipli"));
 
   if (isLoading) {
     return (

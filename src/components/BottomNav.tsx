@@ -31,7 +31,7 @@ export default function BottomNav() {
   // TODO: Only render for specific roles or routes if needed
 
   return (
-    <nav className="fixed bottom-0 left-0 z-50 w-full h-[76px] border-t border-primary-10 bg-base shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.1)] md:hidden">
+    <nav className="absolute bottom-0 left-0 z-50 w-full h-[76px] border-t border-primary-10 bg-base shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.1)]">
       {/* Adjusted grid to 3 columns for Dashboard, Add, Explore */}
       <div className="mx-auto grid grid-cols-3 h-full max-w-lg items-center">
         {navItems.map((item, index) => renderNavItem(item, index))} 

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
+import { useDatabase } from '@/store/databaseStore';
 import { PlusIcon, SearchIcon, UsersIcon, CalendarIcon, HandshakeIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
@@ -13,12 +13,11 @@ type Request = {
   description: string;
   people_count: number;
   pickup_date: string;
-  pickup_time: string;
+  pickup_start_time: string;
+  pickup_end_time: string;
   status: string;
   created_at: string;
-  user: {
-    email: string;
-  } | null;
+  user_id: string;
 };
 
 export default function RequestsPage(): React.ReactElement {
@@ -26,32 +25,28 @@ export default function RequestsPage(): React.ReactElement {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed' | 'cancelled'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'fulfilled' | 'cancelled'>('all');
+  
+  const { isInitialized, getAllRequests, users } = useDatabase();
 
   useEffect(() => {
-    fetchRequests();
-  }, [statusFilter]);
+    if (isInitialized) {
+      fetchRequests();
+    }
+  }, [isInitialized, statusFilter]);
 
   const fetchRequests = async () => {
     try {
-      let query = supabase
-        .from('requests')
-        .select(`
-          *,
-          user:profiles(email)
-        `)
-        .order('created_at', { ascending: false });
-
+      const allRequests = getAllRequests();
+      
+      let filteredByStatus = allRequests;
       if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
+        filteredByStatus = allRequests.filter(req => req.status === statusFilter);
       }
 
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setRequests(data as Request[]);
+      setRequests(filteredByStatus);
     } catch (err: any) {
-      setError(err.message);
+      setError('Failed to load requests');
     } finally {
       setLoading(false);
     }
@@ -60,6 +55,11 @@ export default function RequestsPage(): React.ReactElement {
   const filteredRequests = requests.filter(request =>
     request.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getUserEmail = (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    return user?.email || 'Unknown user';
+  };
 
   if (loading) {
     return (
@@ -70,8 +70,8 @@ export default function RequestsPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <div className="min-h-screen bg-gray-50 p-6 max-w-md mx-auto">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-800">Food Requests</h1>
           <Link href="/request/new">
@@ -82,7 +82,7 @@ export default function RequestsPage(): React.ReactElement {
           </Link>
         </div>
 
-        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
+        <div className="flex flex-col space-y-4">
           <div className="relative flex-1">
             <Input
               type="text"
@@ -96,15 +96,15 @@ export default function RequestsPage(): React.ReactElement {
 
           <Select
             value={statusFilter}
-            onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'completed' | 'cancelled')}
+            onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'fulfilled' | 'cancelled')}
           >
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="fulfilled">Fulfilled</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
@@ -116,7 +116,7 @@ export default function RequestsPage(): React.ReactElement {
           </div>
         )}
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-4">
           {filteredRequests.map((request) => (
             <Link
               key={request.id}
@@ -128,7 +128,7 @@ export default function RequestsPage(): React.ReactElement {
                   <span className={`rounded-full px-2 py-1 text-xs font-medium ${
                     request.status === 'active'
                       ? 'bg-green-100 text-green-800'
-                      : request.status === 'completed'
+                      : request.status === 'fulfilled'
                       ? 'bg-gray-100 text-gray-800'
                       : 'bg-red-100 text-red-800'
                   }`}>
@@ -153,7 +153,8 @@ export default function RequestsPage(): React.ReactElement {
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     <span>{new Date(request.pickup_date).toLocaleDateString()}</span>
                   </div>
-                  <p>🕒 {request.pickup_time}</p>
+                  <p>🕒 {request.pickup_start_time} - {request.pickup_end_time}</p>
+                  <p className="text-xs">By: {getUserEmail(request.user_id)}</p>
                 </div>
               </div>
             </Link>

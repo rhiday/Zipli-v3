@@ -19,9 +19,11 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
-import { PlusIcon } from 'lucide-react';
-import { useAuth } from '@/components/auth/AuthProvider';
+import { PlusIcon, Clock, MapPin } from 'lucide-react';
+
 import DonationCard from '@/components/donations/DonationCard';
+import { Textarea } from '@/components/ui/Textarea';
+
 
 interface DonationItem {
   id: string;
@@ -40,7 +42,7 @@ function ManualDonationPageInner() {
   const updateFoodItem = useDatabase(state => state.updateFoodItem);
   const donations = useDatabase(state => state.donations);
   const foodItems = useDatabase(state => state.foodItems);
-  const { user } = useAuth();
+  const currentUser = useDatabase(state => state.currentUser);
 
   const [currentItem, setCurrentItem] = useState<Omit<DonationItem, 'id'> & { id: string | 'new' }>({
     id: 'new',
@@ -59,10 +61,10 @@ function ManualDonationPageInner() {
 
   useEffect(() => {
     const editItemId = searchParams.get('id');
-    if (editItemId && user) {
+    if (editItemId && currentUser) {
       setIsEditMode(true);
       const foundDonation = donations
-        .filter(d => d.id === editItemId && d.donor_id === user.id)
+        .filter(d => d.id === editItemId && d.donor_id === currentUser.id)
         .map(d => {
           const foodItem = foodItems.find(fi => fi.id === d.food_item_id);
           return { ...d, food_item: foodItem! };
@@ -82,7 +84,7 @@ function ManualDonationPageInner() {
         setShowAddAnotherForm(true);
       }
     }
-  }, [searchParams, user, donations, foodItems]);
+  }, [searchParams, currentUser, donations, foodItems]);
 
   const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
     setCurrentItem(prev => ({ ...prev, [field]: value }));

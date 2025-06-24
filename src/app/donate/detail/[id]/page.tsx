@@ -20,10 +20,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
-import { useAuth } from '@/components/auth/AuthProvider';
 
 export default function DonationDetailPage({ params }: { params: { id: string } }) {
-  const { user } = useAuth();
+  const currentUser = useDatabase(state => state.currentUser);
   const router = useRouter();
   const donations = useDatabase(state => state.donations);
   const foodItems = useDatabase(state => state.foodItems);
@@ -37,8 +36,8 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    if (user && params.id) {
-      const userDonations = donations.filter(d => d.donor_id === user.id);
+    if (currentUser && params.id) {
+      const userDonations = donations.filter(d => d.donor_id === currentUser.id);
       const mainDonation = userDonations.find(d => d.id === params.id);
 
       if (mainDonation) {
@@ -57,7 +56,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
       }
     }
     setLoading(false);
-  }, [user, params.id, donations, foodItems]);
+  }, [currentUser, params.id, donations, foodItems]);
 
   const handleRemoveListing = () => {
     if (!donation) return;
