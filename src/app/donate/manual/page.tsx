@@ -92,8 +92,6 @@ function ManualDonationPageInner() {
     const name = foodName.toLowerCase().trim();
     if (!name) return [];
 
-
-
     // Check if it matches an existing food item
     const existingFood = foodItems.find(item => 
       item.name.toLowerCase() === name ||
@@ -101,10 +99,12 @@ function ManualDonationPageInner() {
       name.includes(item.name.toLowerCase())
     );
     
-    if (existingFood && existingFood.allergens) {
-      return Array.isArray(existingFood.allergens) 
+    if (existingFood && existingFood.allergens && existingFood.allergens.length > 0) {
+      const allergens = Array.isArray(existingFood.allergens) 
         ? existingFood.allergens 
         : String(existingFood.allergens).split(',').map(a => a.trim());
+      // Filter out 'None' if other allergens are present
+      return allergens.filter(a => a.toLowerCase() !== 'none');
     }
 
     // Smart pattern matching for common food types
@@ -161,7 +161,7 @@ function ManualDonationPageInner() {
       'plant': ['None'],
       'vegetable': ['None'],
       'fruit': ['None'],
-      'salad': name.includes('nut') ? ['Tree nuts'] : ['None'],
+      'salad': name.includes('nut') ? ['Tree nuts'] : [],
     };
 
     // Check for pattern matches
@@ -171,7 +171,7 @@ function ManualDonationPageInner() {
       }
     }
 
-    return ['None']; // Default to None for unrecognized items
+    return []; // Default to empty for unrecognized items
   };
 
   const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
@@ -185,12 +185,16 @@ function ManualDonationPageInner() {
         setHasAttemptedSave(false);
       }
       
-      // Auto-suggest allergens when food name changes
+      // Auto-suggest allergens only if user hasn't set any allergens yet
       if (field === 'name' && value.trim() && prev.allergens.length === 0) {
         const suggestedAllergens = suggestAllergensForFood(value);
         if (suggestedAllergens.length > 0) {
           updated.allergens = suggestedAllergens;
+        } else {
+          updated.allergens = ['None']; // Default to 'None' if no suggestions
         }
+      } else if (field === 'name' && !value.trim()) {
+        updated.allergens = []; // Clear allergens if name is cleared
       }
       
       return updated;

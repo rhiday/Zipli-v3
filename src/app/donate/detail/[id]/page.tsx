@@ -34,6 +34,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (currentUser && params.id) {
@@ -101,15 +102,23 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        {donation.food_item.image_url ? (
+        {donation.food_item.image_url && !imageError ? (
           <Image
             src={donation.food_item.image_url}
             alt={donation.food_item.name}
             fill
             className="object-cover"
+            onError={() => setImageError(true)}
           />
         ) : (
-          <div className="h-full w-full bg-gray-200"></div>
+          <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+            <Image
+              src="/images/placeholder.svg"
+              alt="Placeholder image"
+              width={160}
+              height={160}
+            />
+          </div>
         )}
       </div>
 
@@ -123,16 +132,13 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
 
           {/* Tags */}
           <div className="mt-4 flex flex-wrap gap-2">
-            {donation.food_item.allergens && (
+            {donation.food_item.allergens &&
               (Array.isArray(donation.food_item.allergens)
                 ? donation.food_item.allergens
                 : String(donation.food_item.allergens).split(',')
               ).map((tag: string) => (
-                <Tag key={tag}>
-                  {tag.trim()}
-                </Tag>
-              ))
-            )}
+                <Tag key={tag}>{tag.trim()}</Tag>
+              ))}
           </div>
 
           <p className="mt-4 text-gray-600 leading-relaxed">{donation.food_item.description}</p>
