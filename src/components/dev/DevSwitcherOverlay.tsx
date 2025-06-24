@@ -1,9 +1,13 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import DevLoginSwitcher from './DevLoginSwitcher';
 
 export default function DevSwitcherOverlay() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+
+  const toggleOpen = useCallback(() => {
+    setOpen((v) => !v);
+  }, []);
 
   return (
     <>
@@ -15,8 +19,8 @@ export default function DevSwitcherOverlay() {
       <button
         type="button"
         aria-label={open ? 'Hide dev switcher' : 'Show dev switcher'}
-        onClick={() => setOpen((v) => !v)}
-        className={`fixed z-[100] bg-gray-800 text-white rounded-full shadow-lg p-2 hover:bg-gray-700 transition-all ${
+        onClick={toggleOpen}
+        className={`fixed z-[100] bg-gray-800 text-white rounded-full shadow-lg p-2 hover:bg-gray-700 transition-all duration-200 ${
           open ? 'bottom-[280px] right-4' : 'bottom-4 right-4'
         }`}
         style={{ pointerEvents: 'auto' }}
