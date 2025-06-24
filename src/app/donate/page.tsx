@@ -61,8 +61,13 @@ export default function DonorDashboardPage(): React.ReactElement {
     setLoading(true);
 
     if (!currentUser) {
-      router.push('/auth/login');
-      return;
+      // Add a small delay before redirecting to avoid race conditions
+      const timer = setTimeout(() => {
+        if (!currentUser) {
+          router.push('/auth/login');
+        }
+      }, 500);
+      return () => clearTimeout(timer);
     }
 
     const profile: ProfileRow = {

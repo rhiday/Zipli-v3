@@ -97,15 +97,13 @@ export default function PickupSlotPage() {
   const isFormValid = currentSlot.date && currentSlot.startTime && currentSlot.endTime;
 
   return (
-    <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto">
+    <div className="min-h-screen pb-20">
       <SecondaryNavbar title="Add pickup slot" backHref="/donate/manual" onBackClick={handleBackClick} />
       <div className="px-6 pt-2">
         <Progress value={50} className="h-2 w-full" />
       </div>
-
-      <main className="flex-1 flex flex-col gap-6 p-6">
+      <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         <h2 className="text-xl font-semibold">Pickup slot</h2>
-        
         <div className="flex flex-col gap-4">
           {pickupSlots.map(slot => (
             <div key={slot.id} className="flex items-center justify-between p-3 h-[56px] rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">

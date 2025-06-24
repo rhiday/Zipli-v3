@@ -9,13 +9,14 @@ import { SearchIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import DonationCard from '@/components/donations/DonationCard';
 
 // Simplified type for the feed
-type FeedItem = DonationWithFoodItem;
+type FeedItem = DonationWithFoodItem & { donorName: string; pickupTime?: string };
 
 export default function FeedPage(): React.ReactElement {
   const router = useRouter();
-  const { currentUser, donations, foodItems, isInitialized } = useDatabase();
+  const { currentUser, donations, foodItems, users, isInitialized } = useDatabase();
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,22 +29,31 @@ export default function FeedPage(): React.ReactElement {
       return;
     }
 
-    // Enrich donations with food item details
+    // Enrich donations with food item details and donor name
     const enrichedDonations = donations
-      .map(donation => {
+      .map((donation): FeedItem | null => {
         const foodItem = foodItems.find(fi => fi.id === donation.food_item_id);
-        return foodItem ? { ...donation, food_item: foodItem } : null;
+        const donor = users.find(u => u.id === donation.donor_id);
+        if (foodItem && donor) {
+          return {
+            ...donation,
+            food_item: foodItem,
+            donorName: donor.full_name,
+            pickupTime: (donation as any).pickup_time,
+          };
+        }
+        return null;
       })
-      .filter((d): d is DonationWithFoodItem => d !== null); // Type guard to filter out nulls
+      .filter((d): d is FeedItem => d !== null);
 
     // For now, the feed will just show all available donations.
     // We filter out donations made by the current user.
     const availableDonations = enrichedDonations
-      .filter(d => d.status === 'available' && d.donor_id !== currentUser.id);
+      .filter(d => d.status === 'available');
     
     setFeedItems(availableDonations);
     setLoading(false);
-  }, [isInitialized, currentUser, donations, foodItems, router]);
+  }, [isInitialized, currentUser, donations, foodItems, users, router]);
 
   const filteredItems = feedItems.filter(item => {
     const searchTermLower = searchTerm.toLowerCase();
@@ -62,7 +72,7 @@ export default function FeedPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen bg-cream p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-white px-[17px] py-4 md:py-6 lg:py-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-titleLg font-display text-primary">
@@ -81,38 +91,9 @@ export default function FeedPage(): React.ReactElement {
         </div>
 
         {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3">
             {filteredItems.map((item) => (
-              <Link key={item.id} href={`/donate/detail/${item.id}`} className="block group">
-                <div className="overflow-hidden rounded-xl border border-primary-10 bg-white shadow-sm transition-all duration-200 ease-in-out group-hover:shadow-md group-hover:-translate-y-0.5">
-                  <div className="relative h-48 w-full">
-                    {item.food_item.image_url ? (
-                      <Image
-                        src={item.food_item.image_url}
-                        alt={item.food_item.name}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gray-100">
-                        {/* Placeholder Icon */}
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="truncate font-semibold text-primary">
-                      {item.food_item.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-primary-75">
-                      {item.quantity} · {item.food_item.description}
-                    </p>
-                    {/* Simplified status display */}
-                    <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-positive">
-                      {item.status}
-                    </p>
-                  </div>
-                </div>
-              </Link>
+              <DonationCard key={item.id} donation={item} donorName={item.donorName} pickupTime={item.pickupTime} />
             ))}
           </div>
         ) : (

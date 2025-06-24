@@ -117,8 +117,8 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
   })();
 
   return (
-    <div className="min-h-screen bg-cream p-4 max-w-md mx-auto">
-      <div className="space-y-6">
+    <div className="min-h-screen pb-20">
+      <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         <div className="mb-6 flex items-center">
           <Button 
             variant="ghost" 
@@ -247,7 +247,7 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
             )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 } 

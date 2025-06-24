@@ -91,7 +91,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
   const donorName = 'A Generous Donor';
 
   return (
-    <div className="min-h-screen bg-white pb-24 font-sans max-w-md mx-auto">
+    <div className="min-h-screen pb-20">
       {/* Header with Image and Back Arrow */}
       <div className="relative h-60 w-full">
         <Button
@@ -113,108 +113,108 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
         )}
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 -mt-12 rounded-t-[20px] bg-white p-5">
-        <h1 className="text-2xl font-bold text-gray-900">{donation.food_item.name}</h1>
-        <div className="mt-2 flex items-center gap-2 text-gray-600">
-          <ShoppingBag className="h-5 w-5" />
-          <span className="font-medium">{donation.quantity} kg</span>
-        </div>
+      <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
+        <section>
+          <h1 className="text-2xl font-bold text-gray-900">{donation.food_item.name}</h1>
+          <div className="mt-2 flex items-center gap-2 text-gray-600">
+            <ShoppingBag className="h-5 w-5" />
+            <span className="font-medium">{donation.quantity} kg</span>
+          </div>
 
-        {/* Tags */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {donation.food_item.allergens && (
-            (Array.isArray(donation.food_item.allergens)
-              ? donation.food_item.allergens
-              : String(donation.food_item.allergens).split(',')
-            ).map((tag: string) => (
-              <Tag key={tag}>
-                {tag.trim()}
-              </Tag>
-            ))
-          )}
-        </div>
+          {/* Tags */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {donation.food_item.allergens && (
+              (Array.isArray(donation.food_item.allergens)
+                ? donation.food_item.allergens
+                : String(donation.food_item.allergens).split(',')
+              ).map((tag: string) => (
+                <Tag key={tag}>
+                  {tag.trim()}
+                </Tag>
+              ))
+            )}
+          </div>
 
-        <p className="mt-4 text-gray-600 leading-relaxed">{donation.food_item.description}</p>
+          <p className="mt-4 text-gray-600 leading-relaxed">{donation.food_item.description}</p>
 
-        <div className="mt-4 flex items-start gap-3 text-gray-600">
-          <MapPin className="h-5 w-5 flex-shrink-0" />
-          <span className="font-medium">Address not provided</span>
-        </div>
-        
-        {isOwner ? (
-          <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-            <div className="mt-6 flex items-center gap-3">
-              <DialogTrigger asChild>
+          <div className="mt-4 flex items-start gap-3 text-gray-600">
+            <MapPin className="h-5 w-5 flex-shrink-0" />
+            <span className="font-medium">Address not provided</span>
+          </div>
+
+          {isOwner ? (
+            <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+              <div className="mt-6 flex items-center gap-3">
+                <DialogTrigger asChild>
+                  <Button
+                    variant="destructive-outline"
+                    size="cta"
+                    className="flex-1"
+                  >
+                    <Trash2 className="h-5 w-5" /> Remove listing
+                  </Button>
+                </DialogTrigger>
                 <Button
-                  variant="destructive-outline"
+                  variant="primary"
                   size="cta"
                   className="flex-1"
+                  onClick={() => router.push(`/donate/manual?id=${donation.id}`)}
                 >
-                  <Trash2 className="h-5 w-5" /> Remove listing
+                  <Edit className="h-5 w-5" /> Edit listing
                 </Button>
-              </DialogTrigger>
+              </div>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Are you sure?</DialogTitle>
+                  <DialogDescription>
+                    This will permanently remove the listing from public view. This action cannot be undone.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
+                  <Button variant="destructive" onClick={handleRemoveListing}>Yes, remove</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <div className="mt-6">
               <Button
                 variant="primary"
                 size="cta"
-                className="flex-1"
-                onClick={() => router.push(`/donate/manual?id=${donation.id}`)}
+                className="w-full"
+                onClick={() => router.push(`/request/${params.id}`)}
               >
-                <Edit className="h-5 w-5" /> Edit listing
+                Request this donation
               </Button>
             </div>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Are you sure?</DialogTitle>
-                <DialogDescription>
-                  This will permanently remove the listing from public view. This action cannot be undone.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
-                <Button variant="destructive" onClick={handleRemoveListing}>Yes, remove</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        ) : (
-          <div className="mt-6">
-            <Button
-              variant="primary"
-              size="cta"
-              className="w-full"
-              onClick={() => router.push(`/request/${params.id}`)}
-            >
-              Request this donation
+          )}
+        </section>
+
+        <hr className="border-gray-100" />
+
+        {/* Other Donations by Same Donor */}
+        <section className="bg-gray-50 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <span className="text-lg font-semibold">{getInitials(donorName)}</span>
+              </Avatar>
+              <div>
+                <p className="font-semibold text-gray-900">{donorName}</p>
+                <p className="text-sm text-gray-500">{totalDonations} donations</p>
+              </div>
+            </div>
+            <Button variant="secondary" size="sm" onClick={() => alert('View profile not implemented')}>
+              View profile
             </Button>
           </div>
-        )}
-      </div>
-      
-      {/* Divider */}
-      <hr className="my-6 mx-5 border-gray-100" />
-
-      {/* Other Donations by Same Donor */}
-      <div className="bg-gray-50 p-5 mt-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Avatar>
-              <span className="text-lg font-semibold">{getInitials(donorName)}</span>
-            </Avatar>
-            <div>
-              <p className="font-semibold text-gray-900">{donorName}</p>
-              <p className="text-sm text-gray-500">{totalDonations} donations</p>
-            </div>
+          <div className="grid grid-cols-2 gap-4">
+            {otherDonations.map((otherDonation) => (
+              <DonationCard key={otherDonation.id} donation={otherDonation} />
+            ))}
           </div>
-          <Button variant="secondary" size="sm" onClick={() => alert('View profile not implemented')}>
-            View profile
-          </Button>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          {otherDonations.map((otherDonation) => (
-            <DonationCard key={otherDonation.id} donation={otherDonation} />
-          ))}
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 } 

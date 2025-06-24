@@ -34,6 +34,9 @@ export default function LoginPage() {
       if (response.data?.user) {
         const user = response.data.user;
         
+        // Small delay to ensure store state is updated before redirect
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         // Redirect based on role
         switch (user.role) {
           case 'food_donor':

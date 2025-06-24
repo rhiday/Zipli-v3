@@ -19,7 +19,10 @@ interface Donation {
   donor_id: string;
   quantity: string;
   status: string;
+  pickup_time: string;
   pickup_slots?: any[]; // Allow for pickup slots
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface User {
@@ -147,6 +150,7 @@ export const useDatabase = create<DatabaseState>()(
           contact_number: '+358123456789',
           address: 'Helsinki, Finland'
         })) as User[];
+
         
         const foodItemsWithIds = (foodItemsData as any[]).map((fi, i) => ({ ...fi, id: `food-item-${i + 1}` }));
         
@@ -292,6 +296,15 @@ export const useDatabase = create<DatabaseState>()(
         const { currentUser, foodItems, donations } = get();
         if (!currentUser) return;
 
+        // Helper to generate a random date within the last 7 days
+        function randomRecentISO() {
+          const now = new Date();
+          const daysAgo = Math.floor(Math.random() * 7);
+          const hoursAgo = Math.floor(Math.random() * 24);
+          const d = new Date(now.getTime() - (daysAgo * 24 + hoursAgo) * 60 * 60 * 1000);
+          return d.toISOString();
+        }
+
         const newFoodItems = items.map((item, index) => ({
           ...item,
           id: `food-item-${foodItems.length + index + 1}`,
@@ -303,12 +316,12 @@ export const useDatabase = create<DatabaseState>()(
           donor_id: currentUser.id,
           quantity: items[index].quantity,
           status: 'available',
+          pickup_time: items[index].pickup_time || randomRecentISO(),
           pickup_slots: slots,
           claimed_at: null,
           created_at: new Date().toISOString(),
           instructions_for_driver: null,
           picked_up_at: null,
-          pickup_time: null, 
           receiver_id: null,
           updated_at: new Date().toISOString(),
         }));
@@ -387,6 +400,12 @@ export const useDatabase = create<DatabaseState>()(
         requests: state.requests,
         currentUser: state.currentUser 
       }), // persist relevant data
+      onRehydrateStorage: () => (state) => {
+        // If state is empty after rehydration, initialize it with mock data
+        if (state && (!state.users || state.users.length === 0) && !state.isInitialized) {
+          state.init();
+        }
+      },
     }
   )
 ); 
