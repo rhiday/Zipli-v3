@@ -176,15 +176,37 @@ function ManualDonationPageInner() {
 
   const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
     setCurrentItem(prev => {
-      const updated = { ...prev, [field]: value };
-      
+      const updated: typeof prev = { ...prev, [field]: value };
+
       // Reset error state when user makes changes to required fields
-      if (hasAttemptedSave && ((field === 'allergens' && value.length > 0) || 
-          (field === 'name' && value.trim()) || 
-          (field === 'quantity' && value.trim()))) {
+      if (
+        hasAttemptedSave &&
+        ((field === 'allergens' && Array.isArray(value) && value.length > 0) ||
+          (field === 'name' && typeof value === 'string' && value.trim().length > 0) ||
+          (field === 'quantity' && typeof value === 'string' && value.trim().length > 0))
+      ) {
         setHasAttemptedSave(false);
       }
-      
+
+      // Auto-suggest allergens only if user hasn't set any allergens yet
+      if (
+        field === 'name' &&
+        typeof value === 'string' &&
+        value.trim().length > 0 &&
+        Array.isArray(prev.allergens) &&
+        prev.allergens.length === 0
+      ) {
+        const suggestedAllergens = suggestAllergensForFood(value);
+        if (Array.isArray(suggestedAllergens) && suggestedAllergens.length > 0) {
+          updated.allergens = suggestedAllergens;
+        }
+      }
+
+      // If name is cleared, clear allergens as well so user can start fresh
+      if (field === 'name' && typeof value === 'string' && value.trim().length === 0) {
+        updated.allergens = [];
+      }
+
       return updated;
     });
   };
@@ -329,11 +351,11 @@ function ManualDonationPageInner() {
       
       <AllergensDropdown
         label="Allergens"
-        options={['Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
+        options={['None', 'Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
         value={currentItem.allergens}
         onChange={(allergens) => handleCurrentItemChange('allergens', allergens)}
         placeholder="Select allergens"
-        error={undefined}
+        error={hasAttemptedSave && currentItem.allergens.length === 0 ? "Please select an allergen or 'None'" : undefined}
       />
 
       <PhotoUpload
