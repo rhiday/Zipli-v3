@@ -56,6 +56,7 @@ function ManualDonationPageInner() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
   
   const hasItems = donationItems.length > 0;
 
@@ -86,8 +87,114 @@ function ManualDonationPageInner() {
     }
   }, [searchParams, currentUser, donations, foodItems]);
 
+  // Smart allergen suggestions based on food name
+  const suggestAllergensForFood = (foodName: string): string[] => {
+    const name = foodName.toLowerCase().trim();
+    if (!name) return [];
+
+
+
+    // Check if it matches an existing food item
+    const existingFood = foodItems.find(item => 
+      item.name.toLowerCase() === name ||
+      item.name.toLowerCase().includes(name) ||
+      name.includes(item.name.toLowerCase())
+    );
+    
+    if (existingFood && existingFood.allergens) {
+      return Array.isArray(existingFood.allergens) 
+        ? existingFood.allergens 
+        : String(existingFood.allergens).split(',').map(a => a.trim());
+    }
+
+    // Smart pattern matching for common food types
+    const allergenSuggestions: { [key: string]: string[] } = {
+      // Dairy products
+      'milk': ['Milk'],
+      'cheese': ['Milk'],
+      'butter': ['Milk'],
+      'cream': ['Milk'],
+      'yogurt': ['Milk'],
+      'quark': ['Milk'],
+      
+      // Gluten/Wheat
+      'bread': ['Wheat'],
+      'pasta': ['Wheat'],
+      'pizza': ['Wheat', 'Milk'],
+      'noodles': ['Wheat'],
+      'flour': ['Wheat'],
+      'sandwich': ['Wheat'],
+      'wrap': ['Wheat'],
+      'pie': ['Wheat', 'Eggs'],
+      'cake': ['Wheat', 'Eggs', 'Milk'],
+      
+      // Fish & seafood
+      'fish': ['Fish'],
+      'salmon': ['Fish'],
+      'tuna': ['Fish'],
+      'cod': ['Fish'],
+      'shrimp': ['Shellfish'],
+      'crab': ['Shellfish'],
+      'lobster': ['Shellfish'],
+      'soup': ['Fish'], // Many soups contain fish stock
+      
+      // Nuts
+      'nuts': ['Tree nuts'],
+      'almond': ['Tree nuts'],
+      'walnut': ['Tree nuts'],
+      'peanut': ['Peanuts'],
+      'hazelnut': ['Tree nuts'],
+      
+      // Eggs
+      'egg': ['Eggs'],
+      'mayonnaise': ['Eggs'],
+      'meatball': ['Eggs', 'Wheat'],
+      
+      // Soy
+      'tofu': ['Soybeans'],
+      'soy': ['Soybeans'],
+      'miso': ['Soybeans'],
+      'tempeh': ['Soybeans'],
+      
+      // Vegan options
+      'vegan': ['None'],
+      'plant': ['None'],
+      'vegetable': ['None'],
+      'fruit': ['None'],
+      'salad': name.includes('nut') ? ['Tree nuts'] : ['None'],
+    };
+
+    // Check for pattern matches
+    for (const [pattern, allergens] of Object.entries(allergenSuggestions)) {
+      if (name.includes(pattern)) {
+        return allergens;
+      }
+    }
+
+    return ['None']; // Default to None for unrecognized items
+  };
+
   const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
-    setCurrentItem(prev => ({ ...prev, [field]: value }));
+    setCurrentItem(prev => {
+      const updated = { ...prev, [field]: value };
+      
+      // Reset error state when user makes changes to required fields
+      if (hasAttemptedSave && ((field === 'allergens' && value.length > 0) || 
+          (field === 'name' && value.trim()) || 
+          (field === 'quantity' && value.trim()))) {
+        setHasAttemptedSave(false);
+      }
+      
+      // Auto-suggest allergens when food name changes
+      if (field === 'name' && value.trim() && prev.allergens.length === 0) {
+        const suggestedAllergens = suggestAllergensForFood(value);
+        if (suggestedAllergens.length > 0) {
+          updated.allergens = suggestedAllergens;
+        }
+      }
+      
+      return updated;
+    });
   };
 
   const handleImageUpload = (imageUrl: string) => {
@@ -95,7 +202,8 @@ function ManualDonationPageInner() {
   };
 
   const handleSaveItem = async () => {
-    if (!currentItem.name.trim() || !currentItem.quantity.trim()) return;
+    setHasAttemptedSave(true);
+    if (!currentItem.name.trim() || !currentItem.quantity.trim() || currentItem.allergens.length === 0) return;
     setIsSaving(true);
 
     try {
@@ -141,6 +249,7 @@ function ManualDonationPageInner() {
           description: null,
           imageUrl: undefined,
         });
+        setHasAttemptedSave(false);
       }
     } catch (error) {
       console.error('Failed to save changes:', error);
@@ -160,6 +269,7 @@ function ManualDonationPageInner() {
       description: null,
       imageUrl: undefined,
     });
+    setHasAttemptedSave(false);
     setShowAddAnotherForm(true);
   };
 
@@ -273,16 +383,19 @@ function ManualDonationPageInner() {
           </div>
 
           <AllergensDropdown
-            label="Allergens (optional)"
-            options={['Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
+            label="Allergens"
+            options={['None', 'Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
             value={currentItem.allergens}
             onChange={(v) => handleCurrentItemChange('allergens', v)}
             placeholder="Select allergens"
+            error={hasAttemptedSave && currentItem.allergens.length === 0 ? "Please select allergens or choose 'None'" : undefined}
           />
 
           <PhotoUpload
+            isMobile={true}
             onImageUpload={handleImageUpload}
             uploadedImage={currentItem.imageUrl}
+            hint="Photos help receivers identify your food items"
           />
         </main>
       )}
@@ -298,7 +411,7 @@ function ManualDonationPageInner() {
         {isFormVisible ? (
           <Button
             onClick={handleSaveItem}
-            disabled={isSaving || !currentItem.name.trim() || !String(currentItem.quantity).trim()}
+            disabled={isSaving || !currentItem.name.trim() || !String(currentItem.quantity).trim() || currentItem.allergens.length === 0}
             className="flex-1"
           >
             {isSaving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Add to donation'}

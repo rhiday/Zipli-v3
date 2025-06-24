@@ -10,7 +10,7 @@ interface FoodItem {
   name: string;
   description: string;
   image_url: string;
-  allergens?: string;
+  allergens?: string | string[];
 }
 
 interface Donation {
@@ -308,6 +308,7 @@ export const useDatabase = create<DatabaseState>()(
         const newFoodItems = items.map((item, index) => ({
           ...item,
           id: `food-item-${foodItems.length + index + 1}`,
+          image_url: item.imageUrl || item.image_url || '',
         }));
 
         const newDonations = newFoodItems.map((foodItem, index) => ({

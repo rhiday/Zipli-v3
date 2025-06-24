@@ -17,16 +17,62 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
     }
   };
 
-  const handleFileSelect = (file: File) => {
-    if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
+  const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      
       const reader = new FileReader();
       reader.onload = (e) => {
-        const result = e.target?.result as string;
-        if (result && onImageUpload) {
-          onImageUpload(result);
-        }
+        img.src = e.target?.result as string;
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileSelect = async (file: File) => {
+    const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+    
+    if (!file) return;
+    
+    if (file.size > maxSizeInBytes) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+    
+    if (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp') {
+      try {
+        // Compress image for better performance
+        const compressedImage = await compressImage(file);
+        if (onImageUpload) {
+          onImageUpload(compressedImage);
+        }
+      } catch (error) {
+        // Fallback to original if compression fails
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          if (result && onImageUpload) {
+            onImageUpload(result);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    } else {
+      alert('Please select a JPEG, PNG, or WebP image file');
     }
   };
 
@@ -100,7 +146,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
                       </svg>
                     </div>
                     <div className="font-manrope text-[#021d13] text-[14px] text-center opacity-70 w-[146px]">
-                      Drag & drop or click to choose files
+                      {isMobile ? "Tap to take photo or choose file" : "Drag & drop or click to choose files"}
                     </div>
                     {hint && (
                       <div className="mt-2 flex items-center gap-2 text-[#021d13] text-xs font-manrope opacity-60">
@@ -118,7 +164,8 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png"
+                accept="image/jpeg,image/png,image/webp"
+                capture="environment"
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -129,7 +176,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
           </div>
         </div>
         <div className="w-full flex flex-row items-center justify-between text-[#021d13] text-[14px] font-manrope opacity-70">
-          <div>Supported formats: JPG, PNG</div>
+          <div>Supported formats: JPG, PNG, WebP</div>
           <div>Max: 5MB</div>
         </div>
       </div>
