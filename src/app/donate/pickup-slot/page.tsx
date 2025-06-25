@@ -68,15 +68,14 @@ export default function PickupSlotPage() {
     } else {
       updatePickupSlot(currentSlot as PickupSlot);
     }
-    
-    // Reset form for the next entry
+    // Always keep form open for next slot (unless editing)
     setCurrentSlot({
       id: 'new',
       date: undefined,
       startTime: '09:00',
       endTime: '14:00',
     });
-    setShowAddForm(false); // Hide form after adding, user can click to show again
+    setShowAddForm(true);
   };
 
   const handleDeleteSlot = (id: string) => {
@@ -206,20 +205,22 @@ export default function PickupSlotPage() {
                       </div>
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-56 p-0 bg-white border border-gray-200 rounded-lg shadow-lg">
-                    <div className="h-60 overflow-y-auto">
-                      {timeOptions.map(time => (
-                        <Button
-                          key={time}
-                          variant="ghost"
-                          className="w-full justify-center rounded-none font-normal text-sm text-black"
+                  <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                    <div className="max-h-60 overflow-y-auto">
+                      {timeOptions.map((option) => (
+                        <div
+                          key={option}
+                          className={cn(
+                            'px-4 py-2 cursor-pointer hover:bg-[#eafcd6] text-black',
+                            currentSlot.startTime === option && 'bg-[#eafcd6] font-semibold'
+                          )}
                           onClick={() => {
-                            handleCurrentSlotChange('startTime', time);
+                            handleCurrentSlotChange('startTime', option);
                             setOpenPopover(null);
                           }}
                         >
-                          {time}
-                        </Button>
+                          {option}
+                        </div>
                       ))}
                     </div>
                   </PopoverContent>
@@ -238,38 +239,43 @@ export default function PickupSlotPage() {
                       </div>
                     </Button>
                   </PopoverTrigger>
-                   <PopoverContent className="w-56 p-0 bg-white border border-gray-200 rounded-lg shadow-lg">
-                    <div className="h-60 overflow-y-auto">
-                      {timeOptions.map(time => (
-                        <Button
-                          key={time}
-                          variant="ghost"
-                          className="w-full justify-center rounded-none font-normal text-sm text-black"
+                  <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                    <div className="max-h-60 overflow-y-auto">
+                      {timeOptions.map((option) => (
+                        <div
+                          key={option}
+                          className={cn(
+                            'px-4 py-2 cursor-pointer hover:bg-[#eafcd6] text-black',
+                            currentSlot.endTime === option && 'bg-[#eafcd6] font-semibold'
+                          )}
                           onClick={() => {
-                            handleCurrentSlotChange('endTime', time);
+                            handleCurrentSlotChange('endTime', option);
                             setOpenPopover(null);
                           }}
                         >
-                          {time}
-                        </Button>
+                          {option}
+                        </div>
                       ))}
                     </div>
                   </PopoverContent>
                 </Popover>
               </div>
             </div>
+            <div className="flex justify-center mt-2">
+              <button
+                type="button"
+                onClick={handleSaveSlot}
+                disabled={!isFormValid}
+                className={
+                  `text-interactive font-semibold text-base underline underline-offset-4 px-2 py-1 rounded transition-colors ` +
+                  (isFormValid ? 'hover:bg-[#eafcd6] cursor-pointer' : 'text-gray-400 cursor-not-allowed')
+                }
+              >
+                + Add another
+              </button>
+            </div>
           </div>
         )}
-
-        <button
-          onClick={handleAddTimeSlotClick}
-          className="flex items-center justify-center gap-2 text-interactive font-semibold text-base self-center"
-        >
-          <span className="flex items-center gap-2 border-b border-interactive pb-1">
-            <span className="text-xl">+</span>
-            Add another
-          </span>
-        </button>
       </main>
       
       <footer className="px-4 pb-6 pt-4 bg-white">

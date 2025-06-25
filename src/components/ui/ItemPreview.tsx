@@ -32,7 +32,7 @@ export const ItemPreview: React.FC<ItemPreviewProps> = ({ name, quantity, descri
       <div className="flex-1 min-w-0">
         <p className="text-base font-semibold text-earth truncate">{name}</p>
         <p className="text-sm text-gray-500 truncate">
-          {description ? `${description} · Qty: ${quantity}` : `Qty: ${quantity}`}
+          {description && description !== name ? `${description} · Qty: ${quantity}` : `Qty: ${quantity}`}
         </p>
         {allergens && allergens.length > 0 && (
           <p className="text-sm text-gray-500 truncate">

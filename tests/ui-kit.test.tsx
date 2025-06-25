@@ -1,10 +1,11 @@
+// 🚨 Snapshot test to freeze the PickupSlotPage UI layout. If this test fails, review any UI changes carefully before updating the snapshot.
+import React from 'react';
+import { render } from '@testing-library/react';
+import PickupSlotPage from '../src/app/donate/pickup-slot/page';
 
-import { render, screen } from '@testing-library/react';
-import { PrimaryButton } from '@/components/ui-kit';
-
-describe('PrimaryButton', () => {
-  it('renders correctly', () => {
-    render(<PrimaryButton>Test Button</PrimaryButton>);
-    expect(screen.getByText('Test Button')).toBeInTheDocument();
+describe('PickupSlotPage UI', () => {
+  it('renders the pickup slot UI and matches the snapshot', () => {
+    const { container } = render(<PickupSlotPage />);
+    expect(container).toMatchSnapshot();
   });
 });
