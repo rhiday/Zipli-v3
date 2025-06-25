@@ -305,131 +305,125 @@ function ManualDonationPageInner() {
   };
 
   const handleBackClick = () => {
-    if (showAddAnotherForm) {
-      setShowAddAnotherForm(false);
+    if (isEditMode) {
+      router.push('/donor/dashboard');
     } else {
-      window.history.back();
+      router.back();
     }
   };
 
   const isFormVisible = !hasItems || showAddAnotherForm;
 
-  return (
-    <div className="min-h-screen pb-20">
-      <SecondaryNavbar 
-        title="Add food item" 
-        backHref="/donate"
-        onBackClick={hasItems || showAddAnotherForm ? handleBackClick : undefined}
-      />
-      <div className="px-6 pt-2">
-        <Progress value={isEditMode ? 100 : 25} className="h-2 w-full" />
+  const formContent = (
+    <div className="flex flex-col gap-4">
+      <div>
+        <label htmlFor="name" className="text-sm font-medium text-gray-700">Name of food</label>
+        <Input
+          id="name"
+          value={currentItem.name}
+          onChange={(e) => handleCurrentItemChange('name', e.target.value)}
+          placeholder="e.g. Bread, Rice, etc."
+          className={hasAttemptedSave && !currentItem.name ? "border-red-500" : ""}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="quantity" className="text-sm font-medium text-gray-700">Quantity (kg)</label>
+        <Input
+          id="quantity"
+          type="number"
+          value={currentItem.quantity}
+          onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
+          placeholder="e.g. 10"
+          className={hasAttemptedSave && !currentItem.quantity ? "border-red-500" : ""}
+        />
       </div>
       
-      {hasItems && !showAddAnotherForm ? (
-        <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
-          <h2 className="text-lg font-semibold text-[#021d13]">
-            Your donation:
-          </h2>
+      <AllergensDropdown
+        label="Allergens"
+        options={['None', 'Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
+        value={currentItem.allergens}
+        onChange={(allergens) => handleCurrentItemChange('allergens', allergens)}
+        placeholder="Select allergens"
+        error={hasAttemptedSave && currentItem.allergens.length === 0 ? "Please select an allergen or 'None'" : undefined}
+      />
+
+      <PhotoUpload
+        onImageUpload={handleImageUpload}
+        uploadedImage={currentItem.imageUrl}
+        hint="Photos help receivers identify your food items"
+      />
+
+      <div>
+        <label htmlFor="description" className="text-sm font-medium text-gray-700">Description</label>
+        <Textarea
+          id="description"
+          value={currentItem.description || ''}
+          onChange={(e) => handleCurrentItemChange('description', e.target.value)}
+          placeholder="e.g. A delicious and healthy meal."
+        />
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col h-dvh bg-white">
+      <SecondaryNavbar 
+        title={isEditMode ? "Edit food item" : "Add food item"} 
+        onBackClick={handleBackClick}
+        backHref="#" // Dummy href, onBackClick will override
+      />
+      
+      <main className="flex-grow overflow-y-auto p-4">
+        {hasItems && !showAddAnotherForm ? (
           <div className="flex flex-col gap-4">
-            {donationItems.map((item) => (
-              <ItemPreview
+            <h2 className="text-lg font-semibold">Current Items in Donation</h2>
+            {donationItems.map(item => (
+              <ItemPreview 
                 key={item.id}
                 name={item.name}
                 quantity={item.quantity}
-                description={item.description ?? undefined}
+                description={item.description || undefined}
                 imageUrl={item.imageUrl}
                 onEdit={() => handleEditItem(item.id)}
                 onDelete={() => handleDeleteItem(item.id)}
               />
             ))}
+            <div className="flex flex-col items-center gap-4">
+              <button
+                onClick={handleAddAnotherItem}
+                className="flex items-center justify-center gap-2 text-interactive font-semibold text-base self-center"
+              >
+                <span className="flex items-center gap-2 border-b border-interactive pb-1">
+                  <PlusIcon size={20} />
+                  Add another item
+                </span>
+              </button>
+            </div>
           </div>
-
-          <button
-            onClick={handleAddAnotherItem}
-            className="flex items-center justify-center gap-2 py-2 text-interactive font-semibold border-b border-interactive"
-          >
-            <PlusIcon className="w-4 h-4" />
-            Add another item
-          </button>
-        </main>
-      ) : (
-        // Add/Edit Form View
-        <main className="flex-1 flex flex-col gap-6 p-6">
-          <h2 className="text-lg font-semibold text-[#021d13]">
-            {isEditMode ? 'Edit food item' : 'Add food item'}
-          </h2>
-          <div>
-            <label htmlFor="food-name" className="block text-label font-semibold mb-2">Name of food</label>
-            <Input
-              id="food-name"
-              placeholder="e.g. Bread, Rice, etc."
-              value={currentItem.name}
-              onChange={(e) => handleCurrentItemChange('name', e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="description" className="block text-label font-semibold mb-2">Description</label>
-            <Input
-              id="description"
-              placeholder="e.g. A delicious and healthy meal."
-              value={currentItem.description ?? ''}
-              onChange={(e) => handleCurrentItemChange('description', e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="quantity" className="block text-label font-semibold mb-2">Quantity (kg)</label>
-            <Input
-              id="quantity"
-              placeholder="e.g. 10"
-              value={currentItem.quantity}
-              onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
-            />
-          </div>
-
-          <AllergensDropdown
-            label="Allergens"
-            options={['None', 'Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
-            value={currentItem.allergens}
-            onChange={(v) => handleCurrentItemChange('allergens', v)}
-            placeholder="Select allergens"
-            error={hasAttemptedSave && currentItem.allergens.length === 0 ? "Please select allergens or choose 'None'" : undefined}
-          />
-
-          <PhotoUpload
-            isMobile={true}
-            onImageUpload={handleImageUpload}
-            uploadedImage={currentItem.imageUrl}
-            hint="Photos help receivers identify your food items"
-          />
-        </main>
-      )}
-
-      <div className="sticky bottom-0 left-0 w-full bg-white p-6 mt-auto flex gap-4">
-        <Button 
-          variant="secondary" 
-          className="flex-1"
-          onClick={() => router.push('/donate')}
-        >
-          Cancel
-        </Button>
-        {isFormVisible ? (
-          <Button
-            onClick={handleSaveItem}
-            disabled={isSaving || !currentItem.name.trim() || !String(currentItem.quantity).trim() || currentItem.allergens.length === 0}
-            className="flex-1"
-          >
-            {isSaving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Add to donation'}
-          </Button>
         ) : (
-          <Button
-            onClick={() => router.push('/donate/pickup-slot')}
-            disabled={isSaving || donationItems.length === 0}
-            className="flex-1"
-          >
-            Continue
-          </Button>
+          <div>
+            <Progress value={(donationItems.length + 1) * 50} className="mb-4" />
+            {formContent}
+          </div>
         )}
-      </div>
+      </main>
+      
+      <footer className="px-4 pb-6 pt-4 bg-white">
+        {hasItems && !showAddAnotherForm ? (
+          <div className="flex justify-end">
+            <Button onClick={() => router.push('/donate/pickup-slot')}>
+              Continue
+            </Button>
+          </div>
+        ) : (
+          <div className="flex justify-end">
+            <Button onClick={handleSaveItem} disabled={isSaving}>
+              {isSaving ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Add item')}
+            </Button>
+          </div>
+        )}
+      </footer>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent>

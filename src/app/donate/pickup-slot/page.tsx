@@ -97,12 +97,12 @@ export default function PickupSlotPage() {
   const isFormValid = currentSlot.date && currentSlot.startTime && currentSlot.endTime;
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="flex flex-col h-dvh bg-white">
       <SecondaryNavbar title="Add pickup slot" backHref="/donate/manual" onBackClick={handleBackClick} />
-      <div className="px-6 pt-2">
+      <div className="px-4 pt-2">
         <Progress value={50} className="h-2 w-full" />
       </div>
-      <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
+      <main className="flex flex-col flex-grow overflow-y-auto p-4 gap-6">
         <h2 className="text-xl font-semibold">Pickup slot</h2>
         <div className="flex flex-col gap-4">
           {pickupSlots.map(slot => (
@@ -240,22 +240,20 @@ export default function PickupSlotPage() {
           </div>
         )}
 
-        <button 
+        <button
           onClick={handleAddTimeSlotClick}
-          className="flex items-center justify-center gap-2 text-interactive font-semibold text-base py-1 border-b border-interactive self-center"
+          className="flex items-center justify-center gap-2 text-interactive font-semibold text-base self-center"
         >
-          <span className="text-xl">+</span>
-          Save slot and add another
+          <span className="flex items-center gap-2 border-b border-interactive pb-1">
+            <span className="text-xl">+</span>
+            Save slot and add another
+          </span>
         </button>
       </main>
       
-      <footer className="sticky bottom-0 left-0 w-full bg-white p-6 mt-auto">
-        <Button 
-          onClick={handleSubmitDonation}
-          disabled={pickupSlots.length === 0}
-          className="w-full"
-        >
-          Continue
+      <footer className="px-4 pb-6 pt-4 bg-white">
+        <Button onClick={handleSubmitDonation} disabled={pickupSlots.length === 0} className="w-full">
+          Confirm pickup details
         </Button>
       </footer>
     </div>
