@@ -18,7 +18,7 @@ interface AllergensDropdownProps {
 export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   label,
   options,
-  value,
+  value = [],
   onChange,
   error,
   hint,

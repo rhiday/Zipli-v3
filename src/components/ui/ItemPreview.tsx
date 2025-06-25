@@ -7,32 +7,38 @@ interface ItemPreviewProps {
   quantity: string;
   description?: string;
   imageUrl?: string;
+  allergens?: string[];
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
-export const ItemPreview: React.FC<ItemPreviewProps> = ({ name, quantity, description, imageUrl, onEdit, onDelete }) => {
+export const ItemPreview: React.FC<ItemPreviewProps> = ({ name, quantity, description, imageUrl, allergens, onEdit, onDelete }) => {
   return (
     <div className="flex justify-center items-center w-full p-[12px_14px_12px_12px] gap-[18px] rounded-[12px] border border-[#D9DBD5] bg-[#F5F9EF]">
       <div 
-        className="bg-cover bg-center bg-no-repeat rounded-md shrink-0 size-[79px] bg-gray-100 flex items-center justify-center"
+        className="bg-cover bg-center bg-no-repeat rounded-md shrink-0 size-[79px] bg-gray-100 flex items-center justify-center overflow-hidden"
         style={{
           backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
         }}
       >
         {!imageUrl && (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C13.1046 2 14 2.89543 14 4C14 5.10457 13.1046 6 12 6C10.8954 6 10 5.10457 10 4C10 2.89543 10.8954 2 12 2Z" fill="#6B7280"/>
-            <path d="M21 8V18C21 19.1046 20.1046 20 19 20H5C3.89543 20 3 19.1046 3 18V8C3 6.89543 3.89543 6 5 6H7L8.5 4H15.5L17 6H19C20.1046 6 21 6.89543 21 8ZM19 8H17H15.5L14 6H10L8.5 8H7H5V18H19V8Z" fill="#6B7280"/>
-            <path d="M17 11H13V15H11V11H7V9H11V5H13V9H17V11Z" fill="#6B7280"/>
-          </svg>
+          <img
+            src="/images/placeholder.svg"
+            alt="Placeholder image"
+            className="w-full h-full object-cover"
+          />
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+        <p className="text-base font-semibold text-earth truncate">{name}</p>
         <p className="text-sm text-gray-500 truncate">
           {description ? `${description} · Qty: ${quantity}` : `Qty: ${quantity}`}
         </p>
+        {allergens && allergens.length > 0 && (
+          <p className="text-sm text-gray-500 truncate">
+            Allergens: {allergens.join(', ')}
+          </p>
+        )}
       </div>
       <div className="flex flex-row gap-2 items-center shrink-0">
         {onEdit && (

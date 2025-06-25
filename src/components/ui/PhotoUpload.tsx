@@ -99,7 +99,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
   };
 
   return (
-    <div className={isMobile ? 'w-full' : 'w-[400px] max-w-full'}>
+    <div className="w-full">
       <div className="flex flex-col gap-3 w-full">
         <div className="w-full">
           <div className="flex flex-col gap-[13px] w-full">

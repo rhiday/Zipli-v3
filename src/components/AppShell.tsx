@@ -18,7 +18,11 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
   }, [init]);
 
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
-  const hideBottomNav = pathname.startsWith('/donate/new') || pathname.startsWith('/donate/manual');
+
+  // Hides bottom nav on all pages within the donation creation flow.
+  const donationFlowRegex =
+    /^\/donate\/(new|manual|pickup-slot|summary|thank-you|detail|[^/]+\/handover-confirm)/;
+  const hideBottomNav = donationFlowRegex.test(pathname);
 
   return (
     <AuthProvider>
@@ -31,7 +35,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
         <div className="min-h-screen bg-cream">
           <div className="relative mx-auto flex h-screen w-full max-w-lg flex-col bg-base shadow-lg">
             {/* Main content container */}
-            <main className="flex-grow overflow-y-auto pb-[76px]">
+            <main className={`flex-grow overflow-y-auto ${!hideBottomNav ? 'pb-[76px]' : ''}`}>
               {children}
             </main>
             {/* BottomNav is now part of this container and positioned absolutely */}

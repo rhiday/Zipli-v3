@@ -385,6 +385,7 @@ function ManualDonationPageInner() {
                 quantity={item.quantity}
                 description={item.description || undefined}
                 imageUrl={item.imageUrl}
+                allergens={item.allergens}
                 onEdit={() => handleEditItem(item.id)}
                 onDelete={() => handleDeleteItem(item.id)}
               />

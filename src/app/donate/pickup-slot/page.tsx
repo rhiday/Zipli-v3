@@ -31,6 +31,18 @@ export default function PickupSlotPage() {
   const router = useRouter();
   const addFullDonation = useDatabase(state => state.addFullDonation);
   const { donationItems, pickupSlots, addPickupSlot, updatePickupSlot, deletePickupSlot, clearDonation } = useDonationStore();
+
+  // Helper function to safely format dates
+  const formatSlotDate = (date: Date | undefined | string) => {
+    if (!date) return null;
+    try {
+      const dateObj = date instanceof Date ? date : new Date(date);
+      if (isNaN(dateObj.getTime())) return null;
+      return format(dateObj, 'dd.M.yyyy');
+    } catch {
+      return null;
+    }
+  };
   const [currentSlot, setCurrentSlot] = useState<Omit<PickupSlot, 'id'> & { id: string | 'new' }>({
     id: 'new',
     date: undefined,
@@ -38,7 +50,7 @@ export default function PickupSlotPage() {
     endTime: '14:00',
   });
   const [openPopover, setOpenPopover] = useState<string | null>(null);
-  const [showAddForm, setShowAddForm] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(pickupSlots.length === 0);
 
   const handleBackClick = () => {
     router.back();
@@ -80,17 +92,26 @@ export default function PickupSlotPage() {
   };
   
   const handleAddTimeSlotClick = () => {
-    if (currentSlot.date && showAddForm) {
-      handleSaveSlot();
-    } else {
-      setShowAddForm(true);
-    }
+    setShowAddForm(true);
   };
 
   const handleSubmitDonation = () => {
-    if (pickupSlots.length === 0) return;
+    // Auto-save current slot if form is filled out
+    if (currentSlot.date && currentSlot.startTime && currentSlot.endTime && showAddForm) {
+      if (currentSlot.id === 'new') {
+        addPickupSlot(currentSlot);
+      } else {
+        updatePickupSlot(currentSlot as PickupSlot);
+      }
+    }
+    
+    // Check if we have at least one slot (including the one we just saved)
+    const totalSlots = pickupSlots.length + (currentSlot.date && showAddForm ? 1 : 0);
+    if (totalSlots === 0) return;
+    
     addFullDonation(donationItems, pickupSlots);
-    clearDonation();
+    // Don't clear donation store yet - summary page needs it
+    // clearDonation();
     router.push('/donate/summary');
   };
 
@@ -108,7 +129,7 @@ export default function PickupSlotPage() {
           {pickupSlots.map(slot => (
             <div key={slot.id} className="flex items-center justify-between p-3 h-[56px] rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
               <span className="font-semibold text-interactive">
-                {slot.date ? `${format(slot.date, 'dd.M.yyyy')}, ${slot.startTime} - ${slot.endTime}` : ''}
+                {formatSlotDate(slot.date) ? `${formatSlotDate(slot.date)}, ${slot.startTime} - ${slot.endTime}` : 'Date not set'}
               </span>
               <div className="flex items-center gap-2">
                 <button onClick={() => handleEditSlot(slot.id)} className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5" aria-label="Edit">
@@ -140,26 +161,26 @@ export default function PickupSlotPage() {
             )}
             {/* Date Picker */}
             <div>
-              <label className="block text-label font-semibold mb-2">Select a day</label>
+              <label className="block text-black font-semibold mb-2">Select a day</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="secondary"
                     className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
                   >
-                    {currentSlot.date ? (
-                      <span className="text-primary">{format(currentSlot.date, 'dd/MM/yyyy')}</span>
+                    {currentSlot.date && currentSlot.date instanceof Date && !isNaN(currentSlot.date.getTime()) ? (
+                      <span className="text-black">{format(currentSlot.date, 'dd/MM/yyyy')}</span>
                     ) : (
-                      <span className="text-primary-75">DD/MM/YYYY</span>
+                      <span className="text-gray-400">DD/MM/YYYY</span>
                     )}
                     <div className="pointer-events-none">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
-                        <CalendarIcon className="h-4 w-4 text-primary-75" />
+                        <CalendarIcon className="h-4 w-4 text-gray-400" />
                       </div>
                     </div>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-base border-primary-25" align="start">
+                <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
                   <Calendar
                     mode="single"
                     selected={currentSlot.date}
@@ -173,25 +194,25 @@ export default function PickupSlotPage() {
             {/* Time Pickers */}
             <div className="grid grid-cols-2 gap-4">
                <div>
-                <label className="block text-label font-semibold mb-2">Start time</label>
+                <label className="block text-black font-semibold mb-2">Start time</label>
                 <Popover open={openPopover === 'start'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'start' : null)}>
                   <PopoverTrigger asChild>
                     <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
-                      <span className="text-primary">{currentSlot.startTime}</span>
+                      <span className="text-black">{currentSlot.startTime}</span>
                       <div className="pointer-events-none">
                         <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
-                          <ClockIcon className="h-4 w-4 text-primary-75" />
+                          <ClockIcon className="h-4 w-4 text-gray-400" />
                         </div>
                       </div>
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-56 p-0 bg-white border border-primary-25 rounded-lg shadow-lg">
+                  <PopoverContent className="w-56 p-0 bg-white border border-gray-200 rounded-lg shadow-lg">
                     <div className="h-60 overflow-y-auto">
                       {timeOptions.map(time => (
                         <Button
                           key={time}
                           variant="ghost"
-                          className="w-full justify-center rounded-none font-manrope font-normal text-sm text-primary"
+                          className="w-full justify-center rounded-none font-normal text-sm text-black"
                           onClick={() => {
                             handleCurrentSlotChange('startTime', time);
                             setOpenPopover(null);
@@ -205,25 +226,25 @@ export default function PickupSlotPage() {
                 </Popover>
               </div>
               <div>
-                <label className="block text-label font-semibold mb-2">End time</label>
+                <label className="block text-black font-semibold mb-2">End time</label>
                 <Popover open={openPopover === 'end'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'end' : null)}>
                   <PopoverTrigger asChild>
                     <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
-                      <span className="text-primary">{currentSlot.endTime}</span>
+                      <span className="text-black">{currentSlot.endTime}</span>
                       <div className="pointer-events-none">
                         <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
-                          <ClockIcon className="h-4 w-4 text-primary-75" />
+                          <ClockIcon className="h-4 w-4 text-gray-400" />
                         </div>
                       </div>
                     </Button>
                   </PopoverTrigger>
-                   <PopoverContent className="w-56 p-0 bg-white border border-primary-25 rounded-lg shadow-lg">
+                   <PopoverContent className="w-56 p-0 bg-white border border-gray-200 rounded-lg shadow-lg">
                     <div className="h-60 overflow-y-auto">
                       {timeOptions.map(time => (
                         <Button
                           key={time}
                           variant="ghost"
-                          className="w-full justify-center rounded-none font-manrope font-normal text-sm text-primary"
+                          className="w-full justify-center rounded-none font-normal text-sm text-black"
                           onClick={() => {
                             handleCurrentSlotChange('endTime', time);
                             setOpenPopover(null);
@@ -246,15 +267,17 @@ export default function PickupSlotPage() {
         >
           <span className="flex items-center gap-2 border-b border-interactive pb-1">
             <span className="text-xl">+</span>
-            Save slot and add another
+            Add another
           </span>
         </button>
       </main>
       
       <footer className="px-4 pb-6 pt-4 bg-white">
-        <Button onClick={handleSubmitDonation} disabled={pickupSlots.length === 0} className="w-full">
-          Confirm pickup details
-        </Button>
+        <div className="flex justify-end">
+          <Button onClick={handleSubmitDonation} disabled={pickupSlots.length === 0 && (!currentSlot.date || !currentSlot.startTime || !currentSlot.endTime)}>
+            Continue
+          </Button>
+        </div>
       </footer>
     </div>
   );
