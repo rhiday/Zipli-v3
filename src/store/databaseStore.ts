@@ -84,6 +84,7 @@ interface DatabaseState {
   updatePassword: (password: string) => Promise<{ error: string | null }>;
   verifyOtp: (email: string, token: string, type: string) => Promise<AuthResponse>;
   setCurrentUser: (email: string) => void;
+  updateUser: (updatedUser: User) => void;
   logout: () => void;
   
   // Donation methods
@@ -265,6 +266,16 @@ export const useDatabase = create<DatabaseState>()(
       setCurrentUser: (email) => {
         const user = get().users.find(u => u.email === email);
         set({ currentUser: user || null });
+      },
+      
+      updateUser: (updatedUser) => {
+        const users = get().users.map(user => 
+          user.id === updatedUser.id ? { ...user, ...updatedUser } : user
+        );
+        set({ 
+          users,
+          currentUser: get().currentUser?.id === updatedUser.id ? updatedUser : get().currentUser
+        });
       },
       
       logout: () => {
