@@ -1,44 +1,83 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
+import { EditIcon } from './icons/EditIcon';
+import { DeleteIcon } from './icons/DeleteIcon';
 
 interface ItemPreviewProps {
   name: string;
   quantity: string;
+  description?: string;
   imageUrl?: string;
+  allergens?: string[];
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
-export const ItemPreview: React.FC<ItemPreviewProps> = ({ name, quantity, imageUrl, onEdit, onDelete }) => {
+export const ItemPreview: React.FC<ItemPreviewProps> = React.memo(({ name, quantity, description, imageUrl, allergens, onEdit, onDelete }) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const handleImageLoad = useCallback(() => {
+    setImageLoaded(true);
+    setImageError(false);
+  }, []);
+
+  const handleImageError = useCallback(() => {
+    setImageError(true);
+    setImageLoaded(false);
+  }, []);
+
+  // Test if image URL is accessible
+  React.useEffect(() => {
+    if (imageUrl && !imageError) {
+      const img = new Image();
+      img.onload = handleImageLoad;
+      img.onerror = handleImageError;
+      img.src = imageUrl;
+    }
+  }, [imageUrl, imageError, handleImageLoad, handleImageError]);
+
+  const shouldShowPlaceholder = !imageUrl || imageError || !imageLoaded;
+
   return (
     <div className="flex justify-center items-center w-full p-[12px_14px_12px_12px] gap-[18px] rounded-[12px] border border-[#D9DBD5] bg-[#F5F9EF]">
-      <div 
-        className="bg-cover bg-center bg-no-repeat rounded-md shrink-0 size-[79px] bg-gray-100 flex items-center justify-center"
-        style={{
-          backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
-        }}
-      >
-        {!imageUrl && (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C13.1046 2 14 2.89543 14 4C14 5.10457 13.1046 6 12 6C10.8954 6 10 5.10457 10 4C10 2.89543 10.8954 2 12 2Z" fill="#6B7280"/>
-            <path d="M21 8V18C21 19.1046 20.1046 20 19 20H5C3.89543 20 3 19.1046 3 18V8C3 6.89543 3.89543 6 5 6H7L8.5 4H15.5L17 6H19C20.1046 6 21 6.89543 21 8ZM19 8H17H15.5L14 6H10L8.5 8H7H5V18H19V8Z" fill="#6B7280"/>
-            <path d="M17 11H13V15H11V11H7V9H11V5H13V9H17V11Z" fill="#6B7280"/>
-          </svg>
+      <div className="relative rounded-md shrink-0 size-[79px] bg-gray-100 overflow-hidden">
+        {!shouldShowPlaceholder && (
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${imageUrl})` }}
+          />
+        )}
+        {shouldShowPlaceholder && (
+          <img
+            src="/images/placeholder.svg"
+            alt="Placeholder image"
+            className="w-full h-full object-cover"
+          />
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="font-manrope font-semibold text-[#021d13] text-[16px] truncate">{name}</div>
-        <div className="font-manrope text-[14px] text-[#021d13] opacity-60 mt-1">Qty: {quantity}</div>
+        <p className="text-base font-semibold text-earth truncate">{name}</p>
+        <p className="text-sm text-gray-500 truncate">
+          {description && description !== name ? `${description} · Qty: ${quantity}` : `Qty: ${quantity}`}
+        </p>
+        {allergens && allergens.length > 0 && (
+          <p className="text-sm text-gray-500 truncate">
+            Allergens: {allergens.join(', ')}
+          </p>
+        )}
       </div>
       <div className="flex flex-row gap-2 items-center shrink-0">
-        <button
-          onClick={onEdit}
-          className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#021d13] text-[#021d13] hover:bg-black/5"
-          aria-label="Edit"
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path fillRule="evenodd" clipRule="evenodd" d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z" fill="#024209"/>
-          </svg>
-        </button>
+        {onEdit && (
+          <button
+            onClick={onEdit}
+            className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#021d13] text-[#021d13] hover:bg-black/5"
+            aria-label="Edit"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fillRule="evenodd" clipRule="evenodd" d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z" fill="#024209"/>
+            </svg>
+          </button>
+        )}
         {onDelete && (
           <button
             onClick={onDelete}
@@ -54,4 +93,6 @@ export const ItemPreview: React.FC<ItemPreviewProps> = ({ name, quantity, imageU
       </div>
     </div>
   );
-}; 
+});
+
+ItemPreview.displayName = 'ItemPreview'; 

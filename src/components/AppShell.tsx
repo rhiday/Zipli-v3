@@ -1,14 +1,9 @@
 'use client';
 import { AuthProvider } from '@/components/auth/AuthProvider';
-import dynamic from 'next/dynamic';
-import React from 'react';
-import Header from './layout/Header'; // Assuming Header might be part of AppShell
-import BottomNav from './BottomNav'; // Assuming BottomNav might be part of AppShell
+import React, { useEffect } from 'react';
+import BottomNav from './BottomNav';
 import { usePathname } from 'next/navigation';
-import { logger } from '../../lib/logger';
-// Or import whatever components are actually used in AppShell
-
-const DesktopGlobalNavbar = dynamic(() => import('@/components/DesktopGlobalNavbar'), { ssr: false });
+import { useDatabase } from '@/store/databaseStore';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -16,27 +11,34 @@ interface AppShellProps {
 
 const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const pathname = usePathname();
+  const init = useDatabase(state => state.init);
+
+  useEffect(() => {
+    init();
+  }, [init]);
+
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
-  const hideBottomNav = pathname.startsWith('/donate/new') || pathname.startsWith('/donate/manual');
-  
+
+  // Hides bottom nav on all pages within the donation creation flow.
+  const donationFlowRegex =
+    /^\/donate\/(new|manual|pickup-slot|summary|thank-you|detail|[^/]+\/handover-confirm)/;
+  const hideBottomNav = donationFlowRegex.test(pathname);
+
   return (
     <AuthProvider>
       {isAuthRoute ? (
-        <> {/* No sidebar for auth routes */}
+        <> {/* No shell for auth routes */}
           {children}
         </>
       ) : (
-        /* Layout: flex container on md for sidebar + content */
-        <div className="min-h-screen bg-cream md:flex">
-          {/* Sidebar for desktop */}
-          <DesktopGlobalNavbar />
-          {/* Main content container */}
-          <div className="flex flex-col flex-1">
-            {/* Optional Header if global */}
-            {/* <Header /> */}
-            <main className="flex-grow px-0 pb-[76px] md:pb-0">
+        /* Layout: A mobile-like container centered on all screen sizes */
+        <div className="min-h-screen bg-cream">
+          <div className="relative mx-auto flex h-screen w-full max-w-lg flex-col bg-base shadow-lg">
+            {/* Main content container */}
+            <main className={`flex-grow overflow-y-auto ${!hideBottomNav ? 'pb-[76px]' : ''}`}>
               {children}
             </main>
+            {/* BottomNav is now part of this container and positioned absolutely */}
             {!hideBottomNav && <BottomNav />}
           </div>
         </div>

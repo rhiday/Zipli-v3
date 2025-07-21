@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, StopCircle, Brain, Loader2 } from 'lucide-react';
 import { logger } from '../../../lib/logger';
@@ -48,7 +48,7 @@ interface VoiceInputControlProps {
   setServerError: (error: string | null) => void;
 }
 
-export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
+export const VoiceInputControl: React.FC<VoiceInputControlProps> = React.memo(({
   onProcessComplete,
   setServerError,
 }) => {
@@ -58,7 +58,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  const handleVoiceInput = async () => {
+  const handleVoiceInput = useCallback(async () => {
     if (isRecording && mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       return;
@@ -157,9 +157,13 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
         'Could not start recording. Please ensure microphone permissions are granted.'
       );
     }
-  };
+  }, [isRecording, onProcessComplete, setServerError]);
 
-  const getButtonState = () => {
+  // Memoized empty function to prevent re-renders
+  const noopAction = useCallback(() => {}, []);
+
+  // Memoized button state
+  const buttonState = useMemo(() => {
     if (isRecording) {
       return {
         text: 'Listening...',
@@ -172,7 +176,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
       return {
         text: 'Transcribing...',
         icon: <Loader2 className="h-12 w-12 animate-spin" />,
-        action: () => {},
+        action: noopAction,
         disabled: true,
       };
     }
@@ -180,7 +184,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
       return {
         text: 'Processing...',
         icon: <Brain className="h-12 w-12" />,
-        action: () => {},
+        action: noopAction,
         disabled: true,
       };
     }
@@ -190,9 +194,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
       action: handleVoiceInput,
       disabled: false,
     };
-  };
-
-  const buttonState = getButtonState();
+  }, [isRecording, isTranscribing, isProcessingDetails, handleVoiceInput, noopAction]);
 
   return (
     <div className="text-center">
@@ -228,4 +230,6 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = ({
       </div>
     </div>
   );
-}; 
+});
+
+VoiceInputControl.displayName = 'VoiceInputControl'; 

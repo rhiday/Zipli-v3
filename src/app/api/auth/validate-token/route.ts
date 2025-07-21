@@ -1,25 +1,56 @@
 import { NextResponse } from "next/server";
 import { tokens, saveTokens } from "@/lib/tokens";
+import { checkRateLimit, getClientIP } from "@/lib/validation";
+
+// Secure CORS configuration - only allow specific origins
+const getAllowedOrigin = (origin: string | null) => {
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_APP_URL,
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://zipli-v3.vercel.app'
+  ].filter(Boolean);
+  
+  return origin && allowedOrigins.includes(origin) ? origin : 'null';
+};
 
 export async function GET(request: Request) {
   try {
+    // Rate limiting for token validation
+    const clientIP = getClientIP(request);
+    const rateLimitResult = checkRateLimit(`validate-token-${clientIP}`, 30, 60000); // 30 requests per minute
+    
+    if (!rateLimitResult.allowed) {
+      return new NextResponse(
+        JSON.stringify({ valid: false, message: "Rate limit exceeded" }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
+            'X-RateLimit-Limit': '30',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+          },
+        }
+      );
+    }
+
     // Get token from URL
     const url = new URL(request.url);
     const token = url.searchParams.get("token");
 
-    console.log(`Validating token from origin: ${url.origin}`);
-    console.log(`Token to validate: ${token}`);
-    console.log("Current tokens:", JSON.stringify(tokens, null, 2));
+    // Validation request received
 
     if (!token) {
-      console.log("No token provided");
+      // No token provided in request
       return new NextResponse(
         JSON.stringify({ valid: false, message: "Token is required" }),
         {
           status: 400,
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
           },
         }
       );
@@ -27,14 +58,14 @@ export async function GET(request: Request) {
 
     // Check if token exists
     if (!tokens[token]) {
-      console.log(`Token not found: ${token}`);
+      // Invalid token provided
       return new NextResponse(
         JSON.stringify({ valid: false, message: "Invalid token" }),
         {
           status: 404,
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
           },
         }
       );
@@ -42,11 +73,11 @@ export async function GET(request: Request) {
 
     // Get token data
     const tokenData = tokens[token];
-    console.log(`Token data:`, tokenData);
+    // Token found in store
 
     // Check if token is used
     if (tokenData.used) {
-      console.log(`Token already used: ${token}`);
+      // Token already consumed
       return new NextResponse(
         JSON.stringify({
           valid: false,
@@ -57,7 +88,7 @@ export async function GET(request: Request) {
           status: 403,
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
           },
         }
       );
@@ -70,7 +101,7 @@ export async function GET(request: Request) {
       delete tokens[token];
       saveTokens(tokens);
 
-      console.log(`Token expired: ${token}`);
+      // Token has expired
       return new NextResponse(
         JSON.stringify({
           valid: false,
@@ -81,7 +112,7 @@ export async function GET(request: Request) {
           status: 403,
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
           },
         }
       );
@@ -91,7 +122,7 @@ export async function GET(request: Request) {
     tokenData.used = true;
     saveTokens(tokens);
 
-    console.log(`Token validated successfully: ${token}`);
+    // Token validated successfully
 
     // Return success
     return new NextResponse(
@@ -124,11 +155,11 @@ export async function GET(request: Request) {
 }
 
 // Handle OPTIONS requests for CORS preflight
-export async function OPTIONS() {
+export async function OPTIONS(request: Request) {
   return new NextResponse(null, {
     status: 204,
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Max-Age": "86400",

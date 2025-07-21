@@ -2,6 +2,15 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  async redirects() {
+    return [
+      {
+        source: '/donor/dashboard',
+        destination: '/donate',
+        permanent: true,
+      },
+    ]
+  },
   images: {
     remotePatterns: [
       {

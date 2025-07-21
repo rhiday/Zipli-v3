@@ -4,18 +4,18 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import type { Database } from '@/lib/supabase/types';
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
+import { useDatabase } from '@/store/databaseStore';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('hasan@zipli.test');
+  const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
+  const login = useDatabase(state => state.login);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,49 +23,38 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) throw signInError;
+      const response = await login(email, password);
       
-      if (data.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-
-        if (profileError) throw profileError;
-
-        if (profile) {
-          const role = profile.role as Database['public']['Enums']['user_role'];
-          switch (role) {
-            case 'food_donor':
-              router.push('/donate');
-              break;
-            case 'food_receiver':
-              router.push('/feed');
-              break;
-            case 'terminals':
-            case 'city':
-              router.push('/dashboard');
-              break;
-            default:
-              console.warn(`Unknown user role: ${role}, redirecting to generic dashboard.`);
-              router.push('/dashboard');
-          }
-        } else {
-          console.warn('Profile not found for user after login, redirecting to generic dashboard.');
-          router.push('/dashboard');
-        }
-      } else {
-        throw new Error('User data not available after sign in.');
+      if (response.error) {
+        setError(response.error);
+        setLoading(false);
+        return;
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during login');
-    } finally {
+
+      if (response.data?.user) {
+        const user = response.data.user;
+        
+        // Small delay to ensure store state is updated before redirect
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Redirect based on role
+        switch (user.role) {
+          case 'food_donor':
+            router.push('/donate');
+            break;
+          case 'food_receiver':
+            router.push('/feed');
+            break;
+          case 'city':
+            router.push('/dashboard');
+            break;
+          default:
+            console.warn(`Unknown user role: ${user.role}, redirecting to generic dashboard.`);
+            router.push('/dashboard');
+        }
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
       setLoading(false);
     }
   };

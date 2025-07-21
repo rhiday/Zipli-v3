@@ -1,13 +1,46 @@
 import { NextResponse } from "next/server";
 import { tokens, saveTokens } from "@/lib/tokens";
+import { checkRateLimit, getClientIP } from "@/lib/validation";
+
+// Secure CORS configuration - only allow specific origins
+const getAllowedOrigin = (origin: string | null) => {
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_APP_URL,
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://zipli-v3.vercel.app'
+  ].filter(Boolean);
+  
+  return origin && allowedOrigins.includes(origin) ? origin : 'null';
+};
 
 // Specific user account that will be used for QR code login
 const QR_LOGIN_USER_EMAIL = "helsinki.airport@sodexo.com"; // Specific account for Helsinki Airport
 
 export async function GET(request: Request) {
   try {
+    // Rate limiting for QR token generation (more restrictive)
+    const clientIP = getClientIP(request);
+    const rateLimitResult = checkRateLimit(`qr-token-${clientIP}`, 10, 60000); // 10 requests per minute
+    
+    if (!rateLimitResult.allowed) {
+      return new NextResponse(
+        JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
+            'X-RateLimit-Limit': '10',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+          },
+        }
+      );
+    }
+
     const url = new URL(request.url);
-    console.log("QR token request from origin:", url.origin);
+    // QR token generation request
 
     // Generate a unique token - simplified version without uuid dependency
     const token =
@@ -39,9 +72,7 @@ export async function GET(request: Request) {
     // Save again after cleanup
     saveTokens(tokens);
 
-    // Debug log
-    console.log(`Token generated: ${token}`);
-    console.log("Current tokens:", JSON.stringify(tokens, null, 2));
+    // Token generated successfully
 
     // Return CORS headers for cross-origin requests
     return new NextResponse(
@@ -53,7 +84,7 @@ export async function GET(request: Request) {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
           "Access-Control-Allow-Methods": "GET, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type, Authorization",
         },
@@ -67,7 +98,7 @@ export async function GET(request: Request) {
         status: 500,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
           "Access-Control-Allow-Methods": "GET, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type, Authorization",
         },
@@ -77,11 +108,11 @@ export async function GET(request: Request) {
 }
 
 // Handle OPTIONS requests for CORS preflight
-export async function OPTIONS() {
+export async function OPTIONS(request: Request) {
   return new NextResponse(null, {
     status: 204,
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Max-Age": "86400",

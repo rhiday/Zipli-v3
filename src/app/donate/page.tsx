@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import BottomNav from '@/components/BottomNav';
 import { ArrowRight, Info, ChevronDown, PlusIcon, PackageIcon, Scale, Utensils, Euro, Leaf } from 'lucide-react';
-import { Database } from '@/lib/supabase/types';
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -20,24 +18,15 @@ import {
 import { jsPDF } from 'jspdf';
 import SummaryOverview from '@/components/SummaryOverview';
 import DonationCard from '@/components/donations/DonationCard';
+import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
+import { SkeletonDashboardStat, SkeletonRecipient } from '@/components/ui/Skeleton';
 import { useDonationStore } from '@/store/donation';
 
-type DonationWithFoodItem = {
-  id: string;
-  food_item: {
-    name: string;
-    description: string;
-    image_url: string | null;
-    expiry_date: string;
-    allergens: string | null;
-  };
-  quantity: number;
-  status: string;
-  pickup_time: string;
-  created_at: string;
+type ProfileRow = {
+    id: string;
+    full_name: string | null;
+    organization_name: string | null;
 };
-
-type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 
 type DonorDashboardData = {
     profile: ProfileRow | null;
@@ -46,7 +35,11 @@ type DonorDashboardData = {
 
 export default function DonorDashboardPage(): React.ReactElement {
   const router = useRouter();
-  const { donationItems, setDonationItems } = useDonationStore();
+  const { currentUser, isInitialized } = useDatabase();
+  const allDonations = useDatabase(state => state.donations);
+  const foodItems = useDatabase(state => state.foodItems);
+  const clearDonation = useDonationStore(state => state.clearDonation);
+
   const [dashboardData, setDashboardData] = useState<DonorDashboardData>({ profile: null, donations: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,89 +49,53 @@ export default function DonorDashboardPage(): React.ReactElement {
       'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  // Calculate last 3 months
   const currentDate = new Date();
-  const currentMonthIndex = currentDate.getMonth(); // 0-11
-  const lastThreeMonthsIndices = [
-      (currentMonthIndex - 2 + 12) % 12, // Two months ago
-      (currentMonthIndex - 1 + 12) % 12, // One month ago
-      currentMonthIndex // Current month
-  ];
-  const lastThreeMonths = lastThreeMonthsIndices.map(index => allMonths[index]);
+  const currentMonthIndex = currentDate.getMonth();
+  const lastThreeMonths = Array.from({ length: 3 }, (_, i) => {
+      const monthIndex = (currentMonthIndex - 2 + i + 12) % 12;
+      return allMonths[monthIndex];
+  });
 
-  // Set default selected month to the current month
   const [selectedMonth, setSelectedMonth] = useState(allMonths[currentMonthIndex]);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (!isInitialized) return;
 
-  const fetchDashboardData = async () => {
     setLoading(true);
-    setError(null);
-    try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
-        router.push('/auth/login');
-        return;
-      }
 
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single<ProfileRow>();
-        
-      if (profileError && profileError.code !== 'PGRST116') {
-        throw profileError;
-      }
-
-      const { data: donationsData, error: donationsError } = await supabase
-        .from('donations')
-        .select(`
-          id,
-          quantity,
-          status,
-          pickup_time,
-          created_at,
-          food_item:food_items!inner(
-            name,
-            description,
-            image_url,
-            allergens
-          )
-        `)
-        .eq('donor_id', user.id)
-        .order('created_at', { ascending: false })
-        .returns<DonationWithFoodItem[]>();
-
-      if (donationsError) throw donationsError;
-
-      setDashboardData({ profile: profileData, donations: donationsData || [] });
-
-      if (donationsData) {
-        const itemsForStore = donationsData.map((d) => ({
-          id: d.id,
-          name: d.food_item.name,
-          quantity: String(d.quantity),
-          description: d.food_item.description,
-          allergens: d.food_item.allergens
-            ? d.food_item.allergens.split(',').map(a => a.trim())
-            : ['Gluten-Free', 'Lactose-Free'],
-          imageUrl: d.food_item.image_url || undefined,
-        }));
-        setDonationItems(itemsForStore);
-      }
-
-    } catch (err: any) {
-      setError(err.message || 'Failed to load dashboard data.');
-    } finally {
-      setLoading(false);
+    if (!currentUser) {
+      // Add a small delay before redirecting to avoid race conditions
+      const timer = setTimeout(() => {
+        if (!currentUser) {
+          router.push('/auth/login');
+        }
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  };
 
-  // Placeholder PDF generation function
-  const handleExportPDF = () => {
+    // Clear any draft donations when user navigates to dashboard
+    clearDonation();
+
+    const profile: ProfileRow = {
+      id: currentUser.id,
+      full_name: currentUser.full_name,
+      organization_name: null, // Not available in mock user
+    };
+    
+    const userDonations = allDonations
+      .filter(d => d.donor_id === currentUser.id)
+      .map(d => {
+        const foodItem = foodItems.find(fi => fi.id === d.food_item_id);
+        return { ...d, food_item: foodItem! };
+      });
+    
+    setDashboardData({ profile, donations: userDonations });
+    setLoading(false);
+
+  }, [isInitialized, currentUser, router, allDonations, foodItems]);
+
+  // Memoized PDF generation function
+  const handleExportPDF = useCallback(() => {
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text('Zipli Summary', 10, 10);
@@ -148,12 +105,54 @@ export default function DonorDashboardPage(): React.ReactElement {
     doc.text(`Saved in food disposal costs: 125€`, 10, 40);
     doc.text(`Emission reduction: 89%`, 10, 50);
     doc.save('zipli-summary.pdf');
-  };
+  }, []);
+
+  // Memoized month selection handler
+  const handleMonthSelect = useCallback((month: string) => {
+    setSelectedMonth(month);
+  }, []);
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
+      <div className="min-h-screen pb-20">
+        <Header title="Loading..." />
+        
+        <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
+          <section>
+            <div className="flex justify-between items-center mb-4">
+              <div className="h-7 w-32 bg-gray-200 rounded-md animate-pulse"></div>
+              <div className="h-6 w-20 bg-gray-200 rounded-md animate-pulse"></div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-6">
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i} className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-5 h-5 bg-gray-200 rounded-md animate-pulse"></div>
+                    <div className="h-8 w-16 bg-gray-200 rounded-md animate-pulse"></div>
+                  </div>
+                  <div className="h-4 w-24 bg-gray-200 rounded-md animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <div className="my-4">
+            <div className="h-5 w-32 bg-gray-200 rounded-md animate-pulse mb-1"></div>
+            <div className="h-4 w-48 bg-gray-200 rounded-md animate-pulse"></div>
+          </div>
+          
+          <section>
+            <div className="h-7 w-48 bg-gray-200 rounded-md animate-pulse mb-3"></div>
+            
+            <div className="space-y-4">
+              {Array.from({ length: 3 }, (_, i) => (
+                <SkeletonRecipient key={i} />
+              ))}
+            </div>
+          </section>
+        </main>
+
+        <BottomNav />
       </div>
     );
   }
@@ -162,7 +161,7 @@ export default function DonorDashboardPage(): React.ReactElement {
     <div className="min-h-screen pb-20">
       <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'} />
 
-      <main className="relative z-20 mt-4 rounded-t-3xl md:rounded-t-none py-4 px-4 md:px-12 space-y-6">
+      <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         {/* This section is being removed as it's redundant with the header */}
         <section>
             <div className="flex justify-between items-center mb-4">
@@ -176,14 +175,14 @@ export default function DonorDashboardPage(): React.ReactElement {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-white">
                     {lastThreeMonths.map((month) => (
-                      <DropdownMenuItem key={month} onSelect={() => setSelectedMonth(month)}>
+                      <DropdownMenuItem key={month} onSelect={() => handleMonthSelect(month)}>
                         {month}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div className="grid grid-cols-2 gap-4 mt-6">
               {/* Total food offered */}
               <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
                 <div className="flex items-center gap-2 mb-2">

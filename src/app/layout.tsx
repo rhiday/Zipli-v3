@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css'; // Assuming globals.css exists for Tailwind base styles
 import AppShell from '@/components/AppShell';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { Manrope, Space_Grotesk } from 'next/font/google'; // Import fonts
+import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
+import DevSwitcherOverlay from '@/components/dev/DevSwitcherOverlay';
 
 // Configure fonts
 const manrope = Manrope({
@@ -28,11 +31,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const isDev = process.env.NODE_ENV === 'development';
   return (
     // Apply font variables to html tag
     <html lang="en" className={`${manrope.variable} ${spaceGrotesk.variable}`}> 
       <body>
-        <AppShell>{children}</AppShell>
+        <ErrorBoundary>
+          <AppShell>{children}</AppShell>
+          {isDev && <DevSwitcherOverlay />}
+        </ErrorBoundary>
       </body>
     </html>
   );

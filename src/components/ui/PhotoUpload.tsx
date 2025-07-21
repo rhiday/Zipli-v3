@@ -9,24 +9,77 @@ interface PhotoUploadProps {
 
 export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImageUpload, uploadedImage }) => {
   const [hovered, setHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleRemoveImage = () => {
+    setImageError(false);
     if (onImageUpload) {
       onImageUpload('');
     }
   };
 
-  const handleFileSelect = (file: File) => {
-    if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      
       const reader = new FileReader();
       reader.onload = (e) => {
-        const result = e.target?.result as string;
-        if (result && onImageUpload) {
-          onImageUpload(result);
-        }
+        img.src = e.target?.result as string;
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileSelect = async (file: File) => {
+    const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+    
+    if (!file) return;
+    
+    if (file.size > maxSizeInBytes) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+    
+    if (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp') {
+      try {
+        // Compress image for better performance
+        const compressedImage = await compressImage(file);
+        setImageError(false);
+        if (onImageUpload) {
+          onImageUpload(compressedImage);
+        }
+      } catch (error) {
+        // Fallback to original if compression fails
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          if (result && onImageUpload) {
+            onImageUpload(result);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    } else {
+      alert('Please select a JPEG, PNG, or WebP image file');
     }
   };
 
@@ -53,7 +106,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
   };
 
   return (
-    <div className={isMobile ? 'w-full' : 'w-[400px] max-w-full'}>
+    <div className="w-full">
       <div className="flex flex-col gap-3 w-full">
         <div className="w-full">
           <div className="flex flex-col gap-[13px] w-full">
@@ -62,11 +115,20 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
                 // Image Preview State
                 <div className="flex items-center justify-start w-full h-full bg-white rounded-xl border border-dashed border-[rgba(2,29,19,0.36)] pl-4">
                   <div className="relative w-24 h-24">
-                    <img
-                      src={uploadedImage}
-                      alt="Uploaded preview"
-                      className="w-full h-full object-cover rounded-lg"
-                    />
+                    {imageError ? (
+                      <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    ) : (
+                      <img
+                        src={uploadedImage}
+                        alt="Uploaded preview"
+                        className="w-full h-full object-cover rounded-lg"
+                        onError={handleImageError}
+                      />
+                    )}
                     <button
                       onClick={handleRemoveImage}
                       className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
@@ -100,7 +162,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
                       </svg>
                     </div>
                     <div className="font-manrope text-[#021d13] text-[14px] text-center opacity-70 w-[146px]">
-                      Drag & drop or click to choose files
+                      {isMobile ? "Tap to take photo or choose file" : "Drag & drop or click to choose files"}
                     </div>
                     {hint && (
                       <div className="mt-2 flex items-center gap-2 text-[#021d13] text-xs font-manrope opacity-60">
@@ -118,7 +180,8 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png"
+                accept="image/jpeg,image/png,image/webp"
+                capture="environment"
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -129,7 +192,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({ isMobile, hint, onImag
           </div>
         </div>
         <div className="w-full flex flex-row items-center justify-between text-[#021d13] text-[14px] font-manrope opacity-70">
-          <div>Supported formats: JPG, PNG</div>
+          <div>Supported formats: JPG, PNG, WebP</div>
           <div>Max: 5MB</div>
         </div>
       </div>

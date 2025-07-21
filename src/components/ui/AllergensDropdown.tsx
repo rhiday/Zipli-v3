@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Input } from './Input';
 import { Chip } from './Chip';
 
@@ -18,7 +18,7 @@ interface AllergensDropdownProps {
 export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   label,
   options,
-  value,
+  value = [],
   onChange,
   error,
   hint,
@@ -26,7 +26,24 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   placeholder = 'Select...',
 }) => {
   const [open, setOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Handle clicking outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open]);
 
   const handleToggle = (option: string) => {
     if (value.includes(option)) {
@@ -36,33 +53,53 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
     }
   };
 
+  const handleInputClick = () => {
+    if (!disabled) {
+      setOpen(!open);
+    }
+  };
+
+  // Check if there are more chips to scroll to
+  const hasOverflow = value.length > 3;
+
   return (
-    <div className="w-full">
+    <div className="w-full" ref={containerRef}>
       <label className="block text-label font-semibold mb-2">{label}</label>
       <div className="relative">
         <Input
-          ref={inputRef}
           readOnly
           value={''}
-          placeholder={placeholder}
+          placeholder={value.length > 0 ? '' : placeholder}
           variant={error ? 'error' : 'default'}
           disabled={disabled}
           className="cursor-pointer"
-          onFocus={() => setOpen(true)}
-          onBlur={() => setOpen(false)}
-          onClick={() => setOpen((v) => !v)}
+          onClick={handleInputClick}
         />
         {value.length > 0 && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 flex gap-2 max-w-[80%] overflow-x-auto">
-            {value.map((v) => (
-              <Chip
-                key={v}
-                label={v}
-                selected
-                onRemove={() => handleToggle(v)}
-              />
-            ))}
-          </div>
+          <>
+            <div 
+              className="absolute left-3 right-12 top-1/2 -translate-y-1/2 flex gap-2 overflow-x-auto overflow-y-hidden pointer-events-auto scrollbar-hide" 
+              style={{ 
+                scrollbarWidth: 'none', 
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch' // Smooth scrolling on iOS
+              }}
+              onClick={(e) => e.stopPropagation()} // Prevent input click when scrolling
+            >
+              {value.map((v) => (
+                <div key={v} className="flex-shrink-0">
+                  <Chip
+                    label={v}
+                    selected
+                    onRemove={() => handleToggle(v)}
+                  />
+                </div>
+              ))}
+            </div>
+            {hasOverflow && (
+              <div className="absolute right-12 top-1/2 -translate-y-1/2 w-6 h-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+            )}
+          </>
         )}
         {open && (
           <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
@@ -70,7 +107,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
               <div
                 key={option}
                 className={`flex items-center px-4 py-2 cursor-pointer transition-colors ${value.includes(option) ? 'bg-[#eafcd6]' : 'hover:bg-gray-50'}`}
-                onMouseDown={() => handleToggle(option)}
+                onClick={() => handleToggle(option)}
               >
                 <input
                   type="checkbox"
@@ -91,4 +128,6 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
       ) : null}
     </div>
   );
-}; 
+};
+
+AllergensDropdown.displayName = 'AllergensDropdown'; 

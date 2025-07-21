@@ -71,6 +71,15 @@ module.exports = {
   			bodyLg:  ['16px', { lineHeight: '19.2px' }],
   			titleSm: ['24px', { lineHeight: '28.8px', fontWeight: '600' }],
   			titleMd: ['36px', { lineHeight: '43.2px', fontWeight: '600' }]
+  		},
+
+  		/*  ───────── Animations ───────── */
+  		keyframes: {
+  			wave: {
+  				'0%': { transform: 'translateX(-100%)' },
+  				'50%': { transform: 'translateX(100%)' },
+  				'100%': { transform: 'translateX(100%)' }
+  			}
   		}
   	}
   },

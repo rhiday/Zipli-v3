@@ -2,81 +2,68 @@
 'use client';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
 import Image from 'next/image';
-import { ArrowLeft, ShoppingBag, MapPin, Plus } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, MapPin, Plus, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Tag from '@/components/ui/Tag';
+import { Avatar } from '@/components/ui/Avatar';
+import { getInitials } from '@/lib/utils';
+import DonationCard from '@/components/donations/DonationCard';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
 
-// Using 'any' for now to bypass stubborn linter issues.
-// The actual shape should be a single object for food_item and donor.
-type DonationDetails = any;
-type OtherDonation = any;
-
-export default function DonationDetailPage() {
-  const { id } = useParams();
+export default function DonationDetailPage({ params }: { params: { id: string } }) {
+  const currentUser = useDatabase(state => state.currentUser);
   const router = useRouter();
-  const [donation, setDonation] = useState<DonationDetails | null>(null);
-  const [otherDonations, setOtherDonations] = useState<OtherDonation[]>([]);
+  const donations = useDatabase(state => state.donations);
+  const foodItems = useDatabase(state => state.foodItems);
+  const deleteDonation = useDatabase(state => state.deleteDonation);
+  const [donation, setDonation] = useState<DonationWithFoodItem | null>(null);
+  const [otherDonations, setOtherDonations] = useState<DonationWithFoodItem[]>([]);
+  const [totalDonations, setTotalDonations] = useState(0);
+  const [isOwner, setIsOwner] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    const fetchDonationData = async () => {
-      if (!id) {
-        setLoading(false);
-        setError('No ID provided.');
-        return;
-      }
+    if (currentUser && params.id) {
+      const userDonations = donations.filter(d => d.donor_id === currentUser.id);
+      const mainDonation = userDonations.find(d => d.id === params.id);
 
-      try {
-        setLoading(true);
-        const { data: donationData, error: donationError } = await supabase
-          .from('donations')
-          .select(
-            `
-            id,
-            quantity,
-            food_item:food_items!inner(
-              name,
-              description,
-              image_url,
-              allergens
-            ),
-            donor:profiles!donor_id(address, full_name, organization_name)
-          `
-          )
-          .eq('id', id as string)
-          .single();
+      if (mainDonation) {
+        const foodItem = foodItems.find(fi => fi.id === mainDonation.food_item_id);
+        if (foodItem) {
+          setDonation({ ...mainDonation, food_item: foodItem });
+          setIsOwner(true);
 
-        if (donationError) throw donationError;
-
-        // Provide default allergens if none exist
-        if (donationData && (donationData as any).food_item && !(donationData as any).food_item.allergens) {
-          (donationData as any).food_item.allergens = 'Gluten-Free, Lactose-Free';
+          const otherDons = userDonations
+            .filter(d => d.id !== params.id)
+            .map(d => ({ ...d, food_item: foodItems.find(fi => fi.id === d.food_item_id)! }))
+            .slice(0, 4);
+          setOtherDonations(otherDons);
+          setTotalDonations(userDonations.length);
         }
-        
-        // Provide default description if none exist
-        if (donationData && (donationData as any).food_item && !(donationData as any).food_item.description) {
-          (donationData as any).food_item.description = `A delicious portion of ${(donationData as any).food_item.name}.`;
-        }
-
-        setDonation(donationData);
-
-        // TODO: Re-add fetching other donations and donor info
-        // For now, focusing on fixing the main item fetch.
-
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch donation details.');
-        console.error(err);
-      } finally {
-        setLoading(false);
       }
-    };
+    }
+    setLoading(false);
+  }, [currentUser, params.id, donations, foodItems]);
 
-    fetchDonationData();
-  }, [id]);
+  const handleRemoveListing = () => {
+    if (!donation) return;
+    deleteDonation(donation.id);
+    router.push('/donate');
+  };
 
   if (loading) {
     return (
@@ -102,13 +89,10 @@ export default function DonationDetailPage() {
     );
   }
   
-  const donorName =
-    donation.donor?.organization_name ||
-    donation.donor?.full_name ||
-    'Anonymous Donor';
+  const donorName = 'A Generous Donor';
 
   return (
-    <div className="min-h-screen bg-white pb-24 font-sans max-w-md mx-auto">
+    <div className="min-h-screen pb-20">
       {/* Header with Image and Back Arrow */}
       <div className="relative h-60 w-full">
         <Button
@@ -118,69 +102,125 @@ export default function DonationDetailPage() {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        {donation.food_item.image_url ? (
+        {donation.food_item.image_url && !imageError ? (
           <Image
             src={donation.food_item.image_url}
             alt={donation.food_item.name}
             fill
             className="object-cover"
+            onError={() => setImageError(true)}
           />
         ) : (
-          <div className="h-full w-full bg-gray-200"></div>
+          <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+            <Image
+              src="/images/placeholder.svg"
+              alt="Placeholder image"
+              width={160}
+              height={160}
+            />
+          </div>
         )}
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 -mt-12 rounded-t-[20px] bg-white p-5 shadow-2xl">
-        <h1 className="text-2xl font-bold text-gray-900">{donation.food_item.name}</h1>
-        <div className="mt-2 flex items-center gap-2 text-gray-600">
-          <ShoppingBag className="h-5 w-5" />
-          <span className="font-medium">{donation.quantity} kg</span>
-        </div>
+      <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
+        <section>
+          <h1 className="text-2xl font-bold text-gray-900">{donation.food_item.name}</h1>
+          <div className="mt-2 flex items-center gap-2 text-gray-600">
+            <ShoppingBag className="h-5 w-5" />
+            <span className="font-medium">{donation.quantity} kg</span>
+          </div>
 
-        {/* Tags */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {donation.food_item.allergens?.split(',').map((tag: string) => (
-            <Tag key={tag}>
-              {tag.trim()}
-            </Tag>
-          ))}
-        </div>
+          {/* Tags */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {donation.food_item.allergens &&
+              (Array.isArray(donation.food_item.allergens)
+                ? donation.food_item.allergens
+                : String(donation.food_item.allergens).split(',')
+              ).map((tag: string) => (
+                <Tag key={tag}>{tag.trim()}</Tag>
+              ))}
+          </div>
 
-        <p className="mt-4 text-gray-600 leading-relaxed">{donation.food_item.description}</p>
+          <p className="mt-4 text-gray-600 leading-relaxed">{donation.food_item.description}</p>
 
-        <div className="mt-4 flex items-start gap-3 text-gray-600">
-          <MapPin className="h-5 w-5 flex-shrink-0" />
-          <span className="font-medium">{donation.donor?.address || 'Address not provided'}</span>
-        </div>
-        
-        <div className="mt-6 flex justify-end">
-          <Button variant="primary" size="cta" className="text-bodyLg">
-            <Plus className="h-5 w-5" />
-            Add to cart
-          </Button>
-        </div>
-      </div>
-      
-      {/* Divider */}
-      <div className="my-3 h-2.5 bg-gray-50"></div>
+          <div className="mt-4 flex items-start gap-3 text-gray-600">
+            <MapPin className="h-5 w-5 flex-shrink-0" />
+            <span className="font-medium">Address not provided</span>
+          </div>
 
-      {/* Donor Info */}
-      <div className="px-5">
-         <div className="flex items-center gap-4">
-            {/* Placeholder for donor avatar */}
-            <div className="h-14 w-14 rounded-full bg-gray-200"></div>
-            <div>
-              <p className="text-lg font-bold text-gray-900">{donorName}</p>
-              <p className="font-medium text-gray-500">1+ donations</p>
+          {isOwner ? (
+            <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+              <div className="mt-6 flex items-center gap-3">
+                <DialogTrigger asChild>
+                  <Button
+                    variant="destructive-outline"
+                    size="cta"
+                    className="flex-1"
+                  >
+                    <Trash2 className="h-5 w-5" /> Remove listing
+                  </Button>
+                </DialogTrigger>
+                <Button
+                  variant="primary"
+                  size="cta"
+                  className="flex-1"
+                  onClick={() => router.push(`/donate/manual?id=${donation.id}`)}
+                >
+                  <Edit className="h-5 w-5" /> Edit listing
+                </Button>
+              </div>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Are you sure?</DialogTitle>
+                  <DialogDescription>
+                    This will permanently remove the listing from public view. This action cannot be undone.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
+                  <Button variant="destructive" onClick={handleRemoveListing}>Yes, remove</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <div className="mt-6">
+              <Button
+                variant="primary"
+                size="cta"
+                className="w-full"
+                onClick={() => router.push(`/request/${params.id}`)}
+              >
+                Request this donation
+              </Button>
             </div>
-         </div>
+          )}
+        </section>
 
-         <h2 className="mt-6 text-xl font-bold text-gray-900">Available from this donor</h2>
-         <div className="mt-4 grid grid-cols-2 gap-4">
-            {/* Placeholder for other donations */}
-         </div>
-      </div>
+        <hr className="border-gray-100" />
+
+        {/* Other Donations by Same Donor */}
+        <section className="bg-gray-50 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <span className="text-lg font-semibold">{getInitials(donorName)}</span>
+              </Avatar>
+              <div>
+                <p className="font-semibold text-gray-900">{donorName}</p>
+                <p className="text-sm text-gray-500">{totalDonations} donations</p>
+              </div>
+            </div>
+            <Button variant="secondary" size="sm" onClick={() => alert('View profile not implemented')}>
+              View profile
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {otherDonations.map((otherDonation) => (
+              <DonationCard key={otherDonation.id} donation={otherDonation} />
+            ))}
+          </div>
+        </section>
+      </main>
     </div>
   );
 } 

@@ -36,32 +36,32 @@ export default function NewDonationPage() {
   };
 
     return (
-    <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto">
-      <SecondaryNavbar title="Create a donation" backHref="/donate">
-        <div className="absolute left-0 bottom-0 w-full px-4">
-          <Progress value={25} className="h-2 w-full" />
-        </div>
-      </SecondaryNavbar>
+      <div className="min-h-screen pb-20">
+        <SecondaryNavbar title="Create a donation" backHref="/donate">
+          <div className="absolute left-0 bottom-0 w-full px-4">
+            <Progress value={25} className="h-2 w-full" />
+          </div>
+        </SecondaryNavbar>
 
-      <main className="flex-1 flex flex-col items-center justify-center text-center p-4">
-        <div className="w-full flex flex-col items-center">
-          <VoiceInputControl
-            onProcessComplete={handleProcessComplete}
-            setServerError={setServerError}
+        <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
+          <div className="w-full flex flex-col items-center">
+            <VoiceInputControl
+              onProcessComplete={handleProcessComplete}
+              setServerError={setServerError}
+            />
+          </div>
+          {serverError && <p className="text-red-500 mt-4">{serverError}</p>}
+        </main>
+
+        <footer className="p-4 bg-white pb-24">
+          <ActionButton
+            href="/donate/manual"
+            title="Type donation manually"
+            description="It only takes a few minutes"
+            icon={<Pencil className="w-6 h-6" />}
+            className="mt-8"
           />
-        </div>
-        {serverError && <p className="text-red-500 mt-4">{serverError}</p>}
-      </main>
-
-      <footer className="p-4 bg-white pb-24">
-        <ActionButton
-          href="/donate/manual"
-          title="Type donation manually"
-          description="It only takes a few minutes"
-          icon={<Pencil className="w-6 h-6" />}
-          className="mt-8"
-        />
-      </footer>
-    </div>
-  );
+        </footer>
+      </div>
+    );
 } 

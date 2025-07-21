@@ -1,1 +1,18 @@
-[{"food_item_id":"food-1","quantity":"5 portions","status":"available"}]
+[
+  {"food_item_id": "food-1", "quantity": 5, "status": "available", "donor_id": "user-1", "pickup_time": "2024-07-01T14:00:00+03:00"},
+  {"food_item_id": "food-2", "quantity": 8, "status": "available", "donor_id": "user-4", "pickup_time": "2024-07-01T16:30:00+03:00"},
+  {"food_item_id": "food-3", "quantity": 12, "status": "available", "donor_id": "user-5", "pickup_time": "2024-07-02T12:00:00+03:00"},
+  {"food_item_id": "food-4", "quantity": 7, "status": "available", "donor_id": "user-1", "pickup_time": "2024-07-01T18:00:00+03:00"},
+  {"food_item_id": "food-5", "quantity": 10, "status": "available", "donor_id": "user-4", "pickup_time": "2024-07-02T11:00:00+03:00"},
+  {"food_item_id": "food-6", "quantity": 6, "status": "available", "donor_id": "user-5", "pickup_time": "2024-07-01T15:00:00+03:00"},
+  {"food_item_id": "food-7", "quantity": 15, "status": "available", "donor_id": "user-1", "pickup_time": "2024-07-02T13:30:00+03:00"},
+  {"food_item_id": "food-8", "quantity": 9, "status": "available", "donor_id": "user-4", "pickup_time": "2024-07-01T17:00:00+03:00"},
+  {"food_item_id": "food-9", "quantity": 20, "status": "available", "donor_id": "user-5", "pickup_time": "2024-07-02T10:00:00+03:00"},
+  {"food_item_id": "food-10", "quantity": 4, "status": "available", "donor_id": "user-1", "pickup_time": "2024-07-01T19:00:00+03:00"},
+  {"food_item_id": "food-11", "quantity": 11, "status": "available", "donor_id": "user-4", "pickup_time": "2024-07-02T09:00:00+03:00"},
+  {"food_item_id": "food-2", "quantity": 3, "status": "available", "donor_id": "user-1", "pickup_time": "2024-07-03T10:00:00+03:00"},
+  {"food_item_id": "food-5", "quantity": 7, "status": "available", "donor_id": "user-1", "pickup_time": "2024-07-03T12:30:00+03:00"},
+  {"food_item_id": "food-8", "quantity": 2, "status": "available", "donor_id": "user-1", "pickup_time": "2024-07-03T15:00:00+03:00"},
+  {"food_item_id": "food-10", "quantity": 6, "status": "available", "donor_id": "user-1", "pickup_time": "2024-07-03T17:00:00+03:00"},
+  {"food_item_id": "food-11", "quantity": 9, "status": "available", "donor_id": "user-1", "pickup_time": "2024-07-03T19:00:00+03:00"}
+]

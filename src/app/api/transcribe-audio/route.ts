@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { Readable } from 'stream';
+import { checkRateLimit, getClientIP } from '@/lib/validation';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -25,12 +26,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
   }
 
+  // Rate limiting for audio transcription (more restrictive due to higher cost)
+  const clientIP = getClientIP(req);
+  const rateLimitResult = checkRateLimit(`transcribe-audio-${clientIP}`, 10, 60000); // 10 requests per minute
+  
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Please try again later.' },
+      { 
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': '10',
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+        }
+      }
+    );
+  }
+
   try {
     const audioFormData = await req.formData();
     const audioFileFromFormData = audioFormData.get('audio') as File;
 
     if (!audioFileFromFormData || audioFileFromFormData.size === 0) {
       return NextResponse.json({ error: 'No audio file uploaded or file is empty' }, { status: 400 });
+    }
+
+    // Validate file size (max 25MB for audio files)
+    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+    if (audioFileFromFormData.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: 'Audio file too large. Maximum size is 25MB.' }, { status: 400 });
+    }
+
+    // Validate file type
+    const allowedTypes = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/webm', 'audio/ogg'];
+    if (!allowedTypes.includes(audioFileFromFormData.type)) {
+      return NextResponse.json({ 
+        error: 'Invalid file type. Please upload an audio file (MP3, MP4, WAV, WebM, or OGG).' 
+      }, { status: 400 });
     }
 
     // Log the received file details for debugging

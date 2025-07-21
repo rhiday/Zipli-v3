@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { EditIcon } from '@/components/ui/icons/EditIcon';
 import { DeleteIcon } from '@/components/ui/icons/DeleteIcon';
 import { useDonationStore } from '@/store/donation';
+import { useDatabase } from '@/store/databaseStore';
 
 const timeOptions = Array.from({ length: 48 }, (_, i) => {
   const hours = Math.floor(i / 2);
@@ -28,7 +29,20 @@ interface PickupSlot {
 
 export default function PickupSlotPage() {
   const router = useRouter();
-  const { pickupSlots, addPickupSlot, updatePickupSlot, deletePickupSlot } = useDonationStore();
+  const addFullDonation = useDatabase(state => state.addFullDonation);
+  const { donationItems, pickupSlots, addPickupSlot, updatePickupSlot, deletePickupSlot, clearDonation } = useDonationStore();
+
+  // Helper function to safely format dates
+  const formatSlotDate = (date: Date | undefined | string) => {
+    if (!date) return null;
+    try {
+      const dateObj = date instanceof Date ? date : new Date(date);
+      if (isNaN(dateObj.getTime())) return null;
+      return format(dateObj, 'dd.M.yyyy');
+    } catch {
+      return null;
+    }
+  };
   const [currentSlot, setCurrentSlot] = useState<Omit<PickupSlot, 'id'> & { id: string | 'new' }>({
     id: 'new',
     date: undefined,
@@ -36,7 +50,7 @@ export default function PickupSlotPage() {
     endTime: '14:00',
   });
   const [openPopover, setOpenPopover] = useState<string | null>(null);
-  const [showAddForm, setShowAddForm] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(pickupSlots.length === 0);
 
   const handleBackClick = () => {
     router.back();
@@ -54,15 +68,14 @@ export default function PickupSlotPage() {
     } else {
       updatePickupSlot(currentSlot as PickupSlot);
     }
-    
-    // Reset form for the next entry
+    // Always keep form open for next slot (unless editing)
     setCurrentSlot({
       id: 'new',
       date: undefined,
       startTime: '09:00',
       endTime: '14:00',
     });
-    setShowAddForm(false); // Hide form after adding, user can click to show again
+    setShowAddForm(true);
   };
 
   const handleDeleteSlot = (id: string) => {
@@ -78,29 +91,44 @@ export default function PickupSlotPage() {
   };
   
   const handleAddTimeSlotClick = () => {
-    if (currentSlot.date && showAddForm) {
-      handleSaveSlot();
-    }
     setShowAddForm(true);
-  }
+  };
+
+  const handleSubmitDonation = () => {
+    // Auto-save current slot if form is filled out
+    if (currentSlot.date && currentSlot.startTime && currentSlot.endTime && showAddForm) {
+      if (currentSlot.id === 'new') {
+        addPickupSlot(currentSlot);
+      } else {
+        updatePickupSlot(currentSlot as PickupSlot);
+      }
+    }
+    
+    // Check if we have at least one slot (including the one we just saved)
+    const totalSlots = pickupSlots.length + (currentSlot.date && showAddForm ? 1 : 0);
+    if (totalSlots === 0) return;
+    
+    addFullDonation(donationItems, pickupSlots);
+    // Don't clear donation store yet - summary page needs it
+    // clearDonation();
+    router.push('/donate/summary');
+  };
 
   const isFormValid = currentSlot.date && currentSlot.startTime && currentSlot.endTime;
 
   return (
-    <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto">
+    <div className="flex flex-col h-dvh bg-white">
       <SecondaryNavbar title="Add pickup slot" backHref="/donate/manual" onBackClick={handleBackClick} />
-      <div className="px-6 pt-2">
+      <div className="px-4 pt-2">
         <Progress value={50} className="h-2 w-full" />
       </div>
-
-      <main className="flex-1 flex flex-col gap-6 p-6">
+      <main className="flex flex-col flex-grow overflow-y-auto p-4 gap-6">
         <h2 className="text-xl font-semibold">Pickup slot</h2>
-        
         <div className="flex flex-col gap-4">
           {pickupSlots.map(slot => (
             <div key={slot.id} className="flex items-center justify-between p-3 h-[56px] rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
               <span className="font-semibold text-interactive">
-                {slot.date ? `${format(slot.date, 'dd.M.yyyy')}, ${slot.startTime} - ${slot.endTime}` : ''}
+                {formatSlotDate(slot.date) ? `${formatSlotDate(slot.date)}, ${slot.startTime} - ${slot.endTime}` : 'Date not set'}
               </span>
               <div className="flex items-center gap-2">
                 <button onClick={() => handleEditSlot(slot.id)} className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5" aria-label="Edit">
@@ -132,26 +160,26 @@ export default function PickupSlotPage() {
             )}
             {/* Date Picker */}
             <div>
-              <label className="block text-label font-semibold mb-2">Select a day</label>
+              <label className="block text-black font-semibold mb-2">Select a day</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="secondary"
                     className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
                   >
-                    {currentSlot.date ? (
-                      <span className="text-primary">{format(currentSlot.date, 'dd/MM/yyyy')}</span>
+                    {currentSlot.date && currentSlot.date instanceof Date && !isNaN(currentSlot.date.getTime()) ? (
+                      <span className="text-black">{format(currentSlot.date, 'dd/MM/yyyy')}</span>
                     ) : (
-                      <span className="text-primary-75">DD/MM/YYYY</span>
+                      <span className="text-gray-400">DD/MM/YYYY</span>
                     )}
                     <div className="pointer-events-none">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
-                        <CalendarIcon className="h-4 w-4 text-primary-75" />
+                        <CalendarIcon className="h-4 w-4 text-gray-400" />
                       </div>
                     </div>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-base border-primary-25" align="start">
+                <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
                   <Calendar
                     mode="single"
                     selected={currentSlot.date}
@@ -165,91 +193,98 @@ export default function PickupSlotPage() {
             {/* Time Pickers */}
             <div className="grid grid-cols-2 gap-4">
                <div>
-                <label className="block text-label font-semibold mb-2">Start time</label>
+                <label className="block text-black font-semibold mb-2">Start time</label>
                 <Popover open={openPopover === 'start'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'start' : null)}>
                   <PopoverTrigger asChild>
                     <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
-                      <span className="text-primary">{currentSlot.startTime}</span>
+                      <span className="text-black">{currentSlot.startTime}</span>
                       <div className="pointer-events-none">
                         <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
-                          <ClockIcon className="h-4 w-4 text-primary-75" />
+                          <ClockIcon className="h-4 w-4 text-gray-400" />
                         </div>
                       </div>
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-56 p-0 bg-white border border-primary-25 rounded-lg shadow-lg">
-                    <div className="h-60 overflow-y-auto">
-                      {timeOptions.map(time => (
-                        <Button
-                          key={time}
-                          variant="ghost"
-                          className="w-full justify-center rounded-none font-manrope font-normal text-sm text-primary"
+                  <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                    <div className="max-h-60 overflow-y-auto">
+                      {timeOptions.map((option) => (
+                        <div
+                          key={option}
+                          className={cn(
+                            'px-4 py-2 cursor-pointer hover:bg-[#eafcd6] text-black',
+                            currentSlot.startTime === option && 'bg-[#eafcd6] font-semibold'
+                          )}
                           onClick={() => {
-                            handleCurrentSlotChange('startTime', time);
+                            handleCurrentSlotChange('startTime', option);
                             setOpenPopover(null);
                           }}
                         >
-                          {time}
-                        </Button>
+                          {option}
+                        </div>
                       ))}
                     </div>
                   </PopoverContent>
                 </Popover>
               </div>
               <div>
-                <label className="block text-label font-semibold mb-2">End time</label>
+                <label className="block text-black font-semibold mb-2">End time</label>
                 <Popover open={openPopover === 'end'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'end' : null)}>
                   <PopoverTrigger asChild>
                     <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
-                      <span className="text-primary">{currentSlot.endTime}</span>
+                      <span className="text-black">{currentSlot.endTime}</span>
                       <div className="pointer-events-none">
                         <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
-                          <ClockIcon className="h-4 w-4 text-primary-75" />
+                          <ClockIcon className="h-4 w-4 text-gray-400" />
                         </div>
                       </div>
                     </Button>
                   </PopoverTrigger>
-                   <PopoverContent className="w-56 p-0 bg-white border border-primary-25 rounded-lg shadow-lg">
-                    <div className="h-60 overflow-y-auto">
-                      {timeOptions.map(time => (
-                        <Button
-                          key={time}
-                          variant="ghost"
-                          className="w-full justify-center rounded-none font-manrope font-normal text-sm text-primary"
+                  <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+                    <div className="max-h-60 overflow-y-auto">
+                      {timeOptions.map((option) => (
+                        <div
+                          key={option}
+                          className={cn(
+                            'px-4 py-2 cursor-pointer hover:bg-[#eafcd6] text-black',
+                            currentSlot.endTime === option && 'bg-[#eafcd6] font-semibold'
+                          )}
                           onClick={() => {
-                            handleCurrentSlotChange('endTime', time);
+                            handleCurrentSlotChange('endTime', option);
                             setOpenPopover(null);
                           }}
                         >
-                          {time}
-                        </Button>
+                          {option}
+                        </div>
                       ))}
                     </div>
                   </PopoverContent>
                 </Popover>
               </div>
             </div>
+            <div className="flex justify-center mt-2">
+              <button
+                type="button"
+                onClick={handleSaveSlot}
+                disabled={!isFormValid}
+                className={
+                  `text-interactive font-semibold text-base underline underline-offset-4 px-2 py-1 rounded transition-colors ` +
+                  (isFormValid ? 'hover:bg-[#eafcd6] cursor-pointer' : 'text-gray-400 cursor-not-allowed')
+                }
+              >
+                + Add another
+              </button>
+            </div>
           </div>
         )}
-
-        <button 
-          onClick={handleAddTimeSlotClick}
-          className="flex items-center justify-center gap-2 text-interactive font-semibold text-base py-1 border-b border-interactive self-center"
-        >
-          <span className="text-xl">+</span>
-          Save slot and add another
-        </button>
       </main>
       
-      <div className="sticky bottom-0 left-0 w-full bg-white pt-4 pb-10 pr-6 flex justify-end z-10">
-        <button 
-          onClick={() => router.push('/donate/summary')}
-          disabled={pickupSlots.length === 0}
-          className="bg-[#a6f175] text-[#021d13] font-manrope font-semibold rounded-full px-8 py-3 text-lg shadow-md hover:bg-[#c2f7a1] transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Continue
-        </button>
-      </div>
+      <footer className="px-4 pb-6 pt-4 bg-white">
+        <div className="flex justify-end">
+          <Button onClick={handleSubmitDonation} disabled={pickupSlots.length === 0 && (!currentSlot.date || !currentSlot.startTime || !currentSlot.endTime)}>
+            Continue
+          </Button>
+        </div>
+      </footer>
     </div>
   );
 } 

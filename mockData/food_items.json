@@ -1,1 +1,13 @@
-[{"name":"Pasta Bolognese","description":"Classic pasta.","image_url":"/images/pasta.jpg"}]
+[
+  {"name": "Pasta Bolognese", "description": "Classic pasta.", "image_url": "/images/pasta.jpg", "allergens": ["Wheat", "Milk"]},
+  {"name": "Salmon Soup", "description": "Traditional creamy salmon soup.", "image_url": "/images/salmon_soup.jpg", "allergens": ["Fish", "Milk"]},
+  {"name": "Rye Bread Sandwich", "description": "Hearty rye bread with cheese and ham.", "image_url": "/images/rye_sandwich.jpg", "allergens": ["Wheat", "Milk"]},
+  {"name": "Vegan Stew", "description": "Root vegetables and beans in a rich tomato sauce.", "image_url": "/images/vegan_stew.jpg", "allergens": ["Soybeans"]},
+  {"name": "Chicken Curry", "description": "Mild curry with chicken and rice.", "image_url": "/images/chicken_curry.jpg", "allergens": ["None"]},
+  {"name": "Pulled Oats Bowl", "description": "Plant-based protein bowl with veggies.", "image_url": "/images/pulled_oats.jpg", "allergens": ["None"]},
+  {"name": "Karelian Pie", "description": "Finnish rice pie with egg butter.", "image_url": "/images/karelian_pie.jpg", "allergens": ["Eggs", "Milk"]},
+  {"name": "Beetroot Salad", "description": "Fresh beetroot, apple, and walnut salad.", "image_url": "/images/beetroot_salad.jpg", "allergens": ["Tree nuts"]},
+  {"name": "Meatballs & Mashed Potatoes", "description": "Classic Finnish meatballs with creamy mash.", "image_url": "/images/meatballs.jpg", "allergens": ["Eggs", "Wheat", "Milk"]},
+  {"name": "Falafel Wrap", "description": "Falafel, hummus, and veggies in a soft wrap.", "image_url": "/images/falafel_wrap.jpg", "allergens": ["Wheat", "Soybeans"]},
+  {"name": "Berry Quark", "description": "Sweet quark dessert with local berries.", "image_url": "/images/berry_quark.jpg", "allergens": ["Milk"]}
+]

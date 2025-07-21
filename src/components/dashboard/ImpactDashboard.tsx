@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Info, ChevronDown } from 'lucide-react';
 import ExportCard from './ExportCard';
 
@@ -11,7 +11,7 @@ interface ImpactDashboardProps {
   emissionReduction?: number;
 }
 
-const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
+const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(({
   totalWeight = 46,
   portionsOffered = 131,
   savedCosts = 125,
@@ -19,12 +19,58 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
 }) => {
   const [selectedMonth, setSelectedMonth] = useState('February');
 
+  // Memoized month selector handler
+  const handleMonthSelect = useCallback(() => {
+    // TODO: Implement month selection logic
+  }, []);
+
+  // Memoized stats data
+  const statsData = useMemo(() => [
+    {
+      value: portionsOffered,
+      label: 'Portions offered',
+      bgColor: 'bg-lime/20'
+    },
+    {
+      value: `${savedCosts}€`,
+      label: 'Saved in food disposal costs',
+      bgColor: 'bg-lime/20'
+    },
+    {
+      value: `${emissionReduction}%`,
+      label: 'Emission reduction',
+      bgColor: 'bg-lime/20'
+    }
+  ], [portionsOffered, savedCosts, emissionReduction]);
+
+  // Memoized recipients data
+  const recipientsData = useMemo(() => [
+    {
+      id: 1,
+      name: 'Red cross',
+      info: '500g · Beef stew',
+      avatar: { type: 'icon', color: 'rose', icon: '+' }
+    },
+    {
+      id: 2,
+      name: 'Stadin Safka',
+      info: '500g · Beef stew',
+      avatar: { type: 'placeholder', color: 'gray' }
+    },
+    {
+      id: 3,
+      name: 'Recipient name',
+      info: '500g · Beef stew',
+      avatar: { type: 'placeholder', color: 'gray' }
+    }
+  ], []);
+
   return (
     <div className="bg-base rounded-t-3xl -mt-3 px-6 pt-6 pb-4">
       {/* Impact header with month selector */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-primary text-titleSm font-semibold">Your impact</h2>
-        <button className="flex items-center text-interactive font-medium">
+        <button onClick={handleMonthSelect} className="flex items-center text-interactive font-medium">
           {selectedMonth} <ChevronDown className="ml-1" size={20} />
         </button>
       </div>
@@ -37,38 +83,17 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
       
       {/* Stats grid */}
       <div className="grid grid-cols-3 gap-3 mb-6">
-        {/* Portions stat */}
-        <div className="bg-lime/20 rounded-xl p-4">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-primary text-titleMd font-semibold">{portionsOffered}</span>
-            <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-              <Info size={16} />
-            </button>
+        {statsData.map((stat, index) => (
+          <div key={index} className={`${stat.bgColor} rounded-xl p-4`}>
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-primary text-titleMd font-semibold">{stat.value}</span>
+              <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
+                <Info size={16} />
+              </button>
+            </div>
+            <p className="text-secondary text-caption">{stat.label}</p>
           </div>
-          <p className="text-secondary text-caption">Portions offered</p>
-        </div>
-        
-        {/* Costs stat */}
-        <div className="bg-lime/20 rounded-xl p-4">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-primary text-titleMd font-semibold">{savedCosts}€</span>
-            <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-              <Info size={16} />
-            </button>
-          </div>
-          <p className="text-secondary text-caption">Saved in food disposal costs</p>
-        </div>
-        
-        {/* Emission stat */}
-        <div className="bg-lime/20 rounded-xl p-4">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-primary text-titleMd font-semibold">{emissionReduction}%</span>
-            <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-              <Info size={16} />
-            </button>
-          </div>
-          <p className="text-secondary text-caption">Emission reduction</p>
-        </div>
+        ))}
       </div>
       
       {/* Export card */}
@@ -79,38 +104,29 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = ({
         <h2 className="text-primary text-titleMd font-semibold mb-6">This is whom you've helped</h2>
         
         <div className="space-y-6">
-          {/* Recipient 1 */}
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-rose-100 flex items-center justify-center overflow-hidden">
-              <span className="text-rose-600 text-2xl font-bold">+</span>
+          {recipientsData.map((recipient) => (
+            <div key={recipient.id} className="flex items-center gap-4">
+              <div className={`h-16 w-16 rounded-full ${
+                recipient.avatar.type === 'icon' 
+                  ? 'bg-rose-100 flex items-center justify-center' 
+                  : 'bg-gray-200 flex items-center justify-center'
+              } overflow-hidden`}>
+                {recipient.avatar.type === 'icon' && (
+                  <span className="text-rose-600 text-2xl font-bold">{recipient.avatar.icon}</span>
+                )}
+              </div>
+              <div>
+                <h3 className="text-primary text-titleXs font-semibold">{recipient.name}</h3>
+                <p className="text-secondary text-bodyLg">{recipient.info}</p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-primary text-titleXs font-semibold">Red cross</h3>
-              <p className="text-secondary text-bodyLg">500g · Beef stew</p>
-            </div>
-          </div>
-          
-          {/* Recipient 2 */}
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"></div>
-            <div>
-              <h3 className="text-primary text-titleXs font-semibold">Stadin Safka</h3>
-              <p className="text-secondary text-bodyLg">500g · Beef stew</p>
-            </div>
-          </div>
-          
-          {/* Recipient 3 */}
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"></div>
-            <div>
-              <h3 className="text-primary text-titleXs font-semibold">Recipient name</h3>
-              <p className="text-secondary text-bodyLg">500g · Beef stew</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
   );
-};
+});
+
+ImpactDashboard.displayName = 'ImpactDashboard';
 
 export default ImpactDashboard; 

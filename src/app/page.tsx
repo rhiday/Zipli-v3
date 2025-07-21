@@ -1,29 +1,80 @@
-import React from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import BottomNav from '@/components/BottomNav';
+import { useDatabase } from '@/store/databaseStore';
 
 export default function HomePage() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
-      <div className="w-full max-w-xs text-center">
-        <h1 className="text-titleMd font-display text-primary">Welcome to Zipli!</h1>
-        <p className="mt-2 mb-8 text-body text-primary-75">
-          Join our community to donate or receive food
-        </p>
+  const router = useRouter();
+  const { currentUser, isInitialized, deleteDonation, donations, foodItems } = useDatabase();
 
-        <Link href="/auth/login" className="w-full">
-          <Button variant="primary" size="md" className="w-full">
-            Log in
-          </Button>
-        </Link>
+  useEffect(() => {
+    if (isInitialized && !currentUser) {
+      router.push('/auth/login');
+    }
+  }, [isInitialized, currentUser, router]);
 
-        <p className="mt-6 text-body">
-          <span className="text-inactive">Don't have an account? </span>
-          <Link href="/auth/register" className="font-medium text-earth hover:text-primary">
-            Register here
-          </Link>
-        </p>
+  const deleteSpecificDonations = () => {
+    const targetNames = ['aaaaaaa', 'ggggggg', 'Halala', 'fdfvfe'];
+    
+    const donationsToDelete = donations.filter(d => {
+      if (!currentUser || d.donor_id !== currentUser.id) return false;
+      const foodItem = foodItems.find(fi => fi.id === d.food_item_id);
+      return foodItem && targetNames.includes(foodItem.name);
+    });
+
+    console.log('Found donations to delete:', donationsToDelete);
+    
+    donationsToDelete.forEach(donation => {
+      deleteDonation(donation.id);
+    });
+
+    alert(`Deleted ${donationsToDelete.length} donations`);
+  };
+
+  if (!isInitialized) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-cream">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
+    );
+  }
+
+  if (!currentUser) {
+    return null; // Redirecting to login
+  }
+
+  return (
+    <div className="min-h-screen pb-20">
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-8">Welcome to Zipli</h1>
+        
+        <div className="space-y-4">
+          <Button onClick={deleteSpecificDonations} variant="destructive" className="w-full">
+            Delete Recent Test Donations (aaaaaaa, ggggggg, Halala, fdfvfe)
+          </Button>
+          
+          <Button 
+            onClick={() => router.push('/donate')} 
+            className="w-full"
+            variant="primary"
+          >
+            Go to Donate Dashboard
+          </Button>
+          
+          <Button 
+            onClick={() => router.push('/feed')} 
+            className="w-full"
+            variant="secondary"
+          >
+            Go to Feed
+          </Button>
+        </div>
+      </main>
+      
+      <BottomNav />
     </div>
   );
 } 
