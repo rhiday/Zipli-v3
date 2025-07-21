@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 import { 
   Select, 
   SelectContent, 
@@ -23,6 +24,10 @@ export default function ProfilePage(): React.ReactElement {
     full_name: '',
     email: '',
     role: '',
+    organization_name: '',
+    address: '',
+    contact_number: '',
+    driver_instructions: '',
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -39,11 +44,15 @@ export default function ProfilePage(): React.ReactElement {
       full_name: currentUser.full_name || '',
       email: currentUser.email || '',
       role: currentUser.role || '',
+      organization_name: currentUser.organization_name || '',
+      address: currentUser.address || '',
+      contact_number: currentUser.contact_number || '',
+      driver_instructions: (currentUser as any).driver_instructions || '',
     });
     setLoading(false);
   }, [currentUser, isInitialized, router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -133,6 +142,20 @@ export default function ProfilePage(): React.ReactElement {
                 </div>
 
                 <div>
+                  <label htmlFor="organization_name" className="block text-sm font-medium text-primary mb-1">
+                    Organization Name
+                  </label>
+                  <Input
+                    type="text"
+                    id="organization_name"
+                    name="organization_name"
+                    value={formData.organization_name}
+                    onChange={handleChange}
+                    placeholder="Your organization name"
+                  />
+                </div>
+
+                <div>
                   <label htmlFor="role" className="block text-sm font-medium text-primary mb-1">
                     Role
                   </label>
@@ -150,6 +173,49 @@ export default function ProfilePage(): React.ReactElement {
                       <SelectItem value="city">City Administration</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div>
+                  <label htmlFor="address" className="block text-sm font-medium text-primary mb-1">
+                    Address
+                  </label>
+                  <Textarea
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Your full address"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="contact_number" className="block text-sm font-medium text-primary mb-1">
+                    Contact Number
+                  </label>
+                  <Input
+                    type="tel"
+                    id="contact_number"
+                    name="contact_number"
+                    value={formData.contact_number}
+                    onChange={handleChange}
+                    placeholder="Your phone number"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="driver_instructions" className="block text-sm font-medium text-primary mb-1">
+                    Default Driver Instructions
+                  </label>
+                  <Textarea
+                    id="driver_instructions"
+                    name="driver_instructions"
+                    value={formData.driver_instructions}
+                    onChange={handleChange}
+                    placeholder="e.g. Please ring the doorbell, Leave at reception"
+                    rows={3}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">These instructions will be pre-filled when making donations</p>
                 </div>
 
                 <div className="flex gap-3">
@@ -179,8 +245,28 @@ export default function ProfilePage(): React.ReactElement {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-primary mb-1">Organization Name</label>
+                  <p className="text-gray-900">{formData.organization_name || 'Not set'}</p>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-primary mb-1">Role</label>
                   <p className="text-gray-900">{formatRole(formData.role)}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-1">Address</label>
+                  <p className="text-gray-900">{formData.address || 'Not set'}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-1">Contact Number</label>
+                  <p className="text-gray-900">{formData.contact_number || 'Not set'}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-1">Default Driver Instructions</label>
+                  <p className="text-gray-900">{formData.driver_instructions || 'Not set'}</p>
                 </div>
 
                 <div className="flex gap-3">

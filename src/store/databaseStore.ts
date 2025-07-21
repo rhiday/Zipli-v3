@@ -33,6 +33,7 @@ export interface User {
   organization_name?: string;
   contact_number?: string;
   address?: string;
+  driver_instructions?: string;
 }
 
 interface Request {

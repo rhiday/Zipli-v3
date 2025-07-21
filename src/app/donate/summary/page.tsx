@@ -23,20 +23,23 @@ export default function DonationSummaryPage() {
 
   const [address, setAddress] = useState('');
   const [instructions, setInstructions] = useState('');
+  const [updateAddressInProfile, setUpdateAddressInProfile] = useState(false);
+  const [updateInstructionsInProfile, setUpdateInstructionsInProfile] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // Pre-fill address and instructions from user profile
   useEffect(() => {
     if (isInitialized && currentUser) {
       // Pre-fill address from profile if available
-      if (currentUser.address && !address) {
+      if (currentUser.address) {
         setAddress(currentUser.address);
       }
-      
-      // You could also pre-fill driver instructions if stored in profile
-      // For now, we'll leave instructions empty unless they have a preference
+      // Pre-fill driver instructions from profile if available
+      if ((currentUser as any).driver_instructions) {
+        setInstructions((currentUser as any).driver_instructions);
+      }
     }
-  }, [isInitialized, currentUser, address]);
+  }, [isInitialized, currentUser]);
 
   const handleEditItem = (itemId: string) => {
     // Navigate back to manual page with edit mode for this item
@@ -47,19 +50,53 @@ export default function DonationSummaryPage() {
     deleteDonationItem(itemId);
   };
 
-  const handleConfirmDonation = () => {
+  const handleConfirmDonation = async () => {
     if (!address.trim()) return;
 
     setIsSaving(true);
-    // In a real app, this is where you would save the complete donation
-    // For now, we just navigate to the thank you page
     
-    // Clear the donation store after confirming
-    const clearDonation = useDonationStore.getState().clearDonation;
-    clearDonation();
-    
-    router.push('/donate/thank-you');
-    setIsSaving(false);
+    try {
+      // Update profile data if checkboxes are checked
+      const { updateUser } = useDatabase.getState();
+      
+      if (currentUser && (updateAddressInProfile || updateInstructionsInProfile)) {
+        const profileUpdates: Partial<typeof currentUser> = {};
+        
+        if (updateAddressInProfile && address !== currentUser.address) {
+          profileUpdates.address = address;
+        }
+        
+        if (updateInstructionsInProfile && instructions !== (currentUser as any).driver_instructions) {
+          (profileUpdates as any).driver_instructions = instructions;
+        }
+        
+        // Only update if there are actual changes
+        if (Object.keys(profileUpdates).length > 0) {
+          console.log('Updating profile with:', profileUpdates);
+          // In a real app, you would make an API call to update the profile
+          // For now, we'll update the local store
+          updateUser({
+            ...currentUser,
+            ...profileUpdates
+          });
+        }
+      }
+      
+      // In a real app, this is where you would save the complete donation
+      // with the current address and instructions (not necessarily the profile ones)
+      
+      // Clear the donation store after confirming
+      const clearDonation = useDonationStore.getState().clearDonation;
+      clearDonation();
+      
+      router.push('/donate/thank-you');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      // Still proceed with the donation even if profile update fails
+      router.push('/donate/thank-you');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Show loading if no donation data
@@ -127,6 +164,18 @@ export default function DonationSummaryPage() {
               onChange={(e) => setAddress(e.target.value)}
               rows={3}
             />
+            <div className="flex items-center gap-2 mt-2">
+              <input
+                type="checkbox"
+                id="update-address-profile"
+                checked={updateAddressInProfile}
+                onChange={(e) => setUpdateAddressInProfile(e.target.checked)}
+                className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              />
+              <label htmlFor="update-address-profile" className="text-sm text-gray-600">
+                Also update this address in my profile for future donations
+              </label>
+            </div>
           </div>
           <div>
             <label htmlFor="driver-instructions" className="block text-black font-semibold mb-2">Instructions for driver</label>
@@ -137,6 +186,18 @@ export default function DonationSummaryPage() {
               onChange={(e) => setInstructions(e.target.value)}
               rows={3}
             />
+            <div className="flex items-center gap-2 mt-2">
+              <input
+                type="checkbox"
+                id="update-instructions-profile"
+                checked={updateInstructionsInProfile}
+                onChange={(e) => setUpdateInstructionsInProfile(e.target.checked)}
+                className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              />
+              <label htmlFor="update-instructions-profile" className="text-sm text-gray-600">
+                Also update these instructions in my profile as default
+              </label>
+            </div>
           </div>
         </div>
       </main>
