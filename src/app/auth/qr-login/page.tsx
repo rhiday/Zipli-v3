@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useDatabase } from '@/store/databaseStore';
 
-export default function QRLoginPage() {
+function QRLoginPageContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -109,5 +109,20 @@ export default function QRLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function QRLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+        <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-body text-primary-75">Loading...</p>
+        </div>
+      </div>
+    }>
+      <QRLoginPageContent />
+    </Suspense>
   );
 }
