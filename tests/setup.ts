@@ -41,7 +41,8 @@ global.ResizeObserver = class ResizeObserver {
   }
 };
 
-// Mock matchMedia
+// Mock matchMedia (guard for non-jsdom envs)
+if (typeof window !== 'undefined') {
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation(query => ({
@@ -83,6 +84,7 @@ const sessionStorageMock = {
 Object.defineProperty(window, 'sessionStorage', {
   value: sessionStorageMock,
 });
+}
 
 // Mock console methods to reduce noise in tests
 const originalError = console.error;
