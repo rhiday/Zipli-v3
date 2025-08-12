@@ -52,8 +52,8 @@ export default function PickupSlotPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cream">
-      <div className="mx-auto max-w-lg bg-base">
+    <div className="flex flex-col h-dvh bg-white">
+      <div className="mx-auto max-w-lg bg-white w-full">
         <SecondaryNavbar 
           title="Pickup slot" 
           backHref="/request/new" 
