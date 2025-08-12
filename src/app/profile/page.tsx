@@ -13,10 +13,13 @@ import {
 } from '@/components/ui/Select';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store/databaseStore';
+import { useLanguage } from '@/hooks/useLanguage';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function ProfilePage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized } = useDatabase();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,11 +86,11 @@ export default function ProfilePage(): React.ReactElement {
 
   const formatRole = (role: string) => {
     switch (role) {
-      case 'food_donor': return 'Food Donor (Restaurants, Catering, etc.)';
-      case 'food_receiver': return 'Food Receiver (Charities, Kitchens, etc.)';
-      case 'terminals': return 'Food Terminal (Processing Centers)';
-      case 'city': return 'City Administration';
-      default: return role || 'Not set';
+      case 'food_donor': return t('foodDonor');
+      case 'food_receiver': return t('foodReceiver');
+      case 'terminals': return t('terminalOperator');
+      case 'city': return t('city');
+      default: return role || t('notSet');
     }
   };
 
@@ -102,7 +105,10 @@ export default function ProfilePage(): React.ReactElement {
   return (
     <div className="min-h-screen bg-cream p-4">
       <div className="mx-auto max-w-lg">
-        <h1 className="mb-6 text-2xl font-bold text-primary">Profile</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-primary">{t('profile')}</h1>
+          <LanguageSwitcher />
+        </div>
 
         {error && (
           <div className="mb-4 rounded-md bg-red-100 p-4 text-sm text-red-700">
@@ -116,7 +122,7 @@ export default function ProfilePage(): React.ReactElement {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-primary mb-1">
-                    Email
+                    {t('email')}
                   </label>
                   <Input
                     type="email"
@@ -129,7 +135,7 @@ export default function ProfilePage(): React.ReactElement {
 
                 <div>
                   <label htmlFor="full_name" className="block text-sm font-medium text-primary mb-1">
-                    Full Name
+                    {t('fullNameLabel')}
                   </label>
                   <Input
                     type="text"
@@ -137,13 +143,13 @@ export default function ProfilePage(): React.ReactElement {
                     name="full_name"
                     value={formData.full_name}
                     onChange={handleChange}
-                    placeholder="Your full name"
+                    placeholder={t('fullNameLabel')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="organization_name" className="block text-sm font-medium text-primary mb-1">
-                    Organization Name
+                    {t('organizationNameLabel')}
                   </label>
                   <Input
                     type="text"
@@ -151,47 +157,47 @@ export default function ProfilePage(): React.ReactElement {
                     name="organization_name"
                     value={formData.organization_name}
                     onChange={handleChange}
-                    placeholder="Your organization name"
+                    placeholder={t('organizationNameLabel')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="role" className="block text-sm font-medium text-primary mb-1">
-                    Role
+                    {t('role')}
                   </label>
                   <Select
                     value={formData.role}
                     onValueChange={(value) => handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLSelectElement>)}
                   >
                     <SelectTrigger id="role" name="role">
-                      <SelectValue placeholder="Select your role..." />
+                      <SelectValue placeholder={`${t('iAmA')}...`} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="food_donor">Food Donor (Restaurants, Catering, etc.)</SelectItem>
-                      <SelectItem value="food_receiver">Food Receiver (Charities, Kitchens, etc.)</SelectItem>
-                      <SelectItem value="terminals">Food Terminal (Processing Centers)</SelectItem>
-                      <SelectItem value="city">City Administration</SelectItem>
+                      <SelectItem value="food_donor">{t('foodDonor')}</SelectItem>
+                      <SelectItem value="food_receiver">{t('foodReceiver')}</SelectItem>
+                      <SelectItem value="terminals">{t('terminalOperator')}</SelectItem>
+                      <SelectItem value="city">{t('city')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-primary mb-1">
-                    Address
+                    {t('address')}
                   </label>
                   <Textarea
                     id="address"
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                    placeholder="Your full address"
+                    placeholder={t('address')}
                     rows={3}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="contact_number" className="block text-sm font-medium text-primary mb-1">
-                    Contact Number
+                    {t('contactNumber')}
                   </label>
                   <Input
                     type="tel"
@@ -199,13 +205,13 @@ export default function ProfilePage(): React.ReactElement {
                     name="contact_number"
                     value={formData.contact_number}
                     onChange={handleChange}
-                    placeholder="Your phone number"
+                    placeholder={t('contactNumber')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="driver_instructions" className="block text-sm font-medium text-primary mb-1">
-                    Default Driver Instructions
+                    {t('defaultDriverInstructions')}
                   </label>
                   <Textarea
                     id="driver_instructions"
@@ -215,12 +221,12 @@ export default function ProfilePage(): React.ReactElement {
                     placeholder="e.g. Please ring the doorbell, Leave at reception"
                     rows={3}
                   />
-                  <p className="text-xs text-gray-500 mt-1">These instructions will be pre-filled when making donations</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('defaultDriverInstructions')}</p>
                 </div>
 
                 <div className="flex gap-3">
                   <Button type="submit" disabled={saving} className="flex-1">
-                    {saving ? 'Saving...' : 'Save Changes'}
+                    {saving ? t('saving') : t('saveChanges')}
                   </Button>
                   <Button 
                     type="button" 
@@ -228,50 +234,50 @@ export default function ProfilePage(): React.ReactElement {
                     onClick={() => setIsEditing(false)}
                     className="flex-1"
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                 </div>
               </form>
             ) : (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">Email</label>
+                  <label className="block text-sm font-medium text-primary mb-1">{t('email')}</label>
                   <p className="text-gray-900">{formData.email}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">Full Name</label>
-                  <p className="text-gray-900">{formData.full_name || 'Not set'}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">{t('fullNameLabel')}</label>
+                  <p className="text-gray-900">{formData.full_name || t('notSet')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">Organization Name</label>
-                  <p className="text-gray-900">{formData.organization_name || 'Not set'}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">{t('organizationNameLabel')}</label>
+                  <p className="text-gray-900">{formData.organization_name || t('notSet')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">Role</label>
+                  <label className="block text-sm font-medium text-primary mb-1">{t('role')}</label>
                   <p className="text-gray-900">{formatRole(formData.role)}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">Address</label>
-                  <p className="text-gray-900">{formData.address || 'Not set'}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">{t('address')}</label>
+                  <p className="text-gray-900">{formData.address || t('notSet')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">Contact Number</label>
-                  <p className="text-gray-900">{formData.contact_number || 'Not set'}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">{t('contactNumber')}</label>
+                  <p className="text-gray-900">{formData.contact_number || t('notSet')}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">Default Driver Instructions</label>
-                  <p className="text-gray-900">{formData.driver_instructions || 'Not set'}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">{t('defaultDriverInstructions')}</label>
+                  <p className="text-gray-900">{formData.driver_instructions || t('notSet')}</p>
                 </div>
 
                 <div className="flex gap-3">
                   <Button onClick={() => setIsEditing(true)} className="flex-1">
-                    Edit Profile
+                    {t('editProfile')}
                   </Button>
                   <Button 
                     variant="destructive" 
@@ -279,7 +285,7 @@ export default function ProfilePage(): React.ReactElement {
                     disabled={isLoggingOut}
                     className="flex-1"
                   >
-                    {isLoggingOut ? 'Logging out...' : 'Log Out'}
+                    {isLoggingOut ? t('loggingOut') : t('logout')}
                   </Button>
                 </div>
               </div>

@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
 import { useDatabase } from '@/store/databaseStore';
+import { useLanguage } from '@/hooks/useLanguage';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('hasan@zipli.test');
@@ -16,6 +18,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const login = useDatabase(state => state.login);
+  const { t } = useLanguage();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,10 +65,13 @@ export default function LoginPage() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
+        <div className="flex justify-end mb-4">
+          <LanguageSwitcher />
+        </div>
         <div className="text-center">
-          <h1 className="text-titleSm font-display text-primary">Welcome back</h1>
+          <h1 className="text-titleSm font-display text-primary">{t('welcomeBack')}</h1>
           <p className="mt-2 text-body text-primary-75">
-            Sign in to your account
+            {t('signInToAccount')}
           </p>
         </div>
 
@@ -78,7 +84,7 @@ export default function LoginPage() {
         <form onSubmit={handleLogin} className="mt-8 space-y-6">
           <div>
             <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
-              Email address
+              {t('emailAddress')}
             </label>
             <Input
               id="email"
@@ -93,7 +99,7 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="password" className="block text-label font-medium text-primary mb-1">
-              Password
+              {t('password')}
             </label>
             <Input
               id="password"
@@ -117,7 +123,7 @@ export default function LoginPage() {
                 className="h-4 w-4 rounded border-border text-primary focus:ring-primary/50"
               />
               <label htmlFor="remember-me" className="ml-2 block text-body text-primary">
-                Remember me
+                {t('rememberMe')}
               </label>
             </div>
 
@@ -126,7 +132,7 @@ export default function LoginPage() {
                 href="/auth/forgot-password"
                 className="font-medium text-earth hover:text-primary"
               >
-                Forgot your password?
+                {t('forgotPassword')}
               </Link>
             </div>
           </div>
@@ -139,18 +145,18 @@ export default function LoginPage() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? t('signingIn') : t('signIn')}
             </Button>
           </div>
         </form>
 
         <div className="text-center text-body">
-          <span className="text-inactive">Don\'t have an account?</span>{' '}
+          <span className="text-inactive">{t('dontHaveAccount')}</span>{' '}
           <Link
             href="/auth/register"
             className="font-medium text-earth hover:text-primary"
           >
-            Sign up
+            {t('signUp')}
           </Link>
         </div>
       </div>

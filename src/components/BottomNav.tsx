@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutGrid, Plus, Search, ShoppingBag, FileText, BarChart3, Users } from 'lucide-react';
 import { useDatabase } from '@/store/databaseStore';
+import { useLanguage } from '@/hooks/useLanguage';
 import {
   Drawer,
   DrawerClose,
@@ -22,6 +23,7 @@ export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser } = useDatabase();
+  const { t } = useLanguage();
 
   // Define navigation items based on user role
   const navItems = useMemo(() => {
@@ -32,32 +34,32 @@ export default function BottomNav() {
     switch (role) {
       case 'food_donor':
         return [
-          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
-          { href: '#', label: 'Add', icon: Plus, isCentral: true }, 
-          { href: '/feed', label: 'Explore', icon: Search },
+          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
+          { href: '#', label: t('add'), icon: Plus, isCentral: true }, 
+          { href: '/feed', label: t('explore'), icon: Search },
         ];
       case 'food_receiver':
         return [
-          { href: '/receiver/dashboard', label: 'Dashboard', icon: LayoutGrid },
-          { href: '#', label: 'Request', icon: Plus, isCentral: true }, 
-          { href: '/feed', label: 'Explore', icon: Search },
+          { href: '/receiver/dashboard', label: t('dashboard'), icon: LayoutGrid },
+          { href: '#', label: t('request'), icon: Plus, isCentral: true }, 
+          { href: '/feed', label: t('explore'), icon: Search },
         ];
       case 'city':
         return [
-          { href: '/city/dashboard', label: 'Dashboard', icon: LayoutGrid },
-          { href: '/city', label: 'Analytics', icon: BarChart3 },
-          { href: '/feed', label: 'Overview', icon: Users },
+          { href: '/city/dashboard', label: t('dashboard'), icon: LayoutGrid },
+          { href: '/city', label: t('analytics'), icon: BarChart3 },
+          { href: '/feed', label: t('overview'), icon: Users },
         ];
       case 'terminals':
         return [
-          { href: '/terminal/dashboard', label: 'Terminal', icon: LayoutGrid },
-          { href: '/feed', label: 'Overview', icon: Users },
+          { href: '/terminal/dashboard', label: t('dashboard'), icon: LayoutGrid },
+          { href: '/feed', label: t('overview'), icon: Users },
         ];
       default:
         return [
-          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
-          { href: '#', label: 'Add', icon: Plus, isCentral: true }, 
-          { href: '/feed', label: 'Explore', icon: Search },
+          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
+          { href: '#', label: t('add'), icon: Plus, isCentral: true }, 
+          { href: '/feed', label: t('explore'), icon: Search },
         ];
     }
   }, [currentUser]);
@@ -100,7 +102,7 @@ export default function BottomNav() {
           </DrawerTrigger>
           <DrawerContent className="bg-base">
             <DrawerHeader className="text-center">
-              <DrawerTitle className="text-lg font-semibold text-primary">What would you like to do?</DrawerTitle>
+              <DrawerTitle className="text-lg font-semibold text-primary">{t('createDonation')}?</DrawerTitle>
             </DrawerHeader>
             <div className="grid gap-3 p-4">
               {currentUser?.role === 'food_receiver' ? (
@@ -113,8 +115,8 @@ export default function BottomNav() {
                   >
                     <FileText className="mr-3 h-5 w-5 text-primary" />
                     <div>
-                      <p className="font-semibold text-primary">Request Food</p>
-                      <p className="text-xs text-secondary">Create a request for specific items.</p>
+                      <p className="font-semibold text-primary">{t('request')} {t('donate')}</p>
+                      <p className="text-xs text-secondary">{t('createDonation')}.</p>
                     </div>
                   </Button>
                 </DrawerClose>
@@ -129,8 +131,8 @@ export default function BottomNav() {
                     >
                       <BarChart3 className="mr-3 h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-semibold text-primary">View Analytics</p>
-                        <p className="text-xs text-secondary">Monitor city-wide food sustainability.</p>
+                        <p className="font-semibold text-primary">{t('analytics')}</p>
+                        <p className="text-xs text-secondary">{t('overview')}.</p>
                       </div>
                     </Button>
                   </DrawerClose>
@@ -146,8 +148,8 @@ export default function BottomNav() {
                     >
                       <ShoppingBag className="mr-3 h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-semibold text-primary">Donate Food</p>
-                        <p className="text-xs text-secondary">Offer food items to others.</p>
+                        <p className="font-semibold text-primary">{t('donate')} {t('foodItem')}</p>
+                        <p className="text-xs text-secondary">{t('createDonation')}.</p>
                       </div>
                     </Button>
                   </DrawerClose>
@@ -160,8 +162,8 @@ export default function BottomNav() {
                     >
                       <FileText className="mr-3 h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-semibold text-primary">Request Food</p>
-                        <p className="text-xs text-secondary">Create a request for specific items.</p>
+                        <p className="font-semibold text-primary">{t('request')} {t('foodItem')}</p>
+                        <p className="text-xs text-secondary">{t('createDonation')}.</p>
                       </div>
                     </Button>
                   </DrawerClose>
@@ -170,7 +172,7 @@ export default function BottomNav() {
             </div>
             <DrawerFooter className="pt-2">
               <DrawerClose asChild>
-                <Button variant="ghost" size="sm">Cancel</Button>
+                <Button variant="ghost" size="sm">{t('cancel')}</Button>
               </DrawerClose>
             </DrawerFooter>
           </DrawerContent>

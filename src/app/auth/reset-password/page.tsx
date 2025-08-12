@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDatabase } from '@/store/databaseStore';
+import { useLanguage } from '@/hooks/useLanguage';
 
 function ResetPasswordPageContent() {
   const [password, setPassword] = useState('');
@@ -15,6 +16,7 @@ function ResetPasswordPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const updatePassword = useDatabase(state => state.updatePassword);
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,13 +24,13 @@ function ResetPasswordPageContent() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError(t('passwordTooShort'));
       setLoading(false);
       return;
     }
@@ -45,7 +47,7 @@ function ResetPasswordPageContent() {
       // Success - redirect to login
       router.push('/auth/login?message=Password updated successfully');
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('networkError'));
       setLoading(false);
     }
   };
@@ -54,9 +56,9 @@ function ResetPasswordPageContent() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-titleSm font-display text-primary">Set new password</h1>
+          <h1 className="text-titleSm font-display text-primary">{t('resetPassword')}</h1>
           <p className="mt-2 text-body text-primary-75">
-            Enter your new password below.
+            {t('resetPasswordDesc')}
           </p>
         </div>
 
@@ -69,7 +71,7 @@ function ResetPasswordPageContent() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
             <label htmlFor="password" className="block text-label font-medium text-primary mb-1">
-              New password
+              {t('newPassword')}
             </label>
             <Input
               id="password"
@@ -79,13 +81,13 @@ function ResetPasswordPageContent() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter new password"
+              placeholder={t('newPassword')}
             />
           </div>
 
           <div>
             <label htmlFor="confirmPassword" className="block text-label font-medium text-primary mb-1">
-              Confirm new password
+              {t('confirmNewPassword')}
             </label>
             <Input
               id="confirmPassword"
@@ -95,7 +97,7 @@ function ResetPasswordPageContent() {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
+              placeholder={t('confirmNewPassword')}
             />
           </div>
 
@@ -107,7 +109,7 @@ function ResetPasswordPageContent() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? 'Updating...' : 'Update password'}
+              {loading ? t('updatingPassword') : t('updatePassword')}
             </Button>
           </div>
         </form>
@@ -117,7 +119,7 @@ function ResetPasswordPageContent() {
             href="/auth/login"
             className="font-medium text-earth hover:text-primary"
           >
-            ← Back to sign in
+            ← {t('backToLogin')}
           </Link>
         </div>
       </div>

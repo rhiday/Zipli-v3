@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useDatabase } from '@/store/databaseStore';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export default function ForgotPasswordPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const resetPassword = useDatabase(state => state.resetPassword);
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +27,10 @@ export default function ForgotPasswordPage() {
       if (response.error) {
         setError(response.error);
       } else {
-        setMessage('If an account with that email exists, we\'ve sent you a password reset link.');
+        setMessage(t('resetPasswordDesc'));
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('networkError'));
     } finally {
       setLoading(false);
     }
@@ -38,9 +40,9 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-titleSm font-display text-primary">Reset your password</h1>
+          <h1 className="text-titleSm font-display text-primary">{t('resetPassword')}</h1>
           <p className="mt-2 text-body text-primary-75">
-            Enter your email address and we'll send you a link to reset your password.
+            {t('resetPasswordDesc')}
           </p>
         </div>
 
@@ -59,7 +61,7 @@ export default function ForgotPasswordPage() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
             <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
-              Email address
+              {t('emailAddress')}
             </label>
             <Input
               id="email"
@@ -69,7 +71,7 @@ export default function ForgotPasswordPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              placeholder={t('emailAddress')}
             />
           </div>
 
@@ -81,7 +83,7 @@ export default function ForgotPasswordPage() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? 'Sending...' : 'Send reset link'}
+              {loading ? t('sendingResetLink') : t('sendResetLink')}
             </Button>
           </div>
         </form>
@@ -91,7 +93,7 @@ export default function ForgotPasswordPage() {
             href="/auth/login"
             className="font-medium text-earth hover:text-primary"
           >
-            ← Back to sign in
+            ← {t('backToLogin')}
           </Link>
         </div>
       </div>
