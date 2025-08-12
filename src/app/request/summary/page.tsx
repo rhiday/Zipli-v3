@@ -3,9 +3,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useRequestStore } from '@/store/request';
 import { useDatabase } from '@/store/databaseStore';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 
 export default function RequestSummaryPage() {
   const router = useRouter();
@@ -52,20 +53,18 @@ export default function RequestSummaryPage() {
     return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
   };
 
+  const handleBackClick = () => {
+    router.back();
+  };
+
   return (
     <div className="min-h-screen bg-cream">
       <div className="mx-auto max-w-lg bg-base">
-        {/* Header */}
-        <div className="flex items-center p-4 border-b">
-          <Button 
-            variant="ghost" 
-            onClick={() => router.back()} 
-            className="p-2 h-9 w-9 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center mr-4"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold text-primary">Request summary</h1>
-        </div>
+        <SecondaryNavbar 
+          title="Request summary" 
+          backHref="/request/pickup-slot" 
+          onBackClick={handleBackClick}
+        />
 
         {/* Progress Bar */}
         <div className="px-4 py-2">

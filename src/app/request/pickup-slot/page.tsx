@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { ChevronLeft, Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 import { Label } from "@/components/ui/label";
 import { useRequestStore } from '@/store/request';
 import { useDatabase } from '@/store/databaseStore';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 
 // Define Form Input Types
 type PickupSlotFormInputs = {
@@ -46,20 +47,18 @@ export default function PickupSlotPage() {
     router.push('/request/summary');
   };
 
+  const handleBackClick = () => {
+    router.back();
+  };
+
   return (
     <div className="min-h-screen bg-cream">
       <div className="mx-auto max-w-lg bg-base">
-        {/* Header */}
-        <div className="flex items-center p-4 border-b">
-          <Button 
-            variant="ghost" 
-            onClick={() => router.back()} 
-            className="p-2 h-9 w-9 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center mr-4"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold text-primary">Pickup slot</h1>
-        </div>
+        <SecondaryNavbar 
+          title="Pickup slot" 
+          backHref="/request/new" 
+          onBackClick={handleBackClick}
+        />
 
         {/* Progress Bar */}
         <div className="px-4 py-2">
