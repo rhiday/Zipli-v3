@@ -34,10 +34,10 @@ interface TimeSlotSelectorProps {
 }
 
 export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
-  label = "Select time slot",
-  dateLabel = "Select a day",
-  startTimeLabel = "Start time",
-  endTimeLabel = "End time",
+  label,
+  dateLabel,
+  startTimeLabel,
+  endTimeLabel,
   date,
   startTime,
   endTime,

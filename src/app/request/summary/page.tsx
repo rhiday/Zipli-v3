@@ -8,9 +8,11 @@ import { useRequestStore } from '@/store/request';
 import { useDatabase } from '@/store/databaseStore';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export default function RequestSummaryPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const { requestData, clearRequest } = useRequestStore();
   const { currentUser, addRequest } = useDatabase();
 
@@ -62,7 +64,7 @@ export default function RequestSummaryPage() {
     <div className="flex flex-col h-dvh bg-white">
       <div className="mx-auto max-w-lg bg-white w-full">
         <SecondaryNavbar 
-          title="Request summary" 
+          title={t('requestSummary')} 
           backHref="/request/pickup-slot" 
           onBackClick={handleBackClick}
         />
@@ -76,21 +78,21 @@ export default function RequestSummaryPage() {
           {/* Request Summary */}
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-600">Recurring interval</span>
+              <span className="text-sm text-gray-600">{t('recurringInterval')}</span>
               <span className="text-sm font-medium text-gray-900">
-                {requestData.recurringInterval || 'One-time'}
+                {requestData.recurringInterval || t('oneTime')}
               </span>
             </div>
             
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-600">Quantity</span>
+              <span className="text-sm text-gray-600">{t('quantity')}</span>
               <span className="text-sm font-medium text-gray-900">
-                {requestData.quantity} portions
+                {requestData.quantity} {t('portions')}
               </span>
             </div>
             
             <div className="flex justify-between items-start py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-600">Allergies, intolerances & diets</span>
+              <span className="text-sm text-gray-600">{t('allergiesIntolerancesDiets')}</span>
               <div className="flex flex-wrap gap-1 justify-end max-w-[200px]">
                 {requestData.allergens.map((allergen) => (
                   <span
@@ -104,7 +106,7 @@ export default function RequestSummaryPage() {
             </div>
             
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-600">When do you need</span>
+              <span className="text-sm text-gray-600">{t('whenDoYouNeed')}</span>
               <span className="text-sm font-medium text-gray-900">
                 {formatDate(requestData.pickupDate)}, {requestData.startTime}-{requestData.endTime}
               </span>
@@ -113,15 +115,15 @@ export default function RequestSummaryPage() {
 
           {/* Next Steps */}
           <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-            <h3 className="font-medium text-gray-900">Next steps</h3>
+            <h3 className="font-medium text-gray-900">{t('nextSteps')}</h3>
             
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
                 <Check className="w-3 h-3 text-green-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Request submitted</p>
-                <p className="text-xs text-gray-600">Your request has been added to our system</p>
+                <p className="text-sm font-medium text-gray-900">{t('requestSubmitted')}</p>
+                <p className="text-xs text-gray-600">{t('requestAddedToSystem')}</p>
               </div>
             </div>
             
@@ -130,8 +132,8 @@ export default function RequestSummaryPage() {
                 <span className="text-xs font-medium text-gray-600">2</span>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Matching in progress</p>
-                <p className="text-xs text-gray-600">We're looking for donations that match your criteria</p>
+                <p className="text-sm font-medium text-gray-900">{t('matchingInProgress')}</p>
+                <p className="text-xs text-gray-600">{t('lookingForMatches')}</p>
               </div>
             </div>
             
@@ -140,8 +142,8 @@ export default function RequestSummaryPage() {
                 <span className="text-xs font-medium text-gray-600">3</span>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Get notified</p>
-                <p className="text-xs text-gray-600">You'll receive a notification when we find a match</p>
+                <p className="text-sm font-medium text-gray-900">{t('getNotified')}</p>
+                <p className="text-xs text-gray-600">{t('receiveNotificationWhenMatch')}</p>
               </div>
             </div>
           </div>
@@ -153,7 +155,7 @@ export default function RequestSummaryPage() {
               onClick={handleSubmitRequest}
               className="w-full"
             >
-              Submit request
+              {t('submitRequest')}
             </Button>
           </div>
         </footer>

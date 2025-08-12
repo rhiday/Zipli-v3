@@ -12,6 +12,7 @@ import { useRequestStore } from '@/store/request';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
+import { useLanguage } from '@/hooks/useLanguage';
 
 // Define Form Input Types
 type RequestFormInputs = {
@@ -22,6 +23,7 @@ type RequestFormInputs = {
 
 export default function NewRequestPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const { requestData, setRequestData } = useRequestStore();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>(requestData.allergens);
 
@@ -61,7 +63,7 @@ export default function NewRequestPage() {
     <div className="flex flex-col h-dvh bg-white">
       <div className="mx-auto max-w-lg bg-white w-full">
         <SecondaryNavbar 
-          title="New request" 
+          title={t('newRequest')} 
           backHref="/request" 
           onBackClick={handleBackClick}
         />
@@ -76,43 +78,43 @@ export default function NewRequestPage() {
             {/* Recurring Interval */}
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Recurring interval
+                {t('recurringInterval')}
               </Label>
               <Select>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select interval" />
+                  <SelectValue placeholder={t('selectInterval')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="daily">{t('daily')}</SelectItem>
+                  <SelectItem value="weekly">{t('weekly')}</SelectItem>
+                  <SelectItem value="monthly">{t('monthly')}</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-gray-500 mt-1">
-                Zipli only allows to request according to a preselected set of options.
+                {t('requestOnlyAllowsPreselected')}
               </p>
             </div>
 
             {/* Quantity */}
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Quantity (portions)
+                {t('quantityPortions')}
               </Label>
               <Input
                 {...register('quantity', { required: 'Quantity is required' })}
-                placeholder="Enter quantity"
+                placeholder={t('enterQuantity')}
                 className="w-full"
               />
             </div>
 
             {/* Allergies, intolerances & diets */}
             <AllergensDropdown
-              label="Allergies, intolerances & diets"
+              label={t('allergiesIntolerancesDiets')}
               options={['Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans', 'Vegan', 'Vegetarian', 'Gluten-free', 'Low-lactose']}
               value={selectedAllergens}
               onChange={handleAllergensChange}
-              placeholder="Select dietary restrictions..."
-              hint="This is a hint text."
+              placeholder={t('selectDietaryRestrictions')}
+              hint={t('requestHintText')}
             />
           </form>
         </main>
@@ -125,7 +127,7 @@ export default function NewRequestPage() {
               className="w-full"
               disabled={isSubmitting}
             >
-              Continue
+              {t('continue')}
             </Button>
           </div>
         </footer>

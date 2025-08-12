@@ -9,6 +9,7 @@ import { useDatabase } from '@/store/databaseStore';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { TimeSlotSelector } from '@/components/ui/TimeSlotSelector';
+import { useLanguage } from '@/hooks/useLanguage';
 
 // Define Form Input Types
 type PickupSlotFormInputs = {
@@ -19,6 +20,7 @@ type PickupSlotFormInputs = {
 
 export default function PickupSlotPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const { requestData, setRequestData, clearRequest } = useRequestStore();
   const { currentUser, addRequest } = useDatabase();
 
@@ -57,7 +59,7 @@ export default function PickupSlotPage() {
     <div className="flex flex-col h-dvh bg-white">
       <div className="mx-auto max-w-lg bg-white w-full">
         <SecondaryNavbar 
-          title="Pickup slot" 
+          title={t('pickupSlot')} 
           backHref="/request/new" 
           onBackClick={handleBackClick}
         />
@@ -69,7 +71,10 @@ export default function PickupSlotPage() {
 
         <main className="flex-grow overflow-y-auto p-4">
           <TimeSlotSelector
-            label="When do you need"
+            label={t('whenDoYouNeed')}
+            dateLabel={t('selectADay')}
+            startTimeLabel={t('startTime')}
+            endTimeLabel={t('endTime')}
             date={selectedDate}
             startTime={startTime}
             endTime={endTime}
@@ -86,7 +91,7 @@ export default function PickupSlotPage() {
               className="w-full"
               disabled={isSubmitting || !selectedDate || !startTime || !endTime}
             >
-              Continue
+              {t('continue')}
             </Button>
           </div>
         </footer>

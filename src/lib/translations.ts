@@ -165,6 +165,15 @@ export const translations = {
     logout: 'Logout',
     loggingOut: 'Logging out...',
     notSet: 'Not set',
+    detail: 'Detail',
+    donationLabel: 'Donation',
+    showMore: 'Show more',
+    showLess: 'Show less',
+    selectAllergens: 'Select allergens',
+    photosHelpIdentify: 'Photos help receivers identify your food items',
+    placeholderFoodName: 'e.g. Bread, Rice, etc.',
+    placeholderQuantity: 'e.g. 10',
+    placeholderDescription: 'e.g. A delicious and healthy meal.',
     
     // Request Flow
     newRequest: 'New request',
@@ -178,6 +187,92 @@ export const translations = {
     selectDay: 'Select a day',
     startTime: 'Start time',
     endTime: 'End time',
+    
+    // Donation Dashboard
+    yourImpact: 'Your impact',
+    totalFoodOffered: 'Total food offered',
+    portionsOffered: 'Portions offered',
+    savedInFoodDisposalCosts: 'Saved in food disposal costs',
+    co2Avoided: 'CO2 Avoided',
+    exportToPdf: 'Export to PDF',
+    environmentalAndSocialImpactData: 'Environmental and social impact data for reporting, and operation planning.',
+    thisIsWhomYouveHelped: 'This is whom you\'ve helped',
+    
+    // Manual Donation Form
+    nameOfFood: 'Name of food',
+    quantityKg: 'Quantity (kg)',
+    addFoodItem: 'Add food item',
+    editFoodItem: 'Edit food item',
+    currentItemsInDonation: 'Current Items in Donation',
+    addAnotherItem: 'Add another item',
+    addItem: 'Add item',
+    changesSaved: 'Changes saved',
+    goBackToDashboard: 'Go back to Dashboard',
+    noDonationItemsFound: 'No donation items found.',
+    startNewDonation: 'Start New Donation',
+    createDonationLong: 'Create donation',
+    typeDonationManually: 'Type donation manually',
+    itOnlyTakesFewMinutes: 'It only takes a few minutes',
+    
+    // Pickup Slot Management
+    addPickupSlot: 'Add pickup slot',
+    editPickupSlot: 'Edit pickup slot',
+    addAnotherPickupSlot: 'Add another pickup slot',
+    addAnother: '+ Add another',
+    dateNotSet: 'Date not set',
+    
+    // Donation Summary
+    donationSummary: 'Donation summary',
+    donationItems: 'Donation items',
+    pickupSchedule: 'Pickup schedule',
+    deliveryDetails: 'Delivery details',
+    instructionsForDriver: 'Instructions for driver',
+    enterYourFullAddress: 'Enter your full address',
+    pleaseRingTheDoorbell: 'e.g. Please ring the doorbell',
+    updateAddressInProfile: 'Also update this address in my profile for future donations',
+    updateInstructionsInProfile: 'Also update these instructions in my profile as default',
+    continuing: 'Continuing...',
+    
+    // Feed Page
+    exploreAvailableDonations: 'Explore available donations',
+    searchDonations: 'Search donations...',
+    noDonationsFound: 'No donations found',
+    noDonationsMatchingSearch: 'There are no available donations matching your search.',
+    
+    // Request Flow - New Request Page
+    newRequest: 'New request',
+    recurringInterval: 'Recurring interval',
+    selectInterval: 'Select interval',
+    daily: 'Daily',
+    weekly: 'Weekly', 
+    monthly: 'Monthly',
+    quantityPortions: 'Quantity (portions)',
+    enterQuantity: 'Enter quantity',
+    allergiesIntolerancesDiets: 'Allergies, intolerances & diets',
+    selectDietaryRestrictions: 'Select dietary restrictions...',
+    requestHintText: 'This is a hint text.',
+    requestOnlyAllowsPreselected: 'Zipli only allows to request according to a preselected set of options.',
+    
+    // Request Flow - Pickup Slot Page  
+    pickupSlot: 'Pickup slot',
+    whenDoYouNeed: 'When do you need',
+    selectADay: 'Select a day',
+    selectDate: 'Select date',
+    startTime: 'Start time',
+    endTime: 'End time',
+    
+    // Request Flow - Summary Page
+    requestSummary: 'Request summary',
+    oneTime: 'One-time',
+    portions: 'portions',
+    nextSteps: 'Next steps',
+    requestSubmitted: 'Request submitted',
+    requestAddedToSystem: 'Your request has been added to our system',
+    matchingInProgress: 'Matching in progress',
+    lookingForMatches: 'We\'re looking for donations that match your criteria',
+    getNotified: 'Get notified',
+    receiveNotificationWhenMatch: 'You\'ll receive a notification when we find a match',
+    submitRequest: 'Submit request',
   },
   fi: {
     // Navigation
@@ -342,6 +437,15 @@ export const translations = {
     logout: 'Kirjaudu ulos',
     loggingOut: 'Kirjaudutaan ulos...',
     notSet: 'Ei asetettu',
+    detail: 'Lisätiedot',
+    donationLabel: 'Lahjoitus',
+    showMore: 'Näytä lisää',
+    showLess: 'Näytä vähemmän',
+    selectAllergens: 'Valitse allergeenit',
+    photosHelpIdentify: 'Kuvat auttavat vastaanottajia tunnistamaan ruoka-aineet',
+    placeholderFoodName: 'esim. Leipä, Riisi, jne.',
+    placeholderQuantity: 'esim. 10',
+    placeholderDescription: 'esim. Herkullinen ja terveellinen ateria.',
     
     // Request Flow
     newRequest: 'Uusi pyyntö',
@@ -355,6 +459,92 @@ export const translations = {
     selectDay: 'Valitse päivä',
     startTime: 'Alkamisaika',
     endTime: 'Päättymisaika',
+    
+    // Donation Dashboard
+    yourImpact: 'Vaikutuksesi',
+    totalFoodOffered: 'Tarjottu ruoka yhteensä',
+    portionsOffered: 'Tarjotut annokset',
+    savedInFoodDisposalCosts: 'Säästetty ruoan hävityskustannuksissa',
+    co2Avoided: 'Vältetty CO2',
+    exportToPdf: 'Vie PDF:ksi',
+    environmentalAndSocialImpactData: 'Ympäristö- ja sosiaalisen vaikutuksen tiedot raportointia ja toiminnan suunnittelua varten.',
+    thisIsWhomYouveHelped: 'Näitä olet auttanut',
+    
+    // Manual Donation Form
+    nameOfFood: 'Ruoan nimi',
+    quantityKg: 'Määrä (kg)',
+    addFoodItem: 'Lisää ruoka-aine',
+    editFoodItem: 'Muokkaa ruoka-ainetta',
+    currentItemsInDonation: 'Nykyiset tuotteet lahjoituksessa',
+    addAnotherItem: 'Lisää toinen tuote',
+    addItem: 'Lisää tuote',
+    changesSaved: 'Muutokset tallennettu',
+    goBackToDashboard: 'Palaa kojelautaan',
+    noDonationItemsFound: 'Lahjoitustuotteita ei löytynyt.',
+    startNewDonation: 'Aloita uusi lahjoitus',
+    createDonationLong: 'Luo lahjoitus',
+    typeDonationManually: 'Kirjoita lahjoitus käsin',
+    itOnlyTakesFewMinutes: 'Se kestää vain muutaman minuutin',
+    
+    // Pickup Slot Management
+    addPickupSlot: 'Lisää noutopaikka',
+    editPickupSlot: 'Muokkaa noutopaikka',
+    addAnotherPickupSlot: 'Lisää toinen noutopaikka',
+    addAnother: '+ Lisää toinen',
+    dateNotSet: 'Päivämäärää ei asetettu',
+    
+    // Donation Summary
+    donationSummary: 'Lahjoituksen yhteenveto',
+    donationItems: 'Lahjoitustuotteet',
+    pickupSchedule: 'Noutaikataulu',
+    deliveryDetails: 'Toimitusten tiedot',
+    instructionsForDriver: 'Ohjeet kuljettajalle',
+    enterYourFullAddress: 'Syötä koko osoitteesi',
+    pleaseRingTheDoorbell: 'esim. Soita ovikelloa',
+    updateAddressInProfile: 'Päivitä tämä osoite myös profiiliini tulevia lahjoituksia varten',
+    updateInstructionsInProfile: 'Päivitä nämä ohjeet myös profiiliini oletuksena',
+    continuing: 'Jatketaan...',
+    
+    // Feed Page
+    exploreAvailableDonations: 'Tutki saatavilla olevia lahjoituksia',
+    searchDonations: 'Hae lahjoituksia...',
+    noDonationsFound: 'Lahjoituksia ei löytynyt',
+    noDonationsMatchingSearch: 'Haullasi ei löytynyt saatavilla olevia lahjoituksia.',
+    
+    // Request Flow - New Request Page
+    newRequest: 'Uusi pyyntö',
+    recurringInterval: 'Toistuvuusväli',
+    selectInterval: 'Valitse väli',
+    daily: 'Päivittäin',
+    weekly: 'Viikoittain', 
+    monthly: 'Kuukausittain',
+    quantityPortions: 'Määrä (annokset)',
+    enterQuantity: 'Syötä määrä',
+    allergiesIntolerancesDiets: 'Allergiat, intoleranssit ja ruokavaliot',
+    selectDietaryRestrictions: 'Valitse ruokavaliorajoitukset...',
+    requestHintText: 'Tämä on vihjeteksti.',
+    requestOnlyAllowsPreselected: 'Zipli sallii pyynnön vain ennalta valittujen vaihtoehtojen mukaan.',
+    
+    // Request Flow - Pickup Slot Page  
+    pickupSlot: 'Noutopaikka',
+    whenDoYouNeed: 'Milloin tarvitset',
+    selectADay: 'Valitse päivä',
+    selectDate: 'Valitse päivämäärä',
+    startTime: 'Aloitusaika',
+    endTime: 'Lopetusaika',
+    
+    // Request Flow - Summary Page
+    requestSummary: 'Pyynnön yhteenveto',
+    oneTime: 'Kertaluontoinen',
+    portions: 'annosta',
+    nextSteps: 'Seuraavat vaiheet',
+    requestSubmitted: 'Pyyntö lähetetty',
+    requestAddedToSystem: 'Pyyntösi on lisätty järjestelmään',
+    matchingInProgress: 'Vastaavuushaku käynnissä',
+    lookingForMatches: 'Etsimme lahjoituksia, jotka vastaavat kriteerejäsi',
+    getNotified: 'Saat ilmoituksen',
+    receiveNotificationWhenMatch: 'Saat ilmoituksen kun löydämme sopivan lahjoituksen',
+    submitRequest: 'Lähetä pyyntö',
   }
 } as const;
 
