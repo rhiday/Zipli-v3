@@ -1,8 +1,6 @@
 [
   {"id": "user-1", "email":"alice@zipli.test","password":"password","role":"food_donor","full_name":"Alice's Restaurant"},
   {"id": "user-2", "email":"bob@zipli.test","password":"password","role":"food_receiver","full_name":"Bob's Charity House"},
-  {"id": "user-3", "email":"donor@zipli.test","password":"password","role":"food_donor","full_name":"Test Donor"},
-  {"id": "user-4", "email":"helsinki.airport@sodexo.com","password":"password","role":"food_donor","full_name":"Sodexo Helsinki"},
-  {"id": "user-5", "email":"helsinki.community@redcross.org","password":"password","role":"food_receiver","full_name":"Red Cross Helsinki"},
-  {"id": "user-6", "email":"receiver@zipli.test","password":"password","role":"food_receiver","full_name":"Test Receiver"}
+  {"id": "user-3", "email":"helsinki.airport@sodexo.com","password":"password","role":"food_donor","full_name":"Sodexo Helsinki Airport"},
+  {"id": "user-4", "email":"helsinki.community@redcross.org","password":"password","role":"food_receiver","full_name":"Red Cross Helsinki Community"}
 ]

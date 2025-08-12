@@ -15,4 +15,5 @@ coverage/
 .vscode/
 *.swp 
 supabase/.temp/
-workspace.json 
+workspace.json
+.kiro/settings/mcp.json

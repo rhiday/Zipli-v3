@@ -188,8 +188,11 @@ export const useDatabase = create<DatabaseState>()(
           return { data: null, error: 'Invalid email or password' };
         }
         
-        // In a real app, you'd verify the password here
-        // For mock purposes, we'll accept any password
+        // Verify password matches the one stored in mock data
+        if ((user as any).password !== password) {
+          return { data: null, error: 'Invalid email or password' };
+        }
+        
         set({ currentUser: user });
         return { data: { user }, error: null };
       },
