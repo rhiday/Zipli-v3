@@ -2,15 +2,13 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/Input';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { Calendar, Clock } from 'lucide-react';
-import { Label } from "@/components/ui/label";
 import { useRequestStore } from '@/store/request';
 import { useDatabase } from '@/store/databaseStore';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
+import { TimeSlotSelector } from '@/components/ui/TimeSlotSelector';
 
 // Define Form Input Types
 type PickupSlotFormInputs = {
@@ -24,24 +22,27 @@ export default function PickupSlotPage() {
   const { requestData, setRequestData, clearRequest } = useRequestStore();
   const { currentUser, addRequest } = useDatabase();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<PickupSlotFormInputs>({
-    defaultValues: {
-      pickupDate: requestData.pickupDate,
-      startTime: requestData.startTime,
-      endTime: requestData.endTime,
-    }
-  });
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    requestData.pickupDate ? new Date(requestData.pickupDate) : undefined
+  );
+  const [startTime, setStartTime] = useState<string>(requestData.startTime || '');
+  const [endTime, setEndTime] = useState<string>(requestData.endTime || '');
 
-  const onSubmit = async (data: PickupSlotFormInputs) => {
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<PickupSlotFormInputs>();
+
+  const onSubmit = async () => {
+    if (!selectedDate || !startTime || !endTime) {
+      return; // Add validation as needed
+    }
+
     // Update store with pickup slot data
     setRequestData({
-      pickupDate: data.pickupDate,
-      startTime: data.startTime,
-      endTime: data.endTime,
+      pickupDate: selectedDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      startTime: startTime,
+      endTime: endTime,
     });
 
     // Navigate to summary page
@@ -66,66 +67,24 @@ export default function PickupSlotPage() {
           <Progress value={67} className="h-2 w-full" />
         </div>
 
-        <main className="flex-grow overflow-y-auto">
-          <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-6">
-            {/* When do you need */}
-            <div>
-              <Label className="text-lg font-medium text-gray-900 mb-4 block">
-                When do you need
-              </Label>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Select a day
-              </Label>
-              <div className="relative">
-                <Input
-                  type="date"
-                  {...register('pickupDate', { required: 'Date is required' })}
-                  className="w-full pl-10"
-                  placeholder="DD/MM/YYYY"
-                />
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              </div>
-            </div>
-
-            {/* Time Selection */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Start time
-                </Label>
-                <div className="relative">
-                  <Input
-                    type="time"
-                    {...register('startTime', { required: 'Start time is required' })}
-                    className="w-full pl-10"
-                  />
-                  <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                  End time
-                </Label>
-                <div className="relative">
-                  <Input
-                    type="time"
-                    {...register('endTime', { required: 'End time is required' })}
-                    className="w-full pl-10"
-                  />
-                  <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-            </div>
-          </form>
+        <main className="flex-grow overflow-y-auto p-4">
+          <TimeSlotSelector
+            label="When do you need"
+            date={selectedDate}
+            startTime={startTime}
+            endTime={endTime}
+            onDateChange={setSelectedDate}
+            onStartTimeChange={setStartTime}
+            onEndTimeChange={setEndTime}
+          />
         </main>
 
         <footer className="px-4 pb-6 pt-4 bg-white">
           <div className="flex justify-end">
             <Button
-              type="submit"
-              onClick={handleSubmit(onSubmit)}
+              onClick={onSubmit}
               className="w-full bg-green-400 hover:bg-green-500 text-black font-medium py-3 rounded-full"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !selectedDate || !startTime || !endTime}
             >
               Continue
             </Button>
