@@ -5,6 +5,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { Manrope, Space_Grotesk } from 'next/font/google'; // Import fonts
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
 import DevSwitcherOverlay from '@/components/dev/DevSwitcherOverlay';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Configure fonts
 const manrope = Manrope({
@@ -37,8 +38,10 @@ export default function RootLayout({
     <html lang="en" className={`${manrope.variable} ${spaceGrotesk.variable}`}> 
       <body>
         <ErrorBoundary>
-          <AppShell>{children}</AppShell>
-          {isDev && <DevSwitcherOverlay />}
+          <LanguageProvider>
+            <AppShell>{children}</AppShell>
+            {isDev && <DevSwitcherOverlay />}
+          </LanguageProvider>
         </ErrorBoundary>
       </body>
     </html>

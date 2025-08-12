@@ -19,23 +19,32 @@ export async function GET() {
       {
         email: 'alice@example.com',
         password: 'testpass123',
-        role: 'food_donor',
+        role: 'donor',
         full_name: 'Alice Restaurant',
-        organization_name: 'Alice\'s Restaurant',
       },
       {
         email: 'bob@example.com',
         password: 'testpass123',
-        role: 'food_receiver',
+        role: 'receiver',
         full_name: 'Bob Charity',
-        organization_name: 'Bob\'s Food Bank',
       },
       {
         email: 'helsinki@example.com',
         password: 'testpass123',
         role: 'city',
         full_name: 'Helsinki Admin',
-        organization_name: 'Helsinki',
+      },
+      {
+        email: 'sodexo.ladonlukko@sodexo.com',
+        password: 'password',
+        role: 'donor',
+        full_name: 'Sodexo LadonLuko',
+      },
+      {
+        email: 'tsanssi@etappiry.net',
+        password: 'password',
+        role: 'receiver',
+        full_name: 'Kohtaamispaikka Tsänssi',
       },
     ];
 

@@ -1,6 +1,7 @@
 [
-  {"id": "user-1", "email":"alice@zipli.test","password":"password","role":"food_donor","full_name":"Alice's Restaurant"},
-  {"id": "user-2", "email":"bob@zipli.test","password":"password","role":"food_receiver","full_name":"Bob's Charity House"},
-  {"id": "user-3", "email":"helsinki.airport@sodexo.com","password":"password","role":"food_donor","full_name":"Sodexo Helsinki Airport"},
-  {"id": "user-4", "email":"helsinki.community@redcross.org","password":"password","role":"food_receiver","full_name":"Red Cross Helsinki Community"}
+  {"id": "user-1", "email":"alice@zipli.test","password":"password","role":"food_donor","full_name":"Alice's Restaurant","address":"Kaivokatu 12, 00100 Helsinki","phone":"+358 9 1234 5678","driver_instructions":"Ring doorbell twice, entrance through main door","business_id":"FI12345678","contact_person":"Alice Virtanen"},
+  {"id": "user-2", "email":"bob@zipli.test","password":"password","role":"food_receiver","full_name":"Bob's Charity House","address":"Mannerheimintie 45, 00260 Helsinki","phone":"+358 50 987 6543","driver_instructions":"Use side entrance, call before arrival","organization_type":"charity","contact_person":"Bob Korhonen"},
+  {"id": "user-3", "email":"sodexo.ladonlukko@sodexo.com","password":"password","role":"food_donor","full_name":"Sodexo LadonLuko","address":"Latokartanonkaari 9, 00790 Helsinki","phone":"+358 40 555 1234","driver_instructions":"Loading dock at back of building, use service entrance","business_id":"FI87654321","contact_person":"Marja Laaksonen"},
+  {"id": "user-4", "email":"helsinki.community@redcross.org","password":"password","role":"food_receiver","full_name":"Red Cross Helsinki Community","address":"Tehtaankatu 1A, 00140 Helsinki","phone":"+358 29 123 4567","driver_instructions":"Main entrance, ask for volunteer coordinator","organization_type":"humanitarian","contact_person":"Jukka Virtanen"},
+  {"id": "user-5", "email":"tsanssi@etappiry.net","password":"password","role":"food_receiver","full_name":"Kohtaamispaikka Tsänssi","address":"Hämeentie 13A, 00530 Helsinki","phone":"+358 45 678 9012","driver_instructions":"Ring buzzer, apartment entrance on right side","organization_type":"community_center","contact_person":"Sari Koskinen"}
 ]

@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutGrid, Plus, Search, ShoppingBag, FileText, BarChart3, Users } from 'lucide-react';
 import { useDatabase } from '@/store/databaseStore';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Drawer,
   DrawerClose,
@@ -22,6 +23,7 @@ export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser } = useDatabase();
+  const { t } = useLanguage();
 
   // Define navigation items based on user role
   const navItems = useMemo(() => {
@@ -32,21 +34,21 @@ export default function BottomNav() {
     switch (role) {
       case 'food_donor':
         return [
-          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
-          { href: '#', label: 'Add', icon: Plus, isCentral: true }, 
-          { href: '/feed', label: 'Explore', icon: Search },
+          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
+          { href: '#', label: t('donate'), icon: Plus, isCentral: true }, 
+          { href: '/feed', label: t('explore'), icon: Search },
         ];
       case 'food_receiver':
         return [
-          { href: '/receiver/dashboard', label: 'Dashboard', icon: LayoutGrid },
-          { href: '#', label: 'Request', icon: Plus, isCentral: true }, 
-          { href: '/feed', label: 'Explore', icon: Search },
+          { href: '/receiver/dashboard', label: t('dashboard'), icon: LayoutGrid },
+          { href: '#', label: t('request'), icon: Plus, isCentral: true }, 
+          { href: '/feed', label: t('explore'), icon: Search },
         ];
       case 'city':
         return [
-          { href: '/city/dashboard', label: 'Dashboard', icon: LayoutGrid },
-          { href: '/city', label: 'Analytics', icon: BarChart3 },
-          { href: '/feed', label: 'Overview', icon: Users },
+          { href: '/city/dashboard', label: t('dashboard'), icon: LayoutGrid },
+          { href: '/city', label: t('analytics'), icon: BarChart3 },
+          { href: '/feed', label: t('overview'), icon: Users },
         ];
       case 'terminals':
         return [
