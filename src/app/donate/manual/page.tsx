@@ -185,8 +185,6 @@ function ManualDonationPageInner() {
         setHasAttemptedSave(false);
       }
       
-<<<<<<< HEAD
-=======
       // Auto-suggest allergens only if user hasn't set any allergens yet
       if (field === 'name' && value.trim() && prev.allergens.length === 0) {
         const suggestedAllergens = suggestAllergensForFood(value);
@@ -199,7 +197,6 @@ function ManualDonationPageInner() {
         updated.allergens = []; // Clear allergens if name is cleared
       }
       
->>>>>>> 21f3ce4 (feat: improve allergen handling and image fallbacks)
       return updated;
     });
   };
