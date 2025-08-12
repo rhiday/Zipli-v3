@@ -122,7 +122,7 @@ export default function NewRequestPage() {
             <Button
               type="submit"
               onClick={handleSubmit(onSubmit)}
-              className="w-full bg-green-400 hover:bg-green-500 text-black font-medium py-3 rounded-full"
+              className="w-full"
               disabled={isSubmitting}
             >
               Continue

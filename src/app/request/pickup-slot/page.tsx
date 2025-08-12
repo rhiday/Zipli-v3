@@ -83,7 +83,7 @@ export default function PickupSlotPage() {
           <div className="flex justify-end">
             <Button
               onClick={onSubmit}
-              className="w-full bg-green-400 hover:bg-green-500 text-black font-medium py-3 rounded-full"
+              className="w-full"
               disabled={isSubmitting || !selectedDate || !startTime || !endTime}
             >
               Continue

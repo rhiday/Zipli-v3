@@ -151,7 +151,7 @@ export default function RequestSummaryPage() {
           <div className="flex justify-end">
             <Button
               onClick={handleSubmitRequest}
-              className="w-full bg-green-400 hover:bg-green-500 text-black font-medium py-3 rounded-full"
+              className="w-full"
             >
               Submit request
             </Button>
