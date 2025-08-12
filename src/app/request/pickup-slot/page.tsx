@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useRequestStore } from '@/store/request';
 import { useDatabase } from '@/store/databaseStore';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Progress } from '@/components/ui/progress';
 
 // Define Form Input Types
 type PickupSlotFormInputs = {
@@ -61,12 +62,8 @@ export default function PickupSlotPage() {
         />
 
         {/* Progress Bar */}
-        <div className="px-4 py-2">
-          <div className="flex space-x-2">
-            <div className="h-1 bg-green-600 rounded flex-1"></div>
-            <div className="h-1 bg-green-600 rounded flex-1"></div>
-            <div className="h-1 bg-gray-200 rounded flex-1"></div>
-          </div>
+        <div className="px-4 pt-2">
+          <Progress value={67} className="h-2 w-full" />
         </div>
 
         {/* Form */}

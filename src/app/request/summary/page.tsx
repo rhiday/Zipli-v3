@@ -7,6 +7,7 @@ import { Check } from 'lucide-react';
 import { useRequestStore } from '@/store/request';
 import { useDatabase } from '@/store/databaseStore';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Progress } from '@/components/ui/progress';
 
 export default function RequestSummaryPage() {
   const router = useRouter();
@@ -67,12 +68,8 @@ export default function RequestSummaryPage() {
         />
 
         {/* Progress Bar */}
-        <div className="px-4 py-2">
-          <div className="flex space-x-2">
-            <div className="h-1 bg-green-600 rounded flex-1"></div>
-            <div className="h-1 bg-green-600 rounded flex-1"></div>
-            <div className="h-1 bg-green-600 rounded flex-1"></div>
-          </div>
+        <div className="px-4 pt-2">
+          <Progress value={100} className="h-2 w-full" />
         </div>
 
         <div className="p-4 space-y-6">
