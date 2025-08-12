@@ -6,12 +6,12 @@ import { Input } from '@/components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { X } from 'lucide-react';
 import { Label } from "@/components/ui/label";
 import { cn } from '@/lib/utils';
 import { useRequestStore } from '@/store/request';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
+import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 
 // Define Form Input Types
 type RequestFormInputs = {
@@ -39,8 +39,8 @@ export default function NewRequestPage() {
     }
   });
 
-  const removeAllergen = (allergen: string) => {
-    setSelectedAllergens(prev => prev.filter(a => a !== allergen));
+  const handleAllergensChange = (allergens: string[]) => {
+    setSelectedAllergens(allergens);
   };
 
   const onSubmit = async (data: RequestFormInputs) => {
@@ -106,31 +106,14 @@ export default function NewRequestPage() {
             </div>
 
             {/* Allergies, intolerances & diets */}
-            <div>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Allergies, intolerances & diets
-              </Label>
-              <div className="border rounded-md p-3 min-h-[60px] flex flex-wrap gap-2">
-                {selectedAllergens.map((allergen) => (
-                  <div
-                    key={allergen}
-                    className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
-                  >
-                    {allergen}
-                    <button
-                      type="button"
-                      onClick={() => removeAllergen(allergen)}
-                      className="ml-1 hover:bg-green-200 rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                This is a hint text.
-              </p>
-            </div>
+            <AllergensDropdown
+              label="Allergies, intolerances & diets"
+              options={['Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans', 'Vegan', 'Vegetarian', 'Gluten-free', 'Low-lactose']}
+              value={selectedAllergens}
+              onChange={handleAllergensChange}
+              placeholder="Select dietary restrictions..."
+              hint="This is a hint text."
+            />
           </form>
         </main>
 
