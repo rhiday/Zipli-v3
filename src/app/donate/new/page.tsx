@@ -11,15 +11,17 @@ import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { ActionButton } from '@/components/ui/action-button';
 import { useRouter } from 'next/navigation';
 import { useDonationStore } from '@/store/donation';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export default function NewDonationPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
   const { donationItems, setDonationItems, setPickupSlots } = useDonationStore();
+  const { t } = useLanguage();
 
   const handleProcessComplete = (data: any) => {
     if (!data || !Array.isArray(data.items)) {
-      setServerError('Could not extract donation items from your voice input. Please try again or type manually.');
+      setServerError(t('anErrorOccurred'));
       return;
     }
     // Map new items
@@ -37,7 +39,7 @@ export default function NewDonationPage() {
 
     return (
       <div className="min-h-screen pb-20">
-        <SecondaryNavbar title="Create a donation" backHref="/donate">
+        <SecondaryNavbar title={t('createDonationLong')} backHref="/donate">
           <div className="absolute left-0 bottom-0 w-full px-4">
             <Progress value={25} className="h-2 w-full" />
           </div>
@@ -56,8 +58,8 @@ export default function NewDonationPage() {
         <footer className="p-4 bg-white pb-24">
           <ActionButton
             href="/donate/manual"
-            title="Type donation manually"
-            description="It only takes a few minutes"
+            title={t('typeDonationManually')}
+            description={t('itOnlyTakesFewMinutes')}
             icon={<Pencil className="w-6 h-6" />}
             className="mt-8"
           />

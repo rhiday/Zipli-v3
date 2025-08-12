@@ -164,6 +164,19 @@ export const translations = {
     logout: 'Logout',
     loggingOut: 'Logging out...',
     notSet: 'Not set',
+    
+    // Request Flow
+    newRequest: 'New request',
+    pickupSlot: 'Pickup slot',
+    selectInterval: 'Select interval',
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+    enterQuantity: 'Enter quantity',
+    whenDoYouNeed: 'When do you need',
+    selectDay: 'Select a day',
+    startTime: 'Start time',
+    endTime: 'End time',
   },
   fi: {
     // Navigation
@@ -327,6 +340,19 @@ export const translations = {
     logout: 'Kirjaudu ulos',
     loggingOut: 'Kirjaudutaan ulos...',
     notSet: 'Ei asetettu',
+    
+    // Request Flow
+    newRequest: 'Uusi pyyntö',
+    pickupSlot: 'Noutopaikka',
+    selectInterval: 'Valitse väli',
+    daily: 'Päivittäin',
+    weekly: 'Viikoittain',
+    monthly: 'Kuukausittain',
+    enterQuantity: 'Syötä määrä',
+    whenDoYouNeed: 'Milloin tarvitset',
+    selectDay: 'Valitse päivä',
+    startTime: 'Alkamisaika',
+    endTime: 'Päättymisaika',
   }
 } as const;
 

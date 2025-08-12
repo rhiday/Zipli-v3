@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store/databaseStore';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface HeaderProps {
   title?: string;
@@ -15,6 +16,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title }) => {
   const { currentUser, isInitialized, donations: allDonations, foodItems } = useDatabase();
   const router = useRouter();
+  const { t } = useLanguage();
 
   // Get donations for the current user, sorted by latest creation time
   const donationItems = isInitialized && currentUser
@@ -50,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     <div className="relative w-full bg-green-800 text-white px-4 pt-10 pb-6 shadow-lg overflow-hidden mb-8">
       <div className="flex justify-between items-center">
         <div>
-          <p className="text-white/80">Good to see you!</p>
+          <p className="text-white/80">{t('goodToSeeYou')}</p>
           <h1 className="text-4xl font-bold text-white mt-1">{title || currentUser?.full_name || ''}</h1>
         </div>
         <div className="flex items-center gap-2">

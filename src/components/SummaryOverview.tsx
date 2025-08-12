@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface Donation {
   status: string;
@@ -12,6 +13,7 @@ interface SummaryOverviewProps {
 }
 
 const SummaryOverview: React.FC<SummaryOverviewProps> = ({ userId, donations }) => {
+  const { t } = useLanguage();
   // Since we don't have active requests in our mock data, we'll just hardcode it for now.
   const activeRequests = 0;
   const activeOffers = donations.filter((d: Donation) => d.status === 'available' || d.status === 'claimed').length;
@@ -21,13 +23,13 @@ const SummaryOverview: React.FC<SummaryOverviewProps> = ({ userId, donations }) 
       <div className="flex-1 flex flex-col items-center justify-center py-2">
         <Link href="/donate/all-offers?filter=active&type=donations" className="focus:outline-none group flex flex-col items-center">
           <span className="text-2xl font-bold text-primary group-hover:underline cursor-pointer">{activeOffers}</span>
-          <span className="text-sm text-primary-75 block group-hover:underline cursor-pointer">Active offers</span>
+          <span className="text-sm text-primary-75 block group-hover:underline cursor-pointer">{t('activeOffers')}</span>
         </Link>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center py-2">
         <Link href="/donate/all-offers?filter=active&type=requests" className="focus:outline-none group flex flex-col items-center">
           <span className="text-2xl font-bold text-primary group-hover:underline cursor-pointer">{activeRequests}</span>
-          <span className="text-sm text-primary-75 block group-hover:underline cursor-pointer">Active requests</span>
+          <span className="text-sm text-primary-75 block group-hover:underline cursor-pointer">{t('activeRequests')}</span>
         </Link>
       </div>
       <div className="flex-1 flex flex-col justify-end items-center md:items-end py-2">
