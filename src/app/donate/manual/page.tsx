@@ -23,6 +23,7 @@ import { PlusIcon, Clock, MapPin } from 'lucide-react';
 
 import DonationCard from '@/components/donations/DonationCard';
 import { Textarea } from '@/components/ui/Textarea';
+import { useLanguage } from '@/hooks/useLanguage';
 
 
 interface DonationItem {
@@ -43,6 +44,7 @@ function ManualDonationPageInner() {
   const donations = useDatabase(state => state.donations);
   const foodItems = useDatabase(state => state.foodItems);
   const currentUser = useDatabase(state => state.currentUser);
+  const { t } = useLanguage();
 
   const [currentItem, setCurrentItem] = useState<Omit<DonationItem, 'id'> & { id: string | 'new' }>({
     id: 'new',
@@ -317,50 +319,50 @@ function ManualDonationPageInner() {
   const formContent = (
     <div className="flex flex-col gap-4">
       <div>
-        <label htmlFor="name" className="text-sm font-medium text-gray-700">Name of food</label>
+        <label htmlFor="name" className="text-sm font-medium text-gray-700">{t('nameOfFood')}</label>
         <Input
           id="name"
           value={currentItem.name}
           onChange={(e) => handleCurrentItemChange('name', e.target.value)}
-          placeholder="e.g. Bread, Rice, etc."
+          placeholder={t('placeholderFoodName')}
           className={hasAttemptedSave && !currentItem.name ? "border-red-500" : ""}
         />
       </div>
 
       <div>
-        <label htmlFor="quantity" className="text-sm font-medium text-gray-700">Quantity (kg)</label>
+        <label htmlFor="quantity" className="text-sm font-medium text-gray-700">{t('quantityKg')}</label>
         <Input
           id="quantity"
           type="number"
           value={currentItem.quantity}
           onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
-          placeholder="e.g. 10"
+          placeholder={t('placeholderQuantity')}
           className={hasAttemptedSave && !currentItem.quantity ? "border-red-500" : ""}
         />
       </div>
       
-      <AllergensDropdown
-        label="Allergens"
-        options={['Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
-        value={currentItem.allergens}
-        onChange={(allergens) => handleCurrentItemChange('allergens', allergens)}
-        placeholder="Select allergens"
-        error={undefined}
-      />
+        <AllergensDropdown
+          label={t('allergens')}
+          options={['Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
+          value={currentItem.allergens}
+          onChange={(allergens) => handleCurrentItemChange('allergens', allergens)}
+          placeholder={t('selectAllergens')}
+          error={undefined}
+        />
 
-      <PhotoUpload
-        onImageUpload={handleImageUpload}
-        uploadedImage={currentItem.imageUrl}
-        hint="Photos help receivers identify your food items"
-      />
+        <PhotoUpload
+          onImageUpload={handleImageUpload}
+          uploadedImage={currentItem.imageUrl}
+          hint={t('photosHelpIdentify')}
+        />
 
       <div>
-        <label htmlFor="description" className="text-sm font-medium text-gray-700">Description</label>
+        <label htmlFor="description" className="text-sm font-medium text-gray-700">{t('description')}</label>
         <Textarea
           id="description"
           value={currentItem.description || ''}
           onChange={(e) => handleCurrentItemChange('description', e.target.value)}
-          placeholder="e.g. A delicious and healthy meal."
+          placeholder={t('placeholderDescription')}
         />
       </div>
     </div>
@@ -369,7 +371,7 @@ function ManualDonationPageInner() {
   return (
     <div className="flex flex-col h-dvh bg-white">
       <SecondaryNavbar 
-        title={isEditMode ? "Edit food item" : "Add food item"} 
+        title={isEditMode ? t('editFoodItem') : t('addFoodItem')} 
         onBackClick={handleBackClick}
         backHref="#" // Dummy href, onBackClick will override
       />
@@ -377,7 +379,7 @@ function ManualDonationPageInner() {
       <main className="flex-grow overflow-y-auto p-4">
         {hasItems && !showAddAnotherForm ? (
           <div className="flex flex-col gap-4">
-            <h2 className="text-lg font-semibold">Current Items in Donation</h2>
+            <h2 className="text-lg font-semibold">{t('currentItemsInDonation')}</h2>
             {donationItems.map(item => (
               <ItemPreview 
                 key={item.id}
@@ -397,7 +399,7 @@ function ManualDonationPageInner() {
               >
                 <span className="flex items-center gap-2 border-b border-interactive pb-1">
                   <PlusIcon size={20} />
-                  Add another item
+{t('addAnotherItem')}
                 </span>
               </button>
             </div>
@@ -414,13 +416,13 @@ function ManualDonationPageInner() {
         {hasItems && !showAddAnotherForm ? (
           <div className="flex justify-end">
             <Button onClick={() => router.push('/donate/pickup-slot')}>
-              Continue
+              {t('continue')}
             </Button>
           </div>
         ) : (
           <div className="flex justify-end">
             <Button onClick={handleSaveItem} disabled={isSaving}>
-              {isSaving ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Add item')}
+              {isSaving ? t('saving') : (isEditMode ? t('saveChanges') : t('addItem'))}
             </Button>
           </div>
         )}
@@ -429,14 +431,14 @@ function ManualDonationPageInner() {
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Changes saved</DialogTitle>
+            <DialogTitle>{t('changesSaved')}</DialogTitle>
           </DialogHeader>
           <DialogFooter>
             <Button
               onClick={() => router.push('/donate')}
               className="w-full"
             >
-              Go back to Dashboard
+              {t('goBackToDashboard')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -446,8 +448,9 @@ function ManualDonationPageInner() {
 }
 
 function ManualDonationPage() {
+  const { t } = useLanguage();
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>{t('loading')}</div>}>
       <ManualDonationPageInner />
     </Suspense>
   );

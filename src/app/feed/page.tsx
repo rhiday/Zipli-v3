@@ -11,6 +11,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import DonationCard from '@/components/donations/DonationCard';
 import { SkeletonCard } from '@/components/ui/Skeleton';
+import { useLanguage } from '@/hooks/useLanguage';
 
 // Simplified type for the feed
 type FeedItem = DonationWithFoodItem & { donorName: string; pickupTime?: string };
@@ -18,6 +19,7 @@ type FeedItem = DonationWithFoodItem & { donorName: string; pickupTime?: string 
 export default function FeedPage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, donations, foodItems, users, isInitialized } = useDatabase();
+  const { t } = useLanguage();
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -95,13 +97,13 @@ export default function FeedPage(): React.ReactElement {
       <div className="mx-auto max-w-7xl space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-titleLg font-display text-primary">
-            Explore available donations
+            {t('exploreAvailableDonations')}
           </h1>
           <div className="relative flex-1 sm:max-w-xs">
             <SearchIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary-50" />
             <Input
               type="text"
-              placeholder="Search donations..."
+              placeholder={t('searchDonations')}
               value={searchTerm}
               onChange={handleSearchChange}
               className="pl-10 pr-4 w-full"
@@ -117,9 +119,9 @@ export default function FeedPage(): React.ReactElement {
           </div>
         ) : (
           <div className="text-center py-16">
-            <h3 className="text-xl font-semibold text-primary">No donations found</h3>
+            <h3 className="text-xl font-semibold text-primary">{t('noDonationsFound')}</h3>
             <p className="mt-2 text-primary-75">
-              There are no available donations matching your search.
+              {t('noDonationsMatchingSearch')}
             </p>
           </div>
         )}

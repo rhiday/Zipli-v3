@@ -21,6 +21,7 @@ import DonationCard from '@/components/donations/DonationCard';
 import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
 import { SkeletonDashboardStat, SkeletonRecipient } from '@/components/ui/Skeleton';
 import { useDonationStore } from '@/store/donation';
+import { useLanguage } from '@/hooks/useLanguage';
 
 type ProfileRow = {
     id: string;
@@ -39,6 +40,7 @@ export default function DonorDashboardPage(): React.ReactElement {
   const allDonations = useDatabase(state => state.donations);
   const foodItems = useDatabase(state => state.foodItems);
   const clearDonation = useDonationStore(state => state.clearDonation);
+  const { t } = useLanguage();
 
   const [dashboardData, setDashboardData] = useState<DonorDashboardData>({ profile: null, donations: [] });
   const [loading, setLoading] = useState(true);
@@ -115,7 +117,7 @@ export default function DonorDashboardPage(): React.ReactElement {
   if (loading) {
     return (
       <div className="min-h-screen pb-20">
-        <Header title="Loading..." />
+        <Header title={t('loading')} />
         
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
           <section>
@@ -165,7 +167,7 @@ export default function DonorDashboardPage(): React.ReactElement {
         {/* This section is being removed as it's redundant with the header */}
         <section>
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-primary mb-4">Your impact</h2>
+                <h2 className="text-lg font-semibold text-primary mb-4">{t('yourImpact')}</h2>
                  <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="underline underline-offset-4 inline-flex items-center gap-1 text-primary text-lg font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-1">
@@ -189,7 +191,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                   <Scale className="w-5 h-5 text-primary-50" />
                   <span className="text-2xl font-semibold text-green-800">46kg</span>
                 </div>
-                <span className="text-sm text-primary-75">Total food offered</span>
+                <span className="text-sm text-primary-75">{t('totalFoodOffered')}</span>
               </div>
               {/* Portions offered */}
               <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
@@ -197,7 +199,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                   <Utensils className="w-5 h-5 text-primary-50" />
                   <span className="text-2xl font-semibold text-green-800">131</span>
                 </div>
-                <span className="text-sm text-primary-75">Portions offered</span>
+                <span className="text-sm text-primary-75">{t('portionsOffered')}</span>
               </div>
               {/* Saved in food disposal costs */}
               <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
@@ -205,7 +207,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                   <Euro className="w-5 h-5 text-primary-50" />
                   <span className="text-2xl font-semibold text-green-800">125€</span>
                 </div>
-                <span className="text-sm text-primary-75">Saved in food disposal costs</span>
+                <span className="text-sm text-primary-75">{t('savedInFoodDisposalCosts')}</span>
               </div>
               {/* CO2 Avoided */}
               <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
@@ -213,7 +215,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                   <Leaf className="w-5 h-5 text-primary-50" />
                   <span className="text-2xl font-semibold text-green-800">10t</span>
                 </div>
-                <span className="text-sm text-primary-75">CO2 Avoided</span>
+                <span className="text-sm text-primary-75">{t('co2Avoided')}</span>
               </div>
             </div>
         </section>
@@ -226,16 +228,16 @@ export default function DonorDashboardPage(): React.ReactElement {
             tabIndex={0}
             role="button"
           >
-            Export to PDF
+            {t('exportToPdf')}
           </a>
           <span className="block text-sm text-primary-75 mt-1">
-            Environmental and social impact data for reporting, and operation planning.
+            {t('environmentalAndSocialImpactData')}
           </span>
         </div>
         
         {/* This is whom you've helped section */}
         <section>
-          <h2 className="text-lg font-semibold text-primary mb-3">This is whom you've helped</h2>
+          <h2 className="text-lg font-semibold text-primary mb-3">{t('thisIsWhomYouveHelped')}</h2>
           
           <div className="space-y-4">
             {/* Recipient 1 - Tsänssi */}

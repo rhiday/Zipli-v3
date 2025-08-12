@@ -13,6 +13,7 @@ import { EditIcon } from '@/components/ui/icons/EditIcon';
 import { DeleteIcon } from '@/components/ui/icons/DeleteIcon';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store/databaseStore';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const timeOptions = Array.from({ length: 48 }, (_, i) => {
   const hours = Math.floor(i / 2);
@@ -31,6 +32,7 @@ export default function PickupSlotPage() {
   const router = useRouter();
   const addFullDonation = useDatabase(state => state.addFullDonation);
   const { donationItems, pickupSlots, addPickupSlot, updatePickupSlot, deletePickupSlot, clearDonation } = useDonationStore();
+  const { t } = useLanguage();
 
   // Helper function to safely format dates
   const formatSlotDate = (date: Date | undefined | string) => {
@@ -118,17 +120,17 @@ export default function PickupSlotPage() {
 
   return (
     <div className="flex flex-col h-dvh bg-white">
-      <SecondaryNavbar title="Add pickup slot" backHref="/donate/manual" onBackClick={handleBackClick} />
+      <SecondaryNavbar title={t('addPickupSlot')} backHref="/donate/manual" onBackClick={handleBackClick} />
       <div className="px-4 pt-2">
         <Progress value={50} className="h-2 w-full" />
       </div>
       <main className="flex flex-col flex-grow overflow-y-auto p-4 gap-6">
-        <h2 className="text-xl font-semibold">Pickup slot</h2>
+        <h2 className="text-xl font-semibold">{t('pickupSlot')}</h2>
         <div className="flex flex-col gap-4">
           {pickupSlots.map(slot => (
             <div key={slot.id} className="flex items-center justify-between p-3 h-[56px] rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
               <span className="font-semibold text-interactive">
-                {formatSlotDate(slot.date) ? `${formatSlotDate(slot.date)}, ${slot.startTime} - ${slot.endTime}` : 'Date not set'}
+                {formatSlotDate(slot.date) ? `${formatSlotDate(slot.date)}, ${slot.startTime} - ${slot.endTime}` : t('dateNotSet')}
               </span>
               <div className="flex items-center gap-2">
                 <button onClick={() => handleEditSlot(slot.id)} className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5" aria-label="Edit">
@@ -155,12 +157,12 @@ export default function PickupSlotPage() {
           <div className="flex flex-col gap-6">
             {(pickupSlots.length > 0 || currentSlot.id !== 'new') && (
               <h3 className="text-lg font-semibold text-[#021d13]">
-                {currentSlot.id !== 'new' ? 'Edit pickup slot' : 'Add another pickup slot'}
+                {currentSlot.id !== 'new' ? t('editPickupSlot') : t('addAnotherPickupSlot')}
               </h3>
             )}
             {/* Date Picker */}
             <div>
-              <label className="block text-black font-semibold mb-2">Select a day</label>
+              <label className="block text-black font-semibold mb-2">{t('selectDay')}</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -193,7 +195,7 @@ export default function PickupSlotPage() {
             {/* Time Pickers */}
             <div className="grid grid-cols-2 gap-4">
                <div>
-                <label className="block text-black font-semibold mb-2">Start time</label>
+                <label className="block text-black font-semibold mb-2">{t('startTime')}</label>
                 <Popover open={openPopover === 'start'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'start' : null)}>
                   <PopoverTrigger asChild>
                     <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
@@ -227,7 +229,7 @@ export default function PickupSlotPage() {
                 </Popover>
               </div>
               <div>
-                <label className="block text-black font-semibold mb-2">End time</label>
+                <label className="block text-black font-semibold mb-2">{t('endTime')}</label>
                 <Popover open={openPopover === 'end'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'end' : null)}>
                   <PopoverTrigger asChild>
                     <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
@@ -271,7 +273,7 @@ export default function PickupSlotPage() {
                   (isFormValid ? 'hover:bg-[#eafcd6] cursor-pointer' : 'text-gray-400 cursor-not-allowed')
                 }
               >
-                + Add another
+{t('addAnother')}
               </button>
             </div>
           </div>
@@ -281,7 +283,7 @@ export default function PickupSlotPage() {
       <footer className="px-4 pb-6 pt-4 bg-white">
         <div className="flex justify-end">
           <Button onClick={handleSubmitDonation} disabled={pickupSlots.length === 0 && (!currentSlot.date || !currentSlot.startTime || !currentSlot.endTime)}>
-            Continue
+            {t('continue')}
           </Button>
         </div>
       </footer>

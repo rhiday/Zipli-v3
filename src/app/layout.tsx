@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
-import './globals.css'; // Assuming globals.css exists for Tailwind base styles
+import './globals.css';
 import AppShell from '@/components/AppShell';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Manrope, Space_Grotesk } from 'next/font/google'; // Import fonts
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
 import DevSwitcherOverlay from '@/components/dev/DevSwitcherOverlay';
+import LangSetter from '@/components/LangSetter';
 
 // Configure fonts
 const manrope = Manrope({
@@ -26,16 +27,14 @@ export const metadata: Metadata = {
   description: 'Connecting food donors and receivers to reduce waste.',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const isDev = process.env.NODE_ENV === 'development';
+  // Read persisted language on client; default en on first render
+  // We keep html lang reactive via a data-attr on body for simplicity
   return (
-    // Apply font variables to html tag
-    <html lang="en" className={`${manrope.variable} ${spaceGrotesk.variable}`}> 
+    <html className={`${manrope.variable} ${spaceGrotesk.variable}`}>
       <body>
+        <LangSetter />
         <ErrorBoundary>
           <AppShell>{children}</AppShell>
           {isDev && <DevSwitcherOverlay />}

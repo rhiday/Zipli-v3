@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
@@ -31,6 +30,8 @@ interface TimeSlotSelectorProps {
   disabled?: boolean;
   error?: string;
   className?: string;
+  datePlaceholder?: string; // e.g. "DD/MM/YYYY"
+  dateFormat?: string; // e.g. 'dd/MM/yyyy'
 }
 
 export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
@@ -47,6 +48,8 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
   disabled = false,
   error,
   className = "",
+  datePlaceholder = 'DD/MM/YYYY',
+  dateFormat = 'dd/MM/yyyy',
 }) => {
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [isStartTimeOpen, setIsStartTimeOpen] = useState(false);
@@ -68,21 +71,23 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
         <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
           <PopoverTrigger asChild>
             <Button
-              variant="outline"
+              variant="secondary"
               disabled={disabled}
               className={cn(
-                "w-full justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50",
+                "rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base",
                 !date && "text-muted-foreground"
               )}
             >
+              {date ? (
+                <span className="text-black">{format(date, dateFormat)}</span>
+              ) : (
+                <span className="text-gray-400">{datePlaceholder}</span>
+              )}
               <div className="pointer-events-none">
                 <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
                   <CalendarIcon className="h-4 w-4 text-gray-400" />
                 </div>
               </div>
-              <span className="ml-3">
-                {date ? format(date, 'dd.M.yyyy') : "Select date"}
-              </span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
@@ -110,21 +115,19 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
           <Popover open={isStartTimeOpen} onOpenChange={setIsStartTimeOpen}>
             <PopoverTrigger asChild>
               <Button
-                variant="outline"
+                variant="secondary"
                 disabled={disabled}
                 className={cn(
-                  "w-full justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50",
+                  "rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base",
                   !startTime && "text-muted-foreground"
                 )}
               >
+                <span className="text-black">{startTime || "--:--"}</span>
                 <div className="pointer-events-none">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
                     <ClockIcon className="h-4 w-4 text-gray-400" />
                   </div>
                 </div>
-                <span className="ml-3">
-                  {startTime || "Start time"}
-                </span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
@@ -157,21 +160,19 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
           <Popover open={isEndTimeOpen} onOpenChange={setIsEndTimeOpen}>
             <PopoverTrigger asChild>
               <Button
-                variant="outline"
+                variant="secondary"
                 disabled={disabled}
                 className={cn(
-                  "w-full justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50",
+                  "rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base",
                   !endTime && "text-muted-foreground"
                 )}
               >
+                <span className="text-black">{endTime || "--:--"}</span>
                 <div className="pointer-events-none">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
                     <ClockIcon className="h-4 w-4 text-gray-400" />
                   </div>
                 </div>
-                <span className="ml-3">
-                  {endTime || "End time"}
-                </span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
