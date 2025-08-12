@@ -12,6 +12,8 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { SummaryCard, AllergenChips } from '@/components/ui/SummaryCard';
 import { Textarea } from '@/components/ui/Textarea';
 import { format } from 'date-fns';
+import PageContainer from '@/components/layout/PageContainer';
+import BottomActionBar from '@/components/ui/BottomActionBar';
 
 export default function RequestSummaryPage() {
   const router = useRouter();
@@ -100,20 +102,31 @@ export default function RequestSummaryPage() {
   };
 
   return (
-    <div className="flex flex-col h-dvh bg-white">
-      <div className="mx-auto max-w-lg bg-white w-full">
-        <SecondaryNavbar 
-          title={t('requestSummary')} 
-          backHref="/request/pickup-slot" 
-          onBackClick={handleBackClick}
-        />
-
-        {/* Progress Bar */}
-        <div className="px-4 pt-2">
-          <Progress value={100} className="h-2 w-full" />
-        </div>
-
-        <main className="flex-grow overflow-y-auto p-4 space-y-6">
+    <PageContainer
+      header={(
+        <>
+          <SecondaryNavbar 
+            title={t('requestSummary')} 
+            backHref="/request/pickup-slot" 
+            onBackClick={handleBackClick}
+          />
+          <div className="px-4 pt-2">
+            <Progress value={100} className="h-2 w-full" />
+          </div>
+        </>
+      )}
+      contentClassName="p-4 space-y-6"
+      footer={(
+        <BottomActionBar>
+          <div className="flex justify-end">
+            <Button onClick={handleSubmitRequest} className="w-full" disabled={isSaving || !address.trim()}>
+              {isSaving ? t('continuing') : t('submitRequest')}
+            </Button>
+          </div>
+        </BottomActionBar>
+      )}
+      className="bg-white"
+    >
           {/* Donation items (requested) */}
           <div className="space-y-2">
             <h2 className="text-lg font-semibold text-[#021d13]">{t('donationItems')}</h2>
@@ -243,16 +256,6 @@ export default function RequestSummaryPage() {
               </div>
             </div>
           </div>
-        </main>
-
-        <footer className="px-4 pb-6 pt-4 bg-white">
-          <div className="flex justify-end">
-            <Button onClick={handleSubmitRequest} className="w-full" disabled={isSaving || !address.trim()}>
-              {isSaving ? t('continuing') : t('submitRequest')}
-            </Button>
-          </div>
-        </footer>
-      </div>
-    </div>
+    </PageContainer>
   );
 }

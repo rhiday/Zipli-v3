@@ -13,6 +13,8 @@ import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import { useLanguage } from '@/hooks/useLanguage';
+import PageContainer from '@/components/layout/PageContainer';
+import BottomActionBar from '@/components/ui/BottomActionBar';
 
 // Define Form Input Types
 type RequestFormInputs = {
@@ -60,20 +62,37 @@ export default function NewRequestPage() {
   };
 
   return (
-    <div className="flex flex-col h-dvh bg-white">
-      <div className="mx-auto max-w-lg bg-white w-full">
-        <SecondaryNavbar 
-          title={t('newRequest')} 
-          backHref="/request" 
-          onBackClick={handleBackClick}
-        />
-
-        {/* Progress Bar */}
-        <div className="px-4 pt-2">
-          <Progress value={33} className="h-2 w-full" />
-        </div>
-
-        <main className="flex-grow overflow-y-auto">
+    <PageContainer
+      header={(
+        <>
+          <SecondaryNavbar 
+            title={t('newRequest')} 
+            backHref="/request" 
+            onBackClick={handleBackClick}
+          />
+          <div className="px-4 pt-2">
+            <Progress value={33} className="h-2 w-full" />
+          </div>
+        </>
+      )}
+      contentClassName=""
+      footer={(
+        <BottomActionBar>
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              onClick={handleSubmit(onSubmit)}
+              className="w-full"
+              disabled={isSubmitting}
+            >
+              {t('continue')}
+            </Button>
+          </div>
+        </BottomActionBar>
+      )}
+      className="bg-white"
+    >
+      <main className="contents">
           <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-6">
             {/* Recurring Interval */}
             <div>
@@ -117,21 +136,7 @@ export default function NewRequestPage() {
               hint={t('requestHintText')}
             />
           </form>
-        </main>
-
-        <footer className="px-4 pb-6 pt-4 bg-white">
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              onClick={handleSubmit(onSubmit)}
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {t('continue')}
-            </Button>
-          </div>
-        </footer>
-      </div>
-    </div>
+      </main>
+    </PageContainer>
   );
 } 

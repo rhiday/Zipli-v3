@@ -10,6 +10,8 @@ import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { TimeSlotSelector } from '@/components/ui/TimeSlotSelector';
 import { useLanguage } from '@/hooks/useLanguage';
+import PageContainer from '@/components/layout/PageContainer';
+import BottomActionBar from '@/components/ui/BottomActionBar';
 
 // Define Form Input Types
 type PickupSlotFormInputs = {
@@ -56,20 +58,35 @@ export default function PickupSlotPage() {
   };
 
   return (
-    <div className="flex flex-col h-dvh bg-white">
-      <div className="mx-auto max-w-lg bg-white w-full">
-        <SecondaryNavbar 
-          title={t('pickupSlot')} 
-          backHref="/request/new" 
-          onBackClick={handleBackClick}
-        />
-
-        {/* Progress Bar */}
-        <div className="px-4 pt-2">
-          <Progress value={67} className="h-2 w-full" />
-        </div>
-
-        <main className="flex-grow overflow-y-auto p-4">
+    <PageContainer
+      header={(
+        <>
+          <SecondaryNavbar 
+            title={t('pickupSlot')} 
+            backHref="/request/new" 
+            onBackClick={handleBackClick}
+          />
+          <div className="px-4 pt-2">
+            <Progress value={67} className="h-2 w-full" />
+          </div>
+        </>
+      )}
+      contentClassName="p-4"
+      footer={(
+        <BottomActionBar>
+          <div className="flex justify-end">
+            <Button
+              onClick={onSubmit}
+              className="w-full"
+              disabled={isSubmitting || !selectedDate || !startTime || !endTime}
+            >
+              {t('continue')}
+            </Button>
+          </div>
+        </BottomActionBar>
+      )}
+      className="bg-white"
+    >
           <TimeSlotSelector
             label={t('whenDoYouNeed')}
             dateLabel={t('selectADay')}
@@ -82,20 +99,6 @@ export default function PickupSlotPage() {
             onStartTimeChange={setStartTime}
             onEndTimeChange={setEndTime}
           />
-        </main>
-
-        <footer className="px-4 pb-6 pt-4 bg-white">
-          <div className="flex justify-end">
-            <Button
-              onClick={onSubmit}
-              className="w-full"
-              disabled={isSubmitting || !selectedDate || !startTime || !endTime}
-            >
-              {t('continue')}
-            </Button>
-          </div>
-        </footer>
-      </div>
-    </div>
+    </PageContainer>
   );
 }

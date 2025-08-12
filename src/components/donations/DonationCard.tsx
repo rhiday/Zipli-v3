@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { ImageIcon, MapPinIcon, ShoppingBag } from 'lucide-react';
-import { DonationWithFoodItem } from '@/store/databaseStore';
+import { DonationWithFoodItem, useDatabase } from '@/store/databaseStore';
 import { CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -18,6 +18,7 @@ interface DonationCardProps {
 
 const DonationCard: React.FC<DonationCardProps> = React.memo(({ donation, donorName, pickupTime, className }) => {
   const { t } = useLanguage();
+  const { users } = useDatabase();
   
   if (!donation || !donation.food_item) {
     return null;
@@ -31,7 +32,9 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(({ donation, donorN
   // Memoized calculations
   const displayData = React.useMemo(() => {
     // Fallbacks for demo/mock data
-    const displayDonor = donorName || t('generousDonor');
+    const donorFromStore = users.find(u => u.id === donor_id);
+    const resolvedDonorName = donorName || donorFromStore?.full_name || donorFromStore?.organization_name;
+    const displayDonor = resolvedDonorName || t('generousDonor');
     const displayDistance = distance || '2.4km'; // TODO: replace with real value if available
     const displayTime = pickupTime || (donation as any).pickup_time || (donation as any).pickup_end_time || undefined;
 
@@ -52,7 +55,7 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(({ donation, donorN
       numericQuantity,
       displayUnit
     };
-  }, [donorName, distance, pickupTime, quantity, donation]);
+  }, [donorName, users, donor_id, distance, pickupTime, quantity, donation, t]);
 
   // Memoized error handler
   const handleImageError = useCallback(() => {

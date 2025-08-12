@@ -11,6 +11,8 @@ import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store/databaseStore';
 import { useLanguage } from '@/hooks/useLanguage';
 import { SummaryCard } from '@/components/ui/SummaryCard';
+import PageContainer from '@/components/layout/PageContainer';
+import BottomActionBar from '@/components/ui/BottomActionBar';
 
 export default function DonationSummaryPage() {
   const router = useRouter();
@@ -126,13 +128,30 @@ export default function DonationSummaryPage() {
   }
 
   return (
-    <div className="flex flex-col h-dvh bg-white">
-      <SecondaryNavbar title={t('donationSummary')} backHref="/donate/pickup-slot" />
-      <div className="px-4 pt-2">
-        <Progress value={75} className="h-2 w-full" />
-      </div>
-
-      <main className="flex-grow overflow-y-auto p-4 space-y-8">
+    <PageContainer
+      header={(
+        <>
+          <SecondaryNavbar title={t('donationSummary')} backHref="/donate/pickup-slot" />
+          <div className="px-4 pt-2">
+            <Progress value={75} className="h-2 w-full" />
+          </div>
+        </>
+      )}
+      contentClassName="p-4 space-y-8"
+      footer={(
+        <BottomActionBar>
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleConfirmDonation}
+              disabled={!address.trim() || isSaving}
+            >
+              {isSaving ? t('continuing') : t('continue')}
+            </Button>
+          </div>
+        </BottomActionBar>
+      )}
+      className="bg-white"
+    >
         {/* Donation Items Section */}
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold text-[#021d13]">{t('donationItems')}</h2>
@@ -218,18 +237,6 @@ export default function DonationSummaryPage() {
             </div>
           </div>
         </div>
-      </main>
-
-      <footer className="px-4 pb-6 pt-4 bg-white">
-        <div className="flex justify-end">
-          <Button 
-            onClick={handleConfirmDonation}
-            disabled={!address.trim() || isSaving}
-          >
-            {isSaving ? t('continuing') : t('continue')}
-          </Button>
-        </div>
-      </footer>
-    </div>
+    </PageContainer>
   );
 } 

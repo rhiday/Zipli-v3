@@ -14,6 +14,8 @@ import { DeleteIcon } from '@/components/ui/icons/DeleteIcon';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store/databaseStore';
 import { useLanguage } from '@/hooks/useLanguage';
+import PageContainer from '@/components/layout/PageContainer';
+import BottomActionBar from '@/components/ui/BottomActionBar';
 
 const timeOptions = Array.from({ length: 48 }, (_, i) => {
   const hours = Math.floor(i / 2);
@@ -119,12 +121,28 @@ export default function PickupSlotPage() {
   const isFormValid = currentSlot.date && currentSlot.startTime && currentSlot.endTime;
 
   return (
-    <div className="flex flex-col h-dvh bg-white">
-      <SecondaryNavbar title={t('addPickupSlot')} backHref="/donate/manual" onBackClick={handleBackClick} />
-      <div className="px-4 pt-2">
-        <Progress value={50} className="h-2 w-full" />
-      </div>
-      <main className="flex flex-col flex-grow overflow-y-auto p-4 gap-6">
+    <PageContainer
+      header={(
+        <>
+          <SecondaryNavbar title={t('addPickupSlot')} backHref="/donate/manual" onBackClick={handleBackClick} />
+          <div className="px-4 pt-2">
+            <Progress value={50} className="h-2 w-full" />
+          </div>
+        </>
+      )}
+      contentClassName="p-4 gap-6 flex flex-col"
+      footer={(
+        <BottomActionBar>
+          <div className="flex justify-end">
+            <Button onClick={handleSubmitDonation} disabled={pickupSlots.length === 0 && (!currentSlot.date || !currentSlot.startTime || !currentSlot.endTime)}>
+              {t('continue')}
+            </Button>
+          </div>
+        </BottomActionBar>
+      )}
+      className="bg-white"
+    >
+      <main className="contents">
         <h2 className="text-xl font-semibold">{t('pickupSlot')}</h2>
         <div className="flex flex-col gap-4">
           {pickupSlots.map(slot => (
@@ -279,14 +297,6 @@ export default function PickupSlotPage() {
           </div>
         )}
       </main>
-      
-      <footer className="px-4 pb-6 pt-4 bg-white">
-        <div className="flex justify-end">
-          <Button onClick={handleSubmitDonation} disabled={pickupSlots.length === 0 && (!currentSlot.date || !currentSlot.startTime || !currentSlot.endTime)}>
-            {t('continue')}
-          </Button>
-        </div>
-      </footer>
-    </div>
+    </PageContainer>
   );
 } 

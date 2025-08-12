@@ -28,10 +28,12 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
   const router = useRouter();
   const donations = useDatabase(state => state.donations);
   const foodItems = useDatabase(state => state.foodItems);
+  const users = useDatabase(state => state.users);
   const deleteDonation = useDatabase(state => state.deleteDonation);
   const [donation, setDonation] = useState<DonationWithFoodItem | null>(null);
   const [otherDonations, setOtherDonations] = useState<DonationWithFoodItem[]>([]);
   const [totalDonations, setTotalDonations] = useState(0);
+  const [donorDisplayName, setDonorDisplayName] = useState<string>('');
   const [isOwner, setIsOwner] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,16 +54,17 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
           const userIsOwner = currentUser && mainDonation.donor_id === currentUser.id;
           setIsOwner(!!userIsOwner);
 
-          if (userIsOwner) {
-            // Only show other donations if user is the owner
-            const userDonations = donations.filter(d => d.donor_id === currentUser.id);
-            const otherDons = userDonations
-              .filter(d => d.id !== params.id)
-              .map(d => ({ ...d, food_item: foodItems.find(fi => fi.id === d.food_item_id)! }))
-              .slice(0, 4);
-            setOtherDonations(otherDons);
-            setTotalDonations(userDonations.length);
-          }
+          // Resolve donor information and other donations for this donor (viewer-agnostic)
+          const donor = users.find(u => u.id === mainDonation.donor_id);
+          setDonorDisplayName(donor?.full_name || donor?.organization_name || '');
+
+          const donorDonations = donations.filter(d => d.donor_id === mainDonation.donor_id);
+          const otherDons = donorDonations
+            .filter(d => d.id !== params.id)
+            .map(d => ({ ...d, food_item: foodItems.find(fi => fi.id === d.food_item_id)! }))
+            .slice(0, 4);
+          setOtherDonations(otherDons);
+          setTotalDonations(donorDonations.length);
         }
       }
     }
@@ -98,7 +101,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
     );
   }
   
-  const donorName = t('generousDonor');
+  const donorName = donorDisplayName || t('generousDonor');
 
   return (
     <div className="min-h-screen pb-20">
@@ -208,6 +211,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
         <hr className="border-gray-100" />
 
         {/* Other Donations by Same Donor */}
+        {otherDonations.length > 0 && (
         <section className="bg-gray-50 rounded-xl p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -219,7 +223,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
                 <p className="text-sm text-gray-500">{totalDonations} {t('donations')}</p>
               </div>
             </div>
-            <Button variant="secondary" size="sm" onClick={() => alert('View profile not implemented')}>
+            <Button variant="secondary" size="sm" onClick={() => router.push(`/profile/${donation.donor_id}`)}>
               {t('viewProfile')}
             </Button>
           </div>
@@ -229,6 +233,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
             ))}
           </div>
         </section>
+        )}
       </main>
     </div>
   );

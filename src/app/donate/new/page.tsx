@@ -12,6 +12,8 @@ import { ActionButton } from '@/components/ui/action-button';
 import { useRouter } from 'next/navigation';
 import { useDonationStore } from '@/store/donation';
 import { useLanguage } from '@/hooks/useLanguage';
+import PageContainer from '@/components/layout/PageContainer';
+import BottomActionBar from '@/components/ui/BottomActionBar';
 
 export default function NewDonationPage() {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -38,32 +40,34 @@ export default function NewDonationPage() {
   };
 
     return (
-      <div className="min-h-screen pb-20">
-        <SecondaryNavbar title={t('createDonationLong')} backHref="/donate">
-          <div className="absolute left-0 bottom-0 w-full px-4">
-            <Progress value={25} className="h-2 w-full" />
-          </div>
-        </SecondaryNavbar>
-
-        <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
-          <div className="w-full flex flex-col items-center">
-            <VoiceInputControl
-              onProcessComplete={handleProcessComplete}
-              setServerError={setServerError}
+      <PageContainer
+        header={(
+          <SecondaryNavbar title={t('createDonationLong')} backHref="/donate">
+            <div className="absolute left-0 bottom-0 w-full px-4">
+              <Progress value={25} className="h-2 w-full" />
+            </div>
+          </SecondaryNavbar>
+        )}
+        contentClassName="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6"
+        footer={(
+          <BottomActionBar className="bg-white">
+            <ActionButton
+              href="/donate/manual"
+              title={t('typeDonationManually')}
+              description={t('itOnlyTakesFewMinutes')}
+              icon={<Pencil className="w-6 h-6" />}
+              className="mt-2"
             />
-          </div>
-          {serverError && <p className="text-red-500 mt-4">{serverError}</p>}
-        </main>
-
-        <footer className="p-4 bg-white pb-24">
-          <ActionButton
-            href="/donate/manual"
-            title={t('typeDonationManually')}
-            description={t('itOnlyTakesFewMinutes')}
-            icon={<Pencil className="w-6 h-6" />}
-            className="mt-8"
+          </BottomActionBar>
+        )}
+      >
+        <div className="w-full flex flex-col items-center">
+          <VoiceInputControl
+            onProcessComplete={handleProcessComplete}
+            setServerError={setServerError}
           />
-        </footer>
-      </div>
+        </div>
+        {serverError && <p className="text-red-500 mt-4">{serverError}</p>}
+      </PageContainer>
     );
 } 

@@ -24,6 +24,8 @@ import { PlusIcon, Clock, MapPin } from 'lucide-react';
 import DonationCard from '@/components/donations/DonationCard';
 import { Textarea } from '@/components/ui/Textarea';
 import { useLanguage } from '@/hooks/useLanguage';
+import PageContainer from '@/components/layout/PageContainer';
+import BottomActionBar from '@/components/ui/BottomActionBar';
 
 
 interface DonationItem {
@@ -369,14 +371,35 @@ function ManualDonationPageInner() {
   );
 
   return (
-    <div className="flex flex-col h-dvh bg-white">
-      <SecondaryNavbar 
-        title={isEditMode ? t('editFoodItem') : t('addFoodItem')} 
-        onBackClick={handleBackClick}
-        backHref="#" // Dummy href, onBackClick will override
-      />
-      
-      <main className="flex-grow overflow-y-auto p-4">
+    <>
+    <PageContainer
+      header={(
+        <SecondaryNavbar 
+          title={isEditMode ? t('editFoodItem') : t('addFoodItem')} 
+          onBackClick={handleBackClick}
+          backHref="#" // Dummy href, onBackClick will override
+        />
+      )}
+      footer={(
+        <BottomActionBar>
+          {hasItems && !showAddAnotherForm ? (
+            <div className="flex justify-end">
+              <Button onClick={() => router.push('/donate/pickup-slot')}>
+                {t('continue')}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex justify-end">
+              <Button onClick={handleSaveItem} disabled={isSaving}>
+                {isSaving ? t('saving') : (isEditMode ? t('saveChanges') : t('addItem'))}
+              </Button>
+            </div>
+          )}
+        </BottomActionBar>
+      )}
+      className="bg-white"
+      contentClassName="p-4"
+    >
         {hasItems && !showAddAnotherForm ? (
           <div className="flex flex-col gap-4">
             <h2 className="text-lg font-semibold">{t('currentItemsInDonation')}</h2>
@@ -410,23 +433,7 @@ function ManualDonationPageInner() {
             {formContent}
           </div>
         )}
-      </main>
-      
-      <footer className="px-4 pb-6 pt-4 bg-white">
-        {hasItems && !showAddAnotherForm ? (
-          <div className="flex justify-end">
-            <Button onClick={() => router.push('/donate/pickup-slot')}>
-              {t('continue')}
-            </Button>
-          </div>
-        ) : (
-          <div className="flex justify-end">
-            <Button onClick={handleSaveItem} disabled={isSaving}>
-              {isSaving ? t('saving') : (isEditMode ? t('saveChanges') : t('addItem'))}
-            </Button>
-          </div>
-        )}
-      </footer>
+    </PageContainer>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent>
@@ -443,7 +450,7 @@ function ManualDonationPageInner() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
 

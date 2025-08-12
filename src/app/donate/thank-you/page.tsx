@@ -35,7 +35,7 @@ export default function DonationThankYouPage() {
         />
       </div>
       <Link href="/donate">
-        <button className="bg-[#C6FFB7] text-black rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-[#A8F5A0] transition">{t('goBackToDashboard')}</button>
+        <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">{t('goBackToDashboard')}</button>
       </Link>
     </div>
   );
