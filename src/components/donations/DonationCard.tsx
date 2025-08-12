@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { ImageIcon, MapPinIcon, ShoppingBag } from 'lucide-react';
 import { DonationWithFoodItem } from '@/store/databaseStore';
 import { CardContent } from '@/components/ui/card';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface DonationCardProps {
   donation: DonationWithFoodItem;
@@ -16,6 +17,8 @@ interface DonationCardProps {
 }
 
 const DonationCard: React.FC<DonationCardProps> = React.memo(({ donation, donorName, pickupTime, className }) => {
+  const { t } = useLanguage();
+  
   if (!donation || !donation.food_item) {
     return null;
   }
@@ -28,7 +31,7 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(({ donation, donorN
   // Memoized calculations
   const displayData = React.useMemo(() => {
     // Fallbacks for demo/mock data
-    const displayDonor = donorName || 'Unknown Donor';
+    const displayDonor = donorName || t('generousDonor');
     const displayDistance = distance || '2.4km'; // TODO: replace with real value if available
     const displayTime = pickupTime || (donation as any).pickup_time || (donation as any).pickup_end_time || undefined;
 
@@ -59,19 +62,19 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(({ donation, donorN
   // Memoized time formatter
   const formattedPickupTime = React.useMemo(() => {
     const time = displayData.displayTime;
-    if (!time) return 'Available now';
+    if (!time) return t('availableNow');
     try {
       const date = new Date(time);
       // If time is in the future, show 'Tomorrow until ...' or 'Until ...'
       const now = new Date();
       if (date.getDate() === now.getDate() + 1) {
-        return `Tomorrow until ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+        return `${t('tomorrow')} ${t('until')} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
       }
-      return `Until ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+      return `${t('until')} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
     } catch (e) {
-      return 'Available now';
+      return t('availableNow');
     }
-  }, [displayData.displayTime]);
+  }, [displayData.displayTime, t]);
 
   return (
     <Link href={`/donate/detail/${id}`} className="block group">
@@ -99,7 +102,7 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(({ donation, donorN
             <div className="flex h-full w-full items-center justify-center bg-gray-100">
               <Image
                 src="/images/placeholder.svg"
-                alt="Placeholder image"
+                alt={t('noImage')}
                 layout="fill"
                 className="object-cover"
               />
@@ -108,12 +111,12 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(({ donation, donorN
         </div>
         <div>
           <h3 className="truncate font-bold text-gray-900 text-lg mb-1 leading-tight">
-            {food_item.name || 'Untitled Item'}
+            {food_item.name || t('untitledItem')}
           </h3>
           <div className="flex items-center gap-1 text-base text-gray-700 mb-1 truncate">
             <span>{displayData.numericQuantity}{displayData.displayUnit}</span>
             <span className="mx-1">·</span>
-            <span className="text-gray-500 truncate">from {displayData.displayDonor}</span>
+            <span className="text-gray-500 truncate">{t('from')} {displayData.displayDonor}</span>
           </div>
           <div className="text-xs text-gray-500 truncate">
             {formattedPickupTime}

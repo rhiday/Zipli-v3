@@ -273,6 +273,55 @@ export const translations = {
     getNotified: 'Get notified',
     receiveNotificationWhenMatch: 'You\'ll receive a notification when we find a match',
     submitRequest: 'Submit request',
+    
+    // Donation Detail Page
+    removeListing: 'Remove listing',
+    editListing: 'Edit listing',
+    generousDonor: 'A Generous Donor',
+    viewProfile: 'View profile',
+    fromUnknownDonor: 'from Unknown Donor',
+    from: 'from',
+    addressNotProvided: 'Address not provided',
+    donations: 'donations',
+    areYouSure: 'Are you sure?',
+    removeListingConfirmation: 'This will permanently remove the listing from public view. This action cannot be undone.',
+    yesRemove: 'Yes, remove',
+    requestThisDonation: 'Request this donation',
+    donationNotFound: 'Donation not found',
+    couldNotLoadDetails: 'Could not load the details for this donation.',
+    goBack: 'Go Back',
+    error: 'Error',
+    noImage: 'No Image',
+    availableNow: 'Available now',
+    until: 'Until',
+    untitledItem: 'Untitled Item',
+    
+    // Error Boundary
+    somethingWentWrong: 'Something went wrong',
+    somethingUnexpectedHappened: "We're sorry, but something unexpected happened. Please try again.",
+    errorDetails: 'Error details (development only)',
+    tryAgain: 'Try Again',
+    goToHome: 'Go to Home',
+    
+    // Language Names (for compact switcher)
+    englishLabel: 'English',
+    finnishLabel: 'Suomi',
+    
+    // Donor Dashboard
+    foodDonorDashboard: 'Food Donor Dashboard',
+    welcomeToDonorDashboard: 'Welcome to your donor dashboard. Here you will be able to:',
+    listAvailableFood: 'List available food items',
+    createNewDonations: 'Create new donations',
+    trackDonationStatus: 'Track donation status',
+    managePickupSchedules: 'Manage pickup schedules',
+    
+    // Page titles
+    welcomeToZipli: 'Welcome to Zipli',
+    foodRequests: 'Food Requests',
+    processing: 'Processing',
+    
+    // Chart messages
+    notEnoughDataPoints: 'Not enough data points for a line chart',
   },
   fi: {
     // Navigation
@@ -545,6 +594,55 @@ export const translations = {
     getNotified: 'Saat ilmoituksen',
     receiveNotificationWhenMatch: 'Saat ilmoituksen kun löydämme sopivan lahjoituksen',
     submitRequest: 'Lähetä pyyntö',
+    
+    // Donation Detail Page
+    removeListing: 'Poista ilmoitus',
+    editListing: 'Muokkaa ilmoitusta',
+    generousDonor: 'Antelias lahjoittaja',
+    viewProfile: 'Näytä profiili',
+    fromUnknownDonor: 'tuntemattomalta lahjoittajalta',
+    from: 'lähteestä',
+    addressNotProvided: 'Osoitetta ei ole annettu',
+    donations: 'lahjoitusta',
+    areYouSure: 'Oletko varma?',
+    removeListingConfirmation: 'Tämä poistaa ilmoituksen pysyvästi julkisesta näkyvyydestä. Tätä toimintoa ei voi peruuttaa.',
+    yesRemove: 'Kyllä, poista',
+    requestThisDonation: 'Pyydä tätä lahjoitusta',
+    donationNotFound: 'Lahjoitusta ei löytynyt',
+    couldNotLoadDetails: 'Lahjoituksen tietoja ei voitu ladata.',
+    goBack: 'Mene takaisin',
+    error: 'Virhe',
+    noImage: 'Ei kuvaa',
+    availableNow: 'Saatavilla nyt',
+    until: 'Asti',
+    untitledItem: 'Nimetön tuote',
+    
+    // Error Boundary
+    somethingWentWrong: 'Jotakin meni vikaan',
+    somethingUnexpectedHappened: 'Pahoittelemme, mutta jotakin odottamatonta tapahtui. Yritä uudelleen.',
+    errorDetails: 'Virheen tiedot (vain kehityksessä)',
+    tryAgain: 'Yritä uudelleen',
+    goToHome: 'Mene kotiin',
+    
+    // Language Names (for compact switcher)
+    englishLabel: 'English',
+    finnishLabel: 'Suomi',
+    
+    // Donor Dashboard
+    foodDonorDashboard: 'Ruoan lahjoittajan kojelauta',
+    welcomeToDonorDashboard: 'Tervetuloa lahjoittajan kojelautaan. Täällä voit:',
+    listAvailableFood: 'Listata saatavilla olevia ruoka-aineita',
+    createNewDonations: 'Luoda uusia lahjoituksia',
+    trackDonationStatus: 'Seurata lahjoitusten tilaa',
+    managePickupSchedules: 'Hallita noutotaikatauluja',
+    
+    // Page titles
+    welcomeToZipli: 'Tervetuloa Zipliin',
+    foodRequests: 'Ruokapyynnöt',
+    processing: 'Käsitellään',
+    
+    // Chart messages
+    notEnoughDataPoints: 'Ei riittävästi datapisteitä viivakaaviota varten',
   }
 } as const;
 

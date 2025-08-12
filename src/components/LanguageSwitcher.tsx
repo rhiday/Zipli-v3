@@ -33,16 +33,16 @@ export default function LanguageSwitcher({ compact = false }: Props) {
             className="px-3 py-1.5 border border-[#F3F4ED] rounded-full flex items-center gap-1.5 text-sm text-white bg-transparent hover:bg-white/5 transition-colors"
           >
             <Languages className="w-4 h-4 text-white" />
-            <span className="leading-none">{language === 'fi' ? 'Suomi' : 'English'}</span>
+            <span className="leading-none">{language === 'fi' ? t('finnishLabel') : t('englishLabel')}</span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="bg-white">
           <DropdownMenuItem onSelect={() => setLanguage('en')} className="flex items-center justify-between">
-            <span>English</span>
+            <span>{t('englishLabel')}</span>
             {language === 'en' ? <Check className="w-4 h-4" /> : null}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setLanguage('fi')} className="flex items-center justify-between">
-            <span>Suomi</span>
+            <span>{t('finnishLabel')}</span>
             {language === 'fi' ? <Check className="w-4 h-4" /> : null}
           </DropdownMenuItem>
         </DropdownMenuContent>

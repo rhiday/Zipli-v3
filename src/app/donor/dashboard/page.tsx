@@ -1,15 +1,19 @@
 'use client';
 
+import { useLanguage } from '@/hooks/useLanguage';
+
 export default function DonorDashboard() {
+  const { t } = useLanguage();
+  
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Food Donor Dashboard</h1>
-      <p>Welcome to your donor dashboard. Here you will be able to:</p>
+      <h1 className="text-2xl font-bold mb-4">{t('foodDonorDashboard')}</h1>
+      <p>{t('welcomeToDonorDashboard')}</p>
       <ul className="list-disc pl-6 mt-4">
-        <li>List available food items</li>
-        <li>Create new donations</li>
-        <li>Track donation status</li>
-        <li>Manage pickup schedules</li>
+        <li>{t('listAvailableFood')}</li>
+        <li>{t('createNewDonations')}</li>
+        <li>{t('trackDonationStatus')}</li>
+        <li>{t('managePickupSchedules')}</li>
       </ul>
     </div>
   );

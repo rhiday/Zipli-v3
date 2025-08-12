@@ -20,8 +20,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export default function DonationDetailPage({ params }: { params: { id: string } }) {
+  const { t } = useLanguage();
   const currentUser = useDatabase(state => state.currentUser);
   const router = useRouter();
   const donations = useDatabase(state => state.donations);
@@ -77,19 +79,19 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
     return (
       <div className="flex min-h-screen flex-col items-center justify-center text-center">
         <h2 className="text-2xl font-bold mb-2">
-          {error ? 'Error' : 'Donation not found'}
+          {error ? t('error') : t('donationNotFound')}
         </h2>
         <p className="text-muted-foreground">
-          {error || 'Could not load the details for this donation.'}
+          {error || t('couldNotLoadDetails')}
         </p>
         <Button onClick={() => router.back()} className="mt-4">
-          Go Back
+          {t('goBack')}
         </Button>
       </div>
     );
   }
   
-  const donorName = 'A Generous Donor';
+  const donorName = t('generousDonor');
 
   return (
     <div className="min-h-screen pb-20">
@@ -114,7 +116,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
           <div className="h-full w-full bg-gray-200 flex items-center justify-center">
             <Image
               src="/images/placeholder.svg"
-              alt="Placeholder image"
+              alt={t('noImage')}
               width={160}
               height={160}
             />
@@ -145,7 +147,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
 
           <div className="mt-4 flex items-start gap-3 text-gray-600">
             <MapPin className="h-5 w-5 flex-shrink-0" />
-            <span className="font-medium">Address not provided</span>
+            <span className="font-medium">{t('addressNotProvided')}</span>
           </div>
 
           {isOwner ? (
@@ -157,7 +159,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
                     size="cta"
                     className="flex-1"
                   >
-                    <Trash2 className="h-5 w-5" /> Remove listing
+                    <Trash2 className="h-5 w-5" /> {t('removeListing')}
                   </Button>
                 </DialogTrigger>
                 <Button
@@ -166,19 +168,19 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
                   className="flex-1"
                   onClick={() => router.push(`/donate/manual?id=${donation.id}`)}
                 >
-                  <Edit className="h-5 w-5" /> Edit listing
+                  <Edit className="h-5 w-5" /> {t('editListing')}
                 </Button>
               </div>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Are you sure?</DialogTitle>
+                  <DialogTitle>{t('areYouSure')}</DialogTitle>
                   <DialogDescription>
-                    This will permanently remove the listing from public view. This action cannot be undone.
+                    {t('removeListingConfirmation')}
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                  <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
-                  <Button variant="destructive" onClick={handleRemoveListing}>Yes, remove</Button>
+                  <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>{t('cancel')}</Button>
+                  <Button variant="destructive" onClick={handleRemoveListing}>{t('yesRemove')}</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -190,7 +192,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
                 className="w-full"
                 onClick={() => router.push(`/request/${params.id}`)}
               >
-                Request this donation
+                {t('requestThisDonation')}
               </Button>
             </div>
           )}
@@ -207,11 +209,11 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
               </Avatar>
               <div>
                 <p className="font-semibold text-gray-900">{donorName}</p>
-                <p className="text-sm text-gray-500">{totalDonations} donations</p>
+                <p className="text-sm text-gray-500">{totalDonations} {t('donations')}</p>
               </div>
             </div>
             <Button variant="secondary" size="sm" onClick={() => alert('View profile not implemented')}>
-              View profile
+              {t('viewProfile')}
             </Button>
           </div>
           <div className="grid grid-cols-2 gap-4">
