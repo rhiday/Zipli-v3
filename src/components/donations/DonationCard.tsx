@@ -100,8 +100,7 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(({ donation, donorN
               <Image
                 src="/images/placeholder.svg"
                 alt="Placeholder image"
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
+                layout="fill"
                 className="object-cover"
               />
             </div>

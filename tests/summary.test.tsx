@@ -2,9 +2,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import SummaryPage from '../src/app/donate/summary/page';
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
-}));
 
 describe('SummaryPage UI', () => {
   it('renders the summary UI and matches the snapshot', () => {

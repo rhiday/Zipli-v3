@@ -176,37 +176,30 @@ function ManualDonationPageInner() {
 
   const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
     setCurrentItem(prev => {
-      const updated: typeof prev = { ...prev, [field]: value };
-
+      const updated = { ...prev, [field]: value };
+      
       // Reset error state when user makes changes to required fields
-      if (
-        hasAttemptedSave &&
-        ((field === 'allergens' && Array.isArray(value) && value.length > 0) ||
-          (field === 'name' && typeof value === 'string' && value.trim().length > 0) ||
-          (field === 'quantity' && typeof value === 'string' && value.trim().length > 0))
-      ) {
+      if (hasAttemptedSave && ((field === 'allergens' && value.length > 0) || 
+          (field === 'name' && value.trim()) || 
+          (field === 'quantity' && value.trim()))) {
         setHasAttemptedSave(false);
       }
-
+      
+<<<<<<< HEAD
+=======
       // Auto-suggest allergens only if user hasn't set any allergens yet
-      if (
-        field === 'name' &&
-        typeof value === 'string' &&
-        value.trim().length > 0 &&
-        Array.isArray(prev.allergens) &&
-        prev.allergens.length === 0
-      ) {
+      if (field === 'name' && value.trim() && prev.allergens.length === 0) {
         const suggestedAllergens = suggestAllergensForFood(value);
-        if (Array.isArray(suggestedAllergens) && suggestedAllergens.length > 0) {
+        if (suggestedAllergens.length > 0) {
           updated.allergens = suggestedAllergens;
+        } else {
+          updated.allergens = ['None']; // Default to 'None' if no suggestions
         }
+      } else if (field === 'name' && !value.trim()) {
+        updated.allergens = []; // Clear allergens if name is cleared
       }
-
-      // If name is cleared, clear allergens as well so user can start fresh
-      if (field === 'name' && typeof value === 'string' && value.trim().length === 0) {
-        updated.allergens = [];
-      }
-
+      
+>>>>>>> 21f3ce4 (feat: improve allergen handling and image fallbacks)
       return updated;
     });
   };
@@ -351,11 +344,11 @@ function ManualDonationPageInner() {
       
       <AllergensDropdown
         label="Allergens"
-        options={['None', 'Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
+        options={['Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
         value={currentItem.allergens}
         onChange={(allergens) => handleCurrentItemChange('allergens', allergens)}
         placeholder="Select allergens"
-        error={hasAttemptedSave && currentItem.allergens.length === 0 ? "Please select an allergen or 'None'" : undefined}
+        error={undefined}
       />
 
       <PhotoUpload
