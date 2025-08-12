@@ -176,6 +176,15 @@ export const useDatabase = create<DatabaseState>()(
           requests: get().requests.length > 0 ? get().requests : requestsWithIds,
           isInitialized: true,
         });
+        
+        // Auto-login first food_donor user in development mode for easier testing
+        if (process.env.NODE_ENV === 'development' && !get().currentUser) {
+          const defaultUser = usersWithIds.find(u => u.role === 'food_donor') || usersWithIds[0];
+          if (defaultUser) {
+            set({ currentUser: defaultUser });
+            console.log('Auto-logged in as:', defaultUser.full_name, '(', defaultUser.role, ')');
+          }
+        }
       },
 
       // Auth methods

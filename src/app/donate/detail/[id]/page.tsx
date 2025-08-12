@@ -39,22 +39,29 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    if (currentUser && params.id) {
-      const userDonations = donations.filter(d => d.donor_id === currentUser.id);
-      const mainDonation = userDonations.find(d => d.id === params.id);
+    if (params.id) {
+      // Find the donation by ID (regardless of owner)
+      const mainDonation = donations.find(d => d.id === params.id);
 
       if (mainDonation) {
         const foodItem = foodItems.find(fi => fi.id === mainDonation.food_item_id);
         if (foodItem) {
           setDonation({ ...mainDonation, food_item: foodItem });
-          setIsOwner(true);
+          
+          // Check if current user is the owner
+          const userIsOwner = currentUser && mainDonation.donor_id === currentUser.id;
+          setIsOwner(!!userIsOwner);
 
-          const otherDons = userDonations
-            .filter(d => d.id !== params.id)
-            .map(d => ({ ...d, food_item: foodItems.find(fi => fi.id === d.food_item_id)! }))
-            .slice(0, 4);
-          setOtherDonations(otherDons);
-          setTotalDonations(userDonations.length);
+          if (userIsOwner) {
+            // Only show other donations if user is the owner
+            const userDonations = donations.filter(d => d.donor_id === currentUser.id);
+            const otherDons = userDonations
+              .filter(d => d.id !== params.id)
+              .map(d => ({ ...d, food_item: foodItems.find(fi => fi.id === d.food_item_id)! }))
+              .slice(0, 4);
+            setOtherDonations(otherDons);
+            setTotalDonations(userDonations.length);
+          }
         }
       }
     }

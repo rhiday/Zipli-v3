@@ -62,7 +62,7 @@ export default function BottomNav() {
           { href: '/feed', label: t('explore'), icon: Search },
         ];
     }
-  }, [currentUser]);
+  }, [currentUser, t]);
 
   // Only render for authenticated users and exclude admin pages
   if (!currentUser || pathname.includes('/admin/') || pathname.includes('/auth/')) {
