@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import donationsData  from '../../mockData/donations.json';
 import foodItemsData  from '../../mockData/food_items.json';
 import usersData      from '../../mockData/users.json';
+import { supabase } from '@/lib/supabase/client';
 
 // Define interfaces for our data structures based on the JSON files
 interface FoodItem {
@@ -180,21 +181,49 @@ export const useDatabase = create<DatabaseState>()(
 
       // Auth methods
       login: async (email, password) => {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        const user = get().users.find(u => u.email === email);
-        if (!user) {
-          return { data: null, error: 'Invalid email or password' };
+        try {
+          // Use real Supabase authentication
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (authError) {
+            return { data: null, error: authError.message };
+          }
+
+          if (authData?.user) {
+            // Fetch the user profile from Supabase
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', authData.user.id)
+              .single();
+
+            if (profileError) {
+              return { data: null, error: 'Failed to load user profile' };
+            }
+
+            // Convert Supabase profile to our User format
+            const user: User = {
+              id: profile.id,
+              email: profile.email,
+              role: profile.role,
+              full_name: profile.full_name,
+              organization_name: profile.organization_name,
+              contact_number: profile.contact_number,
+              address: profile.address,
+              driver_instructions: profile.driver_instructions,
+            };
+
+            set({ currentUser: user });
+            return { data: { user }, error: null };
+          }
+
+          return { data: null, error: 'Authentication failed' };
+        } catch (error) {
+          return { data: null, error: 'Network error. Please try again.' };
         }
-        
-        // Verify password matches the one stored in mock data
-        if ((user as any).password !== password) {
-          return { data: null, error: 'Invalid email or password' };
-        }
-        
-        set({ currentUser: user });
-        return { data: { user }, error: null };
       },
 
       register: async (email, password, userData) => {
@@ -281,7 +310,8 @@ export const useDatabase = create<DatabaseState>()(
         });
       },
       
-      logout: () => {
+      logout: async () => {
+        await supabase.auth.signOut();
         set({ currentUser: null });
         // Clear draft donations from localStorage
         localStorage.removeItem('donation-storage');

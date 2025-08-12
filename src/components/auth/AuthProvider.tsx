@@ -8,6 +8,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useDatabase } from '@/store/databaseStore';
 import type { User } from '@/store/databaseStore';
+import { supabase } from '@/lib/supabase/client';
 
 // We can keep the Supabase types for compatibility if needed, or create our own
 import { Session } from '@supabase/supabase-js';
@@ -18,7 +19,7 @@ interface AuthProviderProps {
 
 interface AuthContextType {
   user: User | null;
-  session: any;
+  session: Session | null;
   isLoading: boolean;
   signOut: () => Promise<void> | void;
 }
@@ -34,21 +35,70 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   const pathname = usePathname();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (isInitialized) {
+        setIsLoading(false);
+      }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session);
+      
+      if (event === 'SIGNED_OUT') {
+        logout();
+        router.push('/auth/login');
+      } else if (event === 'SIGNED_IN' && session?.user) {
+        // Load user profile when signed in
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile) {
+          const user: User = {
+            id: profile.id,
+            email: profile.email,
+            role: profile.role,
+            full_name: profile.full_name,
+            organization_name: profile.organization_name,
+            contact_number: profile.contact_number,
+            address: profile.address,
+            driver_instructions: profile.driver_instructions,
+          };
+          // Update the store with the current user
+          useDatabase.getState().updateUser(user);
+          useDatabase.setState({ currentUser: user });
+        }
+      }
+      
+      setIsLoading(false);
+    });
+
     if (isInitialized) {
       setIsLoading(false);
     }
-  }, [isInitialized]);
 
-  const handleSignOut = () => {
+    return () => subscription.unsubscribe();
+  }, [isInitialized, logout, router]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
     logout();
     router.push('/auth/login');
   };
 
   const value = {
     user: currentUser,
-    session: null, // No real session in mock mode
+    session: session,
     isLoading: isLoading,
     signOut: handleSignOut,
   };

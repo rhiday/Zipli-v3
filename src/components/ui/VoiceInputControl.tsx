@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Mic, StopCircle, Brain, Loader2 } from 'lucide-react';
 import { logger } from '../../../lib/logger';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Helper function to detect iOS
 const isIOS = () => {
@@ -57,6 +58,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = React.memo(({
   const [isProcessingDetails, setIsProcessingDetails] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const { t } = useLanguage();
 
   const handleVoiceInput = useCallback(async () => {
     if (isRecording && mediaRecorderRef.current) {
@@ -166,7 +168,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = React.memo(({
   const buttonState = useMemo(() => {
     if (isRecording) {
       return {
-        text: 'Listening...',
+        text: t('listening'),
         icon: <StopCircle className="h-12 w-12" />,
         action: handleVoiceInput,
         disabled: false,
@@ -182,7 +184,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = React.memo(({
     }
     if (isProcessingDetails) {
       return {
-        text: 'Processing...',
+        text: t('processing'),
         icon: <Brain className="h-12 w-12" />,
         action: noopAction,
         disabled: true,
@@ -210,7 +212,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = React.memo(({
           {buttonState.icon}
         </Button>
         <p className="mt-6 text-lg font-medium text-gray-700">
-          {buttonState.text || 'Press for voice input'}
+          {buttonState.text || t('pressForVoiceInput')}
         </p>
         {isRecording && (
           <p className="mt-2 text-sm text-gray-500 animate-pulse">Recording... Speak now and press again to stop.</p>

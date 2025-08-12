@@ -11,11 +11,13 @@ import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { ActionButton } from '@/components/ui/action-button';
 import { useRouter } from 'next/navigation';
 import { useDonationStore } from '@/store/donation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function NewDonationPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
   const { donationItems, setDonationItems, setPickupSlots } = useDonationStore();
+  const { t } = useLanguage();
 
   const handleProcessComplete = (data: any) => {
     if (!data || !Array.isArray(data.items)) {
