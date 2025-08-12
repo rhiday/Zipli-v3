@@ -185,8 +185,16 @@ export const translations = {
     enterQuantity: 'Enter quantity',
     whenDoYouNeed: 'When do you need',
     selectDay: 'Select a day',
+    selectADay: 'Select a day',
     startTime: 'Start time',
     endTime: 'End time',
+    recurringInterval: 'Recurring interval',
+    quantityPortions: 'Quantity (portions)',
+    allergiesIntolerancesDiets: 'Allergies, intolerances & diets',
+    selectDietaryRestrictions: 'Select dietary restrictions...',
+    requestHintText: 'This is a hint text.',
+    requestOnlyAllowsPreselected: 'Zipli only allows to request according to a preselected set of options.',
+    selectDate: 'Select date',
     
     // Donation Dashboard
     yourImpact: 'Your impact',
@@ -239,27 +247,6 @@ export const translations = {
     noDonationsFound: 'No donations found',
     noDonationsMatchingSearch: 'There are no available donations matching your search.',
     
-    // Request Flow - New Request Page
-    newRequest: 'New request',
-    recurringInterval: 'Recurring interval',
-    selectInterval: 'Select interval',
-    daily: 'Daily',
-    weekly: 'Weekly', 
-    monthly: 'Monthly',
-    quantityPortions: 'Quantity (portions)',
-    enterQuantity: 'Enter quantity',
-    allergiesIntolerancesDiets: 'Allergies, intolerances & diets',
-    selectDietaryRestrictions: 'Select dietary restrictions...',
-    requestHintText: 'This is a hint text.',
-    requestOnlyAllowsPreselected: 'Zipli only allows to request according to a preselected set of options.',
-    
-    // Request Flow - Pickup Slot Page  
-    pickupSlot: 'Pickup slot',
-    whenDoYouNeed: 'When do you need',
-    selectADay: 'Select a day',
-    selectDate: 'Select date',
-    startTime: 'Start time',
-    endTime: 'End time',
     
     // Request Flow - Summary Page
     requestSummary: 'Request summary',
@@ -292,7 +279,6 @@ export const translations = {
     goBack: 'Go Back',
     error: 'Error',
     noImage: 'No Image',
-    availableNow: 'Available now',
     until: 'Until',
     untitledItem: 'Untitled Item',
     
@@ -318,10 +304,14 @@ export const translations = {
     // Page titles
     welcomeToZipli: 'Welcome to Zipli',
     foodRequests: 'Food Requests',
-    processing: 'Processing',
     
     // Chart messages
     notEnoughDataPoints: 'Not enough data points for a line chart',
+    
+    // Summary Overview
+    activeOffers: 'Active offers',
+    activeRequests: 'Active requests',
+    seeAll: 'See all',
   },
   fi: {
     // Navigation
@@ -506,8 +496,16 @@ export const translations = {
     enterQuantity: 'Syötä määrä',
     whenDoYouNeed: 'Milloin tarvitset',
     selectDay: 'Valitse päivä',
+    selectADay: 'Valitse päivä',
     startTime: 'Alkamisaika',
     endTime: 'Päättymisaika',
+    recurringInterval: 'Toistuvuusväli',
+    quantityPortions: 'Määrä (annokset)',
+    allergiesIntolerancesDiets: 'Allergiat, intoleranssit ja ruokavaliot',
+    selectDietaryRestrictions: 'Valitse ruokavaliorajoitukset...',
+    requestHintText: 'Tämä on vihjeteksti.',
+    requestOnlyAllowsPreselected: 'Zipli sallii pyynnön vain ennalta valittujen vaihtoehtojen mukaan.',
+    selectDate: 'Valitse päivämäärä',
     
     // Donation Dashboard
     yourImpact: 'Vaikutuksesi',
@@ -560,27 +558,6 @@ export const translations = {
     noDonationsFound: 'Lahjoituksia ei löytynyt',
     noDonationsMatchingSearch: 'Haullasi ei löytynyt saatavilla olevia lahjoituksia.',
     
-    // Request Flow - New Request Page
-    newRequest: 'Uusi pyyntö',
-    recurringInterval: 'Toistuvuusväli',
-    selectInterval: 'Valitse väli',
-    daily: 'Päivittäin',
-    weekly: 'Viikoittain', 
-    monthly: 'Kuukausittain',
-    quantityPortions: 'Määrä (annokset)',
-    enterQuantity: 'Syötä määrä',
-    allergiesIntolerancesDiets: 'Allergiat, intoleranssit ja ruokavaliot',
-    selectDietaryRestrictions: 'Valitse ruokavaliorajoitukset...',
-    requestHintText: 'Tämä on vihjeteksti.',
-    requestOnlyAllowsPreselected: 'Zipli sallii pyynnön vain ennalta valittujen vaihtoehtojen mukaan.',
-    
-    // Request Flow - Pickup Slot Page  
-    pickupSlot: 'Noutopaikka',
-    whenDoYouNeed: 'Milloin tarvitset',
-    selectADay: 'Valitse päivä',
-    selectDate: 'Valitse päivämäärä',
-    startTime: 'Aloitusaika',
-    endTime: 'Lopetusaika',
     
     // Request Flow - Summary Page
     requestSummary: 'Pyynnön yhteenveto',
@@ -613,7 +590,6 @@ export const translations = {
     goBack: 'Mene takaisin',
     error: 'Virhe',
     noImage: 'Ei kuvaa',
-    availableNow: 'Saatavilla nyt',
     until: 'Asti',
     untitledItem: 'Nimetön tuote',
     
@@ -639,10 +615,14 @@ export const translations = {
     // Page titles
     welcomeToZipli: 'Tervetuloa Zipliin',
     foodRequests: 'Ruokapyynnöt',
-    processing: 'Käsitellään',
     
     // Chart messages
     notEnoughDataPoints: 'Ei riittävästi datapisteitä viivakaaviota varten',
+    
+    // Summary Overview
+    activeOffers: 'Aktiiviset tarjoukset',
+    activeRequests: 'Aktiiviset pyynnöt',
+    seeAll: 'Näytä kaikki',
   }
 } as const;
 

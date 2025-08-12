@@ -34,7 +34,7 @@ const SummaryOverview: React.FC<SummaryOverviewProps> = ({ userId, donations }) 
       </div>
       <div className="flex-1 flex flex-col justify-end items-center md:items-end py-2">
         <Link href="/donate/all-offers?filter=active" className="inline-flex items-center text-sm font-semibold text-primary hover:underline">
-          See all
+          {t('seeAll')}
           <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </div>
