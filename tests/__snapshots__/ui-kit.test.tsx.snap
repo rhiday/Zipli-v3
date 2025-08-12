@@ -1,0 +1,265 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PickupSlotPage UI renders the pickup slot UI and matches the snapshot 1`] = `
+<div>
+  <div
+    class="flex flex-col h-dvh bg-white"
+  >
+    <header
+      class="p-4 bg-white relative h-[80px] flex items-center"
+    >
+      <div
+        class="flex items-center relative w-full"
+      >
+        <button
+          class="text-black z-10"
+        >
+          <svg
+            fill="none"
+            height="28"
+            viewBox="0 0 28 28"
+            width="28"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1.40039 14.0002C1.40039 13.6289 1.548 13.2729 1.81055 13.0103L10.2105 4.61031L10.3172 4.51461C10.8671 4.06612 11.6777 4.09775 12.1902 4.61031C12.7028 5.12287 12.7344 5.93347 12.2859 6.48336L12.1902 6.59L4.78008 14.0002L12.1902 21.4103C12.737 21.957 12.737 22.8433 12.1902 23.39C11.6435 23.9367 10.7573 23.9367 10.2105 23.39L1.81055 14.99L1.71758 14.8875C1.51341 14.6383 1.40039 14.3251 1.40039 14.0002Z"
+              fill="currentColor"
+            />
+            <path
+              d="M26.6004 15.3999L2.80039 15.3999C2.02719 15.3999 1.40039 14.7731 1.40039 13.9999C1.40039 13.2267 2.02719 12.5999 2.80039 12.5999L26.6004 12.5999C27.3736 12.5999 28.0004 13.2267 28.0004 13.9999C28.0004 14.7731 27.3736 15.3999 26.6004 15.3999Z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <h1
+          class="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-black leading-normal whitespace-nowrap"
+        >
+          Add pickup slot
+        </h1>
+      </div>
+    </header>
+    <div
+      class="px-4 pt-2"
+    >
+      <div
+        aria-valuemax="100"
+        aria-valuemin="0"
+        class="relative overflow-hidden rounded-full bg-cloud h-2 w-full"
+        data-max="100"
+        data-state="indeterminate"
+        role="progressbar"
+      >
+        <div
+          class="h-full w-full flex-1 bg-interactive transition-all"
+          data-max="100"
+          data-state="indeterminate"
+          style="transform: translateX(-50%);"
+        />
+      </div>
+    </div>
+    <main
+      class="flex flex-col flex-grow overflow-y-auto p-4 gap-6"
+    >
+      <h2
+        class="text-xl font-semibold"
+      >
+        Pickup slot
+      </h2>
+      <div
+        class="flex flex-col gap-4"
+      />
+      <div
+        class="flex flex-col gap-6"
+      >
+        <div>
+          <label
+            class="block text-black font-semibold mb-2"
+          >
+            Select a day
+          </label>
+          <button
+            aria-controls="radix-:r0:"
+            aria-expanded="false"
+            aria-haspopup="dialog"
+            class="inline-flex transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive cursor-pointer gap-2.5 shrink-0 disabled:bg-inactive disabled:text-tertiary disabled:cursor-not-allowed border hover:bg-cloud text-bodyLg rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
+            data-state="closed"
+            type="button"
+          >
+            <span
+              class="text-gray-400"
+            >
+              DD/MM/YYYY
+            </span>
+            <div
+              class="pointer-events-none"
+            >
+              <div
+                class="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white"
+              >
+                <svg
+                  class="lucide lucide-calendar h-4 w-4 text-gray-400"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8 2v4"
+                  />
+                  <path
+                    d="M16 2v4"
+                  />
+                  <rect
+                    height="18"
+                    rx="2"
+                    width="18"
+                    x="3"
+                    y="4"
+                  />
+                  <path
+                    d="M3 10h18"
+                  />
+                </svg>
+              </div>
+            </div>
+          </button>
+        </div>
+        <div
+          class="grid grid-cols-2 gap-4"
+        >
+          <div>
+            <label
+              class="block text-black font-semibold mb-2"
+            >
+              Start time
+            </label>
+            <button
+              aria-controls="radix-:r1:"
+              aria-expanded="false"
+              aria-haspopup="dialog"
+              class="inline-flex transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive cursor-pointer gap-2.5 shrink-0 disabled:bg-inactive disabled:text-tertiary disabled:cursor-not-allowed border hover:bg-cloud text-bodyLg rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
+              data-state="closed"
+              type="button"
+            >
+              <span
+                class="text-black"
+              >
+                09:00
+              </span>
+              <div
+                class="pointer-events-none"
+              >
+                <div
+                  class="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white"
+                >
+                  <svg
+                    class="lucide lucide-clock h-4 w-4 text-gray-400"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                    />
+                    <polyline
+                      points="12 6 12 12 16 14"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </button>
+          </div>
+          <div>
+            <label
+              class="block text-black font-semibold mb-2"
+            >
+              End time
+            </label>
+            <button
+              aria-controls="radix-:r2:"
+              aria-expanded="false"
+              aria-haspopup="dialog"
+              class="inline-flex transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive cursor-pointer gap-2.5 shrink-0 disabled:bg-inactive disabled:text-tertiary disabled:cursor-not-allowed border hover:bg-cloud text-bodyLg rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
+              data-state="closed"
+              type="button"
+            >
+              <span
+                class="text-black"
+              >
+                14:00
+              </span>
+              <div
+                class="pointer-events-none"
+              >
+                <div
+                  class="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white"
+                >
+                  <svg
+                    class="lucide lucide-clock h-4 w-4 text-gray-400"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                    />
+                    <polyline
+                      points="12 6 12 12 16 14"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div
+          class="flex justify-center mt-2"
+        >
+          <button
+            class="text-interactive font-semibold text-base underline underline-offset-4 px-2 py-1 rounded transition-colors text-gray-400 cursor-not-allowed"
+            disabled=""
+            type="button"
+          >
+            + Add another
+          </button>
+        </div>
+      </div>
+    </main>
+    <footer
+      class="px-4 pb-6 pt-4 bg-white"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <button
+          class="inline-flex items-center justify-center rounded-full font-semibold transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive cursor-pointer gap-2.5 shrink-0 disabled:bg-inactive disabled:text-tertiary disabled:cursor-not-allowed bg-positive hover:bg-positive/90 px-6 py-3 text-bodyLg"
+          disabled=""
+        >
+          Continue
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+`;

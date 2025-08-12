@@ -1,0 +1,243 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ManualDonationPage UI renders the manual donation UI and matches the snapshot 1`] = `
+<div>
+  <div
+    class="flex flex-col h-dvh bg-white"
+  >
+    <header
+      class="p-4 bg-white relative h-[80px] flex items-center"
+    >
+      <div
+        class="flex items-center relative w-full"
+      >
+        <button
+          class="text-black z-10"
+        >
+          <svg
+            fill="none"
+            height="28"
+            viewBox="0 0 28 28"
+            width="28"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1.40039 14.0002C1.40039 13.6289 1.548 13.2729 1.81055 13.0103L10.2105 4.61031L10.3172 4.51461C10.8671 4.06612 11.6777 4.09775 12.1902 4.61031C12.7028 5.12287 12.7344 5.93347 12.2859 6.48336L12.1902 6.59L4.78008 14.0002L12.1902 21.4103C12.737 21.957 12.737 22.8433 12.1902 23.39C11.6435 23.9367 10.7573 23.9367 10.2105 23.39L1.81055 14.99L1.71758 14.8875C1.51341 14.6383 1.40039 14.3251 1.40039 14.0002Z"
+              fill="currentColor"
+            />
+            <path
+              d="M26.6004 15.3999L2.80039 15.3999C2.02719 15.3999 1.40039 14.7731 1.40039 13.9999C1.40039 13.2267 2.02719 12.5999 2.80039 12.5999L26.6004 12.5999C27.3736 12.5999 28.0004 13.2267 28.0004 13.9999C28.0004 14.7731 27.3736 15.3999 26.6004 15.3999Z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+        <h1
+          class="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-black leading-normal whitespace-nowrap"
+        >
+          Add food item
+        </h1>
+      </div>
+    </header>
+    <main
+      class="flex-grow overflow-y-auto p-4"
+    >
+      <div>
+        <div
+          aria-valuemax="100"
+          aria-valuemin="0"
+          class="relative h-2 w-full overflow-hidden rounded-full bg-cloud mb-4"
+          data-max="100"
+          data-state="indeterminate"
+          role="progressbar"
+        >
+          <div
+            class="h-full w-full flex-1 bg-interactive transition-all"
+            data-max="100"
+            data-state="indeterminate"
+            style="transform: translateX(-50%);"
+          />
+        </div>
+        <div
+          class="flex flex-col gap-4"
+        >
+          <div>
+            <label
+              class="text-sm font-medium text-gray-700"
+              for="name"
+            >
+              Name of food
+            </label>
+            <input
+              class="flex h-12 w-full rounded-md border bg-base px-4 py-3.5 text-bodyLg ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border-border focus-visible:ring-interactive"
+              id="name"
+              placeholder="e.g. Bread, Rice, etc."
+              value=""
+            />
+          </div>
+          <div>
+            <label
+              class="text-sm font-medium text-gray-700"
+              for="quantity"
+            >
+              Quantity (kg)
+            </label>
+            <input
+              class="flex h-12 w-full rounded-md border bg-base px-4 py-3.5 text-bodyLg ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border-border focus-visible:ring-interactive"
+              id="quantity"
+              placeholder="e.g. 10"
+              type="number"
+              value=""
+            />
+          </div>
+          <div
+            class="w-full"
+          >
+            <label
+              class="block text-label font-semibold mb-2"
+            >
+              Allergens
+            </label>
+            <div
+              class="relative"
+            >
+              <input
+                class="flex h-12 w-full rounded-md border bg-base px-4 py-3.5 text-bodyLg ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border-border focus-visible:ring-interactive cursor-pointer"
+                placeholder="Select allergens"
+                readonly=""
+                value=""
+              />
+            </div>
+          </div>
+          <div
+            class="w-full"
+          >
+            <div
+              class="flex flex-col gap-3 w-full"
+            >
+              <div
+                class="w-full"
+              >
+                <div
+                  class="flex flex-col gap-[13px] w-full"
+                >
+                  <div
+                    class="h-[140px] w-full"
+                  >
+                    <div
+                      class="flex flex-col gap-3.5 w-full h-full bg-white rounded-xl relative transition-colors cursor-pointer
+                    "
+                      tabindex="0"
+                    >
+                      <div
+                        class="absolute inset-0 border border-dashed pointer-events-none rounded-xl transition-colors border-[rgba(2,29,19,0.36)]"
+                      />
+                      <div
+                        class="flex flex-col items-center justify-center w-full h-full px-4 py-3.5"
+                      >
+                        <div
+                          class="w-[26px] h-[26px]"
+                        >
+                          <svg
+                            class="block w-full h-full"
+                            fill="none"
+                            viewBox="0 0 26 26"
+                          >
+                            <path
+                              d="M23.7714 16.7154L21.631 14.5751C21.5571 14.5011 21.5158 14.4689 21.4928 14.454L21.4614 14.4342C20.7997 14.0259 19.9439 14.0718 19.3271 14.5653L15.3928 17.7129C14.0035 18.8241 12.0545 18.9089 10.5742 17.922L9.81765 17.4177C9.12842 16.9583 8.21946 17.0113 7.58881 17.5444L2.41217 22.721C2.71245 23.3425 3.34972 23.7714 4.08573 23.7714H21.9143C22.94 23.7714 23.7714 22.94 23.7714 21.9143V16.7154ZM10.4 8.54288C10.4 7.5172 9.56858 6.68573 8.54288 6.68572C7.5172 6.68572 6.68572 7.5172 6.68572 8.54288C6.68573 9.56858 7.5172 10.4 8.54288 10.4C9.56858 10.4 10.4 9.56858 10.4 8.54288ZM23.7714 4.08573C23.7714 3.07607 22.9658 2.25461 21.9622 2.22918L21.9143 2.22857H4.08573C3.06006 2.22857 2.22857 3.06006 2.22857 4.08573V19.7529L6.04283 15.9387L6.06951 15.9129C6.07854 15.9045 6.08771 15.8962 6.09702 15.888L6.12971 15.8597C7.51795 14.6705 9.52987 14.5475 11.0537 15.5634L11.8102 16.0676L11.842 16.0883C12.5107 16.5149 13.379 16.4699 14.0007 15.9726L17.9349 12.8251L17.9673 12.7994C19.3332 11.729 21.2161 11.6442 22.6663 12.5593L22.7008 12.5813L22.7404 12.6074C22.9348 12.7382 23.0905 12.8828 23.2073 12.9998L23.7714 13.5639V4.08573ZM12.6286 8.54288C12.6286 10.7994 10.7994 12.6286 8.54288 12.6286C6.28641 12.6286 4.45715 10.7994 4.45715 8.54288C4.45715 6.2864 6.2864 4.45715 8.54288 4.45715C10.7994 4.45715 12.6286 6.28641 12.6286 8.54288ZM26 21.9143C26 24.1708 24.1708 26 21.9143 26H4.08573C2.07291 26 0.401945 24.5455 0.0627221 22.6304L0.0549744 22.5851C0.0187493 22.3662 8.39414e-07 22.1421 0 21.9143V4.08573C0 1.82925 1.82925 0 4.08573 0H21.9143L21.9671 0.000348214C24.1993 0.0286246 26 1.84689 26 4.08573V21.9143Z"
+                              fill="#024209"
+                            />
+                          </svg>
+                        </div>
+                        <div
+                          class="font-manrope text-[#021d13] text-[14px] text-center opacity-70 w-[146px]"
+                        >
+                          Drag & drop or click to choose files
+                        </div>
+                        <div
+                          class="mt-2 flex items-center gap-2 text-[#021d13] text-xs font-manrope opacity-60"
+                        >
+                          <svg
+                            fill="none"
+                            height="16"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <circle
+                              cx="8"
+                              cy="8"
+                              fill="#a6f175"
+                              r="8"
+                            />
+                            <path
+                              d="M8 4V8"
+                              stroke="#024209"
+                              stroke-linecap="round"
+                              stroke-width="1.5"
+                            />
+                            <circle
+                              cx="8"
+                              cy="11"
+                              fill="#024209"
+                              r="1"
+                            />
+                          </svg>
+                          <span>
+                            Photos help receivers identify your food items
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <input
+                      accept="image/jpeg,image/png,image/webp"
+                      capture="environment"
+                      class="hidden"
+                      type="file"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                class="w-full flex flex-row items-center justify-between text-[#021d13] text-[14px] font-manrope opacity-70"
+              >
+                <div>
+                  Supported formats: JPG, PNG, WebP
+                </div>
+                <div>
+                  Max: 5MB
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label
+              class="text-sm font-medium text-gray-700"
+              for="description"
+            >
+              Description
+            </label>
+            <textarea
+              class="flex min-h-[80px] w-full rounded-md border bg-base px-4 py-3.5 text-bodyLg ring-offset-background placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border-border focus-visible:ring-interactive"
+              id="description"
+              placeholder="e.g. A delicious and healthy meal."
+            />
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer
+      class="px-4 pb-6 pt-4 bg-white"
+    >
+      <div
+        class="flex justify-end"
+      >
+        <button
+          class="inline-flex items-center justify-center rounded-full font-semibold transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-interactive cursor-pointer gap-2.5 shrink-0 disabled:bg-inactive disabled:text-tertiary disabled:cursor-not-allowed bg-positive hover:bg-positive/90 px-6 py-3 text-bodyLg"
+        >
+          Add item
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+`;
