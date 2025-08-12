@@ -5,10 +5,20 @@ Welcome to the central documentation hub for the Zipli project. This directory c
 ## Documentation Index
 
 ### 1. Project & Feature Planning
+- [**Feature Development Plan**](./feature-development-plan.md)
+  - _Master plan for current feature development using short-lived branches._
 - [**V2 Redesign & Refactor Plan**](./refactor_plan.md)
   - _The master checklist and plan for the V2 redesign effort._
 - [**Product Requirements Document (PRD)**](./product_requirements.md)
   - _Outlines the goals, features, and requirements for Version 2 of the application._
+
+### 2. Current Feature Documentation
+- [**Finnish Multilingual Support**](./features/finnish-multilingual.md)
+  - _Complete internationalization and Finnish language implementation._
+- [**Content Improvements**](./features/content-improvements.md)
+  - _Enhanced copy, messaging, and user guidance throughout the platform._
+- [**Design Improvements**](./features/design-improvements.md)
+  - _Visual design enhancements, UI improvements, and accessibility upgrades._
 
 ### 2. Technical Documentation & Notes
 - [**Supabase Notes & Implementation Details**](./supabase_notes.md)
