@@ -72,7 +72,7 @@ export default function RequestSummaryPage() {
           <Progress value={100} className="h-2 w-full" />
         </div>
 
-        <div className="p-4 space-y-6">
+        <main className="flex-grow overflow-y-auto p-4 space-y-6">
           {/* Request Summary */}
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -145,9 +145,10 @@ export default function RequestSummaryPage() {
               </div>
             </div>
           </div>
+        </main>
 
-          {/* Submit Button */}
-          <div className="pt-4">
+        <footer className="px-4 pb-6 pt-4 bg-white">
+          <div className="flex justify-end">
             <Button
               onClick={handleSubmitRequest}
               className="w-full bg-green-400 hover:bg-green-500 text-black font-medium py-3 rounded-full"
@@ -155,7 +156,7 @@ export default function RequestSummaryPage() {
               Submit request
             </Button>
           </div>
-        </div>
+        </footer>
       </div>
     </div>
   );

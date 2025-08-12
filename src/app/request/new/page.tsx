@@ -71,78 +71,81 @@ export default function NewRequestPage() {
           <Progress value={33} className="h-2 w-full" />
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-6">
-          {/* Recurring Interval */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              Recurring interval
-            </Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select interval" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-gray-500 mt-1">
-              Zipli only allows to request according to a preselected set of options.
-            </p>
-          </div>
-
-          {/* Quantity */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              Quantity (portions)
-            </Label>
-            <Input
-              {...register('quantity', { required: 'Quantity is required' })}
-              placeholder="Enter quantity"
-              className="w-full"
-            />
-          </div>
-
-          {/* Allergies, intolerances & diets */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              Allergies, intolerances & diets
-            </Label>
-            <div className="border rounded-md p-3 min-h-[60px] flex flex-wrap gap-2">
-              {selectedAllergens.map((allergen) => (
-                <div
-                  key={allergen}
-                  className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
-                >
-                  {allergen}
-                  <button
-                    type="button"
-                    onClick={() => removeAllergen(allergen)}
-                    className="ml-1 hover:bg-green-200 rounded-full p-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
+        <main className="flex-grow overflow-y-auto">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-6">
+            {/* Recurring Interval */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Recurring interval
+              </Label>
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select interval" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">
+                Zipli only allows to request according to a preselected set of options.
+              </p>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              This is a hint text.
-            </p>
-          </div>
 
-          {/* Continue Button */}
-          <div className="pt-8">
+            {/* Quantity */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Quantity (portions)
+              </Label>
+              <Input
+                {...register('quantity', { required: 'Quantity is required' })}
+                placeholder="Enter quantity"
+                className="w-full"
+              />
+            </div>
+
+            {/* Allergies, intolerances & diets */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Allergies, intolerances & diets
+              </Label>
+              <div className="border rounded-md p-3 min-h-[60px] flex flex-wrap gap-2">
+                {selectedAllergens.map((allergen) => (
+                  <div
+                    key={allergen}
+                    className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+                  >
+                    {allergen}
+                    <button
+                      type="button"
+                      onClick={() => removeAllergen(allergen)}
+                      className="ml-1 hover:bg-green-200 rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                This is a hint text.
+              </p>
+            </div>
+          </form>
+        </main>
+
+        <footer className="px-4 pb-6 pt-4 bg-white">
+          <div className="flex justify-end">
             <Button
               type="submit"
+              onClick={handleSubmit(onSubmit)}
               className="w-full bg-green-400 hover:bg-green-500 text-black font-medium py-3 rounded-full"
               disabled={isSubmitting}
             >
               Continue
             </Button>
           </div>
-        </form>
+        </footer>
       </div>
     </div>
   );
