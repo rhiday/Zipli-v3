@@ -156,6 +156,7 @@ export const translations = {
     fieldRequired: 'This field is required',
     passwordsDoNotMatch: 'Passwords do not match',
     passwordTooShort: 'Password must be at least 6 characters long',
+    anErrorOccurred: 'An error occurred. Please try again.',
     
     // Common Actions
     saving: 'Saving...',
@@ -332,6 +333,7 @@ export const translations = {
     fieldRequired: 'Tämä kenttä on pakollinen',
     passwordsDoNotMatch: 'Salasanat eivät täsmää',
     passwordTooShort: 'Salasanan täytyy olla vähintään 6 merkkiä pitkä',
+    anErrorOccurred: 'Virhe tapahtui. Yritä uudelleen.',
     
     // Common Actions
     saving: 'Tallennetaan...',
