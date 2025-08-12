@@ -7,10 +7,13 @@ const DevLoginSwitcher: React.FC = React.memo(() => {
   const { users, login, currentUser } = useDatabase();
 
   const handleLogin = useCallback(async (user: any) => {
+    console.log('DevLoginSwitcher: Attempting login for:', user.email);
     try {
       const result = await login(user.email, 'password');
       if (result.error) {
         console.error('DevLoginSwitcher: Login failed:', result.error);
+      } else {
+        console.log('DevLoginSwitcher: Login successful for:', user.email);
       }
     } catch (error) {
       console.error('DevLoginSwitcher: Login error:', error);
@@ -33,9 +36,11 @@ const DevLoginSwitcher: React.FC = React.memo(() => {
     </ul>
   ), [users, currentUser, handleLogin]);
 
+  console.log('DevLoginSwitcher: Users loaded:', users.length, users.map(u => u.full_name));
+
   return (
     <div className="fixed bottom-4 right-4 z-50 bg-white border border-gray-300 rounded-lg shadow-lg p-4 w-64">
-      <div className="font-bold mb-2 text-sm text-gray-700">Dev User Switcher</div>
+      <div className="font-bold mb-2 text-sm text-gray-700">Dev User Switcher ({users.length} users)</div>
       {userList}
     </div>
   );
