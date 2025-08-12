@@ -6,5 +6,5 @@
   {"id": "user-5", "email":"city.admin@helsinki.fi","password":"password","role":"city","full_name":"Helsinki City Administrator"},
   {"id": "user-6", "email":"terminal.operator@zipli.test","password":"password","role":"terminals","full_name":"Terminal Operator"},
   {"id": "user-7", "email":"tsanssi@zipli.test","password":"password","role":"food_receiver","full_name":"Tsänssi Charity"},
-  {"id": "user-8", "email":"ludenlukko@zipli.test","password":"password","role":"food_donor","full_name":"Ludenlukko Restaurant"}
+  {"id": "user-8", "email":"ludenlukko@zipli.test","password":"password","role":"food_donor","full_name":"Sodexo Ladonlukko"}
 ]
