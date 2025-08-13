@@ -17,6 +17,7 @@ export interface Database {
           id: string;
           role: UserRole;
           full_name: string;
+          email: string;
           organization_name: string | null;
           contact_number: string | null;
           address: string | null;
@@ -28,6 +29,7 @@ export interface Database {
           id: string;
           role: UserRole;
           full_name: string;
+          email: string;
           organization_name?: string | null;
           contact_number?: string | null;
           address?: string | null;
@@ -39,6 +41,7 @@ export interface Database {
           id?: string;
           role?: UserRole;
           full_name?: string;
+          email?: string;
           organization_name?: string | null;
           contact_number?: string | null;
           address?: string | null;
