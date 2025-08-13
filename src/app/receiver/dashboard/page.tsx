@@ -158,7 +158,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
 
   return (
     <div className="min-h-screen pb-20">
-      <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Receiver'} />
+      <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         {/* Impact section */}

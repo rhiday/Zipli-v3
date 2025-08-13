@@ -161,7 +161,7 @@ export default function DonorDashboardPage(): React.ReactElement {
 
   return (
     <div className="min-h-screen pb-20">
-      <Header title={dashboardData.profile?.organization_name || dashboardData.profile?.full_name || 'Donor'} />
+      <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         {/* This section is being removed as it's redundant with the header */}

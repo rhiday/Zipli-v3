@@ -1,7 +1,23 @@
 'use client';
 
-import React from 'react';
-// import { Card } from '@/components/ui/card'; // Removed
+import React, { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import BottomNav from '@/components/BottomNav';
+import { ChevronDown, TrendingUp, Building2, Users, Leaf, Euro, MapPin, Calendar } from 'lucide-react';
+import Header from '@/components/layout/Header';
+import Link from 'next/link';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { jsPDF } from 'jspdf';
+import { useDatabase } from '@/store/databaseStore';
+import { SkeletonDashboardStat, SkeletonRecipient } from '@/components/ui/Skeleton';
+import { useLanguage } from '@/hooks/useLanguage';
 import {
   LineChart,
   Line,
@@ -9,275 +25,296 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell
 } from 'recharts';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { Progress } from '@/components/ui/progress';
-import { ActionButton } from '@/components/ui/action-button';
-import { Download, Store } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-// Removed resolveConfig and tailwindConfig imports
 
-// Removed getColor helper function and theme color extraction
-
-// Mock data
+// Enhanced mock data with more realistic values
 const monthlyData = [
-  { month: 'Jun', total: 12000, donated: 9000 },
-  { month: 'Feb', total: 13500, donated: 10500 },
-  { month: 'Mar', total: 14800, donated: 11200 },
-  { month: 'Apr', total: 15200, donated: 12000 },
-  { month: 'May', total: 16500, donated: 13000 },
-  { month: 'Jun', total: 17200, donated: 13800 },
-  { month: 'Jul', total: 18000, donated: 14500 },
-  { month: 'Aug', total: 19500, donated: 15800 },
+  { month: 'Jan', donations: 145, recipients: 38, waste_diverted: 1850 },
+  { month: 'Feb', donations: 168, recipients: 42, waste_diverted: 2100 },
+  { month: 'Mar', donations: 192, recipients: 48, waste_diverted: 2380 },
+  { month: 'Apr', donations: 178, recipients: 51, waste_diverted: 2680 },
+  { month: 'May', donations: 203, recipients: 55, waste_diverted: 2950 },
+  { month: 'Jun', donations: 235, recipients: 58, waste_diverted: 3200 },
+  { month: 'Jul', donations: 251, recipients: 62, waste_diverted: 3450 },
+  { month: 'Aug', donations: 278, recipients: 67, waste_diverted: 3800 },
 ];
 
-const stats = [
-  {
-    id: 1,
-    value: '356,250 €',
-    label: 'Costs avoided',
-    icon: '💶',
-  },
-  {
-    id: 2,
-    value: '142,500',
-    label: 'Meals served',
-    icon: '🍽️',
-  },
-  {
-    id: 3,
-    value: '178,125 kg',
-    label: 'CO2 emissions avoided',
-    icon: '🌱',
-  },
-  {
-    id: 4,
-    value: '142,500,000 l',
-    label: 'Freshwater saved',
-    icon: '💧',
-  },
-  {
-    id: 5,
-    value: '17.81 hectares',
-    label: 'Agricultural land saved',
-    icon: '🌾',
-  },
+const partnerData = [
+  { name: 'Sodexo Helsinki Airport', donations: 45, category: 'Corporate' },
+  { name: 'Alice\'s Restaurant', donations: 32, category: 'Restaurant' },
+  { name: 'School District #3', donations: 28, category: 'Education' },
+  { name: 'Kesko Citymarket', donations: 22, category: 'Retail' },
+  { name: 'Red Cross Helsinki', donations: 41, category: 'NGO' },
+  { name: 'Tsänssi Charity', donations: 38, category: 'NGO' },
 ];
 
-const surplusData = [
-  { category: 'Employee canteens', percentage: 83 },
-  { category: 'School canteens', percentage: 73 },
-];
+type ProfileRow = {
+    id: string;
+    full_name: string | null;
+    organization_name: string | null;
+};
 
-const climateGoals = [
-  {
-    title: 'Targeted food-related emissions reduction by 2030',
-    percentage: 42,
-  },
-  {
-    title: 'Targeted total food waste reduction by 2030',
-    percentage: 55,
-  },
-];
+type CityDashboardData = {
+    profile: ProfileRow | null;
+    cityStats: any;
+}
 
-const recommendedActions = [
-  {
-    id: 1,
-    title: 'Launch "Zero Waste Kitchen" challenge',
-    description: 'Engage top food waste producers in a 3-month commitment',
-    action: 'Launch campaign',
-  },
-  {
-    id: 2,
-    title: 'Set new "Weekly Waste Cap"',
-    description: 'Use smart caps to manage kitchen waste',
-    action: 'Set smart caps',
-  },
-  {
-    id: 3,
-    title: 'Activate logistics boost',
-    description: 'Offer free pickups for organizations to weekly surplus',
-    action: 'Select eligible partners',
-  },
-];
+export default function CityDashboardPage(): React.ReactElement {
+  const router = useRouter();
+  const { currentUser, isInitialized, getAllDonations, getAllRequests } = useDatabase();
+  const { t } = useLanguage();
 
-export default function CityDashboard() {
-  // Removed color variable definitions
+  const [dashboardData, setDashboardData] = useState<CityDashboardData>({ profile: null, cityStats: {} });
+  const [loading, setLoading] = useState(true);
+  
+  const allMonths = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const currentDate = new Date();
+  const currentMonthIndex = currentDate.getMonth();
+  const lastThreeMonths = Array.from({ length: 3 }, (_, i) => {
+      const monthIndex = (currentMonthIndex - 2 + i + 12) % 12;
+      return allMonths[monthIndex];
+  });
+
+  const [selectedMonth, setSelectedMonth] = useState(allMonths[currentMonthIndex]);
+
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    setLoading(true);
+
+    if (!currentUser) {
+      // Add a small delay before redirecting to avoid race conditions
+      const timer = setTimeout(() => {
+        if (!currentUser) {
+          router.push('/auth/login');
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+
+    const profile: ProfileRow = {
+      id: currentUser.id,
+      full_name: currentUser.full_name,
+      organization_name: null,
+    };
+    
+    // Calculate city-wide stats
+    const allDonations = getAllDonations();
+    const allRequests = getAllRequests();
+    
+    const cityStats = {
+      totalDonations: allDonations.length,
+      totalRequests: allRequests.length,
+      activeDonors: 24,
+      activeReceivers: 18,
+    };
+    
+    setDashboardData({ profile, cityStats });
+    setLoading(false);
+
+  }, [isInitialized, currentUser, router, getAllDonations, getAllRequests]);
+
+  // Memoized PDF generation function
+  const handleExportPDF = useCallback(() => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('Helsinki City Food Waste Analytics', 10, 10);
+    doc.setFontSize(12);
+    doc.text(`Total food redistributed: 3,800kg this month`, 10, 20);
+    doc.text(`Partner organizations: 42 active`, 10, 30);
+    doc.text(`Waste diverted: 89% reduction`, 10, 40);
+    doc.text(`CO2 savings: 2,150kg avoided`, 10, 50);
+    doc.save('helsinki-food-analytics.pdf');
+  }, []);
+
+  // Memoized month selection handler
+  const handleMonthSelect = useCallback((month: string) => {
+    setSelectedMonth(month);
+  }, []);
+
+  // Calculate city-wide impact stats
+  const cityImpactStats = React.useMemo(() => {
+    return {
+      totalFoodRedistributed: '3.8t',
+      partnerOrganizations: 42,
+      wasteReduction: '89%',
+      co2Savings: '2.15t',
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pb-20">
+        <Header title="Loading..." />
+        
+        <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
+          <section>
+            <div className="flex justify-between items-center mb-4">
+              <div className="h-7 w-32 bg-gray-200 rounded-md animate-pulse"></div>
+              <div className="h-6 w-20 bg-gray-200 rounded-md animate-pulse"></div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-6">
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i} className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-5 h-5 bg-gray-200 rounded-md animate-pulse"></div>
+                    <div className="h-8 w-16 bg-gray-200 rounded-md animate-pulse"></div>
+                  </div>
+                  <div className="h-4 w-24 bg-gray-200 rounded-md animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </main>
+
+        <BottomNav />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-cream p-6 md:p-8 lg:p-12"> {/* Use new bg color and spacing */}
-      <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <h1 className="text-titleMd font-display text-primary">Dashboard</h1> {/* Use new typography */}
-        <div className="flex items-center gap-4">
-        <Link href="/admin/qr-login">
-  <span className="text-body text-primary-75 cursor-pointer">
-    QR Login phone
-  </span>
-  </Link>
-          <span className="text-body text-primary-75">City of Helsinki</span> {/* Use new text colors */}
-          <span className="text-body text-primary-75">Liisa Helme</span>
-          {/* Replace placeholder with an actual Avatar component if available, or style a div */}
-          <div className="h-10 w-10 rounded-full bg-primary-25 flex items-center justify-center text-label text-primary">LH</div>
-        </div>
-      </div>
+    <div className="min-h-screen pb-20">
+      <Header title="Helsinki Food Terminal" />
 
-      {/* Stats Section */}
-      <div className="mb-8">
-        <h2 className="mb-4 text-bodyLg font-medium text-primary-75">12 month overview</h2> {/* Use new typography/color */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6"> {/* Adjust grid/gap */}
-          {stats.map((stat) => (
-            // Replace Card with styled div
-            <div key={stat.id} className="rounded-lg bg-base p-4 shadow"> {/* Use new bg/shadow */}
-              <div className="mb-2 text-titleSm">{stat.icon}</div> {/* Adjust icon size/margin if needed */}
-              <div className="text-stat font-medium text-primary">{stat.value}</div> {/* Use new typography/color */}
-              <div className="text-label text-primary-75">{stat.label}</div> {/* Use new typography/color */}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Charts and Breakdown Section */}
-      <div className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6"> {/* Adjust grid/gap */}
-        {/* Redistributed Food Chart */}
-        <div className="rounded-lg bg-base p-6 shadow lg:col-span-2"> {/* Use new bg/shadow */}
-          <h3 className="mb-4 text-titleXs font-display text-primary">Redistributed food</h3> {/* Use new typography */}
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              {/* Use CSS variables for colors */}
-              <LineChart data={monthlyData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-primary-25)" />
-                <XAxis dataKey="month" stroke="var(--color-primary-75)" tick={{ fontSize: 12 }} />
-                <YAxis stroke="var(--color-primary-75)" tick={{ fontSize: 12 }} />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--color-base)', border: `1px solid var(--color-primary-10)` }}/>
-                <Line
-                  type="monotone"
-                  dataKey="total"
-                  stroke="var(--color-primary)" // Use CSS variable
-                  strokeWidth={2}
-                  name="Total"
-                  dot={{ r: 4, fill: 'var(--color-primary)' }}
-                  activeDot={{ r: 6 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="donated"
-                  stroke="var(--color-earth)" // Use CSS variable
-                  strokeWidth={2}
-                  name="Donated"
-                  dot={{ r: 4, fill: 'var(--color-earth)' }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* This div is now a container for the tabs */}
-        <div className="rounded-lg bg-base p-6 shadow">
-          <Tabs defaultValue="breakdown">
-            <TabsList>
-              <TabsTrigger value="breakdown">Breakdown</TabsTrigger>
-              <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
-              <TabsTrigger value="reports">Reports</TabsTrigger>
-            </TabsList>
-            <TabsContent value="breakdown">
-              <div className="space-y-6 mt-4">
-                <div>
-                  <h3 className="mb-4 text-titleXs font-display text-primary">Surplus breakdown</h3>
-                  {surplusData.map((item) => (
-                    <div key={item.category} className="mb-4">
-                      <div className="mb-2 flex justify-between text-body text-primary">
-                        <span>{item.category}</span>
-                        <span className="font-semibold">{item.percentage}%</span>
-                      </div>
-                      <Progress value={item.percentage} />
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <h3 className="mb-4 text-titleXs font-display text-primary">Climate goals development</h3>
-                  {climateGoals.map((goal) => (
-                    <div key={goal.title} className="mb-4">
-                       <div className="mb-2">
-                        <div className="text-body text-primary">{goal.title}</div>
-                        <div className="text-bodyLg font-semibold text-primary">{goal.percentage}%</div>
-                      </div>
-                      <Progress value={goal.percentage} className="[&>*]:bg-blue" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="recommendations">
-              <div className="mt-4">
-                <h3 className="mb-4 text-titleXs font-display text-primary">Recommended actions for next 6 months</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {recommendedActions.map((action) => (
-                    <div
-                      key={action.id}
-                      className="rounded-lg bg-sky-10 p-4 flex flex-col justify-between"
-                    >
-                      <div>
-                        <h4 className="mb-2 text-label font-semibold text-primary">{action.title}</h4>
-                        <p className="mb-4 text-caption text-primary-75">{action.description}</p>
-                      </div>
-                      <Button variant="secondary" size="sm">
-                        {action.action}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="reports">
-              <div className="mt-4">
-                <h3 className="mb-4 text-titleXs font-display text-primary">Reports & Actions</h3>
-                <div className="mb-6">
-                  <Link href="#" passHref>
-                    <Button variant="tertiary" asChild>
-                      <a>Export to PDF</a>
+      <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
+        {/* City Impact Stats Section */}
+        <section>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-primary mb-4">City Impact Overview</h2>
+                 <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="underline underline-offset-4 inline-flex items-center gap-1 text-primary text-lg font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-1">
+                        {selectedMonth}
+                        <ChevronDown className="h-4 w-4" />
                     </Button>
-                  </Link>
-                  <p className="mt-2 text-body text-primary-75">
-                    Environmental and social impact data for reporting, and operation planning.
-                  </p>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-white">
+                    {lastThreeMonths.map((month) => (
+                      <DropdownMenuItem key={month} onSelect={() => handleMonthSelect(month)}>
+                        {month}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-6">
+              {/* Total Food Redistributed */}
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="w-5 h-5 text-primary-50" />
+                  <span className="text-2xl font-semibold text-green-800">{cityImpactStats.totalFoodRedistributed}</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <ActionButton
-                    href="#"
-                    title="Export Surplus Data to PDF"
-                    description="Environmental and social impact data for reporting, and operation planning."
-                    icon={<Download />}
-                    variant="highlighted"
+                <span className="text-sm text-primary-75">Food Redistributed</span>
+              </div>
+              {/* Partner Organizations */}
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
+                <div className="flex items-center gap-2 mb-2">
+                  <Building2 className="w-5 h-5 text-primary-50" />
+                  <span className="text-2xl font-semibold text-green-800">{cityImpactStats.partnerOrganizations}</span>
+                </div>
+                <span className="text-sm text-primary-75">Partner Organizations</span>
+              </div>
+              {/* Waste Reduction */}
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
+                <div className="flex items-center gap-2 mb-2">
+                  <Leaf className="w-5 h-5 text-primary-50" />
+                  <span className="text-2xl font-semibold text-green-800">{cityImpactStats.wasteReduction}</span>
+                </div>
+                <span className="text-sm text-primary-75">Waste Reduction</span>
+              </div>
+              {/* CO2 Savings */}
+              <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
+                <div className="flex items-center gap-2 mb-2">
+                  <Euro className="w-5 h-5 text-primary-50" />
+                  <span className="text-2xl font-semibold text-green-800">{cityImpactStats.co2Savings}</span>
+                </div>
+                <span className="text-sm text-primary-75">CO2 Saved</span>
+              </div>
+            </div>
+        </section>
+
+        {/* Export to PDF as a text link */}
+        <div className="my-4">
+          <a
+            onClick={handleExportPDF}
+            className="text-primary underline font-semibold cursor-pointer"
+            tabIndex={0}
+            role="button"
+          >
+            Export Analytics Report
+          </a>
+          <span className="block text-sm text-primary-75 mt-1">
+            Comprehensive city food waste analytics and impact data
+          </span>
+        </div>
+
+        {/* Analytics Charts Section */}
+        <section>
+          <h2 className="text-lg font-semibold text-primary mb-3">Monthly Trends</h2>
+          
+          <div className="rounded-xl border border-primary-10 shadow-sm p-4 bg-white mb-6">
+            <h3 className="text-base font-medium text-primary mb-4">Food Redistribution Growth</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="month" stroke="#6b7280" />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip />
+                  <Line 
+                    type="monotone" 
+                    dataKey="donations" 
+                    stroke="#22c55e" 
+                    strokeWidth={2}
+                    name="Donations"
                   />
-                  <ActionButton
-                    href="#"
-                    title="Manage Partner Stores"
-                    description="View and manage connected food donors and receivers."
-                    icon={<Store />}
+                  <Line 
+                    type="monotone" 
+                    dataKey="recipients" 
+                    stroke="#3b82f6" 
+                    strokeWidth={2}
+                    name="Recipients"
                   />
-                  <ActionButton
-                    href="#"
-                    title="Generate Annual Impact Report"
-                    description="This feature is coming soon."
-                    icon={<Download />}
-                    disabled
-                  />
-                  <ActionButton
-                    href="#"
-                    title="Onboard New Store"
-                    description="This feature is coming soon."
-                    icon={<Store />}
-                    disabled
-                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </section>
+        
+        {/* Top Partners section */}
+        <section>
+          <h2 className="text-lg font-semibold text-primary mb-3">Top Partner Organizations</h2>
+          
+          <div className="space-y-4">
+            {partnerData.slice(0, 5).map((partner, index) => (
+              <div key={partner.name} className="flex items-center gap-4">
+                <div className="h-16 w-16 rounded-full overflow-hidden relative bg-gray-100 flex items-center justify-center">
+                  <Building2 className="w-8 h-8 text-gray-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-primary font-medium">{partner.name}</h3>
+                  <p className="text-sm text-primary-75">{partner.donations} donations · {partner.category}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-semibold text-green-800">#{index + 1}</div>
                 </div>
               </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      <BottomNav />
     </div>
   );
 } 
