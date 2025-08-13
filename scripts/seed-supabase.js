@@ -116,16 +116,16 @@ const TEST_USERS = [
 
 // Food items to seed
 const FOOD_ITEMS = [
-  { name: 'Fresh Bread', description: 'Daily baked bread from our bakery', allergens: 'Wheat, Gluten', category: 'Bakery', image_url: '/images/bread.jpg' },
-  { name: 'Vegetable Soup', description: 'Hearty vegetable soup with seasonal vegetables', allergens: 'Celery', category: 'Prepared Food', image_url: '/images/soup.jpg' },
-  { name: 'Fresh Produce Box', description: 'Assorted seasonal fruits and vegetables', allergens: 'None', category: 'Produce', image_url: '/images/produce.jpg' },
-  { name: 'Dairy Products', description: 'Milk, cheese, and yogurt close to expiry', allergens: 'Milk, Lactose', category: 'Dairy', image_url: '/images/dairy.jpg' },
-  { name: 'Rice and Grains', description: 'Bulk rice, pasta, and other grain products', allergens: 'Gluten (pasta)', category: 'Dry Goods', image_url: '/images/grains.jpg' },
-  { name: 'Canned Goods', description: 'Assorted canned vegetables and fruits', allergens: 'Varies', category: 'Canned Food', image_url: '/images/canned.jpg' },
-  { name: 'Fresh Salad Mix', description: 'Pre-washed salad greens ready to eat', allergens: 'None', category: 'Produce', image_url: '/images/salad.jpg' },
-  { name: 'Meat Products', description: 'Frozen chicken, beef, and pork', allergens: 'None', category: 'Meat', image_url: '/images/meat.jpg' },
-  { name: 'Fish and Seafood', description: 'Fresh and frozen fish', allergens: 'Fish, Shellfish', category: 'Seafood', image_url: '/images/fish.jpg' },
-  { name: 'Baked Goods', description: 'Pastries, cakes, and cookies', allergens: 'Wheat, Eggs, Milk', category: 'Bakery', image_url: '/images/pastries.jpg' },
+  { name: 'Fresh Bread', description: 'Daily baked bread from our bakery', allergens: ['Wheat', 'Gluten'], image_url: '/images/bread.jpg' },
+  { name: 'Vegetable Soup', description: 'Hearty vegetable soup with seasonal vegetables', allergens: ['Celery'], image_url: '/images/soup.jpg' },
+  { name: 'Fresh Produce Box', description: 'Assorted seasonal fruits and vegetables', allergens: [], image_url: '/images/produce.jpg' },
+  { name: 'Dairy Products', description: 'Milk, cheese, and yogurt close to expiry', allergens: ['Milk', 'Lactose'], image_url: '/images/dairy.jpg' },
+  { name: 'Rice and Grains', description: 'Bulk rice, pasta, and other grain products', allergens: ['Gluten'], image_url: '/images/grains.jpg' },
+  { name: 'Canned Goods', description: 'Assorted canned vegetables and fruits', allergens: [], image_url: '/images/canned.jpg' },
+  { name: 'Fresh Salad Mix', description: 'Pre-washed salad greens ready to eat', allergens: [], image_url: '/images/salad.jpg' },
+  { name: 'Meat Products', description: 'Frozen chicken, beef, and pork', allergens: [], image_url: '/images/meat.jpg' },
+  { name: 'Fish and Seafood', description: 'Fresh and frozen fish', allergens: ['Fish', 'Shellfish'], image_url: '/images/fish.jpg' },
+  { name: 'Baked Goods', description: 'Pastries, cakes, and cookies', allergens: ['Wheat', 'Eggs', 'Milk'], image_url: '/images/pastries.jpg' },
 ];
 
 async function createTestUsers() {
@@ -174,7 +174,7 @@ async function createTestUsers() {
       createdUsers.push({ ...userData, id: authUser.user.id });
 
       // Create or update profile
-      const { error: profileError } = await supabase
+      const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .upsert({
           id: authUser.user.id,
@@ -199,7 +199,8 @@ async function createTestUsers() {
 async function seedFoodItems() {
   console.log('\n🍎 Seeding food items...');
   
-  const { data: existingItems } = await supabase
+  const client = supabaseAdmin || supabase;
+  const { data: existingItems } = await client
     .from('food_items')
     .select('name');
 
@@ -211,7 +212,7 @@ async function seedFoodItems() {
     return;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from('food_items')
     .insert(newItems)
     .select();
@@ -228,8 +229,10 @@ async function seedFoodItems() {
 async function seedDonations(users) {
   console.log('\n📦 Seeding donations...');
   
+  const client = supabaseAdmin || supabase;
+  
   // Get food items
-  const { data: foodItems } = await supabase
+  const { data: foodItems } = await client
     .from('food_items')
     .select('id, name');
 
@@ -239,7 +242,7 @@ async function seedDonations(users) {
   }
 
   // Get donor users
-  const { data: profiles } = await supabase
+  const { data: profiles } = await client
     .from('profiles')
     .select('id, email, role')
     .in('role', ['food_donor']);
@@ -255,27 +258,39 @@ async function seedDonations(users) {
       donor_id: profiles.find(p => p.email === 'hasan@zipli.test')?.id,
       quantity: 10,
       status: 'available',
-      pickup_date: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Tomorrow
-      pickup_start_time: '10:00:00',
-      pickup_end_time: '12:00:00',
+      pickup_slots: [
+        {
+          date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+          start_time: '10:00:00',
+          end_time: '12:00:00'
+        }
+      ],
     },
     {
       food_item_id: foodItems.find(f => f.name === 'Vegetable Soup')?.id,
       donor_id: profiles.find(p => p.email === 'alice@zipli.test')?.id,
       quantity: 5,
       status: 'available',
-      pickup_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-      pickup_start_time: '14:00:00',
-      pickup_end_time: '16:00:00',
+      pickup_slots: [
+        {
+          date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+          start_time: '14:00:00',
+          end_time: '16:00:00'
+        }
+      ],
     },
     {
       food_item_id: foodItems.find(f => f.name === 'Fresh Produce Box')?.id,
       donor_id: profiles.find(p => p.email === 'hasan@zipli.test')?.id,
       quantity: 8,
       status: 'available',
-      pickup_date: new Date(Date.now() + 172800000).toISOString().split('T')[0], // Day after tomorrow
-      pickup_start_time: '09:00:00',
-      pickup_end_time: '11:00:00',
+      pickup_slots: [
+        {
+          date: new Date(Date.now() + 172800000).toISOString().split('T')[0],
+          start_time: '09:00:00',
+          end_time: '11:00:00'
+        }
+      ],
     },
   ].filter(d => d.food_item_id && d.donor_id); // Only include valid donations
 
@@ -284,7 +299,7 @@ async function seedDonations(users) {
     return;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from('donations')
     .insert(donations)
     .select();
@@ -300,8 +315,10 @@ async function seedDonations(users) {
 async function seedRequests() {
   console.log('\n📋 Seeding requests...');
   
+  const client = supabaseAdmin || supabase;
+  
   // Get receiver users
-  const { data: profiles } = await supabase
+  const { data: profiles } = await client
     .from('profiles')
     .select('id, email, role')
     .in('role', ['food_receiver']);
@@ -339,7 +356,7 @@ async function seedRequests() {
     return;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from('requests')
     .insert(requests)
     .select();
