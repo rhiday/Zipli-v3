@@ -148,9 +148,10 @@ export const useDatabase = create<DatabaseState>()(
         const usersWithIds = (usersData as any[]).map((u, i) => ({ 
           ...u, 
           id: `user-${i + 1}`,
-          organization_name: u.role === 'food_donor' ? 'Sample Organization' : undefined,
-          contact_number: '+358123456789',
-          address: 'Helsinki, Finland'
+          // Use organization_name from JSON data, don't override
+          organization_name: u.organization_name,
+          contact_number: u.contact_number || '+358123456789',
+          address: u.address || 'Helsinki, Finland'
         })) as User[];
 
         

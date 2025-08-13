@@ -65,12 +65,31 @@ export default function ProfilePage(): React.ReactElement {
     setSaving(true);
     setError(null);
 
-    // In a real app, you'd update the user in the database
-    // For now, we'll just simulate saving
-    setTimeout(() => {
+    try {
+      if (!currentUser) {
+        throw new Error('No current user');
+      }
+
+      // Update the user in the database store
+      const { updateUser } = useDatabase.getState();
+      
+      const updatedUser = {
+        ...currentUser,
+        full_name: formData.full_name,
+        organization_name: formData.organization_name,
+        address: formData.address,
+        contact_number: formData.contact_number,
+        driver_instructions: formData.driver_instructions,
+      };
+
+      updateUser(updatedUser);
+      
       setIsEditing(false);
       setSaving(false);
-    }, 500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save profile');
+      setSaving(false);
+    }
   };
 
   const handleLogout = () => {
