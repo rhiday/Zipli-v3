@@ -95,6 +95,7 @@ interface DatabaseState {
   updateDonation: (updatedDonation: Partial<Donation> & { id: string }) => void;
   deleteDonation: (id: string) => void;
   updateFoodItem: (updatedFoodItem: Partial<FoodItem> & { id: string }) => void;
+  clearAllData: () => void;
   
   // Request methods
   getAllRequests: () => Request[];
@@ -284,8 +285,8 @@ export const useDatabase = create<DatabaseState>()(
       
       logout: () => {
         set({ currentUser: null });
-        // Clear draft donations from localStorage
-        localStorage.removeItem('donation-storage');
+        // Don't clear draft donations on logout - let users resume their draft later
+        // localStorage.removeItem('donation-storage');
       },
 
       // Donation methods (existing)
@@ -373,6 +374,16 @@ export const useDatabase = create<DatabaseState>()(
             fi.id === updatedFoodItem.id ? { ...fi, ...updatedFoodItem } : fi
           ),
         }));
+      },
+
+      clearAllData: () => {
+        set({
+          donations: [],
+          foodItems: [],
+          requests: [],
+        });
+        // Also clear draft donations
+        localStorage.removeItem('donation-storage');
       },
 
       // Request methods
