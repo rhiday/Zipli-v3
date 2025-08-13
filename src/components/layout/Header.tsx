@@ -15,13 +15,17 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ title }) => {
-  const { currentUser, isInitialized, donations: allDonations, foodItems } = useDatabase();
+  const { currentUser, isInitialized, donations: allDonations, foodItems, getAllRequests } = useDatabase();
   const router = useRouter();
   const { t } = useLanguage();
 
-  // Get donations for the current user, sorted by latest creation time
-  const donationItems = isInitialized && currentUser
-    ? allDonations
+  // Get activity items based on user role
+  const activityItems = React.useMemo(() => {
+    if (!isInitialized || !currentUser) return [];
+
+    if (currentUser.role === 'food_donor') {
+      // Get donations for donors
+      return allDonations
         .filter(d => d.donor_id === currentUser.id && (d.status === 'available' || d.status === 'claimed'))
         .slice()
         .sort((a, b) => {
@@ -37,17 +41,39 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             quantity: d.quantity,
             name: foodItem?.name || 'Unknown Item',
             created_at: d.created_at,
+            type: 'donation' as const,
           };
+        });
+    } else if (currentUser.role === 'food_receiver') {
+      // Get requests for receivers
+      const allRequests = getAllRequests();
+      return allRequests
+        .filter(r => r.user_id === currentUser.id && r.status === 'active')
+        .slice()
+        .sort((a, b) => {
+          const aTime = new Date(a.created_at).getTime();
+          const bTime = new Date(b.created_at).getTime();
+          return bTime - aTime;
         })
-    : [];
+        .map(r => ({
+          id: r.id,
+          quantity: r.people_count,
+          name: r.description,
+          created_at: r.created_at,
+          type: 'request' as const,
+        }));
+    }
+    
+    return [];
+  }, [isInitialized, currentUser, allDonations, foodItems, getAllRequests]);
 
   // Debug: log the creation time order
-  console.log('Activity list order:', donationItems.map(d => d.created_at));
+  console.log('Activity list order:', activityItems.map(d => d.created_at));
 
   const [showAll, setShowAll] = React.useState(false);
   const maxVisible = 4;
-  const visibleItems = showAll ? donationItems : donationItems.slice(0, maxVisible);
-  const hiddenCount = donationItems.length - maxVisible;
+  const visibleItems = showAll ? activityItems : activityItems.slice(0, maxVisible);
+  const hiddenCount = activityItems.length - maxVisible;
 
   return (
     <div className="relative w-full bg-green-800 text-white px-4 pt-10 pb-6 shadow-lg overflow-hidden mb-8">
@@ -77,10 +103,10 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       <div
         className={cn(
           "w-full max-w-xl mt-6 rounded-2xl p-6 flex flex-col gap-3",
-          donationItems.length > 0 && "bg-[rgba(166,241,117,0.10)] border border-[#18E170]"
+          activityItems.length > 0 && "bg-[rgba(166,241,117,0.10)] border border-[#18E170]"
         )}
       >
-        {donationItems.length === 0 ? (
+        {activityItems.length === 0 ? (
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 bg-[#18E170] rounded-full shrink-0"></span>
             <span className="text-white/80">You don't have any active donations or requests</span>
@@ -102,19 +128,23 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                   }
                 >
                   <div>
-                    <span className="text-sm font-semibold text-white">{t('donationLabel')}</span>
-                    <span className="text-white/90 text-sm ml-1">· {item.quantity} kg, {item.name}</span>
+                    <span className="text-sm font-semibold text-white">
+                      {item.type === 'donation' ? t('donationLabel') : 'Request'}
+                    </span>
+                    <span className="text-white/90 text-sm ml-1">
+                      · {item.type === 'donation' ? `${item.quantity} kg, ${item.name}` : `${item.quantity} people, ${item.name}`}
+                    </span>
                   </div>
                   <button
                     className="text-white font-semibold text-sm underline underline-offset-2"
-                    onClick={() => router.push(`/donate/detail/${item.id}`)}
+                    onClick={() => router.push(item.type === 'donation' ? `/donate/detail/${item.id}` : `/request/${item.id}`)}
                   >
                     {t('detail')}
                   </button>
                 </li>
               ))}
             </ul>
-            {donationItems.length > maxVisible && (
+            {activityItems.length > maxVisible && (
               <button
                 className="w-full flex items-center justify-center mt-2 text-white underline underline-offset-2 text-base font-medium"
                 onClick={() => setShowAll(v => !v)}
