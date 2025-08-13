@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { ImageIcon, MapPinIcon, ShoppingBag } from 'lucide-react';
-import { DonationWithFoodItem, useDatabase } from '@/store/databaseStore';
+import { DonationWithFoodItem, useDatabase } from '@/store';
 import { CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/hooks/useLanguage';
 

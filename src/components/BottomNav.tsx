@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutGrid, Plus, Search, ShoppingBag, FileText, BarChart3, Users } from 'lucide-react';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 import {
   Drawer,

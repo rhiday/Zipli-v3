@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useMemo } from 'react';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 
 const DevLoginSwitcher: React.FC = React.memo(() => {
   const { users, login, currentUser } = useDatabase();

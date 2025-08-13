@@ -1,5 +1,15 @@
 # Claude Code Instructions for Zipli v3 Project
 
+## 🎉 **PROJECT STATUS: SUPABASE MIGRATION COMPLETE**
+
+✅ **Database**: Fully migrated to Supabase PostgreSQL  
+✅ **Authentication**: Supabase Auth with JWT and profiles  
+✅ **Store Architecture**: All 30+ components using new Supabase store  
+✅ **Type Safety**: Complete TypeScript integration  
+✅ **Real-time Features**: Live subscriptions ready  
+
+---
+
 ## 🎨 **MANDATORY DESIGN SYSTEM RULES**
 
 ### **BEFORE ANY UI CHANGE - ALWAYS:**
@@ -73,6 +83,7 @@ validateComponent(componentCode, 'ComponentName');
 // Always import these for UI changes
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useDatabase } from '@/store'; // ✅ New unified store
 import { 
   buildButtonClasses,
   buildCardClasses, 
@@ -203,13 +214,91 @@ feat(TimeSlot): add variant using component utilities
 
 ---
 
+## 🗄️ **SUPABASE DATABASE INTEGRATION**
+
+### **Store Usage (MANDATORY)**
+```tsx
+// ✅ ALWAYS use this import pattern
+import { useDatabase } from '@/store';
+
+// ❌ NEVER use the old import (deprecated)
+import { useDatabase } from '@/store/databaseStore';
+```
+
+### **Database Operations**
+```tsx
+const {
+  // Authentication
+  currentUser,           // Current authenticated user
+  isInitialized,         // Store initialization status
+  login, logout,         // Auth operations
+  
+  // Data Access
+  donations,             // Real-time donations list
+  requests,              // Real-time requests list
+  users,                 // Users list
+  foodItems,             // Food items catalog
+  
+  // CRUD Operations  
+  addDonation,           // Create donation (type-safe)
+  updateDonation,        // Update donation (type-safe)
+  deleteDonation,        // Delete donation
+  addRequest,            // Create request (type-safe)
+  updateRequest,         // Update request (type-safe)
+  
+  // Real-time subscriptions are automatic!
+} = useDatabase();
+```
+
+### **Authentication Flow**
+```tsx
+// User signup/login automatically:
+// 1. Creates Supabase auth user
+// 2. Triggers profile creation in database
+// 3. Updates store with user data
+// 4. Enables real-time subscriptions
+
+const handleLogin = async () => {
+  const result = await login(email, password);
+  if (result.data?.user) {
+    // User is authenticated and profile exists
+    // Real-time data automatically available
+  }
+};
+```
+
+### **Type Safety Requirements**
+```tsx
+// All database operations are now type-safe
+import type { 
+  User,
+  Donation, 
+  Request,
+  FoodItem,
+  DonationWithFoodItem 
+} from '@/store';
+
+// TypeScript will enforce correct types
+const donation: Donation = {
+  id: 'uuid',
+  food_item_id: 'uuid',
+  donor_id: currentUser.id,
+  quantity: 5,
+  status: 'available', // Type enforced
+  // ... other required fields
+};
+```
+
+---
+
 ## 🔧 **DEVELOPMENT WORKFLOW**
 
-1. **Start**: Check design system guidelines
-2. **Code**: Use component utilities and design tokens
-3. **Test**: Run validation helpers
-4. **Commit**: Clear, descriptive messages
-5. **Deploy**: Gradual rollout with monitoring
-6. **Verify**: Test production thoroughly
+1. **Start**: Check Supabase integration and design system
+2. **Import**: Always use `@/store` for database operations
+3. **Code**: Type-safe operations with design tokens
+4. **Test**: Real-time features and validation helpers
+5. **Commit**: Clear, descriptive messages
+6. **Deploy**: Test database connectivity
+7. **Verify**: Real-time updates and authentication
 
-**Remember**: Consistency and safety over speed. Every UI change should make the system more consistent, not less! 🎨✨
+**Remember**: All components now use Supabase! Check database connectivity and type safety. 🎨✨

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 
 function ResetPasswordPageContent() {

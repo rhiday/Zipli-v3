@@ -3,7 +3,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider';
 import React, { useEffect } from 'react';
 import BottomNav from './BottomNav';
 import { usePathname } from 'next/navigation';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 
 interface AppShellProps {
   children: React.ReactNode;

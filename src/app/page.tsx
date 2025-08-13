@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import BottomNav from '@/components/BottomNav';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 
 export default function HomePage() {
   const router = useRouter();

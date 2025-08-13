@@ -6,7 +6,7 @@ import { Languages, MessageSquare, UserCircle, ChevronDown, ChevronUp } from 'lu
 import Link from 'next/link';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useRouter } from 'next/navigation';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/hooks/useLanguage';
 

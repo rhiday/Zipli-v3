@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { jsPDF } from 'jspdf';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { SkeletonDashboardStat, SkeletonRecipient } from '@/components/ui/Skeleton';
 import { useLanguage } from '@/hooks/useLanguage';
 import {

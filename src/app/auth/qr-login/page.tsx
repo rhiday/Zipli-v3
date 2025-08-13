@@ -4,7 +4,7 @@ import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 
 function QRLoginPageContent() {
   const [loading, setLoading] = useState(false);

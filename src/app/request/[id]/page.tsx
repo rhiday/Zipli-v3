@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { UsersIcon, CalendarIcon, ClockIcon, CheckIcon, XIcon, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

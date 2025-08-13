@@ -2,7 +2,7 @@
 
 import React from "react";
 import QRLoginGenerator from "@/components/auth/QRLoginGenerator";
-import { useDatabase } from "@/store/databaseStore";
+import { useDatabase } from "@/store";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

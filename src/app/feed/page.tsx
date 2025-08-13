@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
+import { useDatabase, DonationWithFoodItem } from '@/store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import { SearchIcon } from 'lucide-react';

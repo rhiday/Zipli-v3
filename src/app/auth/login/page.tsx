@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 

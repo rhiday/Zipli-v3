@@ -19,7 +19,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
+import { useDatabase, DonationWithFoodItem } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export default function DonationDetailPage({ params }: { params: { id: string } }) {

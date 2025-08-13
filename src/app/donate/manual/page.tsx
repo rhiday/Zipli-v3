@@ -18,7 +18,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
+import { useDatabase, DonationWithFoodItem } from '@/store';
 import { PlusIcon, Clock, MapPin } from 'lucide-react';
 
 import DonationCard from '@/components/donations/DonationCard';

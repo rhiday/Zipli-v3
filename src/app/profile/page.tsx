@@ -12,7 +12,7 @@ import {
   SelectValue 
 } from '@/components/ui/Select';
 import { useRouter } from 'next/navigation';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 

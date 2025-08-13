@@ -1,0 +1,132 @@
+// Mock data for development - to be used with Supabase store
+export const MOCK_USERS = [
+  {
+    id: '11111111-1111-1111-1111-111111111111',
+    email: 'hasan@zipli.test',
+    full_name: 'Hasan Donor',
+    role: 'food_donor' as const,
+    organization_name: 'Zipli Restaurant',
+    contact_number: '+358 40 123 4567',
+    address: 'Mannerheimintie 1, Helsinki',
+  },
+  {
+    id: '22222222-2222-2222-2222-222222222222',
+    email: 'maria@zipli.test',
+    full_name: 'Maria Receiver',
+    role: 'food_receiver' as const,
+    organization_name: 'Red Cross Helsinki',
+    contact_number: '+358 40 234 5678',
+    address: 'Kaisaniemenkatu 10, Helsinki',
+  },
+  {
+    id: '33333333-3333-3333-3333-333333333333',
+    email: 'city@zipli.test',
+    full_name: 'City Admin',
+    role: 'city' as const,
+    organization_name: 'Helsinki City',
+    contact_number: '+358 40 345 6789',
+    address: 'Pohjoisesplanadi 11-13, Helsinki',
+  },
+  {
+    id: '44444444-4444-4444-4444-444444444444',
+    email: 'terminal@zipli.test',
+    full_name: 'Terminal Operator',
+    role: 'terminals' as const,
+    organization_name: 'Helsinki Airport Terminal',
+    contact_number: '+358 40 456 7890',
+    address: 'Helsinki Airport, Vantaa',
+  },
+  {
+    id: '55555555-5555-5555-5555-555555555555',
+    email: 'alice@zipli.test',
+    full_name: 'Alice Restaurant',
+    role: 'food_donor' as const,
+    organization_name: "Alice's Kitchen",
+    contact_number: '+358 40 567 8901',
+    address: 'Aleksanterinkatu 52, Helsinki',
+  },
+  {
+    id: '66666666-6666-6666-6666-666666666666',
+    email: 'kirkko@zipli.test',
+    full_name: 'Andreas Church',
+    role: 'food_receiver' as const,
+    organization_name: 'Andreas Congregation',
+    contact_number: '+358 40 678 9012',
+    address: 'Vuorikatu 5, Helsinki',
+  },
+];
+
+export const MOCK_FOOD_ITEMS = [
+  {
+    id: 'f1111111-1111-1111-1111-111111111111',
+    name: 'Fresh Bread',
+    description: 'Daily baked bread from our bakery',
+    allergens: 'Wheat, Gluten',
+    category: 'Bakery',
+    image_url: '/images/bread.jpg',
+  },
+  {
+    id: 'f2222222-2222-2222-2222-222222222222',
+    name: 'Vegetable Soup',
+    description: 'Hearty vegetable soup, perfect for cold days',
+    allergens: 'None',
+    category: 'Prepared Food',
+    image_url: '/images/soup.jpg',
+  },
+  {
+    id: 'f3333333-3333-3333-3333-333333333333',
+    name: 'Fresh Produce',
+    description: 'Seasonal fruits and vegetables',
+    allergens: 'None',
+    category: 'Produce',
+    image_url: '/images/produce.jpg',
+  },
+  {
+    id: 'f4444444-4444-4444-4444-444444444444',
+    name: 'Dairy Products',
+    description: 'Milk, cheese, and yogurt close to expiry',
+    allergens: 'Milk, Lactose',
+    category: 'Dairy',
+    image_url: '/images/dairy.jpg',
+  },
+];
+
+export const MOCK_DONATIONS = [
+  {
+    id: 'd1111111-1111-1111-1111-111111111111',
+    food_item_id: 'f1111111-1111-1111-1111-111111111111',
+    donor_id: '11111111-1111-1111-1111-111111111111',
+    quantity: 10,
+    status: 'available' as const,
+    pickup_date: new Date().toISOString().split('T')[0],
+    pickup_start_time: '10:00',
+    pickup_end_time: '12:00',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'd2222222-2222-2222-2222-222222222222',
+    food_item_id: 'f2222222-2222-2222-2222-222222222222',
+    donor_id: '55555555-5555-5555-5555-555555555555',
+    quantity: 5,
+    status: 'available' as const,
+    pickup_date: new Date().toISOString().split('T')[0],
+    pickup_start_time: '14:00',
+    pickup_end_time: '16:00',
+    created_at: new Date().toISOString(),
+  },
+];
+
+export const MOCK_REQUESTS = [
+  {
+    id: 'r1111111-1111-1111-1111-111111111111',
+    user_id: '22222222-2222-2222-2222-222222222222',
+    description: 'Need warm meals for 50 people',
+    people_count: 50,
+    pickup_date: new Date().toISOString().split('T')[0],
+    pickup_start_time: '11:00',
+    pickup_end_time: '13:00',
+    status: 'active' as const,
+    is_recurring: false,
+    created_at: new Date().toISOString(),
+  },
+];

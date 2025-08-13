@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { EditIcon } from '@/components/ui/icons/EditIcon';
 import { DeleteIcon } from '@/components/ui/icons/DeleteIcon';
 import { useDonationStore } from '@/store/donation';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';

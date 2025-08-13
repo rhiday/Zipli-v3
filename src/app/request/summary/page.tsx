@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { Check } from 'lucide-react';
 import { useRequestStore } from '@/store/request';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { useLanguage } from '@/hooks/useLanguage';

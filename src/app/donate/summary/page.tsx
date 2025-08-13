@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { useDonationStore } from '@/store/donation';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 import { SummaryCard } from '@/components/ui/SummaryCard';
 import PageContainer from '@/components/layout/PageContainer';

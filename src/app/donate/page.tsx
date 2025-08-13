@@ -18,7 +18,7 @@ import {
 import { jsPDF } from 'jspdf';
 import SummaryOverview from '@/components/SummaryOverview';
 import DonationCard from '@/components/donations/DonationCard';
-import { useDatabase, DonationWithFoodItem } from '@/store/databaseStore';
+import { useDatabase, DonationWithFoodItem } from '@/store';
 import { SkeletonDashboardStat, SkeletonRecipient } from '@/components/ui/Skeleton';
 import { useDonationStore } from '@/store/donation';
 import { useLanguage } from '@/hooks/useLanguage';

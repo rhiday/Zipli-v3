@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({

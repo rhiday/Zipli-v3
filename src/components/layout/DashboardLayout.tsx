@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutGrid, Search, ShoppingBag, FileText, BarChart3, Users, LogOut } from 'lucide-react';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import MobileTabLayout from './MobileTabLayout';
 
 // Desktop Sidebar component

@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useDatabase } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import DonationCard from '@/components/donations/DonationCard';
 import { useLanguage } from '@/hooks/useLanguage';

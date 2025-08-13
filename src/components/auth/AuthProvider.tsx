@@ -6,8 +6,8 @@
  */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useDatabase } from '@/store/databaseStore';
-import type { User } from '@/store/databaseStore';
+import { useDatabase } from '@/store';
+import type { User } from '@/store';
 
 // We can keep the Supabase types for compatibility if needed, or create our own
 import { Session } from '@supabase/supabase-js';
