@@ -1,188 +1,130 @@
 -- =====================================================
--- ZIPLI V3 SEED DATA
--- Created: 2025-01-13
--- Description: Seeds database with initial data for development and testing
+-- SUPABASE SEED DATA
+-- Run this script to populate your database with test data
 -- =====================================================
 
--- Clear existing data (for re-seeding)
-TRUNCATE TABLE donation_claims, requests, donations, food_items, profiles CASCADE;
+-- Clear existing data (optional - be careful in production!)
+-- DELETE FROM donation_claims;
+-- DELETE FROM donations;
+-- DELETE FROM requests;
+-- DELETE FROM food_items;
+-- DELETE FROM profiles;
 
--- =====================================================
--- SEED FOOD ITEMS
--- =====================================================
+-- ===== STEP 1: Create test users in Supabase Auth =====
+-- Note: You need to manually create these users in Supabase Auth Console
+-- or use the Supabase Auth API to create them programmatically
+-- Email: hasan@zipli.test, Password: password
+-- Email: maria@zipli.test, Password: password  
+-- Email: city@zipli.test, Password: password
+-- Email: terminal@zipli.test, Password: password
+-- Email: alice@zipli.test, Password: password
+-- Email: kirkko@zipli.test, Password: password
 
-INSERT INTO food_items (id, name, description, image_url, allergens) VALUES
-    ('550e8400-e29b-41d4-a716-446655440001', 'Pasta Salad', 'Fresh pasta salad with vegetables and italian dressing', '/images/pasta.jpg', ARRAY['gluten']),
-    ('550e8400-e29b-41d4-a716-446655440002', 'Salmon Soup', 'Traditional Finnish salmon soup with potatoes and dill', '/images/salmon_soup.jpg', ARRAY['fish', 'dairy']),
-    ('550e8400-e29b-41d4-a716-446655440003', 'Vegan Stew', 'Hearty vegetable stew with beans and herbs', '/images/vegan_stew.jpg', ARRAY[]::TEXT[]),
-    ('550e8400-e29b-41d4-a716-446655440004', 'Chicken Curry', 'Mild chicken curry with rice', '/images/chicken_curry.jpg', ARRAY['dairy']),
-    ('550e8400-e29b-41d4-a716-446655440005', 'Karelian Pie', 'Traditional Finnish pastry with rice filling', '/images/karelian_pie.jpg', ARRAY['gluten', 'dairy']),
-    ('550e8400-e29b-41d4-a716-446655440006', 'Meatballs', 'Swedish-style meatballs with cream sauce', '/images/meatballs.jpg', ARRAY['gluten', 'dairy', 'eggs']),
-    ('550e8400-e29b-41d4-a716-446655440007', 'Caesar Salad', 'Fresh romaine lettuce with caesar dressing and croutons', '/images/salad.jpg', ARRAY['gluten', 'dairy', 'eggs', 'fish']);
+-- ===== STEP 2: Insert profiles (after creating auth users) =====
+-- Replace these IDs with actual auth.users IDs from your Supabase project
 
--- =====================================================
--- SEED USER PROFILES 
--- Note: These will be created when users sign up through Supabase Auth
--- This is for reference - actual profiles are created via auth triggers
--- =====================================================
+-- Example profiles (you'll need to get the actual user IDs after creating auth users)
+INSERT INTO profiles (id, role, full_name, email, organization_name, contact_number, address) VALUES
+-- Get these IDs from auth.users table after creating users
+-- ('actual-uuid-from-auth-users-1', 'food_donor', 'Hasan Donor', 'hasan@zipli.test', 'Zipli Restaurant', '+358 40 123 4567', 'Mannerheimintie 1, Helsinki'),
+-- ('actual-uuid-from-auth-users-2', 'food_receiver', 'Maria Receiver', 'maria@zipli.test', 'Red Cross Helsinki', '+358 40 234 5678', 'Kaisaniemenkatu 10, Helsinki'),
+-- ('actual-uuid-from-auth-users-3', 'city', 'City Admin', 'city@zipli.test', 'Helsinki City', '+358 40 345 6789', 'Pohjoisesplanadi 11-13, Helsinki'),
+-- ('actual-uuid-from-auth-users-4', 'terminals', 'Terminal Operator', 'terminal@zipli.test', 'Helsinki Airport Terminal', '+358 40 456 7890', 'Helsinki Airport, Vantaa'),
+-- ('actual-uuid-from-auth-users-5', 'food_donor', 'Alice Restaurant', 'alice@zipli.test', 'Alice''s Kitchen', '+358 40 567 8901', 'Aleksanterinkatu 52, Helsinki'),
+-- ('actual-uuid-from-auth-users-6', 'food_receiver', 'Andreas Church', 'kirkko@zipli.test', 'Andreas Congregation', '+358 40 678 9012', 'Vuorikatu 5, Helsinki');
 
--- The following INSERT statements will be executed after user signup
--- They correspond to the mock users in /mockData/users.json
+-- ===== STEP 3: Insert food items =====
+INSERT INTO food_items (name, description, allergens, category, image_url) VALUES
+('Fresh Bread', 'Daily baked bread from our bakery. Perfect for sandwiches or as a side.', 'Wheat, Gluten', 'Bakery', '/images/bread.jpg'),
+('Vegetable Soup', 'Hearty vegetable soup with seasonal vegetables. Perfect for cold days.', 'Celery', 'Prepared Food', '/images/soup.jpg'),
+('Fresh Produce Box', 'Assorted seasonal fruits and vegetables. May include apples, carrots, potatoes, and more.', 'None', 'Produce', '/images/produce.jpg'),
+('Dairy Products', 'Milk, cheese, and yogurt close to expiry but still perfectly good.', 'Milk, Lactose', 'Dairy', '/images/dairy.jpg'),
+('Rice and Grains', 'Bulk rice, pasta, and other grain products. Long shelf life.', 'Gluten (pasta)', 'Dry Goods', '/images/grains.jpg'),
+('Canned Goods', 'Assorted canned vegetables, fruits, and ready meals.', 'Varies', 'Canned Food', '/images/canned.jpg'),
+('Fresh Salad Mix', 'Pre-washed salad greens and vegetables ready to eat.', 'None', 'Produce', '/images/salad.jpg'),
+('Meat Products', 'Frozen chicken, beef, and pork. Must be collected same day.', 'None', 'Meat', '/images/meat.jpg'),
+('Fish and Seafood', 'Fresh and frozen fish. High in omega-3.', 'Fish, Shellfish', 'Seafood', '/images/fish.jpg'),
+('Baked Goods', 'Pastries, cakes, and cookies from our bakery.', 'Wheat, Eggs, Milk', 'Bakery', '/images/pastries.jpg'),
+('Baby Food', 'Unopened jars of baby food and formula.', 'Varies', 'Baby Products', '/images/babyfood.jpg'),
+('Breakfast Cereals', 'Various breakfast cereals and oats.', 'Wheat, Nuts', 'Dry Goods', '/images/cereal.jpg'),
+('Cooking Oil', 'Vegetable and olive oil for cooking.', 'None', 'Cooking Essentials', '/images/oil.jpg'),
+('Spices and Herbs', 'Assorted spices and dried herbs.', 'None', 'Cooking Essentials', '/images/spices.jpg'),
+('Tea and Coffee', 'Various teas and ground coffee.', 'None', 'Beverages', '/images/coffee.jpg');
 
--- User 1: alice@zipli.test (food_donor)
--- User 2: bob@zipli.test (food_receiver)  
--- User 3: helsinki.airport@sodexo.com (food_donor)
--- User 4: helsinki.community@redcross.org (food_receiver)
--- User 5: city.admin@helsinki.fi (city)
--- User 6: terminal.operator@zipli.test (terminals)
--- User 7: tsanssi@zipli.test (food_receiver)
--- User 8: sodexo.ladonlukko@sodexo.com (food_donor)
+-- ===== STEP 4: Insert sample donations =====
+-- Note: You'll need to update donor_id with actual user IDs after creating profiles
+-- Also update food_item_id with actual IDs from the food_items table after insertion
 
--- =====================================================
--- SEED DONATIONS
--- Note: These reference user IDs that will be created through auth
--- In actual implementation, we'll need to update these with real UUIDs
--- =====================================================
+-- Example donations (uncomment and update IDs after creating users and food items):
+/*
+INSERT INTO donations (food_item_id, donor_id, quantity, status, pickup_date, pickup_start_time, pickup_end_time) VALUES
+-- Get food_item_id from food_items table and donor_id from profiles table
+((SELECT id FROM food_items WHERE name = 'Fresh Bread' LIMIT 1), 
+ (SELECT id FROM profiles WHERE email = 'hasan@zipli.test' LIMIT 1), 
+ 10, 'available', CURRENT_DATE + INTERVAL '1 day', '10:00:00', '12:00:00'),
 
--- Sample donations - will be updated with actual user UUIDs after auth setup
--- INSERT INTO donations (id, food_item_id, donor_id, quantity, status, pickup_time, pickup_slots) VALUES
---     ('660e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440001', 'user-1-uuid', 5.5, 'available', '2024-01-20 14:00:00+02', '[]'),
---     ('660e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440002', 'user-3-uuid', 8.2, 'available', '2024-01-21 16:30:00+02', '[]');
+((SELECT id FROM food_items WHERE name = 'Vegetable Soup' LIMIT 1), 
+ (SELECT id FROM profiles WHERE email = 'alice@zipli.test' LIMIT 1), 
+ 5, 'available', CURRENT_DATE + INTERVAL '1 day', '14:00:00', '16:00:00'),
 
--- =====================================================
--- SEED REQUESTS
--- Note: These reference user IDs that will be created through auth  
--- =====================================================
+((SELECT id FROM food_items WHERE name = 'Fresh Produce Box' LIMIT 1), 
+ (SELECT id FROM profiles WHERE email = 'hasan@zipli.test' LIMIT 1), 
+ 8, 'available', CURRENT_DATE + INTERVAL '2 days', '09:00:00', '11:00:00'),
 
--- Sample requests - will be updated with actual user UUIDs after auth setup
--- INSERT INTO requests (id, user_id, description, people_count, pickup_date, pickup_start_time, pickup_end_time, is_recurring, status) VALUES
---     ('770e8400-e29b-41d4-a716-446655440001', 'user-2-uuid', 'Need food for 20 people at homeless shelter', 20, '2024-01-20', '10:00', '14:00', false, 'active'),
---     ('770e8400-e29b-41d4-a716-446655440002', 'user-7-uuid', 'Weekly food collection for community kitchen', 50, '2024-01-25', '09:00', '12:00', true, 'active');
+((SELECT id FROM food_items WHERE name = 'Dairy Products' LIMIT 1), 
+ (SELECT id FROM profiles WHERE email = 'alice@zipli.test' LIMIT 1), 
+ 15, 'available', CURRENT_DATE, '16:00:00', '18:00:00'),
 
--- =====================================================
--- DEVELOPMENT HELPER FUNCTIONS
--- =====================================================
+((SELECT id FROM food_items WHERE name = 'Rice and Grains' LIMIT 1), 
+ (SELECT id FROM profiles WHERE email = 'hasan@zipli.test' LIMIT 1), 
+ 20, 'available', CURRENT_DATE + INTERVAL '3 days', '11:00:00', '13:00:00');
+*/
 
--- Function to create a test user profile (for development)
-CREATE OR REPLACE FUNCTION create_test_profile(
-    user_id UUID,
-    email TEXT,
-    user_role user_role,
-    full_name TEXT,
-    organization_name TEXT DEFAULT NULL
-)
-RETURNS VOID AS $$
-BEGIN
-    INSERT INTO profiles (id, role, full_name, organization_name)
-    VALUES (user_id, user_role, full_name, organization_name)
-    ON CONFLICT (id) DO UPDATE SET
-        role = EXCLUDED.role,
-        full_name = EXCLUDED.full_name,
-        organization_name = EXCLUDED.organization_name;
-END;
-$$ LANGUAGE plpgsql;
+-- ===== STEP 5: Insert sample requests =====
+-- Example requests (uncomment and update IDs after creating users):
+/*
+INSERT INTO requests (user_id, description, people_count, pickup_date, pickup_start_time, pickup_end_time, status, is_recurring) VALUES
+((SELECT id FROM profiles WHERE email = 'maria@zipli.test' LIMIT 1),
+ 'Need warm meals for 50 people at our shelter', 50, 
+ CURRENT_DATE + INTERVAL '1 day', '11:00:00', '13:00:00', 'active', false),
 
--- Function to seed sample donations for a donor
-CREATE OR REPLACE FUNCTION create_sample_donations(donor_id UUID)
-RETURNS VOID AS $$
-DECLARE
-    food_item_ids UUID[] := ARRAY[
-        '550e8400-e29b-41d4-a716-446655440001',
-        '550e8400-e29b-41d4-a716-446655440002',
-        '550e8400-e29b-41d4-a716-446655440003'
-    ];
-    quantities DECIMAL[] := ARRAY[5.5, 8.2, 3.0];
-    pickup_times TIMESTAMPTZ[] := ARRAY[
-        '2024-01-20 14:00:00+02',
-        '2024-01-21 16:30:00+02', 
-        '2024-01-22 12:00:00+02'
-    ];
-    i INTEGER;
-BEGIN
-    FOR i IN 1..3 LOOP
-        INSERT INTO donations (food_item_id, donor_id, quantity, status, pickup_time)
-        VALUES (food_item_ids[i], donor_id, quantities[i], 'available', pickup_times[i]);
-    END LOOP;
-END;
-$$ LANGUAGE plpgsql;
+((SELECT id FROM profiles WHERE email = 'kirkko@zipli.test' LIMIT 1),
+ 'Weekly food assistance for 30 families', 30, 
+ CURRENT_DATE + INTERVAL '2 days', '14:00:00', '16:00:00', 'active', true),
 
--- Function to seed sample requests for a receiver
-CREATE OR REPLACE FUNCTION create_sample_requests(receiver_id UUID)
-RETURNS VOID AS $$
-BEGIN
-    INSERT INTO requests (user_id, description, people_count, pickup_date, pickup_start_time, pickup_end_time, is_recurring, status)
-    VALUES 
-        (receiver_id, 'Need food for 20 people at homeless shelter', 20, '2024-01-20', '10:00', '14:00', false, 'active'),
-        (receiver_id, 'Weekly food collection for community kitchen', 50, '2024-01-25', '09:00', '12:00', true, 'active');
-END;
-$$ LANGUAGE plpgsql;
+((SELECT id FROM profiles WHERE email = 'maria@zipli.test' LIMIT 1),
+ 'Emergency food supplies needed for 20 people', 20, 
+ CURRENT_DATE, '17:00:00', '19:00:00', 'active', false);
+*/
 
--- =====================================================
--- REAL-TIME SUBSCRIPTIONS SETUP
--- =====================================================
+-- ===== STEP 6: Verify data =====
+-- Run these queries to verify the seed data was inserted correctly:
 
--- Enable real-time for relevant tables
-ALTER publication supabase_realtime ADD TABLE donations;
-ALTER publication supabase_realtime ADD TABLE requests;
-ALTER publication supabase_realtime ADD TABLE donation_claims;
+-- Check profiles
+SELECT id, email, full_name, role, organization_name FROM profiles;
 
--- =====================================================
--- COMMENTS FOR DOCUMENTATION
--- =====================================================
+-- Check food items
+SELECT id, name, category FROM food_items;
 
-COMMENT ON FUNCTION create_test_profile IS 'Helper function to create test user profiles during development';
-COMMENT ON FUNCTION create_sample_donations IS 'Creates sample donations for a given donor user';
-COMMENT ON FUNCTION create_sample_requests IS 'Creates sample requests for a given receiver user';
-
--- =====================================================
--- ANALYTICS VIEWS FOR CITY DASHBOARD
--- =====================================================
-
--- View for city-wide donation statistics
-CREATE OR REPLACE VIEW city_donation_stats AS
+-- Check donations with food item details
 SELECT 
-    COUNT(*) as total_donations,
-    COUNT(*) FILTER (WHERE status = 'available') as available_donations,
-    COUNT(*) FILTER (WHERE status = 'completed') as completed_donations,
-    SUM(quantity) FILTER (WHERE status = 'completed') as total_kg_donated,
-    COUNT(DISTINCT donor_id) as active_donors,
-    DATE_TRUNC('month', created_at) as month
-FROM donations
-WHERE created_at >= NOW() - INTERVAL '12 months'
-GROUP BY DATE_TRUNC('month', created_at)
-ORDER BY month;
+    d.id,
+    d.quantity,
+    d.status,
+    d.pickup_date,
+    fi.name as food_name,
+    p.full_name as donor_name
+FROM donations d
+JOIN food_items fi ON d.food_item_id = fi.id
+JOIN profiles p ON d.donor_id = p.id;
 
--- View for city-wide request statistics  
-CREATE OR REPLACE VIEW city_request_stats AS
+-- Check requests
 SELECT 
-    COUNT(*) as total_requests,
-    COUNT(*) FILTER (WHERE status = 'active') as active_requests,
-    COUNT(*) FILTER (WHERE status = 'fulfilled') as fulfilled_requests,
-    SUM(people_count) FILTER (WHERE status = 'fulfilled') as people_served,
-    COUNT(DISTINCT user_id) as active_receivers,
-    DATE_TRUNC('month', created_at) as month
-FROM requests  
-WHERE created_at >= NOW() - INTERVAL '12 months'
-GROUP BY DATE_TRUNC('month', created_at)
-ORDER BY month;
-
--- View for partner organizations
-CREATE OR REPLACE VIEW partner_organizations AS
-SELECT 
-    p.id,
-    p.full_name,
-    p.organization_name,
-    p.role,
-    COUNT(d.id) as donation_count,
-    SUM(d.quantity) FILTER (WHERE d.status = 'completed') as total_kg_donated,
-    MAX(d.created_at) as last_donation_date
-FROM profiles p
-LEFT JOIN donations d ON p.id = d.donor_id
-WHERE p.role IN ('food_donor', 'food_receiver')
-GROUP BY p.id, p.full_name, p.organization_name, p.role
-HAVING COUNT(d.id) > 0 OR p.role = 'food_receiver'
-ORDER BY donation_count DESC NULLS LAST;
-
-COMMENT ON VIEW city_donation_stats IS 'Monthly donation statistics for city analytics';
-COMMENT ON VIEW city_request_stats IS 'Monthly request statistics for city analytics';
-COMMENT ON VIEW partner_organizations IS 'Partner organization statistics for city dashboard';
+    r.id,
+    r.description,
+    r.people_count,
+    r.pickup_date,
+    r.status,
+    p.full_name as requester_name
+FROM requests r
+JOIN profiles p ON r.user_id = p.id;

@@ -38,6 +38,17 @@ const DevLoginSwitcher: React.FC = React.memo(() => {
 
   console.log('DevLoginSwitcher: Users loaded:', users.length, users.map(u => u.full_name));
 
+  if (users.length === 0) {
+    return (
+      <div className="fixed bottom-4 right-4 z-50 bg-white border border-gray-300 rounded-lg shadow-lg p-4 w-64">
+        <div className="font-bold mb-2 text-sm text-gray-700">Dev User Switcher</div>
+        <div className="text-xs text-gray-500">
+          No users found. Run <code className="bg-gray-100 px-1 rounded">npm run seed</code> to create test users.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed bottom-4 right-4 z-50 bg-white border border-gray-300 rounded-lg shadow-lg p-4 w-64">
       <div className="font-bold mb-2 text-sm text-gray-700">Dev User Switcher ({users.length} users)</div>

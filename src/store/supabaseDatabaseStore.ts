@@ -7,7 +7,6 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase/client';
 import { authService } from '@/lib/auth/authService';
-import { MOCK_USERS, MOCK_FOOD_ITEMS, MOCK_DONATIONS, MOCK_REQUESTS } from '@/lib/mockData';
 import {
   Database,
   Profile,
@@ -132,39 +131,17 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           // Check for existing session
           const currentUser = await authService.getCurrentUser();
           
-          // In development mode, populate with mock users if needed
-          const isDevelopment = process.env.NODE_ENV === 'development';
-          
-          if (isDevelopment) {
-            // For development, use mock users for the DevLoginSwitcher
-            set({ users: MOCK_USERS as any });
-            
-            // Also set mock data for better development experience
-            if (!currentUser) {
-              set({ 
-                foodItems: MOCK_FOOD_ITEMS as any,
-                donations: MOCK_DONATIONS.map(d => ({
-                  ...d,
-                  food_item: MOCK_FOOD_ITEMS.find(fi => fi.id === d.food_item_id),
-                })) as any,
-                requests: MOCK_REQUESTS as any,
-              });
-            }
-          } else {
-            // In production, fetch real data
-            await Promise.all([
-              state.fetchFoodItems(),
-              state.fetchDonations(),
-              state.fetchUsers(),
-              state.fetchRequests(),
-              state.fetchClaims(),
-            ]);
-          }
+          // Always fetch data from Supabase
+          await Promise.all([
+            state.fetchFoodItems(),
+            state.fetchDonations(),
+            state.fetchUsers(),
+            state.fetchRequests(),
+            state.fetchClaims(),
+          ]);
 
-          // Setup real-time subscriptions only if we have a real connection
-          if (currentUser) {
-            state.setupRealtimeSubscriptions();
-          }
+          // Setup real-time subscriptions
+          state.setupRealtimeSubscriptions();
 
           set({ 
             currentUser,
@@ -185,27 +162,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
         try {
           set({ loading: true, error: null });
           
-          // In development mode, handle mock user login
-          const isDevelopment = process.env.NODE_ENV === 'development';
-          if (isDevelopment && email.endsWith('@zipli.test')) {
-            // Find the mock user
-            const mockUser = MOCK_USERS.find(u => u.email === email);
-            if (mockUser) {
-              // Set the mock user as current user
-              set({ 
-                currentUser: mockUser as any,
-                loading: false 
-              });
-              
-              // Simulate successful login response
-              return { 
-                data: { user: mockUser as any, session: null }, 
-                error: null 
-              };
-            }
-          }
-          
-          // For real authentication (production or non-mock emails)
+          // Always use real Supabase authentication
           const result = await authService.signIn({ email, password });
           
           if (result.data?.user) {
@@ -296,42 +253,19 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       logout: async () => {
         try {
-          // For mock users in development, just clear the current user
-          const isDevelopment = process.env.NODE_ENV === 'development';
-          const currentUser = get().currentUser;
-          
-          if (isDevelopment && currentUser?.email?.endsWith('@zipli.test')) {
-            // For mock users, just clear the state
-            set({ currentUser: null });
-          } else {
-            // For real users, sign out from Supabase
-            await authService.signOut();
-          }
+          // Always sign out from Supabase
+          await authService.signOut();
           
           get().cleanupSubscriptions();
           
-          // Reset data but keep mock users for DevLoginSwitcher
-          if (isDevelopment) {
-            set({ 
-              currentUser: null,
-              // Keep mock users and food items for development
-              users: MOCK_USERS as any,
-              foodItems: MOCK_FOOD_ITEMS as any,
-              donations: MOCK_DONATIONS.map(d => ({
-                ...d,
-                food_item: MOCK_FOOD_ITEMS.find(fi => fi.id === d.food_item_id),
-              })) as any,
-              requests: MOCK_REQUESTS as any,
-              claims: [],
-            });
-          } else {
-            set({ 
-              currentUser: null,
-              donations: [],
-              requests: [],
-              claims: [],
-            });
-          }
+          set({ 
+            currentUser: null,
+            // Keep users list for DevLoginSwitcher
+            // Other data will be cleared
+            donations: [],
+            requests: [],
+            claims: [],
+          });
         } catch (error) {
           console.error('Logout error:', error);
         }

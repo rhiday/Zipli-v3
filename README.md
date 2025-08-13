@@ -36,6 +36,30 @@ pnpm dev
 
 The application now uses **Supabase** as the primary database. The migration includes:
 
+### Quick Setup (For Development)
+1. **Create a Supabase project** at [supabase.com](https://supabase.com)
+2. **Run database migrations**:
+   ```sql
+   -- Copy and paste these files in Supabase SQL Editor:
+   -- 1. supabase/migrations/20250813_create_core_tables.sql
+   -- 2. supabase/migrations/20250813_setup_rls_policies.sql  
+   -- 3. supabase/migrations/20250813_auth_triggers.sql
+   ```
+3. **Set environment variables** in `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key  # Optional, for seeding
+   ```
+4. **Seed with test data**:
+   ```bash
+   npm run seed
+   ```
+5. **Start development**:
+   ```bash
+   npm run dev
+   ```
+
 ### Database Schema
 - **5 core tables**: profiles, food_items, donations, requests, donation_claims
 - **Row Level Security (RLS)**: Comprehensive security policies
@@ -80,20 +104,20 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 SUPABASE_STORAGE_BUCKET=donations
 ```
 
-### Database Migration
-1. Create a new Supabase project
-2. Run the migration files in order:
+### Production Deployment
+1. **Create Supabase project** for production
+2. **Run migration files** in Supabase SQL Editor:
    ```sql
-   -- 1. Core tables and schema
-   \i supabase/migrations/20250813_create_core_tables.sql
-   
-   -- 2. Row Level Security policies
-   \i supabase/migrations/20250813_setup_rls_policies.sql
-   
-   -- 3. Authentication triggers
-   \i supabase/migrations/20250813_auth_triggers.sql
+   -- Run these in order:
+   -- 1. supabase/migrations/20250813_create_core_tables.sql
+   -- 2. supabase/migrations/20250813_setup_rls_policies.sql
+   -- 3. supabase/migrations/20250813_auth_triggers.sql
    ```
-3. Deploy to Vercel with environment variables
+3. **Seed with production data**:
+   ```bash
+   npm run seed  # Creates test users and food items
+   ```
+4. **Deploy to Vercel** with environment variables
 
 ## Test Accounts
 
