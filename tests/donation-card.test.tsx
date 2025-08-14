@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import '@testing-library/jest-dom';
 import DonationCard from '@/components/donations/DonationCard';
-import { DonationWithFoodItem } from '@/store/databaseStore';
+import { DonationWithFoodItem } from '@/types/supabase';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);
@@ -51,17 +51,26 @@ describe('DonationCard', () => {
     id: 'test-donation-1',
     food_item_id: 'test-food-1',
     donor_id: 'test-donor-1',
-    quantity: '5 kg',
+    quantity: 5,
     status: 'available',
-    pickup_time_start: '2024-12-01T10:00:00Z',
-    pickup_time_end: '2024-12-01T18:00:00Z',
+    pickup_slots: [
+      {
+        start: '2024-12-01T10:00:00Z',
+        end: '2024-12-01T18:00:00Z'
+      }
+    ],
+    pickup_time: '2024-12-01T10:00:00Z',
+    notes: 'Please ring the doorbell',
     created_at: '2024-12-01T08:00:00Z',
+    updated_at: '2024-12-01T08:00:00Z',
     food_item: {
       id: 'test-food-1',
       name: 'Fresh Apples',
       description: 'Organic red apples from local farm',
       image_url: '/test-image.jpg',
       allergens: ['none'],
+      created_at: '2024-12-01T08:00:00Z',
+      updated_at: '2024-12-01T08:00:00Z',
     },
   };
 
@@ -115,8 +124,8 @@ describe('DonationCard', () => {
         ...mockDonation,
         food_item: {
           ...mockDonation.food_item,
-          image_url: undefined,
-          description: undefined,
+          image_url: null,
+          description: null,
         },
       },
     };

@@ -6,7 +6,7 @@ import '@testing-library/jest-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import { PhotoUpload } from '@/components/ui/PhotoUpload';
-import { Skeleton, SkeletonCard, SkeletonDashboardStat } from '@/components/ui/Skeleton';
+import Skeleton, { SkeletonCard, SkeletonDashboardStat } from '@/components/ui/Skeleton';
 
 // Mock dependencies
 jest.mock('next/navigation', () => ({
@@ -79,8 +79,8 @@ describe('UI Components', () => {
     });
 
     it('shows error state correctly', () => {
-      render(<Input error="Invalid input" />);
-      expect(screen.getByText('Invalid input')).toBeInTheDocument();
+      render(<Input variant="error" />);
+      expect(screen.getByRole('textbox')).toHaveClass('border-negative');
     });
   });
 

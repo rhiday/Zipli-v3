@@ -32,7 +32,7 @@ interface PickupSlot {
 
 export default function PickupSlotPage() {
   const router = useRouter();
-  const addFullDonation = useDatabase(state => state.addFullDonation);
+  const { addDonation, currentUser } = useDatabase();
   const { donationItems, pickupSlots, addPickupSlot, updatePickupSlot, deletePickupSlot, clearDonation } = useDonationStore();
   const { t } = useLanguage();
 
@@ -98,7 +98,11 @@ export default function PickupSlotPage() {
     setShowAddForm(true);
   };
 
-  const handleSubmitDonation = () => {
+  const handleSubmitDonation = async () => {
+    // For now, just navigate to summary page
+    // The actual donation creation should happen after reviewing in summary
+    // This avoids the complexity of managing food_item_ids here
+    
     // Auto-save current slot if form is filled out
     if (currentSlot.date && currentSlot.startTime && currentSlot.endTime && showAddForm) {
       if (currentSlot.id === 'new') {
@@ -112,9 +116,7 @@ export default function PickupSlotPage() {
     const totalSlots = pickupSlots.length + (currentSlot.date && showAddForm ? 1 : 0);
     if (totalSlots === 0) return;
     
-    addFullDonation(donationItems, pickupSlots);
-    // Don't clear donation store yet - summary page needs it
-    // clearDonation();
+    // Navigate to summary page where the actual donation will be created
     router.push('/donate/summary');
   };
 
@@ -143,7 +145,7 @@ export default function PickupSlotPage() {
       className="bg-white"
     >
       <main className="contents">
-        <h2 className="text-xl font-semibold">{t('pickupSlot')}</h2>
+        <h2 className="text-xl font-semibold mb-2">{t('pickupSlot')}</h2>
         <div className="flex flex-col gap-4">
           {pickupSlots.map(slot => (
             <div key={slot.id} className="flex items-center justify-between p-3 h-[56px] rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
@@ -174,13 +176,13 @@ export default function PickupSlotPage() {
         {showAddForm && (
           <div className="flex flex-col gap-6">
             {(pickupSlots.length > 0 || currentSlot.id !== 'new') && (
-              <h3 className="text-lg font-semibold text-[#021d13]">
+              <h3 className="text-lg font-semibold text-[#021d13] mt-4">
                 {currentSlot.id !== 'new' ? t('editPickupSlot') : t('addAnotherPickupSlot')}
               </h3>
             )}
             {/* Date Picker */}
             <div>
-              <label className="block text-black font-semibold mb-2">{t('selectDay')}</label>
+              <label className="block text-black font-semibold mb-3">{t('selectDay')}</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -213,7 +215,7 @@ export default function PickupSlotPage() {
             {/* Time Pickers */}
             <div className="grid grid-cols-2 gap-4">
                <div>
-                <label className="block text-black font-semibold mb-2">{t('startTime')}</label>
+                <label className="block text-black font-semibold mb-3">{t('startTime')}</label>
                 <Popover open={openPopover === 'start'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'start' : null)}>
                   <PopoverTrigger asChild>
                     <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
@@ -247,7 +249,7 @@ export default function PickupSlotPage() {
                 </Popover>
               </div>
               <div>
-                <label className="block text-black font-semibold mb-2">{t('endTime')}</label>
+                <label className="block text-black font-semibold mb-3">{t('endTime')}</label>
                 <Popover open={openPopover === 'end'} onOpenChange={(isOpen) => setOpenPopover(isOpen ? 'end' : null)}>
                   <PopoverTrigger asChild>
                     <Button variant="secondary" className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base">
@@ -281,7 +283,7 @@ export default function PickupSlotPage() {
                 </Popover>
               </div>
             </div>
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center mt-4">
               <button
                 type="button"
                 onClick={handleSaveSlot}

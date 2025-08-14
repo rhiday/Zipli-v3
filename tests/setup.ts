@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom';
+import { toHaveNoViolations } from 'jest-axe';
 import { configure } from '@testing-library/react';
+
+// Extend Jest matchers
+expect.extend(toHaveNoViolations);
 
 // Configure testing library
 configure({

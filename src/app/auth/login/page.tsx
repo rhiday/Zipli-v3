@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
+import DevLoginSimple from '@/components/dev/DevLoginSimple';
 import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -163,7 +163,7 @@ export default function LoginPage() {
 
       {process.env.NODE_ENV === 'development' && (
         <div className="absolute bottom-4 right-4 z-50">
-          <DevLoginSwitcher />
+          <DevLoginSimple />
         </div>
       )}
     </div>

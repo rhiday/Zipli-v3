@@ -123,33 +123,41 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       // ===== INITIALIZATION =====
       init: async () => {
         const state = get();
-        if (state.isInitialized) return;
+        if (state.isInitialized) {
+          return;
+        }
 
         try {
+          console.log('🚀 Store init starting...');
           set({ loading: true, error: null });
 
           // Check for existing session
+          console.log('📋 Getting current user...');
           const currentUser = await authService.getCurrentUser();
+          console.log('👤 Current user:', currentUser?.full_name || 'None');
           
           // Always fetch data from Supabase
+          console.log('📦 Fetching data...');
           await Promise.all([
             state.fetchFoodItems(),
-            state.fetchDonations(),
+            // Temporarily skip donations to avoid authentication issues during dev login
+            // state.fetchDonations(),
             state.fetchUsers(),
             state.fetchRequests(),
-            state.fetchClaims(),
+            // Skip fetchClaims for now since table doesn't exist
+            // state.fetchClaims(),
           ]);
+          console.log('✅ Data fetching completed');
 
           // Setup real-time subscriptions
           state.setupRealtimeSubscriptions();
-
           set({ 
             currentUser,
             isInitialized: true,
             loading: false 
           });
         } catch (error) {
-          console.error('Initialization error:', error);
+          console.error('❌ Initialization error:', error);
           set({ 
             error: error instanceof Error ? error.message : 'Initialization failed',
             loading: false 
@@ -168,9 +176,9 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           if (result.data?.user) {
             set({ currentUser: result.data.user });
             // Refresh data after login
-            await get().fetchDonations();
+            // await get().fetchDonations(); // Temporarily disabled for dev login
             await get().fetchRequests();
-            await get().fetchClaims();
+            // await get().fetchClaims(); // Table doesn't exist
           }
           
           set({ loading: false });
@@ -194,10 +202,10 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             userData: {
               role: userData.role || 'food_receiver',
               full_name: userData.full_name || email,
-              organization_name: userData.organization_name,
-              contact_number: userData.contact_number,
-              address: userData.address,
-              driver_instructions: userData.driver_instructions,
+              organization_name: userData.organization_name || undefined,
+              contact_number: userData.contact_number || undefined,
+              address: userData.address || undefined,
+              driver_instructions: userData.driver_instructions || undefined,
             }
           });
           
@@ -626,37 +634,46 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       // ===== REAL-TIME METHODS =====
       setupRealtimeSubscriptions: () => {
+        // Clean up any existing subscriptions first
+        const currentState = get();
+        if (currentState.subscriptions.length > 0) {
+          console.log('Cleaning up existing subscriptions...');
+          currentState.cleanupSubscriptions();
+        }
+
         const subscriptions: RealtimeChannel[] = [];
 
-        // Subscribe to donations changes
-        const donationsChannel = supabase
-          .channel('donations_changes')
-          .on('postgres_changes', 
-            { event: '*', schema: 'public', table: 'donations' },
-            () => get().fetchDonations()
-          )
-          .subscribe();
+        try {
+          // Subscribe to donations changes with unique channel names
+          const donationsChannel = supabase
+            .channel(`donations_changes_${Date.now()}`)
+            .on('postgres_changes', 
+              { event: '*', schema: 'public', table: 'donations' },
+              () => {
+                console.log('Donations changed, refetching...');
+                get().fetchDonations();
+              }
+            )
+            .subscribe();
 
-        // Subscribe to requests changes
-        const requestsChannel = supabase
-          .channel('requests_changes')
-          .on('postgres_changes',
-            { event: '*', schema: 'public', table: 'requests' },
-            () => get().fetchRequests()
-          )
-          .subscribe();
+          // Subscribe to requests changes with unique channel names
+          const requestsChannel = supabase
+            .channel(`requests_changes_${Date.now()}`)
+            .on('postgres_changes',
+              { event: '*', schema: 'public', table: 'requests' },
+              () => {
+                console.log('Requests changed, refetching...');
+                get().fetchRequests();
+              }
+            )
+            .subscribe();
 
-        // Subscribe to claims changes
-        const claimsChannel = supabase
-          .channel('claims_changes')
-          .on('postgres_changes',
-            { event: '*', schema: 'public', table: 'donation_claims' },
-            () => get().fetchClaims()
-          )
-          .subscribe();
-
-        subscriptions.push(donationsChannel, requestsChannel, claimsChannel);
-        set({ subscriptions });
+          subscriptions.push(donationsChannel, requestsChannel);
+          set({ subscriptions });
+          console.log('Real-time subscriptions set up successfully');
+        } catch (error) {
+          console.error('Error setting up subscriptions:', error);
+        }
       },
 
       cleanupSubscriptions: () => {
@@ -673,7 +690,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       // Only persist user session, not the actual data (we'll fetch fresh data on init)
       partialize: (state) => ({ 
         currentUser: state.currentUser,
-        isInitialized: state.isInitialized,
+        // Don't persist isInitialized so we always fetch fresh data on app restart
       }),
     }
   )

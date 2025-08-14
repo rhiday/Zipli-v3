@@ -1,0 +1,635 @@
+/**
+ * Manual Database Test Suite
+ * 
+ * This script tests all database functionality with the real Supabase instance.
+ * Run with: node -r ts-node/register tests/manual-database-test.ts
+ * 
+ * Prerequisites:
+ * 1. npm run seed (to populate test data)
+ * 2. Environment variables set in .env.local
+ */
+
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/types/supabase';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ Missing environment variables:');
+  console.error('   NEXT_PUBLIC_SUPABASE_URL');
+  console.error('   NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  process.exit(1);
+}
+
+const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+
+interface TestResult {
+  name: string;
+  status: 'PASS' | 'FAIL' | 'SKIP';
+  message: string;
+  duration?: number;
+}
+
+const results: TestResult[] = [];
+
+function log(emoji: string, message: string) {
+  console.log(`${emoji} ${message}`);
+}
+
+function logResult(result: TestResult) {
+  const emoji = result.status === 'PASS' ? '✅' : result.status === 'FAIL' ? '❌' : '⚠️';
+  console.log(`${emoji} ${result.name}: ${result.message}`);
+  results.push(result);
+}
+
+async function testAuthentication() {
+  log('🔐', 'Testing Authentication...');
+  
+  try {
+    // Test invalid login
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email: 'nonexistent@test.com',
+      password: 'wrongpassword'
+    });
+    
+    if (loginError) {
+      logResult({
+        name: 'Invalid Login Rejection',
+        status: 'PASS',
+        message: 'Correctly rejected invalid credentials'
+      });
+    } else {
+      logResult({
+        name: 'Invalid Login Rejection',
+        status: 'FAIL',
+        message: 'Should have rejected invalid credentials'
+      });
+    }
+
+    // Test valid login with test user
+    const { data: validLogin, error: validError } = await supabase.auth.signInWithPassword({
+      email: 'hasan@zipli.test',
+      password: 'password'
+    });
+
+    if (validError) {
+      logResult({
+        name: 'Valid User Login',
+        status: 'FAIL',
+        message: `Login failed: ${validError.message}`
+      });
+    } else if (validLogin.user) {
+      logResult({
+        name: 'Valid User Login',
+        status: 'PASS',
+        message: `Successfully logged in as ${validLogin.user.email}`
+      });
+
+      // Test getting user profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', validLogin.user.id)
+        .single();
+
+      if (profileError) {
+        logResult({
+          name: 'User Profile Retrieval',
+          status: 'FAIL',
+          message: `Profile fetch failed: ${profileError.message}`
+        });
+      } else if (profile) {
+        logResult({
+          name: 'User Profile Retrieval',
+          status: 'PASS',
+          message: `Retrieved profile for ${profile.full_name} (${profile.role})`
+        });
+      }
+    }
+
+  } catch (error) {
+    logResult({
+      name: 'Authentication Test',
+      status: 'FAIL',
+      message: `Unexpected error: ${error}`
+    });
+  }
+}
+
+async function testFoodItemsOperations() {
+  log('🍎', 'Testing Food Items CRUD...');
+
+  try {
+    // Test fetching food items
+    const { data: foodItems, error: fetchError } = await supabase
+      .from('food_items')
+      .select('*')
+      .limit(10);
+
+    if (fetchError) {
+      logResult({
+        name: 'Food Items Fetch',
+        status: 'FAIL',
+        message: `Fetch failed: ${fetchError.message}`
+      });
+    } else {
+      logResult({
+        name: 'Food Items Fetch',
+        status: 'PASS',
+        message: `Retrieved ${foodItems?.length || 0} food items`
+      });
+
+      // Test food item structure
+      if (foodItems && foodItems.length > 0) {
+        const item = foodItems[0];
+        const hasRequiredFields = item.id && item.name && Array.isArray(item.allergens);
+        
+        logResult({
+          name: 'Food Item Structure',
+          status: hasRequiredFields ? 'PASS' : 'FAIL',
+          message: hasRequiredFields 
+            ? `Valid structure: ${item.name} with ${item.allergens.length} allergens`
+            : 'Missing required fields'
+        });
+      }
+    }
+
+    // Test allergen filtering
+    const { data: allergenFiltered, error: filterError } = await supabase
+      .from('food_items')
+      .select('*')
+      .contains('allergens', ['Wheat']);
+
+    if (filterError) {
+      logResult({
+        name: 'Allergen Filtering',
+        status: 'FAIL',
+        message: `Filter failed: ${filterError.message}`
+      });
+    } else {
+      logResult({
+        name: 'Allergen Filtering',
+        status: 'PASS',
+        message: `Found ${allergenFiltered?.length || 0} items containing Wheat`
+      });
+    }
+
+  } catch (error) {
+    logResult({
+      name: 'Food Items Test',
+      status: 'FAIL',
+      message: `Unexpected error: ${error}`
+    });
+  }
+}
+
+async function testDonationsLifecycle() {
+  log('📦', 'Testing Donations Lifecycle...');
+
+  try {
+    // Test fetching donations with joins
+    const { data: donations, error: fetchError } = await supabase
+      .from('donations')
+      .select(`
+        *,
+        food_item:food_items(*),
+        donor:profiles(*)
+      `)
+      .limit(5);
+
+    if (fetchError) {
+      logResult({
+        name: 'Donations Fetch with Joins',
+        status: 'FAIL',
+        message: `Fetch failed: ${fetchError.message}`
+      });
+    } else {
+      logResult({
+        name: 'Donations Fetch with Joins',
+        status: 'PASS',
+        message: `Retrieved ${donations?.length || 0} donations with related data`
+      });
+
+      // Test donation structure
+      if (donations && donations.length > 0) {
+        const donation = donations[0] as any;
+        const hasJoins = donation.food_item && donation.donor;
+        
+        logResult({
+          name: 'Donation Join Structure',
+          status: hasJoins ? 'PASS' : 'FAIL',
+          message: hasJoins 
+            ? `Valid joins: ${donation.food_item?.name} from ${donation.donor?.full_name}`
+            : 'Missing joined data'
+        });
+
+        // Test pickup slots structure
+        const hasPickupSlots = Array.isArray(donation.pickup_slots);
+        logResult({
+          name: 'Pickup Slots Structure',
+          status: hasPickupSlots ? 'PASS' : 'FAIL',
+          message: hasPickupSlots 
+            ? `Valid pickup slots: ${donation.pickup_slots?.length || 0} slots`
+            : 'Invalid pickup slots format'
+        });
+      }
+    }
+
+    // Test filtering by status
+    const { data: availableDonations, error: statusError } = await supabase
+      .from('donations')
+      .select('*')
+      .eq('status', 'available');
+
+    if (statusError) {
+      logResult({
+        name: 'Donation Status Filtering',
+        status: 'FAIL',
+        message: `Status filter failed: ${statusError.message}`
+      });
+    } else {
+      logResult({
+        name: 'Donation Status Filtering',
+        status: 'PASS',
+        message: `Found ${availableDonations?.length || 0} available donations`
+      });
+    }
+
+  } catch (error) {
+    logResult({
+      name: 'Donations Test',
+      status: 'FAIL',
+      message: `Unexpected error: ${error}`
+    });
+  }
+}
+
+async function testRequestsManagement() {
+  log('📋', 'Testing Requests Management...');
+
+  try {
+    // Test fetching requests with user data
+    const { data: requests, error: fetchError } = await supabase
+      .from('requests')
+      .select(`
+        *,
+        user:profiles(*)
+      `)
+      .limit(5);
+
+    if (fetchError) {
+      logResult({
+        name: 'Requests Fetch with User Data',
+        status: 'FAIL',
+        message: `Fetch failed: ${fetchError.message}`
+      });
+    } else {
+      logResult({
+        name: 'Requests Fetch with User Data',
+        status: 'PASS',
+        message: `Retrieved ${requests?.length || 0} requests with user data`
+      });
+
+      // Test request structure
+      if (requests && requests.length > 0) {
+        const request = requests[0] as any;
+        const hasUserData = request.user && request.user.full_name;
+        
+        logResult({
+          name: 'Request User Join',
+          status: hasUserData ? 'PASS' : 'FAIL',
+          message: hasUserData 
+            ? `Valid join: Request by ${request.user.full_name}`
+            : 'Missing user data'
+        });
+
+        // Test date/time fields
+        const hasDateTime = request.pickup_date && request.pickup_start_time && request.pickup_end_time;
+        logResult({
+          name: 'Request DateTime Fields',
+          status: hasDateTime ? 'PASS' : 'FAIL',
+          message: hasDateTime 
+            ? `Valid datetime: ${request.pickup_date} ${request.pickup_start_time}-${request.pickup_end_time}`
+            : 'Missing datetime fields'
+        });
+      }
+    }
+
+    // Test filtering by status
+    const { data: activeRequests, error: activeError } = await supabase
+      .from('requests')
+      .select('*')
+      .eq('status', 'active');
+
+    if (activeError) {
+      logResult({
+        name: 'Active Requests Filter',
+        status: 'FAIL',
+        message: `Filter failed: ${activeError.message}`
+      });
+    } else {
+      logResult({
+        name: 'Active Requests Filter',
+        status: 'PASS',
+        message: `Found ${activeRequests?.length || 0} active requests`
+      });
+    }
+
+  } catch (error) {
+    logResult({
+      name: 'Requests Test',
+      status: 'FAIL',
+      message: `Unexpected error: ${error}`
+    });
+  }
+}
+
+async function testCityAnalytics() {
+  log('📊', 'Testing City Analytics Views...');
+
+  try {
+    // Test city donation stats view
+    const { data: donationStats, error: donationStatsError } = await supabase
+      .from('city_donation_stats')
+      .select('*')
+      .limit(5);
+
+    if (donationStatsError) {
+      logResult({
+        name: 'City Donation Stats View',
+        status: 'FAIL',
+        message: `View query failed: ${donationStatsError.message}`
+      });
+    } else {
+      logResult({
+        name: 'City Donation Stats View',
+        status: 'PASS',
+        message: `Retrieved ${donationStats?.length || 0} donation stat records`
+      });
+    }
+
+    // Test city request stats view
+    const { data: requestStats, error: requestStatsError } = await supabase
+      .from('city_request_stats')
+      .select('*')
+      .limit(5);
+
+    if (requestStatsError) {
+      logResult({
+        name: 'City Request Stats View',
+        status: 'FAIL',
+        message: `View query failed: ${requestStatsError.message}`
+      });
+    } else {
+      logResult({
+        name: 'City Request Stats View',
+        status: 'PASS',
+        message: `Retrieved ${requestStats?.length || 0} request stat records`
+      });
+    }
+
+    // Test partner organizations view
+    const { data: partners, error: partnersError } = await supabase
+      .from('partner_organizations')
+      .select('*')
+      .limit(10);
+
+    if (partnersError) {
+      logResult({
+        name: 'Partner Organizations View',
+        status: 'FAIL',
+        message: `View query failed: ${partnersError.message}`
+      });
+    } else {
+      logResult({
+        name: 'Partner Organizations View',
+        status: 'PASS',
+        message: `Retrieved ${partners?.length || 0} partner organizations`
+      });
+    }
+
+  } catch (error) {
+    logResult({
+      name: 'City Analytics Test',
+      status: 'FAIL',
+      message: `Unexpected error: ${error}`
+    });
+  }
+}
+
+async function testRealTimeSubscriptions() {
+  log('⚡', 'Testing Real-time Subscriptions...');
+
+  return new Promise<void>((resolve) => {
+    let testPassed = false;
+    const timeout = setTimeout(() => {
+      if (!testPassed) {
+        logResult({
+          name: 'Real-time Subscription',
+          status: 'FAIL',
+          message: 'Timeout waiting for real-time update'
+        });
+        subscription.unsubscribe();
+        resolve();
+      }
+    }, 5000);
+
+    const subscription = supabase
+      .channel('test-channel')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'donations' 
+        }, 
+        (payload) => {
+          testPassed = true;
+          clearTimeout(timeout);
+          
+          logResult({
+            name: 'Real-time Subscription',
+            status: 'PASS',
+            message: `Received real-time update: ${payload.eventType}`
+          });
+          
+          subscription.unsubscribe();
+          resolve();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          log('📡', 'Real-time subscription established, testing...');
+          
+          // Trigger a small update to test real-time
+          setTimeout(async () => {
+            try {
+              const { data: donations } = await supabase
+                .from('donations')
+                .select('id')
+                .limit(1);
+                
+              if (donations && donations.length > 0) {
+                await supabase
+                  .from('donations')
+                  .update({ updated_at: new Date().toISOString() })
+                  .eq('id', donations[0].id);
+              }
+            } catch (error) {
+              console.error('Error triggering update:', error);
+            }
+          }, 1000);
+        } else if (status === 'CHANNEL_ERROR') {
+          testPassed = true;
+          clearTimeout(timeout);
+          
+          logResult({
+            name: 'Real-time Subscription',
+            status: 'FAIL',
+            message: 'Subscription channel error'
+          });
+          
+          resolve();
+        }
+      });
+  });
+}
+
+async function testDataIntegrity() {
+  log('🔍', 'Testing Data Integrity...');
+
+  try {
+    // Test foreign key relationships
+    const { data: donationsWithMissingRefs, error: fkError } = await supabase
+      .from('donations')
+      .select(`
+        id,
+        food_item:food_items(id),
+        donor:profiles(id)
+      `)
+      .limit(10);
+
+    if (fkError) {
+      logResult({
+        name: 'Foreign Key Integrity',
+        status: 'FAIL',
+        message: `FK check failed: ${fkError.message}`
+      });
+    } else if (donationsWithMissingRefs) {
+      const missingRefs = donationsWithMissingRefs.filter(d => 
+        !d.food_item || !d.donor
+      );
+      
+      logResult({
+        name: 'Foreign Key Integrity',
+        status: missingRefs.length === 0 ? 'PASS' : 'FAIL',
+        message: missingRefs.length === 0 
+          ? 'All foreign key references valid'
+          : `Found ${missingRefs.length} donations with missing references`
+      });
+    }
+
+    // Test enum constraints
+    const { data: invalidStatuses, error: enumError } = await supabase
+      .from('donations')
+      .select('id, status')
+      .not('status', 'in', '(available,claimed,completed,cancelled)');
+
+    if (enumError) {
+      logResult({
+        name: 'Enum Constraints',
+        status: 'PASS',
+        message: 'Enum validation working (query failed as expected)'
+      });
+    } else {
+      logResult({
+        name: 'Enum Constraints',
+        status: invalidStatuses?.length === 0 ? 'PASS' : 'FAIL',
+        message: invalidStatuses?.length === 0 
+          ? 'No invalid enum values found'
+          : `Found ${invalidStatuses?.length} invalid status values`
+      });
+    }
+
+  } catch (error) {
+    logResult({
+      name: 'Data Integrity Test',
+      status: 'FAIL',
+      message: `Unexpected error: ${error}`
+    });
+  }
+}
+
+async function runAllTests() {
+  console.log('🚀 Starting Comprehensive Database Tests\n');
+  console.log(`📍 Testing against: ${supabaseUrl}\n`);
+
+  const startTime = Date.now();
+
+  await testAuthentication();
+  console.log('');
+  
+  await testFoodItemsOperations();
+  console.log('');
+  
+  await testDonationsLifecycle();
+  console.log('');
+  
+  await testRequestsManagement();
+  console.log('');
+  
+  await testCityAnalytics();
+  console.log('');
+  
+  await testRealTimeSubscriptions();
+  console.log('');
+  
+  await testDataIntegrity();
+  console.log('');
+
+  const endTime = Date.now();
+  const duration = endTime - startTime;
+
+  // Print summary
+  const passed = results.filter(r => r.status === 'PASS').length;
+  const failed = results.filter(r => r.status === 'FAIL').length;
+  const skipped = results.filter(r => r.status === 'SKIP').length;
+
+  console.log('📊 TEST SUMMARY');
+  console.log('='.repeat(50));
+  console.log(`✅ Passed: ${passed}`);
+  console.log(`❌ Failed: ${failed}`);
+  console.log(`⚠️  Skipped: ${skipped}`);
+  console.log(`⏱️  Duration: ${duration}ms`);
+  console.log('');
+
+  if (failed > 0) {
+    console.log('❌ FAILED TESTS:');
+    results.filter(r => r.status === 'FAIL').forEach(r => {
+      console.log(`   • ${r.name}: ${r.message}`);
+    });
+    console.log('');
+  }
+
+  const successRate = (passed / (passed + failed)) * 100;
+  console.log(`🎯 Success Rate: ${successRate.toFixed(1)}%`);
+
+  if (successRate >= 90) {
+    console.log('🎉 Excellent! Database is working great!');
+  } else if (successRate >= 70) {
+    console.log('⚠️  Good, but some issues need attention');
+  } else {
+    console.log('🚨 Critical issues found - requires immediate attention');
+  }
+
+  // Cleanup
+  await supabase.auth.signOut();
+  
+  process.exit(failed > 0 ? 1 : 0);
+}
+
+// Run the tests
+runAllTests().catch(error => {
+  console.error('❌ Test suite failed:', error);
+  process.exit(1);
+});

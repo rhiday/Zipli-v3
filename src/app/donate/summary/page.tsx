@@ -23,8 +23,8 @@ export default function DonationSummaryPage() {
   const donationItems = useDonationStore(state => state.donationItems);
   const deleteDonationItem = useDonationStore(state => state.deleteDonationItem);
   
-  // Get user data from database store
-  const { currentUser, isInitialized } = useDatabase();
+  // Get user data and addDonation function from database store
+  const { currentUser, isInitialized, addDonation, foodItems, addFoodItem } = useDatabase();
 
   const [address, setAddress] = useState('');
   const [instructions, setInstructions] = useState('');
@@ -67,7 +67,16 @@ export default function DonationSummaryPage() {
   };
 
   const handleConfirmDonation = async () => {
-    if (!address.trim()) return;
+    console.log('🚀 Starting donation creation...');
+    console.log('📝 Current user:', currentUser?.full_name);
+    console.log('📦 Donation items:', donationItems.length);
+    console.log('📅 Pickup slots:', pickupSlots.length);
+    console.log('🏠 Address:', address.trim());
+    
+    if (!address.trim() || !currentUser) {
+      console.error('❌ Validation failed: missing address or user');
+      return;
+    }
 
     setIsSaving(true);
     
@@ -89,8 +98,7 @@ export default function DonationSummaryPage() {
         // Only update if there are actual changes
         if (Object.keys(profileUpdates).length > 0) {
           console.log('Updating profile with:', profileUpdates);
-          // In a real app, you would make an API call to update the profile
-          // For now, we'll update the local store
+          // Update the user profile
           updateUser({
             ...currentUser,
             ...profileUpdates
@@ -98,8 +106,69 @@ export default function DonationSummaryPage() {
         }
       }
       
-      // In a real app, this is where you would save the complete donation
-      // with the current address and instructions (not necessarily the profile ones)
+      // Create donations in the database for each item
+      const formattedSlots = pickupSlots.map(slot => ({
+        date: slot.date instanceof Date ? slot.date.toISOString().split('T')[0] : slot.date,
+        start_time: slot.startTime,
+        end_time: slot.endTime
+      }));
+      
+      // Create donations for each item
+      console.log('🔄 Processing', donationItems.length, 'donation items...');
+      for (const item of donationItems) {
+        console.log('📦 Processing item:', item.name, 'qty:', item.quantity);
+        
+        // First, find or create the food item in the database
+        let foodItemId = '';
+        
+        // Check if the food item already exists by name
+        const existingFoodItem = foodItems.find(fi => 
+          fi.name.toLowerCase() === item.name.toLowerCase()
+        );
+        
+        if (existingFoodItem) {
+          console.log('✅ Found existing food item:', existingFoodItem.id);
+          foodItemId = existingFoodItem.id;
+        } else {
+          console.log('🆕 Creating new food item...');
+          // Create a new food item
+          const newFoodItemResult = await addFoodItem({
+            name: item.name,
+            description: item.description || '',
+            allergens: item.allergens || [],
+            image_url: null
+          });
+          
+          if (newFoodItemResult.error || !newFoodItemResult.data) {
+            console.error('❌ Error creating food item:', newFoodItemResult.error);
+            continue; // Skip this donation
+          }
+          
+          console.log('✅ Created food item:', newFoodItemResult.data.id);
+          foodItemId = newFoodItemResult.data.id;
+        }
+        
+        // Now create the donation
+        const donationData = {
+          food_item_id: foodItemId,
+          donor_id: currentUser.id,
+          quantity: parseInt(item.quantity) || 1,
+          status: 'available' as const,
+          pickup_slots: formattedSlots,
+          pickup_time: null,
+          notes: instructions || null
+        };
+        
+        console.log('💾 Creating donation with data:', donationData);
+        const result = await addDonation(donationData);
+        
+        if (result.error) {
+          console.error('❌ Error creating donation:', result.error);
+          // Continue with other donations even if one fails
+        } else {
+          console.log('✅ Donation created successfully:', result.data?.id);
+        }
+      }
       
       // Clear the donation store after confirming
       const clearDonation = useDonationStore.getState().clearDonation;
@@ -107,9 +176,9 @@ export default function DonationSummaryPage() {
       
       router.push('/donate/thank-you');
     } catch (error) {
-      console.error('Error updating profile:', error);
-      // Still proceed with the donation even if profile update fails
-      router.push('/donate/thank-you');
+      console.error('Error creating donations:', error);
+      // Show error message to user
+      alert('There was an error creating your donation. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -137,7 +206,7 @@ export default function DonationSummaryPage() {
           </div>
         </>
       )}
-      contentClassName="p-4 space-y-8"
+      contentClassName="p-4 space-y-6"
       footer={(
         <BottomActionBar>
           <div className="flex justify-end">
@@ -154,7 +223,7 @@ export default function DonationSummaryPage() {
     >
         {/* Donation Items Section */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#021d13]">{t('donationItems')}</h2>
+          <h2 className="text-lg font-semibold text-[#021d13] mt-2">{t('donationItems')}</h2>
           {donationItems.map((item, index) => (
             <ItemPreview
               key={index}
@@ -169,8 +238,8 @@ export default function DonationSummaryPage() {
         </div>
 
         {/* Pickup schedule */}
-        <div className="space-y-2">
-          <h2 className="text-lg font-semibold text-[#021d13]">{t('pickupSchedule')}</h2>
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-[#021d13] mt-6">{t('pickupSchedule')}</h2>
           <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
             <span className="font-semibold text-interactive">
               {pickupSlots.length > 0 && pickupSlots[0].date
@@ -191,9 +260,9 @@ export default function DonationSummaryPage() {
 
         {/* Address & Instructions Section */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#021d13]">{t('deliveryDetails')}</h2>
+          <h2 className="text-lg font-semibold text-[#021d13] mt-6">{t('deliveryDetails')}</h2>
           <div>
-            <label htmlFor="address" className="block text-black font-semibold mb-2">{t('address')}</label>
+            <label htmlFor="address" className="block text-black font-semibold mb-3">{t('address')}</label>
             <Textarea
               id="address"
               placeholder={address ? "" : t('enterYourFullAddress')}
@@ -215,7 +284,7 @@ export default function DonationSummaryPage() {
             </div>
           </div>
           <div>
-            <label htmlFor="driver-instructions" className="block text-black font-semibold mb-2">{t('instructionsForDriver')}</label>
+            <label htmlFor="driver-instructions" className="block text-black font-semibold mb-3">{t('instructionsForDriver')}</label>
             <Textarea
               id="driver-instructions"
               placeholder={t('pleaseRingTheDoorbell')}

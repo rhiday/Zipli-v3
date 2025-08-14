@@ -83,8 +83,8 @@ function ManualDonationPageInner() {
           name: food_item.name,
           quantity: String(quantity).replace(' kg', ''),
           allergens: Array.isArray(currentAllergens) ? currentAllergens : String(currentAllergens).split(','),
-          description: food_item.description || null,
-          imageUrl: food_item.image_url,
+          description: food_item.description,
+          imageUrl: food_item.image_url || undefined,
         });
         setShowAddAnotherForm(true);
       }
@@ -219,17 +219,15 @@ function ManualDonationPageInner() {
         const donation = donations.find(d => d.id === currentItem.id);
         if (!donation) throw new Error('Donation not found');
 
-        updateFoodItem({
-          id: donation.food_item_id,
+        await updateFoodItem(donation.food_item_id, {
           name: currentItem.name,
-          allergens: currentItem.allergens.join(','),
+          allergens: currentItem.allergens,
           description: currentItem.description || undefined,
           image_url: currentItem.imageUrl,
         });
 
-        updateDonation({
-          id: currentItem.id,
-          quantity: currentItem.quantity,
+        await updateDonation(currentItem.id, {
+          quantity: parseFloat(currentItem.quantity) || 0,
         });
 
         setShowSuccessDialog(true);

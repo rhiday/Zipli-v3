@@ -1,22 +1,45 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import { useDatabase } from '@/store';
 
 const DevLoginSwitcher: React.FC = React.memo(() => {
-  const { users, login, currentUser } = useDatabase();
+  const { users, login, currentUser, fetchUsers, isInitialized, init } = useDatabase();
+
+  // Ensure store is initialized and users are fetched
+  useEffect(() => {
+    if (!isInitialized) {
+      init();
+    } else if (users.length === 0) {
+      fetchUsers();
+    }
+  }, [isInitialized, users.length, fetchUsers, init]);
 
   const handleLogin = useCallback(async (user: any) => {
     console.log('DevLoginSwitcher: Attempting login for:', user.email);
     try {
-      const result = await login(user.email, 'password');
-      if (result.error) {
-        console.error('DevLoginSwitcher: Login failed:', result.error);
-      } else {
-        console.log('DevLoginSwitcher: Login successful for:', user.email);
-      }
+      // Use development login method which might be different
+      const { setCurrentUser } = useDatabase.getState();
+      await setCurrentUser(user.email);
+      console.log('DevLoginSwitcher: Login successful for:', user.email);
+      
+      // Force a page refresh to ensure proper state
+      window.location.href = '/';
     } catch (error) {
       console.error('DevLoginSwitcher: Login error:', error);
+      
+      // Fallback to regular login
+      try {
+        const result = await login(user.email, 'password');
+        if (result.error) {
+          console.error('DevLoginSwitcher: Fallback login failed:', result.error);
+        } else {
+          console.log('DevLoginSwitcher: Fallback login successful');
+          window.location.href = '/';
+        }
+      } catch (fallbackError) {
+        console.error('DevLoginSwitcher: Both login methods failed:', fallbackError);
+      }
     }
   }, [login]);
 
@@ -36,7 +59,10 @@ const DevLoginSwitcher: React.FC = React.memo(() => {
     </ul>
   ), [users, currentUser, handleLogin]);
 
-  console.log('DevLoginSwitcher: Users loaded:', users.length, users.map(u => u.full_name));
+  // Log state for debugging purposes
+  if (process.env.NODE_ENV === 'development') {
+    console.log('DevLoginSwitcher: Users loaded:', users.length);
+  }
 
   if (users.length === 0) {
     return (

@@ -13,7 +13,9 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const pathname = usePathname();
   const init = useDatabase(state => state.init);
 
+  // Initialize store for all routes (auth routes need it too for DevLoginSwitcher)
   useEffect(() => {
+    console.log('🔧 AppShell initializing store...');
     init();
   }, [init]);
 
@@ -27,7 +29,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
   return (
     <AuthProvider>
       {isAuthRoute ? (
-        <> {/* No shell for auth routes */}
+        <> {/* No shell for auth routes but still need store init */}
           {children}
         </>
       ) : (
