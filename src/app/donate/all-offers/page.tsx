@@ -112,7 +112,7 @@ export default function AllItemsPage(): React.ReactElement {
             if (!foodItem) return null;
             return {
               ...d,
-              itemType: 'donation',
+              itemType: 'donation' as const,
               food_item: foodItem
             };
           })
@@ -131,7 +131,7 @@ export default function AllItemsPage(): React.ReactElement {
         if (filters.dateTo) query = query.lte('pickup_date', filters.dateTo);
         const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
-        fetchedItems = (data || []).map(r => ({ ...r, itemType: 'request' }));
+        fetchedItems = (data || []).map(r => ({ ...r, itemType: 'request' as const }));
       }
       setItems(fetchedItems);
     } catch (err: any) {
