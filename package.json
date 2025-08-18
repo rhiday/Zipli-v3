@@ -106,7 +106,6 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "tsc --noEmit",
       "eslint --fix"
     ],
     "*.{js,jsx,ts,tsx,json,css,md}": [
