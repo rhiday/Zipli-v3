@@ -13,14 +13,11 @@ import {
   FoodItem,
   Donation,
   Request,
-  DonationClaim,
   DonationWithFoodItem,
   RequestWithUser,
-  DonationClaimWithDetails,
   UserRole,
   DonationStatus,
   RequestStatus,
-  ClaimStatus,
   AuthResponse,
   ProfileInsert,
   ProfileUpdate,
@@ -28,8 +25,6 @@ import {
   DonationUpdate,
   RequestInsert,
   RequestUpdate,
-  DonationClaimInsert,
-  DonationClaimUpdate,
 } from '@/types/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
@@ -40,7 +35,6 @@ interface SupabaseDatabaseState {
   foodItems: FoodItem[];
   users: Profile[]; // Keep for compatibility with existing components
   requests: Request[];
-  claims: DonationClaim[];
   currentUser: Profile | null;
   isInitialized: boolean;
   loading: boolean;
@@ -69,7 +63,6 @@ interface SupabaseDatabaseState {
   fetchFoodItems: () => Promise<void>;
   fetchUsers: () => Promise<void>;
   fetchRequests: () => Promise<void>;
-  fetchClaims: () => Promise<void>;
 
   // Donation methods
   getDonationById: (id: string) => DonationWithFoodItem | undefined;
@@ -90,11 +83,6 @@ interface SupabaseDatabaseState {
   updateRequest: (id: string, updates: RequestUpdate) => Promise<{ data: Request | null; error: string | null }>;
   deleteRequest: (id: string) => Promise<{ error: string | null }>;
 
-  // Claim methods
-  getAllClaims: () => DonationClaim[];
-  getClaimById: (id: string) => DonationClaim | undefined;
-  createClaim: (claimData: DonationClaimInsert) => Promise<{ data: DonationClaim | null; error: string | null }>;
-  updateClaim: (id: string, updates: DonationClaimUpdate) => Promise<{ data: DonationClaim | null; error: string | null }>;
 
   // Real-time methods
   setupRealtimeSubscriptions: () => void;
@@ -109,7 +97,6 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       foodItems: [],
       users: [],
       requests: [],
-      claims: [],
       currentUser: null,
       isInitialized: false,
       loading: false,
@@ -143,8 +130,6 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             state.fetchDonations(),
             state.fetchUsers(),
             state.fetchRequests(),
-            // Skip fetchClaims for now since table doesn't exist
-            // state.fetchClaims(),
           ]);
           console.log('✅ Data fetching completed');
 
@@ -172,12 +157,11 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           // Always use real Supabase authentication
           const result = await authService.signIn({ email, password });
           
-          if (result.data?.user) {
-            set({ currentUser: result.data.user });
+          if (result.data) {
+            set({ currentUser: result.data });
             // Refresh data after login
             await get().fetchDonations();
             await get().fetchRequests();
-            // await get().fetchClaims(); // Table doesn't exist
           }
           
           set({ loading: false });
@@ -204,12 +188,11 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
               organization_name: userData.organization_name || undefined,
               contact_number: userData.contact_number || undefined,
               address: userData.address || undefined,
-              driver_instructions: userData.driver_instructions || undefined,
             }
           });
           
-          if (result.data?.user) {
-            set({ currentUser: result.data.user });
+          if (result.data) {
+            set({ currentUser: result.data });
           }
           
           set({ loading: false });
@@ -233,8 +216,8 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       verifyOtp: async (email: string, token: string, type: string) => {
         const result = await authService.verifyOtp(email, token, type as any);
-        if (result.data?.user) {
-          set({ currentUser: result.data.user });
+        if (result.data) {
+          set({ currentUser: result.data });
         }
         return result;
       },
@@ -242,8 +225,8 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       setCurrentUser: async (email: string) => {
         // For development compatibility - find user by email
         const result = await authService.devLogin(email);
-        if (result.data?.user) {
-          set({ currentUser: result.data.user });
+        if (result.data) {
+          set({ currentUser: result.data });
         }
       },
 
@@ -271,8 +254,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             // Other data will be cleared
             donations: [],
             requests: [],
-            claims: [],
-          });
+                });
         } catch (error) {
           console.error('Logout error:', error);
         }
@@ -296,9 +278,10 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
           if (foodItemsError) throw foodItemsError;
 
-          // Map donations with their food items
+          // Map donations with their food items and donors
           const donations: DonationWithFoodItem[] = (donationsData || []).map(donation => {
             const foodItem = foodItemsData?.find(fi => fi.id === donation.food_item_id);
+            const donor = get().users.find(u => u.id === donation.donor_id);
             return {
               ...donation,
               food_item: foodItem || {
@@ -306,7 +289,27 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
                 name: 'Unknown Item',
                 description: null,
                 image_url: null,
-                allergens: [],
+                allergens: null,
+                donor_id: donation.donor_id,
+                food_type: null,
+                quantity: 0,
+                unit: null,
+                user_id: donation.donor_id,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              },
+              donor: donor || {
+                id: donation.donor_id,
+                full_name: 'Unknown Donor',
+                email: '',
+                role: 'food_donor' as any,
+                organization_name: '',
+                contact_number: null,
+                address: null,
+                city: null,
+                country: null,
+                postal_code: null,
+                street_address: null,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
               }
@@ -365,20 +368,6 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
         }
       },
 
-      fetchClaims: async () => {
-        try {
-          const { data, error } = await supabase
-            .from('donation_claims')
-            .select('*')
-            .order('claimed_at', { ascending: false });
-
-          if (error) throw error;
-          set({ claims: data || [] });
-        } catch (error) {
-          console.error('Error fetching claims:', error);
-          set({ error: error instanceof Error ? error.message : 'Failed to fetch claims' });
-        }
-      },
 
       // ===== DONATION METHODS =====
       getDonationById: (id: string) => {
@@ -588,63 +577,6 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
         }
       },
 
-      // ===== CLAIM METHODS =====
-      getAllClaims: () => {
-        return get().claims;
-      },
-
-      getClaimById: (id: string) => {
-        return get().claims.find(c => c.id === id);
-      },
-
-      createClaim: async (claimData: DonationClaimInsert) => {
-        try {
-          const { data, error } = await supabase
-            .from('donation_claims')
-            .insert(claimData)
-            .select()
-            .single();
-
-          if (error) return { data: null, error: error.message };
-          
-          // Add to local state
-          const claims = [data, ...get().claims];
-          set({ claims });
-          
-          return { data, error: null };
-        } catch (error) {
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Failed to create claim' 
-          };
-        }
-      },
-
-      updateClaim: async (id: string, updates: DonationClaimUpdate) => {
-        try {
-          const { data, error } = await supabase
-            .from('donation_claims')
-            .update(updates)
-            .eq('id', id)
-            .select()
-            .single();
-
-          if (error) return { data: null, error: error.message };
-          
-          // Update local state
-          const claims = get().claims.map(claim => 
-            claim.id === id ? { ...claim, ...data } : claim
-          );
-          set({ claims });
-          
-          return { data, error: null };
-        } catch (error) {
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Failed to update claim' 
-          };
-        }
-      },
 
       // ===== REAL-TIME METHODS =====
       setupRealtimeSubscriptions: () => {

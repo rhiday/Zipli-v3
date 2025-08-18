@@ -134,9 +134,14 @@ export default function DonationSummaryPage() {
           // Create a new food item
           const newFoodItemResult = await addFoodItem({
             name: item.name,
-            description: item.description || '',
-            allergens: item.allergens || [],
-            image_url: null
+            description: item.description || null,
+            allergens: JSON.stringify(item.allergens || []),
+            image_url: null,
+            donor_id: currentUser?.id || null,
+            food_type: null,
+            quantity: parseFloat(item.quantity) || 1,
+            unit: null,
+            user_id: currentUser?.id || null
           });
           
           if (newFoodItemResult.error || !newFoodItemResult.data) {

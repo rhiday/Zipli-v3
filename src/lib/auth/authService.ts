@@ -9,8 +9,7 @@ import {
   ProfileInsert, 
   ProfileUpdate, 
   UserRole, 
-  AuthResponse, 
-  AuthError 
+  AuthResponse 
 } from '@/types/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -63,7 +62,7 @@ class AuthService {
         return { data: null, error: 'Failed to create user profile' };
       }
 
-      return { data: { user: profile }, error: null };
+      return { data: profile, error: null };
     } catch (error) {
       return { 
         data: null, 
@@ -97,7 +96,7 @@ class AuthService {
         return { data: null, error: 'User profile not found' };
       }
 
-      return { data: { user: profile }, error: null };
+      return { data: profile, error: null };
     } catch (error) {
       return { 
         data: null, 
@@ -245,7 +244,7 @@ class AuthService {
         return { data: null, error: 'User profile not found' };
       }
 
-      return { data: { user: profile }, error: null };
+      return { data: profile, error: null };
     } catch (error) {
       return { 
         data: null, 
@@ -311,7 +310,7 @@ class AuthService {
         return { data: null, error: 'User not found' };
       }
 
-      return { data: { user: profile }, error: null };
+      return { data: profile, error: null };
     } catch (error) {
       return { 
         data: null, 
@@ -325,4 +324,4 @@ class AuthService {
 export const authService = new AuthService();
 
 // Export types for convenience
-export type { Profile, UserRole, AuthResponse, AuthError };
+export type { Profile, UserRole, AuthResponse };

@@ -41,7 +41,7 @@ export default function FeedPage(): React.ReactElement {
           return {
             ...donation,
             food_item: foodItem,
-            donorName: donor.full_name,
+            donorName: donor.full_name || 'Anonymous',
             pickupTime: (donation as any).pickup_time,
           };
         }
