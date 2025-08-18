@@ -221,7 +221,7 @@ function ManualDonationPageInner() {
 
         await updateFoodItem(donation.food_item_id, {
           name: currentItem.name,
-          allergens: currentItem.allergens,
+          allergens: JSON.stringify(currentItem.allergens),
           description: currentItem.description || undefined,
           image_url: currentItem.imageUrl,
         });
