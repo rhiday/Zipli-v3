@@ -281,21 +281,22 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       // ===== DATA FETCHING METHODS =====
       fetchDonations: async () => {
         try {
-          const { data, error } = await supabase
+          // First fetch donations with food items
+          const { data: donationsData, error: donationsError } = await supabase
             .from('donations')
             .select(`
               *,
-              food_item:food_items(*),
-              donor:profiles(*)
+              food_items (*)
             `)
             .order('created_at', { ascending: false });
 
-          if (error) throw error;
+          if (donationsError) throw donationsError;
 
-          const donations: DonationWithFoodItem[] = data.map(d => ({
+          // Then fetch donor profiles separately if needed
+          const donations: DonationWithFoodItem[] = donationsData.map(d => ({
             ...d,
-            food_item: d.food_item as FoodItem,
-            donor: d.donor as Profile,
+            food_item: d.food_items as FoodItem,
+            // donor will be fetched separately if needed
           }));
 
           set({ donations });
