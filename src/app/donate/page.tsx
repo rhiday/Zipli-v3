@@ -231,51 +231,64 @@ export default function DonorDashboardPage(): React.ReactElement {
             </DropdownMenu>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
-            {/* Total food offered */}
-            <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
-              <div className="flex items-center gap-2 mb-2">
-                <Scale className="w-5 h-5 text-primary-50" />
+            {/* Total food offered - with green background */}
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-[#F5F9EF]">
+              <div className="flex items-center gap-2">
+                <Scale className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
                 <span className="text-2xl font-semibold text-green-800">
                   46kg
                 </span>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('totalFoodOffered')}
+                </p>
               </div>
-              <span className="text-sm text-primary-75">
-                {t('totalFoodOffered')}
-              </span>
             </div>
+
             {/* Portions offered */}
-            <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
-              <div className="flex items-center gap-2 mb-2">
-                <Utensils className="w-5 h-5 text-primary-50" />
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-white">
+              <div className="flex items-center gap-2">
+                <Utensils className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
                 <span className="text-2xl font-semibold text-green-800">
                   131
                 </span>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('portionsOffered')}
+                </p>
               </div>
-              <span className="text-sm text-primary-75">
-                {t('portionsOffered')}
-              </span>
             </div>
+
             {/* Saved in food disposal costs */}
-            <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
-              <div className="flex items-center gap-2 mb-2">
-                <Euro className="w-5 h-5 text-primary-50" />
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-white">
+              <div className="flex items-center gap-2">
+                <Euro className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
                 <span className="text-2xl font-semibold text-green-800">
                   125€
                 </span>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('savedInFoodDisposalCosts')}
+                </p>
               </div>
-              <span className="text-sm text-primary-75">
-                {t('savedInFoodDisposalCosts')}
-              </span>
             </div>
+
             {/* CO2 Avoided */}
-            <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
-              <div className="flex items-center gap-2 mb-2">
-                <Leaf className="w-5 h-5 text-primary-50" />
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-white">
+              <div className="flex items-center gap-2">
+                <Leaf className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
                 <span className="text-2xl font-semibold text-green-800">
                   10t
                 </span>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('co2Avoided')}
+                </p>
               </div>
-              <span className="text-sm text-primary-75">{t('co2Avoided')}</span>
             </div>
           </div>
         </section>
