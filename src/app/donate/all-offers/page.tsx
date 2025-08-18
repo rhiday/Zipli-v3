@@ -104,19 +104,19 @@ export default function AllItemsPage(): React.ReactElement {
         const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
         fetchedItems = (data || [])
-          .map(d => {
-            if (!d || !d.food_item) return null;
+          .reduce<DonationItem[]>((acc, d) => {
+            if (!d || !d.food_item) return acc;
             const foodItem = Array.isArray(d.food_item) && d.food_item.length > 0 
               ? d.food_item[0] 
               : d.food_item;
-            if (!foodItem) return null;
-            return {
+            if (!foodItem) return acc;
+            acc.push({
               ...d,
               itemType: 'donation' as const,
               food_item: foodItem
-            };
-          })
-          .filter((x): x is DonationItem => x !== null);
+            });
+            return acc;
+          }, []);
       } else if (filters.type === 'requests') {
         let query = supabase
           .from('requests')
