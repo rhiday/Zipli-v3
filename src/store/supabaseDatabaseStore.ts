@@ -281,25 +281,39 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       // ===== DATA FETCHING METHODS =====
       fetchDonations: async () => {
         try {
-          // First fetch donations with food items
+          // Simple fetch - just get donations
           const { data: donationsData, error: donationsError } = await supabase
             .from('donations')
-            .select(`
-              *,
-              food_items (*)
-            `)
+            .select('*')
             .order('created_at', { ascending: false });
 
           if (donationsError) throw donationsError;
 
-          // Then fetch donor profiles separately if needed
-          const donations: DonationWithFoodItem[] = donationsData.map(d => ({
-            ...d,
-            food_item: d.food_items as FoodItem,
-            // donor will be fetched separately if needed
-          }));
+          // Fetch food items separately
+          const { data: foodItemsData, error: foodItemsError } = await supabase
+            .from('food_items')
+            .select('*');
 
-          set({ donations });
+          if (foodItemsError) throw foodItemsError;
+
+          // Map donations with their food items
+          const donations: DonationWithFoodItem[] = (donationsData || []).map(donation => {
+            const foodItem = foodItemsData?.find(fi => fi.id === donation.food_item_id);
+            return {
+              ...donation,
+              food_item: foodItem || {
+                id: donation.food_item_id,
+                name: 'Unknown Item',
+                description: null,
+                image_url: null,
+                allergens: [],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              }
+            };
+          });
+
+          set({ donations, foodItems: foodItemsData || [] });
         } catch (error) {
           console.error('Error fetching donations:', error);
           set({ error: error instanceof Error ? error.message : 'Failed to fetch donations' });
