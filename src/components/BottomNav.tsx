@@ -4,7 +4,16 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutGrid, Plus, Search, ShoppingBag, FileText, BarChart3, Users } from 'lucide-react';
+import {
+  LayoutGrid,
+  Plus,
+  Search,
+  ShoppingBag,
+  FileText,
+  BarChart3,
+  Users,
+  TrendingUp,
+} from 'lucide-react';
 import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 import {
@@ -16,7 +25,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
+} from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 
 export default function BottomNav() {
@@ -30,19 +39,23 @@ export default function BottomNav() {
     if (!currentUser) return [];
 
     const role = currentUser.role;
-    
+
     switch (role) {
       case 'food_donor':
         return [
           { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
-          { href: '#', label: t('add'), icon: Plus, isCentral: true }, 
-          { href: '/feed', label: t('explore'), icon: Search },
+          { href: '#', label: t('add'), icon: Plus, isCentral: true },
+          { href: '/impact', label: 'Impact', icon: TrendingUp },
         ];
       case 'food_receiver':
         return [
-          { href: '/receiver/dashboard', label: t('dashboard'), icon: LayoutGrid },
-          { href: '#', label: t('request'), icon: Plus, isCentral: true }, 
-          { href: '/feed', label: t('explore'), icon: Search },
+          {
+            href: '/receiver/dashboard',
+            label: t('dashboard'),
+            icon: LayoutGrid,
+          },
+          { href: '#', label: t('request'), icon: Plus, isCentral: true },
+          { href: '/impact', label: 'Impact', icon: TrendingUp },
         ];
       case 'city':
         return [
@@ -52,20 +65,28 @@ export default function BottomNav() {
         ];
       case 'terminals':
         return [
-          { href: '/terminal/dashboard', label: t('dashboard'), icon: LayoutGrid },
+          {
+            href: '/terminal/dashboard',
+            label: t('dashboard'),
+            icon: LayoutGrid,
+          },
           { href: '/feed', label: t('overview'), icon: Users },
         ];
       default:
         return [
           { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
-          { href: '#', label: t('add'), icon: Plus, isCentral: true }, 
+          { href: '#', label: t('add'), icon: Plus, isCentral: true },
           { href: '/feed', label: t('explore'), icon: Search },
         ];
     }
   }, [currentUser, t]);
 
   // Only render for authenticated users and exclude admin pages
-  if (!currentUser || pathname.includes('/admin/') || pathname.includes('/auth/')) {
+  if (
+    !currentUser ||
+    pathname.includes('/admin/') ||
+    pathname.includes('/auth/')
+  ) {
     return null;
   }
 
@@ -78,7 +99,7 @@ export default function BottomNav() {
   );
 
   // Helper function to render nav items to avoid repetition
-  function renderNavItem(item: typeof navItems[0], index: number) {
+  function renderNavItem(item: (typeof navItems)[0], index: number) {
     const isActive = pathname === item.href && !item.isCentral;
     if (item.isCentral) {
       return (
@@ -87,7 +108,7 @@ export default function BottomNav() {
             <button
               className={cn(
                 'group inline-flex flex-col items-center justify-center text-center w-full',
-                '-mt-8' 
+                '-mt-8'
               )}
               aria-label={item.label}
             >
@@ -101,37 +122,47 @@ export default function BottomNav() {
           </DrawerTrigger>
           <DrawerContent className="bg-base">
             <DrawerHeader className="text-center">
-              <DrawerTitle className="text-lg font-semibold text-primary">{t('createDonation')}?</DrawerTitle>
+              <DrawerTitle className="text-lg font-semibold text-primary">
+                {t('createDonation')}?
+              </DrawerTitle>
             </DrawerHeader>
             <div className="grid gap-3 p-4">
               {currentUser?.role === 'food_receiver' ? (
                 <DrawerClose asChild>
-                  <Button 
-                    variant="secondary" 
-                    size="lg" 
+                  <Button
+                    variant="secondary"
+                    size="lg"
                     className="w-full justify-start py-5 text-left"
                     onClick={() => router.push('/request/new')}
                   >
                     <FileText className="mr-3 h-5 w-5 text-primary" />
                     <div>
-                      <p className="font-semibold text-primary">{t('request')} {t('donate')}</p>
-                      <p className="text-xs text-secondary">{t('createDonation')}.</p>
+                      <p className="font-semibold text-primary">
+                        {t('request')} {t('donate')}
+                      </p>
+                      <p className="text-xs text-secondary">
+                        {t('createDonation')}.
+                      </p>
                     </div>
                   </Button>
                 </DrawerClose>
               ) : currentUser?.role === 'city' ? (
                 <>
                   <DrawerClose asChild>
-                    <Button 
-                      variant="secondary" 
-                      size="lg" 
+                    <Button
+                      variant="secondary"
+                      size="lg"
                       className="w-full justify-start py-5 text-left"
                       onClick={() => router.push('/city/dashboard')}
                     >
                       <BarChart3 className="mr-3 h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-semibold text-primary">{t('analytics')}</p>
-                        <p className="text-xs text-secondary">{t('overview')}.</p>
+                        <p className="font-semibold text-primary">
+                          {t('analytics')}
+                        </p>
+                        <p className="text-xs text-secondary">
+                          {t('overview')}.
+                        </p>
                       </div>
                     </Button>
                   </DrawerClose>
@@ -139,30 +170,38 @@ export default function BottomNav() {
               ) : (
                 <>
                   <DrawerClose asChild>
-                    <Button 
-                      variant="secondary" 
-                      size="lg" 
+                    <Button
+                      variant="secondary"
+                      size="lg"
                       className="w-full justify-start py-5 text-left"
                       onClick={() => router.push('/donate/new')}
                     >
                       <ShoppingBag className="mr-3 h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-semibold text-primary">{t('donate')} {t('foodItem')}</p>
-                        <p className="text-xs text-secondary">{t('createDonation')}.</p>
+                        <p className="font-semibold text-primary">
+                          {t('donate')} {t('foodItem')}
+                        </p>
+                        <p className="text-xs text-secondary">
+                          {t('createDonation')}.
+                        </p>
                       </div>
                     </Button>
                   </DrawerClose>
                   <DrawerClose asChild>
-                    <Button 
-                      variant="secondary" 
-                      size="lg" 
+                    <Button
+                      variant="secondary"
+                      size="lg"
                       className="w-full justify-start py-5 text-left"
                       onClick={() => router.push('/request/new')}
                     >
                       <FileText className="mr-3 h-5 w-5 text-primary" />
                       <div>
-                        <p className="font-semibold text-primary">{t('request')} {t('foodItem')}</p>
-                        <p className="text-xs text-secondary">{t('createDonation')}.</p>
+                        <p className="font-semibold text-primary">
+                          {t('request')} {t('foodItem')}
+                        </p>
+                        <p className="text-xs text-secondary">
+                          {t('createDonation')}.
+                        </p>
                       </div>
                     </Button>
                   </DrawerClose>
@@ -171,7 +210,9 @@ export default function BottomNav() {
             </div>
             <DrawerFooter className="pt-2">
               <DrawerClose asChild>
-                <Button variant="ghost" size="sm">{t('cancel')}</Button>
+                <Button variant="ghost" size="sm">
+                  {t('cancel')}
+                </Button>
               </DrawerClose>
             </DrawerFooter>
           </DrawerContent>
@@ -185,29 +226,33 @@ export default function BottomNav() {
         href={item.href}
         className={cn(
           'group inline-flex flex-col items-center justify-center text-center w-full h-full',
-          'px-1 hover:bg-primary-10' 
+          'px-1 hover:bg-primary-10'
         )}
       >
-        <div className={cn(
-          "flex flex-col items-center justify-center w-full rounded-lg py-2", 
-          isActive ? 'bg-cream' : 'bg-transparent'
-        )}>
+        <div
+          className={cn(
+            'flex flex-col items-center justify-center w-full rounded-lg py-2',
+            isActive ? 'bg-cream' : 'bg-transparent'
+          )}
+        >
           <item.icon
             className={cn(
-              'mb-1 h-5 w-5 text-primary-50 group-hover:text-primary', 
+              'mb-1 h-5 w-5 text-primary-50 group-hover:text-primary',
               isActive && 'text-primary'
             )}
             aria-hidden="true"
           />
-          <span className={cn(
-            'text-[10px]',
-            isActive ? 'text-primary font-semibold' : 'text-primary-50',
-            'group-hover:text-primary'
-          )}>
+          <span
+            className={cn(
+              'text-[10px]',
+              isActive ? 'text-primary font-semibold' : 'text-primary-50',
+              'group-hover:text-primary'
+            )}
+          >
             {item.label}
           </span>
         </div>
       </Link>
     );
   }
-} 
+}
