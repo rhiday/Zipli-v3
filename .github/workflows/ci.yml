@@ -19,31 +19,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run type checking
-        run: npx tsc --noEmit
+        run: npm run type-check
 
       - name: Run linting
-        run: npx eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0
+        run: npm run lint
 
       - name: Run tests
-        run: pnpm test
+        run: npm test
 
       - name: Build application
-        run: pnpm build
+        run: npm run build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -63,22 +58,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run security audit
-        run: pnpm audit --audit-level moderate
+        run: npm audit --audit-level moderate
 
   deploy-preview:
     name: Deploy Preview
