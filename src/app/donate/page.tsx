@@ -295,70 +295,65 @@ export default function DonorDashboardPage(): React.ReactElement {
           </span>
         </div>
 
-        {/* Your Active Donations Section */}
+        {/* This is whom you've helped section */}
         <section>
           <h2 className="text-lg font-semibold text-primary mb-3">
-            {t('yourActiveDonations')}
+            {t('thisIsWhomYouveHelped')}
           </h2>
 
-          {dashboardData.donations && dashboardData.donations.length > 0 ? (
-            <div className="space-y-4">
-              {dashboardData.donations.map((donation) => (
-                <div
-                  key={donation.id}
-                  className="rounded-xl border border-primary-10 shadow-sm p-4 bg-white"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-primary font-medium">
-                        {donation.food_item?.name || 'Food Item'}
-                      </h3>
-                      <p className="text-sm text-primary-75 mt-1">
-                        Quantity: {donation.quantity} · Status:{' '}
-                        {donation.status}
-                      </p>
-                      {donation.pickup_slots &&
-                        Array.isArray(donation.pickup_slots) &&
-                        donation.pickup_slots.length > 0 && (
-                          <p className="text-sm text-primary-75 mt-1">
-                            Pickup: {(donation.pickup_slots[0] as any)?.date}{' '}
-                            {(donation.pickup_slots[0] as any)?.start_time} -{' '}
-                            {(donation.pickup_slots[0] as any)?.end_time}
-                          </p>
-                        )}
-                      {donation.instructions_for_driver && (
-                        <p className="text-sm text-primary-75 mt-2 italic">
-                          Instructions: {donation.instructions_for_driver}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center">
-                      <PackageIcon className="w-5 h-5 text-primary-50" />
-                    </div>
-                  </div>
-                  <div className="mt-3 text-xs text-gray-500">
-                    Created:{' '}
-                    {new Date(donation.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-              ))}
+          <div className="space-y-4">
+            {/* Recipient 1 - Tsänssi */}
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-full overflow-hidden relative">
+                <Image
+                  src="/images/tsänssi.jpg"
+                  alt="Tsänssi logo"
+                  fill
+                  className="object-contain bg-white"
+                  sizes="64px"
+                />
+              </div>
+              <div>
+                <h3 className="text-primary font-medium">Tsänssi</h3>
+                <p className="text-sm text-primary-75">3 kg · Warm food</p>
+              </div>
             </div>
-          ) : (
-            <div className="rounded-xl border border-primary-10 shadow-sm p-6 bg-white text-center">
-              <PackageIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-600 mb-4">{t('noDonationsYet')}</p>
-              <Button
-                onClick={() => router.push('/donate/new')}
-                className="inline-flex items-center gap-2"
-              >
-                <PlusIcon className="w-4 h-4" />
-                {t('createFirstDonation')}
-              </Button>
-            </div>
-          )}
-        </section>
 
-        {/* Removed duplicate 'This is whom you've helped' section - was redundant with Active Donations above */}
+            {/* Recipient 2 - Red cross */}
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-full overflow-hidden relative">
+                <Image
+                  src="/images/redcross.jpg"
+                  alt="Red Cross logo"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-primary font-medium">Red cross</h3>
+                <p className="text-sm text-primary-75">
+                  10 kg · Warm food; Cold food
+                </p>
+              </div>
+            </div>
+
+            {/* Recipient 3 - Andreas church */}
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-full overflow-hidden relative">
+                <Image
+                  src="/images/kirkko.jpg"
+                  alt="Andreas church logo"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-primary font-medium">Andreas church</h3>
+                <p className="text-sm text-primary-75">7 kg · Cold food</p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       <BottomNav />
