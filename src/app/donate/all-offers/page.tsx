@@ -89,7 +89,7 @@ export default function AllItemsPage(): React.ReactElement {
           .from('donations')
           .select('id, created_at, donor_id, food_item_id, pickup_time, pickup_slots, quantity, status, updated_at, food_item:food_items(name, description, image_url, food_type)')
           .eq('donor_id', user.id);
-        if (filters.status) query = query.eq('status', filters.status);
+        if (filters.status) query = query.eq('status', filters.status as Database["public"]["Enums"]["donation_status"]);
         if (filters.foodType) query = query.eq('food_items.food_type', filters.foodType);
         if (filters.minQty) {
           const minQty = parseInt(filters.minQty);
@@ -122,7 +122,7 @@ export default function AllItemsPage(): React.ReactElement {
           .from('requests')
           .select('id, created_at, description, is_recurring, people_count, pickup_date, pickup_end_time, pickup_start_time, status, updated_at, user_id')
           .eq('user_id', user.id);
-        if (filters.status) query = query.eq('status', filters.status);
+        if (filters.status) query = query.eq('status', filters.status as any);
         if (filters.minQty) {
           const minPeople = parseInt(filters.minQty);
           if (!isNaN(minPeople) && minPeople > 0) query = query.gte('people_count', minPeople);
