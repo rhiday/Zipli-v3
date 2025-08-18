@@ -33,8 +33,8 @@ export default function LoginPage() {
         return;
       }
 
-      if (response.data?.user) {
-        const user = response.data.user;
+      if (response.data) {
+        const user = response.data;
         
         // Small delay to ensure store state is updated before redirect
         await new Promise(resolve => setTimeout(resolve, 100));

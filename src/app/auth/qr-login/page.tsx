@@ -35,8 +35,8 @@ function QRLoginPageContent() {
         return;
       }
 
-      if (response.data?.user) {
-        const user = response.data.user;
+      if (response.data) {
+        const user = response.data;
         // Redirect based on role
         switch (user.role) {
           case 'food_donor':

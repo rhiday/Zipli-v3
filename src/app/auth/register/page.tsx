@@ -62,8 +62,8 @@ export default function RegisterPage() {
       }
 
       // Registration successful - redirect to appropriate dashboard
-      if (response.data?.user) {
-        const user = response.data.user;
+      if (response.data) {
+        const user = response.data;
         switch (user.role) {
           case 'food_donor':
             router.push('/donate');
