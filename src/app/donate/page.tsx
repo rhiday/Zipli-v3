@@ -261,7 +261,7 @@ export default function DonorDashboardPage(): React.ReactElement {
                       </p>
                       {donation.pickup_slots && Array.isArray(donation.pickup_slots) && donation.pickup_slots.length > 0 && (
                         <p className="text-sm text-primary-75 mt-1">
-                          Pickup: {donation.pickup_slots[0].date} {donation.pickup_slots[0].start_time} - {donation.pickup_slots[0].end_time}
+                          Pickup: {donation.pickup_slots[0]?.date} {donation.pickup_slots[0]?.start_time} - {donation.pickup_slots[0]?.end_time}
                         </p>
                       )}
                       {donation.instructions_for_driver && (
