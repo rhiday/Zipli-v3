@@ -60,11 +60,10 @@ describe('Database Store Tests', () => {
       users: [],
       donations: [],
       requests: [],
-      claims: [],
       foodItems: [],
       isInitialized: false,
       loading: false,
-      error: null
+      error: null,
     });
   });
 
@@ -74,25 +73,27 @@ describe('Database Store Tests', () => {
         id: 'test-user-id',
         email: 'test@example.com',
         role: 'food_donor',
-        full_name: 'Test User'
+        full_name: 'Test User',
       };
 
       mockSupabaseClient.auth.signInWithPassword.mockResolvedValueOnce({
         data: { user: { id: 'test-user-id', email: 'test@example.com' } },
-        error: null
+        error: null,
       });
 
       mockFromChain.single.mockResolvedValueOnce({
         data: mockUser,
-        error: null
+        error: null,
       });
 
-      const result = await store.getState().login('test@example.com', 'password');
+      const result = await store
+        .getState()
+        .login('test@example.com', 'password');
 
       expect(result.error).toBeNull();
       expect(mockSupabaseClient.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'password'
+        password: 'password',
       });
       expect(store.getState().currentUser).toEqual(mockUser);
     });
@@ -100,10 +101,12 @@ describe('Database Store Tests', () => {
     it('should handle login errors', async () => {
       mockSupabaseClient.auth.signInWithPassword.mockResolvedValueOnce({
         data: { user: null },
-        error: { message: 'Invalid credentials' }
+        error: { message: 'Invalid credentials' },
       });
 
-      const result = await store.getState().login('wrong@example.com', 'wrongpassword');
+      const result = await store
+        .getState()
+        .login('wrong@example.com', 'wrongpassword');
 
       expect(result.error).toBe('Invalid credentials');
       expect(store.getState().currentUser).toBeNull();
@@ -124,30 +127,30 @@ describe('Database Store Tests', () => {
 
   describe('Food Items Management', () => {
     const mockFoodItems = [
-      { 
-        id: '1', 
-        name: 'Fresh Bread', 
+      {
+        id: '1',
+        name: 'Fresh Bread',
         description: 'Daily baked bread',
         allergens: ['Wheat', 'Gluten'],
         image_url: '/images/bread.jpg',
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       },
-      { 
-        id: '2', 
-        name: 'Vegetable Soup', 
+      {
+        id: '2',
+        name: 'Vegetable Soup',
         description: 'Hearty soup',
         allergens: ['Celery'],
         image_url: '/images/soup.jpg',
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }
+        updated_at: new Date().toISOString(),
+      },
     ];
 
     it('should fetch food items successfully', async () => {
       mockFromChain.single.mockResolvedValueOnce({
         data: mockFoodItems,
-        error: null
+        error: null,
       });
 
       await store.getState().fetchFoodItems();
@@ -159,7 +162,7 @@ describe('Database Store Tests', () => {
     it('should handle food items fetch errors', async () => {
       mockFromChain.single.mockResolvedValueOnce({
         data: null,
-        error: { message: 'Database error' }
+        error: { message: 'Database error' },
       });
 
       await store.getState().fetchFoodItems();
@@ -171,20 +174,25 @@ describe('Database Store Tests', () => {
       const newFoodItem = {
         name: 'New Food Item',
         description: 'A new test item',
-        allergens: ['None'],
-        image_url: '/test.jpg'
+        allergens: JSON.stringify(['None']),
+        image_url: '/test.jpg',
+        quantity: 1,
+        unit: 'piece',
+        food_type: 'test',
+        user_id: 'test-user-id',
+        donor_id: 'test-donor-id',
       };
 
       const mockCreatedItem = {
         id: '3',
         ...newFoodItem,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
       mockFromChain.single.mockResolvedValueOnce({
         data: mockCreatedItem,
-        error: null
+        error: null,
       });
 
       const result = await store.getState().addFoodItem(newFoodItem);
@@ -203,18 +211,20 @@ describe('Database Store Tests', () => {
         donor_id: 'donor-1',
         quantity: 10,
         status: 'available',
-        pickup_slots: [{ date: '2025-08-14', start_time: '10:00', end_time: '12:00' }],
+        pickup_slots: [
+          { date: '2025-08-14', start_time: '10:00', end_time: '12:00' },
+        ],
         pickup_time: null,
         instructions_for_driver: null,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }
+        updated_at: new Date().toISOString(),
+      },
     ];
 
     it('should fetch donations successfully', async () => {
       mockFromChain.single.mockResolvedValueOnce({
         data: mockDonations,
-        error: null
+        error: null,
       });
 
       await store.getState().fetchDonations();
@@ -229,7 +239,9 @@ describe('Database Store Tests', () => {
         donor_id: 'donor-1',
         quantity: 5,
         status: 'available' as const,
-        pickup_slots: [{ date: '2025-08-15', start_time: '14:00', end_time: '16:00' }]
+        pickup_slots: [
+          { date: '2025-08-15', start_time: '14:00', end_time: '16:00' },
+        ],
       };
 
       const mockCreatedDonation = {
@@ -238,12 +250,12 @@ describe('Database Store Tests', () => {
         pickup_time: null,
         instructions_for_driver: null,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
       mockFromChain.single.mockResolvedValueOnce({
         data: mockCreatedDonation,
-        error: null
+        error: null,
       });
 
       const result = await store.getState().addDonation(newDonation);
@@ -258,10 +270,12 @@ describe('Database Store Tests', () => {
 
       mockFromChain.single.mockResolvedValueOnce({
         data: { ...mockDonations[0], status: newStatus },
-        error: null
+        error: null,
       });
 
-      const result = await store.getState().updateDonation(donationId, { status: newStatus });
+      const result = await store
+        .getState()
+        .updateDonation(donationId, { status: newStatus });
 
       expect(result.error).toBeNull();
       expect(mockFromChain.update).toHaveBeenCalledWith({ status: newStatus });
@@ -273,7 +287,7 @@ describe('Database Store Tests', () => {
 
       mockFromChain.single.mockResolvedValueOnce({
         data: null,
-        error: null
+        error: null,
       });
 
       const result = await store.getState().deleteDonation(donationId);
@@ -297,14 +311,14 @@ describe('Database Store Tests', () => {
         is_recurring: false,
         status: 'active',
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }
+        updated_at: new Date().toISOString(),
+      },
     ];
 
     it('should fetch requests successfully', async () => {
       mockFromChain.single.mockResolvedValueOnce({
         data: mockRequests,
-        error: null
+        error: null,
       });
 
       await store.getState().fetchRequests();
@@ -322,19 +336,19 @@ describe('Database Store Tests', () => {
         pickup_start_time: '14:00:00',
         pickup_end_time: '16:00:00',
         is_recurring: true,
-        status: 'active' as const
+        status: 'active' as const,
       };
 
       const mockCreatedRequest = {
         id: '2',
         ...newRequest,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
       mockFromChain.single.mockResolvedValueOnce({
         data: mockCreatedRequest,
-        error: null
+        error: null,
       });
 
       const result = await store.getState().addRequest(newRequest);
@@ -354,7 +368,7 @@ describe('Database Store Tests', () => {
 
     it('should handle subscription cleanup', () => {
       store.getState().setupRealtimeSubscriptions();
-      
+
       // Should be able to unsubscribe
       const state = store.getState();
       expect(state.subscriptions).toBeDefined();
@@ -364,35 +378,64 @@ describe('Database Store Tests', () => {
   describe('Data Filtering and Search', () => {
     it('should filter donations by status', () => {
       const allDonations = [
-        { id: '1', status: 'available', food_item_id: '1', donor_id: '1', quantity: 5 },
-        { id: '2', status: 'claimed', food_item_id: '2', donor_id: '1', quantity: 3 },
-        { id: '3', status: 'available', food_item_id: '3', donor_id: '2', quantity: 8 }
+        {
+          id: '1',
+          status: 'available',
+          food_item_id: '1',
+          donor_id: '1',
+          quantity: 5,
+        },
+        {
+          id: '2',
+          status: 'claimed',
+          food_item_id: '2',
+          donor_id: '1',
+          quantity: 3,
+        },
+        {
+          id: '3',
+          status: 'available',
+          food_item_id: '3',
+          donor_id: '2',
+          quantity: 8,
+        },
       ];
 
       // Mock donations in store state
       // Note: In real implementation, donations would be fetched from database
 
       // Test filtering
-      const availableDonations = store.getState().donations.filter(d => d.status === 'available');
+      const availableDonations = store
+        .getState()
+        .donations.filter((d) => d.status === 'available');
       expect(availableDonations).toHaveLength(2);
-      expect(availableDonations.every(d => d.status === 'available')).toBe(true);
+      expect(availableDonations.every((d) => d.status === 'available')).toBe(
+        true
+      );
     });
 
     it('should handle search functionality', () => {
       const foodItems = [
         { id: '1', name: 'Fresh Bread', description: 'Daily baked bread' },
-        { id: '2', name: 'Vegetable Soup', description: 'Hearty soup with vegetables' },
-        { id: '3', name: 'Fruit Salad', description: 'Mixed seasonal fruits' }
+        {
+          id: '2',
+          name: 'Vegetable Soup',
+          description: 'Hearty soup with vegetables',
+        },
+        { id: '3', name: 'Fruit Salad', description: 'Mixed seasonal fruits' },
       ];
 
       // Mock food items in store state
       // Note: In real implementation, food items would be fetched from database
 
       // Test search (this would be implemented in the store)
-      const searchResults = store.getState().foodItems.filter(item =>
-        item.name.toLowerCase().includes('bread') ||
-        item.description?.toLowerCase().includes('bread')
-      );
+      const searchResults = store
+        .getState()
+        .foodItems.filter(
+          (item) =>
+            item.name.toLowerCase().includes('bread') ||
+            item.description?.toLowerCase().includes('bread')
+        );
 
       expect(searchResults).toHaveLength(1);
       expect(searchResults[0].name).toBe('Fresh Bread');
@@ -412,7 +455,7 @@ describe('Database Store Tests', () => {
     it('should handle malformed data', async () => {
       mockFromChain.single.mockResolvedValueOnce({
         data: null,
-        error: { message: 'Malformed data', code: 'PGRST116' }
+        error: { message: 'Malformed data', code: 'PGRST116' },
       });
 
       await store.getState().fetchDonations();
@@ -438,12 +481,15 @@ describe('Database Store Tests', () => {
         email: 'test@example.com',
         role: 'food_donor' as const,
         full_name: 'Test User',
-        organization_name: null,
+        organization_name: 'Test Organization',
         contact_number: null,
         address: null,
-        driver_instructions: null,
+        city: null,
+        country: null,
+        postal_code: null,
+        street_address: null,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
 
       // Use setState directly since setter methods don't exist in new store
@@ -457,12 +503,10 @@ describe('Database Store Tests', () => {
     it('should handle concurrent state updates', () => {
       const foodItems = [
         { id: '1', name: 'Item 1' },
-        { id: '2', name: 'Item 2' }
+        { id: '2', name: 'Item 2' },
       ];
 
-      const donations = [
-        { id: '1', food_item_id: '1', quantity: 5 }
-      ];
+      const donations = [{ id: '1', food_item_id: '1', quantity: 5 }];
 
       // Use setState directly since setter methods don't exist in new store
       store.setState({ foodItems: foodItems as any });

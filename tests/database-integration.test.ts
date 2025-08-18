@@ -6,13 +6,12 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
-import type { 
-  Profile, 
-  FoodItem, 
-  Donation, 
-  Request, 
-  DonationClaim,
-  UserRole 
+import type {
+  Profile,
+  FoodItem,
+  Donation,
+  Request,
+  UserRole,
 } from '@/types/supabase';
 
 // Test environment setup
@@ -26,9 +25,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Create clients for different permission levels
 const supabaseAnon = createClient<Database>(supabaseUrl, supabaseAnonKey);
-const supabaseAdmin = serviceRoleKey 
+const supabaseAdmin = serviceRoleKey
   ? createClient<Database>(supabaseUrl, serviceRoleKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
+      auth: { autoRefreshToken: false, persistSession: false },
     })
   : null;
 
@@ -42,13 +41,15 @@ describe('Database Integration Tests', () => {
 
   beforeAll(async () => {
     if (!supabaseAdmin) {
-      console.warn('⚠️  Service role key not available - some tests will be skipped');
+      console.warn(
+        '⚠️  Service role key not available - some tests will be skipped'
+      );
       return;
     }
 
     // Clean up any existing test data
     await cleanupTestData();
-    
+
     // Create test users and data
     await setupTestData();
   }, 30000);
@@ -73,7 +74,7 @@ describe('Database Integration Tests', () => {
         full_name: 'Test New User',
         organization_name: 'Test Organization',
         contact_number: '+358 40 123 9999',
-        address: 'Test Address 123, Helsinki'
+        address: 'Test Address 123, Helsinki',
       };
 
       const { data, error } = await supabaseAdmin
@@ -92,14 +93,13 @@ describe('Database Integration Tests', () => {
       if (!supabaseAdmin) return;
 
       // Test invalid role
-      const { error: roleError } = await supabaseAdmin
-        .from('profiles')
-        .insert({
-          id: 'test-invalid-role',
-          email: 'invalid@test.com',
-          role: 'invalid_role' as any,
-          full_name: 'Invalid User'
-        });
+      const { error: roleError } = await supabaseAdmin.from('profiles').insert({
+        id: 'test-invalid-role',
+        email: 'invalid@test.com',
+        role: 'invalid_role' as any,
+        full_name: 'Invalid User',
+        organization_name: 'Test Organization',
+      });
 
       expect(roleError).toBeDefined();
       expect(roleError?.message).toContain('invalid input value');
@@ -110,7 +110,7 @@ describe('Database Integration Tests', () => {
 
       const updateData = {
         organization_name: 'Updated Organization',
-        contact_number: '+358 40 999 9999'
+        contact_number: '+358 40 999 9999',
       };
 
       const { data, error } = await supabaseAdmin
@@ -133,8 +133,13 @@ describe('Database Integration Tests', () => {
       const foodItem = {
         name: 'Test Food Item',
         description: 'A test food item for integration testing',
-        allergens: ['Test Allergen'],
-        image_url: '/test/image.jpg'
+        allergens: JSON.stringify(['Test Allergen']),
+        image_url: '/test/image.jpg',
+        quantity: 1,
+        unit: 'piece',
+        food_type: 'test',
+        user_id: testUserId,
+        donor_id: testUserId,
       };
 
       const { data, error } = await supabaseAdmin
@@ -147,7 +152,7 @@ describe('Database Integration Tests', () => {
       expect(data).toBeDefined();
       expect(data?.name).toBe(foodItem.name);
       expect(data?.allergens).toEqual(foodItem.allergens);
-      
+
       testFoodItemId = data!.id;
     });
 
@@ -167,7 +172,7 @@ describe('Database Integration Tests', () => {
 
       const updateData = {
         description: 'Updated test food item description',
-        allergens: ['Updated Allergen', 'Another Allergen']
+        allergens: JSON.stringify(['Updated Allergen', 'Another Allergen']),
       };
 
       const { data, error } = await supabaseAdmin
@@ -206,19 +211,21 @@ describe('Database Integration Tests', () => {
           {
             date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
             start_time: '10:00:00',
-            end_time: '12:00:00'
-          }
-        ]
+            end_time: '12:00:00',
+          },
+        ],
       };
 
       const { data, error } = await supabaseAdmin
         .from('donations')
         .insert(donation)
-        .select(`
+        .select(
+          `
           *,
           food_item:food_items(*),
           donor:profiles(*)
-        `)
+        `
+        )
         .single();
 
       expect(error).toBeNull();
@@ -226,7 +233,7 @@ describe('Database Integration Tests', () => {
       expect(data?.quantity).toBe(donation.quantity);
       expect(data?.status).toBe(donation.status);
       expect(data?.pickup_slots).toEqual(donation.pickup_slots);
-      
+
       testDonationId = data!.id;
     });
 
@@ -244,32 +251,34 @@ describe('Database Integration Tests', () => {
       expect(claimedError).toBeNull();
       expect(claimedData?.status).toBe('claimed');
 
-      // Test claimed -> completed
+      // Test claimed -> picked_up
       const { data: completedData, error: completedError } = await supabaseAdmin
         .from('donations')
-        .update({ status: 'completed' })
+        .update({ status: 'picked_up' })
         .eq('id', testDonationId)
         .select()
         .single();
 
       expect(completedError).toBeNull();
-      expect(completedData?.status).toBe('completed');
+      expect(completedData?.status).toBe('picked_up');
     });
 
     it('should retrieve donations with joins', async () => {
       const { data, error } = await supabaseAnon
         .from('donations')
-        .select(`
+        .select(
+          `
           *,
           food_item:food_items(*),
           donor:profiles(*)
-        `)
+        `
+        )
         .eq('status', 'available')
         .limit(10);
 
       expect(error).toBeNull();
       expect(data).toBeDefined();
-      
+
       if (data && data.length > 0) {
         expect(data[0].food_item).toBeDefined();
         expect(data[0].donor).toBeDefined();
@@ -278,7 +287,7 @@ describe('Database Integration Tests', () => {
 
     it('should handle pickup slot queries', async () => {
       const today = new Date().toISOString().split('T')[0];
-      
+
       const { data, error } = await supabaseAnon
         .from('donations')
         .select('*')
@@ -297,27 +306,31 @@ describe('Database Integration Tests', () => {
         user_id: testReceiverId,
         description: 'Test food request for 20 people',
         people_count: 20,
-        pickup_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+        pickup_date: new Date(Date.now() + 86400000)
+          .toISOString()
+          .split('T')[0],
         pickup_start_time: '14:00:00',
         pickup_end_time: '16:00:00',
         is_recurring: false,
-        status: 'active' as const
+        status: 'active' as const,
       };
 
       const { data, error } = await supabaseAdmin
         .from('requests')
         .insert(request)
-        .select(`
+        .select(
+          `
           *,
           user:profiles(*)
-        `)
+        `
+        )
         .single();
 
       expect(error).toBeNull();
       expect(data).toBeDefined();
       expect(data?.description).toBe(request.description);
       expect(data?.people_count).toBe(request.people_count);
-      
+
       testRequestId = data!.id;
     });
 
@@ -328,11 +341,13 @@ describe('Database Integration Tests', () => {
         user_id: testReceiverId,
         description: 'Weekly food assistance',
         people_count: 30,
-        pickup_date: new Date(Date.now() + 172800000).toISOString().split('T')[0],
+        pickup_date: new Date(Date.now() + 172800000)
+          .toISOString()
+          .split('T')[0],
         pickup_start_time: '10:00:00',
         pickup_end_time: '12:00:00',
         is_recurring: true,
-        status: 'active' as const
+        status: 'active' as const,
       };
 
       const { data, error } = await supabaseAdmin
@@ -370,58 +385,56 @@ describe('Database Integration Tests', () => {
         .update({ status: 'available' })
         .eq('id', testDonationId);
 
-      const claim = {
-        donation_id: testDonationId,
-        receiver_id: testReceiverId,
-        status: 'pending' as const,
-        message: 'Would like to collect this donation',
-        claimed_at: new Date().toISOString()
-      };
-
+      // Test claiming a donation by updating its receiver_id and status
       const { data, error } = await supabaseAdmin
-        .from('donation_claims')
-        .insert(claim)
-        .select(`
+        .from('donations')
+        .update({
+          receiver_id: testReceiverId,
+          status: 'claimed',
+          claimed_at: new Date().toISOString(),
+        })
+        .eq('id', testDonationId)
+        .select(
+          `
           *,
-          donation:donations(*),
           receiver:profiles(*)
-        `)
+        `
+        )
         .single();
 
       expect(error).toBeNull();
       expect(data).toBeDefined();
-      expect(data?.status).toBe('pending');
-      expect(data?.message).toBe(claim.message);
+      expect(data?.status).toBe('claimed');
+      expect(data?.receiver_id).toBe(testReceiverId);
     });
 
-    it('should handle claim approval workflow', async () => {
+    it('should handle donation pickup workflow', async () => {
       if (!supabaseAdmin) return;
 
-      // Get the claim
-      const { data: claims } = await supabaseAdmin
-        .from('donation_claims')
+      // Get the claimed donation
+      const { data: donation } = await supabaseAdmin
+        .from('donations')
         .select('*')
-        .eq('donation_id', testDonationId)
-        .eq('status', 'pending');
+        .eq('id', testDonationId)
+        .eq('status', 'claimed')
+        .single();
 
-      if (!claims || claims.length === 0) return;
+      if (!donation) return;
 
-      const claimId = claims[0].id;
-
-      // Approve the claim
-      const { data: approvedClaim, error } = await supabaseAdmin
-        .from('donation_claims')
-        .update({ 
-          status: 'approved',
-          approved_at: new Date().toISOString()
+      // Mark as picked up
+      const { data: pickedUpDonation, error } = await supabaseAdmin
+        .from('donations')
+        .update({
+          status: 'picked_up',
+          picked_up_at: new Date().toISOString(),
         })
-        .eq('id', claimId)
+        .eq('id', testDonationId)
         .select()
         .single();
 
       expect(error).toBeNull();
-      expect(approvedClaim?.status).toBe('approved');
-      expect(approvedClaim?.approved_at).toBeDefined();
+      expect(pickedUpDonation?.status).toBe('picked_up');
+      expect(pickedUpDonation?.picked_up_at).toBeDefined();
     });
   });
 
@@ -430,14 +443,12 @@ describe('Database Integration Tests', () => {
       if (!supabaseAdmin) return;
 
       // Try to create donation with non-existent food item
-      const { error } = await supabaseAdmin
-        .from('donations')
-        .insert({
-          food_item_id: 'non-existent-id',
-          donor_id: testDonorId,
-          quantity: 1,
-          status: 'available'
-        });
+      const { error } = await supabaseAdmin.from('donations').insert({
+        food_item_id: 'non-existent-id',
+        donor_id: testDonorId,
+        quantity: 1,
+        status: 'available',
+      });
 
       expect(error).toBeDefined();
       expect(error?.message).toContain('foreign key');
@@ -460,14 +471,13 @@ describe('Database Integration Tests', () => {
       if (!supabaseAdmin) return;
 
       // Try to create duplicate profile with same email
-      const { error } = await supabaseAdmin
-        .from('profiles')
-        .insert({
-          id: 'duplicate-test',
-          email: 'test-new-user@zipli.test', // Same email as created earlier
-          role: 'food_donor',
-          full_name: 'Duplicate User'
-        });
+      const { error } = await supabaseAdmin.from('profiles').insert({
+        id: 'duplicate-test',
+        email: 'test-new-user@zipli.test', // Same email as created earlier
+        role: 'food_donor',
+        full_name: 'Duplicate User',
+        organization_name: 'Duplicate Organization',
+      });
 
       expect(error).toBeDefined();
       expect(error?.message).toContain('duplicate key');
@@ -483,13 +493,14 @@ describe('Database Integration Tests', () => {
 
       const subscription = supabaseAnon
         .channel('donations-test')
-        .on('postgres_changes', 
-          { 
-            event: 'UPDATE', 
-            schema: 'public', 
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
             table: 'donations',
-            filter: `id=eq.${testDonationId}`
-          }, 
+            filter: `id=eq.${testDonationId}`,
+          },
           (payload) => {
             expect(payload.new).toBeDefined();
             expect(payload.eventType).toBe('UPDATE');
@@ -503,9 +514,9 @@ describe('Database Integration Tests', () => {
       setTimeout(async () => {
         await supabaseAdmin
           .from('donations')
-          .update({ 
+          .update({
             status: 'available',
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           })
           .eq('id', testDonationId);
       }, 1000);
@@ -514,11 +525,15 @@ describe('Database Integration Tests', () => {
     it('should handle subscription cleanup', () => {
       const subscription = supabaseAnon
         .channel('test-cleanup')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'donations' }, () => {})
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'donations' },
+          () => {}
+        )
         .subscribe();
 
       expect(subscription).toBeDefined();
-      
+
       const unsubscribeResult = subscription.unsubscribe();
       expect(unsubscribeResult).toEqual('ok');
     });
@@ -554,9 +569,9 @@ describe('Database Integration Tests', () => {
   });
 
   describe('City Analytics and Reporting', () => {
-    it('should retrieve city donation statistics', async () => {
+    it('should retrieve city monthly donation data', async () => {
       const { data, error } = await supabaseAnon
-        .from('city_donation_stats')
+        .from('city_monthly_data')
         .select('*')
         .limit(5);
 
@@ -564,9 +579,9 @@ describe('Database Integration Tests', () => {
       expect(data).toBeDefined();
     });
 
-    it('should retrieve city request statistics', async () => {
+    it('should retrieve city statistics', async () => {
       const { data, error } = await supabaseAnon
-        .from('city_request_stats')
+        .from('city_stats')
         .select('*')
         .limit(5);
 
@@ -574,10 +589,11 @@ describe('Database Integration Tests', () => {
       expect(data).toBeDefined();
     });
 
-    it('should retrieve partner organizations', async () => {
+    it('should retrieve organization profiles', async () => {
       const { data, error } = await supabaseAnon
-        .from('partner_organizations')
-        .select('*')
+        .from('profiles')
+        .select('id, organization_name, role')
+        .not('organization_name', 'is', null)
         .limit(10);
 
       expect(error).toBeNull();
@@ -596,24 +612,25 @@ describe('Database Integration Tests', () => {
         password: 'testpassword123',
         role: 'food_donor' as UserRole,
         full_name: 'Test Donor User',
-        organization_name: 'Test Donor Org'
+        organization_name: 'Test Donor Org',
       },
       {
-        email: 'test-receiver@zipli-test.com', 
+        email: 'test-receiver@zipli-test.com',
         password: 'testpassword123',
         role: 'food_receiver' as UserRole,
         full_name: 'Test Receiver User',
-        organization_name: 'Test Receiver Org'
-      }
+        organization_name: 'Test Receiver Org',
+      },
     ];
 
     for (const userData of testUsers) {
       try {
-        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-          email: userData.email,
-          password: userData.password,
-          email_confirm: true
-        });
+        const { data: authUser, error: authError } =
+          await supabaseAdmin.auth.admin.createUser({
+            email: userData.email,
+            password: userData.password,
+            email_confirm: true,
+          });
 
         if (authError && !authError.message.includes('already exists')) {
           console.error('Error creating test user:', authError);
@@ -621,7 +638,7 @@ describe('Database Integration Tests', () => {
         }
 
         const userId = authUser?.user?.id || 'test-' + userData.role;
-        
+
         if (userData.role === 'food_donor') {
           testDonorId = userId;
         } else {
@@ -631,16 +648,13 @@ describe('Database Integration Tests', () => {
         if (!testUserId) testUserId = userId;
 
         // Create profile
-        await supabaseAdmin
-          .from('profiles')
-          .upsert({
-            id: userId,
-            email: userData.email,
-            role: userData.role,
-            full_name: userData.full_name,
-            organization_name: userData.organization_name
-          });
-
+        await supabaseAdmin.from('profiles').upsert({
+          id: userId,
+          email: userData.email,
+          role: userData.role,
+          full_name: userData.full_name,
+          organization_name: userData.organization_name,
+        });
       } catch (error) {
         console.log('Test user might already exist:', userData.email);
       }
@@ -652,12 +666,17 @@ describe('Database Integration Tests', () => {
 
     try {
       // Clean up in reverse dependency order
-      await supabaseAdmin.from('donation_claims').delete().like('receiver_id', 'test-%');
       await supabaseAdmin.from('donations').delete().like('donor_id', 'test-%');
       await supabaseAdmin.from('requests').delete().like('user_id', 'test-%');
-      await supabaseAdmin.from('food_items').delete().eq('name', 'Test Food Item');
-      await supabaseAdmin.from('profiles').delete().like('email', '%zipli-test.com');
-      
+      await supabaseAdmin
+        .from('food_items')
+        .delete()
+        .eq('name', 'Test Food Item');
+      await supabaseAdmin
+        .from('profiles')
+        .delete()
+        .like('email', '%zipli-test.com');
+
       // Clean up auth users
       const { data: users } = await supabaseAdmin.auth.admin.listUsers();
       if (users?.users) {

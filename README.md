@@ -1,48 +1,79 @@
-# Zipli - Food Donation Platform
+# Zipli v3 - Food Donation Platform
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Frhiday%2FZipli-v3&project-name=zipli-v3&repository-name=zipli-v3)
 
-Zipli is a platform connecting food donors with people in need, reducing food waste and helping communities.
+A modern food donation platform connecting donors with recipients, built with Next.js, TypeScript, and Supabase.
 
-> **[📚 View Full Project Documentation](./docs/README.md)**
+## 🚀 **Professional Development Pipeline**
 
----
+This project features a comprehensive deployment pipeline with automated quality gates and multi-environment deployments.
 
-## 🚀 **Current Status: Supabase Migration Complete**
+📋 **Pipeline Status**:
+✅ **Zero TypeScript Errors** - Strict type checking prevents runtime issues  
+✅ **Automated Deployments** - Push to deploy with quality gates  
+✅ **Pre-commit Validation** - Issues caught before reaching repository  
+✅ **Multi-environment Testing** - Staging and feature previews  
+✅ **VS Code Integration** - Real-time error detection and auto-formatting
+
+## 📖 **Documentation Hub**
+
+| Guide                                                | Purpose                          | Time    |
+| ---------------------------------------------------- | -------------------------------- | ------- |
+| **[Development Guide](./DEVELOPMENT.md)**            | Daily development workflow       | 2 min   |
+| **[Deployment Pipeline](./DEPLOYMENT_PIPELINE.md)**  | Complete setup & troubleshooting | 15 min  |
+| **[Migration Guide](./PIPELINE_MIGRATION_GUIDE.md)** | Replicate pipeline elsewhere     | 3 hours |
+
+## 🚀 **Current Status: Production-Ready Architecture**
 
 ✅ **Database Architecture**: Fully migrated to Supabase PostgreSQL  
 ✅ **Authentication**: Supabase Auth with automatic profile creation  
 ✅ **Real-time Features**: Live data updates and subscriptions  
-✅ **Type Safety**: Complete TypeScript integration  
-✅ **Component Architecture**: All 30+ components using new Supabase store  
+✅ **Type Safety**: Complete TypeScript integration with zero errors  
+✅ **Component Architecture**: All 30+ components using unified store  
+✅ **Deployment Pipeline**: Professional CI/CD with quality gates
 
 ---
 
-## Development
-
-Install dependencies:
+## Quick Start
 
 ```bash
-pnpm install
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Quality checks (automatic via pre-commit hooks)
+npm run validate       # Run all checks
+npm run type-check     # TypeScript validation
+npm run lint:fix       # Fix ESLint issues
+npm run format         # Format code
+
+# Building
+npm run build          # Production build
+npm run build:check    # Test production build
 ```
 
-Run the app locally:
+### Branch Strategy & Environments
 
-```bash
-pnpm dev
-```
+- **`main`** → Production deployment (protected)
+- **`develop`** → Staging environment with preview URLs
+- **`feature/*`** → Individual preview deployments
+
+All pushes trigger automatic deployments with quality gates.
 
 ## Database Setup
 
 The application now uses **Supabase** as the primary database. The migration includes:
 
 ### Quick Setup (For Development)
+
 1. **Create a Supabase project** at [supabase.com](https://supabase.com)
 2. **Run database migrations**:
    ```sql
    -- Copy and paste these files in Supabase SQL Editor:
    -- 1. supabase/migrations/20250813_create_core_tables.sql
-   -- 2. supabase/migrations/20250813_setup_rls_policies.sql  
+   -- 2. supabase/migrations/20250813_setup_rls_policies.sql
    -- 3. supabase/migrations/20250813_auth_triggers.sql
    ```
 3. **Set environment variables** in `.env.local`:
@@ -61,6 +92,7 @@ The application now uses **Supabase** as the primary database. The migration inc
    ```
 
 ### Database Schema
+
 - **5 core tables**: profiles, food_items, donations, requests, donation_claims
 - **Row Level Security (RLS)**: Comprehensive security policies
 - **Database triggers**: Automatic profile creation on user signup
@@ -68,12 +100,14 @@ The application now uses **Supabase** as the primary database. The migration inc
 - **Real-time subscriptions**: Live data updates
 
 ### Authentication System
+
 - **Supabase Auth**: JWT-based authentication
 - **Automatic profiles**: Created via database triggers
 - **Role-based access**: food_donor, food_receiver, city, terminals
 - **Type-safe operations**: Full TypeScript integration
 
 ### Key Files
+
 ```
 src/
 ├── types/supabase.ts          # Database type definitions
@@ -91,6 +125,7 @@ src/
 ## Deployment
 
 ### Environment Variables
+
 Add the following to your deployment platform:
 
 ```env
@@ -105,6 +140,7 @@ SUPABASE_STORAGE_BUCKET=donations
 ```
 
 ### Production Deployment
+
 1. **Create Supabase project** for production
 2. **Run migration files** in Supabase SQL Editor:
    ```sql
@@ -124,14 +160,16 @@ SUPABASE_STORAGE_BUCKET=donations
 For development testing with mock data, use these credentials (password: 'password'):
 
 - **Donor**: `hasan@zipli.test` (Food Donor)
-- **Receiver**: `maria@zipli.test` (Food Receiver) 
+- **Receiver**: `maria@zipli.test` (Food Receiver)
 - **City Admin**: `city@zipli.test` (City Official)
 - **Terminal**: `terminal@zipli.test` (Terminal Operator)
 
 ## Architecture Overview
 
 ### Store Architecture
+
 The application now uses a **unified Supabase store** that provides:
+
 - **Type-safe database operations** via generated types
 - **Real-time subscriptions** for live updates
 - **Optimistic updates** for better UX
@@ -139,7 +177,9 @@ The application now uses a **unified Supabase store** that provides:
 - **Row-level security** enforcement
 
 ### Component Integration
+
 All **30+ components** have been migrated to use the new store:
+
 ```tsx
 // ✅ New pattern (all components now use this)
 import { useDatabase } from '@/store';
@@ -149,6 +189,7 @@ import { useDatabase } from '@/store/databaseStore';
 ```
 
 ### Authentication Flow
+
 1. **User signup/login** → Supabase Auth
 2. **Profile creation** → Database trigger
 3. **Role assignment** → Based on signup data
@@ -157,6 +198,7 @@ import { useDatabase } from '@/store/databaseStore';
 ## Migration Summary
 
 ### Completed ✅
+
 - [x] Database schema design and implementation
 - [x] Supabase Auth integration with profile creation
 - [x] TypeScript type generation and integration
@@ -167,6 +209,7 @@ import { useDatabase } from '@/store/databaseStore';
 - [x] Row Level Security policies
 
 ### Next Phase 🔄
+
 - [ ] Production database deployment
 - [ ] End-to-end testing with real Supabase
 - [ ] Performance optimization and caching
@@ -176,26 +219,29 @@ import { useDatabase } from '@/store/databaseStore';
 ## Development Notes
 
 ### Database Operations
+
 ```tsx
 // All CRUD operations are now type-safe
-const { 
-  currentUser,           // Current authenticated user
-  donations,            // Real-time donations list
-  addDonation,         // Create new donation
-  updateDonation,      // Update existing donation
-  subscribeToUpdates   // Real-time subscriptions
+const {
+  currentUser, // Current authenticated user
+  donations, // Real-time donations list
+  addDonation, // Create new donation
+  updateDonation, // Update existing donation
+  subscribeToUpdates, // Real-time subscriptions
 } = useDatabase();
 ```
 
 ### Real-time Features
+
 ```tsx
 // Automatic real-time updates
 useEffect(() => {
   const subscription = supabase
     .channel('donations')
-    .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'donations' }, 
-        handleRealTimeUpdate
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'donations' },
+      handleRealTimeUpdate
     )
     .subscribe();
 
@@ -206,6 +252,7 @@ useEffect(() => {
 ## Future Plans
 
 ### Enhanced Features
+
 - **Advanced filtering** with database indexes
 - **Geolocation services** for distance-based matching
 - **Push notifications** via Supabase Edge Functions
@@ -213,6 +260,7 @@ useEffect(() => {
 - **Multi-tenant support** for different cities
 
 ### Test Automation
+
 - Implement end-to-end (E2E) and integration tests using Playwright
 - Database integration testing with test Supabase instance
 - Component testing with real data flows
@@ -223,6 +271,7 @@ useEffect(() => {
 To bulk-generate images for food items using OpenAI DALL·E and upload to Supabase Storage:
 
 1. Set up environment variables:
+
    ```env
    OPENAI_API_KEY=sk-...
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
@@ -231,6 +280,7 @@ To bulk-generate images for food items using OpenAI DALL·E and upload to Supaba
    ```
 
 2. Install dependencies:
+
    ```bash
    pnpm install openai @supabase/supabase-js dotenv node-fetch
    ```
@@ -241,16 +291,32 @@ To bulk-generate images for food items using OpenAI DALL·E and upload to Supaba
    ```
 
 The script will:
+
 - Skip items that already have images
 - Upload to Supabase Storage `donations` bucket
 - Update `image_url` field in `food_items` table
 
 ---
 
-## Documentation Links
+## 📚 Complete Documentation
 
-- **[Supabase Migration Guide](./SUPABASE_MIGRATION.md)** - Complete migration documentation
-- **[Database Schema](./DATABASE_SCHEMA.md)** - Detailed schema reference
+### Development & Deployment
+
+- **[Development Guide](./DEVELOPMENT.md)** - Daily development workflow
+- **[Deployment Pipeline](./DEPLOYMENT_PIPELINE.md)** - Complete CI/CD setup guide
+- **[Migration Guide](./PIPELINE_MIGRATION_GUIDE.md)** - Replicate pipeline in other projects
+
+### Architecture & Database
+
+- **[Supabase Migration Guide](./SUPABASE_MIGRATION.md)** - Database migration documentation
+- **[Database Schema](./DATABASE_SCHEMA.md)** - Schema reference and types
 - **[Component Architecture](./COMPONENT_ARCHITECTURE.md)** - Store integration guide
+
+### Standards & Guidelines
+
 - **[Claude Instructions](./CLAUDE_INSTRUCTIONS.md)** - Development guidelines
 - **[Design System](./DESIGN_SYSTEM_ROLLOUT.md)** - UI standardization plan
+
+---
+
+**🎯 This project demonstrates production-ready development practices with automated quality assurance, type safety, and seamless deployment workflows.**

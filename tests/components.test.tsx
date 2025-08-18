@@ -6,7 +6,10 @@ import '@testing-library/jest-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import { PhotoUpload } from '@/components/ui/PhotoUpload';
-import Skeleton, { SkeletonCard, SkeletonDashboardStat } from '@/components/ui/Skeleton';
+import Skeleton, {
+  SkeletonCard,
+  SkeletonDashboardStat,
+} from '@/components/ui/Skeleton';
 
 // Mock dependencies
 jest.mock('next/navigation', () => ({
@@ -19,9 +22,11 @@ jest.mock('next/navigation', () => ({
 }));
 
 jest.mock('next/image', () => {
-  return ({ src, alt, ...props }: any) => {
+  const MockImage = ({ src, alt, ...props }: any) => {
     return <img src={src} alt={alt} {...props} />;
   };
+  MockImage.displayName = 'MockImage';
+  return MockImage;
 });
 
 describe('UI Components', () => {
@@ -34,7 +39,7 @@ describe('UI Components', () => {
     it('handles click events', () => {
       const handleClick = jest.fn();
       render(<Button onClick={handleClick}>Clickable</Button>);
-      
+
       fireEvent.click(screen.getByText('Clickable'));
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
@@ -63,10 +68,10 @@ describe('UI Components', () => {
     it('handles value changes', () => {
       const handleChange = jest.fn();
       render(<Input onChange={handleChange} />);
-      
+
       const input = screen.getByRole('textbox');
       fireEvent.change(input, { target: { value: 'test input' } });
-      
+
       expect(handleChange).toHaveBeenCalled();
     });
 
@@ -88,33 +93,36 @@ describe('UI Components', () => {
     it('renders upload area', () => {
       const mockOnImageUpload = jest.fn();
       render(<PhotoUpload onImageUpload={mockOnImageUpload} />);
-      
+
       expect(screen.getByText(/upload/i)).toBeInTheDocument();
     });
 
     it('displays hint text when provided', () => {
       const mockOnImageUpload = jest.fn();
       render(
-        <PhotoUpload 
-          onImageUpload={mockOnImageUpload} 
-          hint="Upload a photo of your food item" 
+        <PhotoUpload
+          onImageUpload={mockOnImageUpload}
+          hint="Upload a photo of your food item"
         />
       );
-      
-      expect(screen.getByText('Upload a photo of your food item')).toBeInTheDocument();
+
+      expect(
+        screen.getByText('Upload a photo of your food item')
+      ).toBeInTheDocument();
     });
 
     it('handles file selection', async () => {
       const mockOnImageUpload = jest.fn();
       render(<PhotoUpload onImageUpload={mockOnImageUpload} />);
-      
-      const fileInput = screen.getByRole('button', { hidden: true }) || 
-                       document.querySelector('input[type="file"]');
-      
+
+      const fileInput =
+        screen.getByRole('button', { hidden: true }) ||
+        document.querySelector('input[type="file"]');
+
       if (fileInput) {
         const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
         fireEvent.change(fileInput, { target: { files: [file] } });
-        
+
         await waitFor(() => {
           expect(mockOnImageUpload).toHaveBeenCalled();
         });
@@ -159,21 +167,21 @@ describe('Form Validation', () => {
     const submitButton = screen.getByText('Submit');
 
     fireEvent.click(submitButton);
-    
+
     // HTML5 validation should prevent submission
     expect(input).toBeInvalid();
   });
 
   it('validates email format', () => {
     render(<Input type="email" defaultValue="invalid-email" />);
-    
+
     const input = screen.getByDisplayValue('invalid-email');
     expect(input).toBeInvalid();
   });
 
   it('accepts valid email format', () => {
     render(<Input type="email" defaultValue="valid@example.com" />);
-    
+
     const input = screen.getByDisplayValue('valid@example.com');
     expect(input).toBeValid();
   });

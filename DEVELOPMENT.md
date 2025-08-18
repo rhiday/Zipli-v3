@@ -1,15 +1,17 @@
-# Development Pipeline
+# Development Pipeline - Quick Reference
+
+> **📖 For comprehensive documentation, see [DEPLOYMENT_PIPELINE.md](./DEPLOYMENT_PIPELINE.md)**
 
 ## Branch Strategy
 
 - **main**: Production environment (auto-deploys to live site)
 - **develop**: Staging environment (auto-deploys to preview URLs)
-- **feature/***: Feature branches (auto-deploys to temporary preview URLs)
+- **feature/\***: Feature branches (auto-deploys to temporary preview URLs)
 
 ## Environments
 
 - **Production**: https://your-production-url.vercel.app (from `main`)
-- **Staging**: Preview URLs from `develop` branch  
+- **Staging**: Preview URLs from `develop` branch
 - **Feature Previews**: Temporary URLs from feature branches
 
 ## Development Workflow
@@ -27,3 +29,35 @@
 - ✅ Automated testing on PRs
 - ✅ Branch protection on main
 - ✅ Required status checks before merge
+
+## Quick Commands
+
+```bash
+# Development
+npm run dev            # Start development server
+npm run validate       # Run all quality checks locally
+
+# Before committing (automatic via pre-commit hooks)
+npm run type-check     # TypeScript validation
+npm run lint:fix       # Fix ESLint issues
+npm run format         # Format code with Prettier
+
+# Building
+npm run build          # Production build
+npm run build:check    # Build and start (test production mode)
+```
+
+## VS Code Integration
+
+The pipeline includes VS Code workspace settings for:
+
+- Real-time TypeScript error detection
+- Automatic ESLint fixing on save
+- Prettier formatting on save
+- Enhanced IntelliSense with type hints
+
+## Need Help?
+
+- **Full Setup Guide**: [DEPLOYMENT_PIPELINE.md](./DEPLOYMENT_PIPELINE.md)
+- **Troubleshooting**: See troubleshooting section in main documentation
+- **Migration Checklist**: For setting up similar pipeline in other projects

@@ -10,10 +10,22 @@
     "build": "next build",
     "start": "next start",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "seed": "node scripts/seed-supabase.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate": "npm run type-check && npm run lint && npm run test",
+    "build:analyze": "ANALYZE=true npm run build",
+    "build:check": "npm run build && npm run start",
+    "clean": "rm -rf .next node_modules/.cache"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
