@@ -140,8 +140,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           console.log('📦 Fetching data...');
           await Promise.all([
             state.fetchFoodItems(),
-            // Temporarily skip donations to avoid authentication issues during dev login
-            // state.fetchDonations(),
+            state.fetchDonations(),
             state.fetchUsers(),
             state.fetchRequests(),
             // Skip fetchClaims for now since table doesn't exist
@@ -176,7 +175,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           if (result.data?.user) {
             set({ currentUser: result.data.user });
             // Refresh data after login
-            // await get().fetchDonations(); // Temporarily disabled for dev login
+            await get().fetchDonations();
             await get().fetchRequests();
             // await get().fetchClaims(); // Table doesn't exist
           }

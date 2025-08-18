@@ -205,6 +205,9 @@ export const translations = {
     exportToPdf: 'Export to PDF',
     environmentalAndSocialImpactData: 'Environmental and social impact data for reporting, and operation planning.',
     thisIsWhomYouveHelped: 'This is whom you\'ve helped',
+    yourActiveDonations: 'Your Active Donations',
+    noDonationsYet: 'No donations yet',
+    createFirstDonation: 'Create First Donation',
     
     // Manual Donation Form
     nameOfFood: 'Name of food',
@@ -516,6 +519,9 @@ export const translations = {
     exportToPdf: 'Vie PDF:ksi',
     environmentalAndSocialImpactData: 'Ympäristö- ja sosiaalisen vaikutuksen tiedot raportointia ja toiminnan suunnittelua varten.',
     thisIsWhomYouveHelped: 'Näitä olet auttanut',
+    yourActiveDonations: 'Aktiiviset lahjoituksesi',
+    noDonationsYet: 'Ei vielä lahjoituksia',
+    createFirstDonation: 'Luo ensimmäinen lahjoitus',
     
     // Manual Donation Form
     nameOfFood: 'Ruoan nimi',

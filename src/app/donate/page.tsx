@@ -235,6 +235,58 @@ export default function DonorDashboardPage(): React.ReactElement {
           </span>
         </div>
         
+        {/* Your Active Donations Section */}
+        <section>
+          <h2 className="text-lg font-semibold text-primary mb-3">{t('yourActiveDonations')}</h2>
+          
+          {dashboardData.donations && dashboardData.donations.length > 0 ? (
+            <div className="space-y-4">
+              {dashboardData.donations.map((donation) => (
+                <div key={donation.id} className="rounded-xl border border-primary-10 shadow-sm p-4 bg-white">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="text-primary font-medium">
+                        {donation.food_item?.name || 'Food Item'}
+                      </h3>
+                      <p className="text-sm text-primary-75 mt-1">
+                        Quantity: {donation.quantity} · Status: {donation.status}
+                      </p>
+                      {donation.pickup_slots && donation.pickup_slots.length > 0 && (
+                        <p className="text-sm text-primary-75 mt-1">
+                          Pickup: {donation.pickup_slots[0].date} {donation.pickup_slots[0].start_time} - {donation.pickup_slots[0].end_time}
+                        </p>
+                      )}
+                      {donation.notes && (
+                        <p className="text-sm text-primary-75 mt-2 italic">
+                          Notes: {donation.notes}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center">
+                      <PackageIcon className="w-5 h-5 text-primary-50" />
+                    </div>
+                  </div>
+                  <div className="mt-3 text-xs text-gray-500">
+                    Created: {new Date(donation.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-primary-10 shadow-sm p-6 bg-white text-center">
+              <PackageIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-600 mb-4">{t('noDonationsYet')}</p>
+              <Button 
+                onClick={() => router.push('/donate/new')}
+                className="inline-flex items-center gap-2"
+              >
+                <PlusIcon className="w-4 h-4" />
+                {t('createFirstDonation')}
+              </Button>
+            </div>
+          )}
+        </section>
+
         {/* This is whom you've helped section */}
         <section>
           <h2 className="text-lg font-semibold text-primary mb-3">{t('thisIsWhomYouveHelped')}</h2>
