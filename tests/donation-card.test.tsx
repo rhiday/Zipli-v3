@@ -60,7 +60,7 @@ describe('DonationCard', () => {
       }
     ],
     pickup_time: '2024-12-01T10:00:00Z',
-    notes: 'Please ring the doorbell',
+    instructions_for_driver: 'Please ring the doorbell',
     created_at: '2024-12-01T08:00:00Z',
     updated_at: '2024-12-01T08:00:00Z',
     food_item: {

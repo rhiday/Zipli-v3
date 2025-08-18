@@ -264,9 +264,9 @@ export default function DonorDashboardPage(): React.ReactElement {
                           Pickup: {donation.pickup_slots[0].date} {donation.pickup_slots[0].start_time} - {donation.pickup_slots[0].end_time}
                         </p>
                       )}
-                      {donation.notes && (
+                      {donation.instructions_for_driver && (
                         <p className="text-sm text-primary-75 mt-2 italic">
-                          Notes: {donation.notes}
+                          Instructions: {donation.instructions_for_driver}
                         </p>
                       )}
                     </div>

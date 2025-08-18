@@ -156,7 +156,7 @@ export default function DonationSummaryPage() {
           status: 'available' as const,
           pickup_slots: formattedSlots,
           pickup_time: null,
-          notes: instructions || null
+          instructions_for_driver: instructions || null
         };
         
         console.log('💾 Creating donation with data:', donationData);

@@ -205,7 +205,7 @@ describe('Database Store Tests', () => {
         status: 'available',
         pickup_slots: [{ date: '2025-08-14', start_time: '10:00', end_time: '12:00' }],
         pickup_time: null,
-        notes: null,
+        instructions_for_driver: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
@@ -236,7 +236,7 @@ describe('Database Store Tests', () => {
         id: '2',
         ...newDonation,
         pickup_time: null,
-        notes: null,
+        instructions_for_driver: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
