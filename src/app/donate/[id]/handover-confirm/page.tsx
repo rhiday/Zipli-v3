@@ -18,7 +18,7 @@ export default function HandoverConfirmPage() {
       const { error } = await supabase
         .from("donations")
         .update({ status: "picked_up", updated_at: new Date().toISOString() })
-        .eq("id", params.id);
+        .eq("id", Array.isArray(params.id) ? params.id[0] : params.id);
       if (error) throw error;
       router.push("/donate");
     } catch (err: any) {
