@@ -84,15 +84,23 @@ export default function DonorDashboardPage(): React.ReactElement {
       organization_name: null, // Not available in mock user
     };
     
-    const userDonations = allDonations
-      .filter(d => d.donor_id === currentUser.id)
-      .map(d => {
-        const foodItem = foodItems.find(fi => fi.id === d.food_item_id);
-        return { ...d, food_item: foodItem! };
-      });
+    // Fetch latest donations to ensure we have current data
+    const fetchLatestDonations = async () => {
+      const { fetchDonations } = useDatabase.getState();
+      await fetchDonations();
+      
+      const userDonations = allDonations
+        .filter(d => d.donor_id === currentUser.id)
+        .map(d => {
+          const foodItem = foodItems.find(fi => fi.id === d.food_item_id);
+          return { ...d, food_item: foodItem! };
+        });
+      
+      setDashboardData({ profile, donations: userDonations });
+      setLoading(false);
+    };
     
-    setDashboardData({ profile, donations: userDonations });
-    setLoading(false);
+    fetchLatestDonations();
 
   }, [isInitialized, currentUser, router, allDonations, foodItems]);
 
