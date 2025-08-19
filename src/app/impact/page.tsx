@@ -174,15 +174,15 @@ export default function ImpactPage(): React.ReactElement {
       <main className="bg-base p-4 space-y-6 pt-6">
         {/* Header with same pattern as dashboard */}
         <section>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-primary mb-4">
+          <div className="flex justify-between items-start gap-4 mb-4">
+            <h2 className="text-lg font-semibold text-primary flex-1">
               Your Complete Impact
             </h2>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="underline underline-offset-4 inline-flex items-center gap-1 text-primary text-lg font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-1"
+                  className="underline underline-offset-4 inline-flex items-center gap-1 text-primary text-lg font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-1 whitespace-nowrap"
                 >
                   {periods.find((p) => p.value === selectedPeriod)?.label}
                   <ChevronDown className="h-4 w-4" />
@@ -204,7 +204,7 @@ export default function ImpactPage(): React.ReactElement {
           {/* Updated grid pattern with rectangular boxes */}
           <div className="grid grid-cols-2 gap-4 mt-6">
             {/* Total food offered - with green background */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-[#F5F9EF]">
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-[#F5F9EF]">
               <div className="flex items-center gap-2">
                 <Scale className="w-4 h-4 text-primary-50" />
               </div>
@@ -219,7 +219,7 @@ export default function ImpactPage(): React.ReactElement {
             </div>
 
             {/* Portions offered */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-white">
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
               <div className="flex items-center gap-2">
                 <Utensils className="w-4 h-4 text-primary-50" />
               </div>
@@ -232,7 +232,7 @@ export default function ImpactPage(): React.ReactElement {
             </div>
 
             {/* Saved in food disposal costs */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-white">
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
               <div className="flex items-center gap-2">
                 <Euro className="w-4 h-4 text-primary-50" />
               </div>
@@ -245,7 +245,7 @@ export default function ImpactPage(): React.ReactElement {
             </div>
 
             {/* CO2 Avoided */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-white">
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
               <div className="flex items-center gap-2">
                 <Leaf className="w-4 h-4 text-primary-50" />
               </div>

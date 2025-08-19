@@ -204,15 +204,15 @@ export default function DonorDashboardPage(): React.ReactElement {
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         {/* This section is being removed as it's redundant with the header */}
         <section>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-primary mb-4">
+          <div className="flex justify-between items-start gap-4 mb-4">
+            <h2 className="text-lg font-semibold text-primary flex-1">
               {t('yourImpact')}
             </h2>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="underline underline-offset-4 inline-flex items-center gap-1 text-primary text-lg font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-1"
+                  className="underline underline-offset-4 inline-flex items-center gap-1 text-primary text-lg font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-1 whitespace-nowrap"
                 >
                   {selectedMonth}
                   <ChevronDown className="h-4 w-4" />
@@ -232,7 +232,7 @@ export default function DonorDashboardPage(): React.ReactElement {
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
             {/* Total food offered - with green background */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-[#F5F9EF]">
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-[#F5F9EF]">
               <div className="flex items-center gap-2">
                 <Scale className="w-4 h-4 text-primary-50" />
               </div>
@@ -247,7 +247,7 @@ export default function DonorDashboardPage(): React.ReactElement {
             </div>
 
             {/* Portions offered */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-white">
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
               <div className="flex items-center gap-2">
                 <Utensils className="w-4 h-4 text-primary-50" />
               </div>
@@ -262,7 +262,7 @@ export default function DonorDashboardPage(): React.ReactElement {
             </div>
 
             {/* Saved in food disposal costs */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-white">
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
               <div className="flex items-center gap-2">
                 <Euro className="w-4 h-4 text-primary-50" />
               </div>
@@ -277,7 +277,7 @@ export default function DonorDashboardPage(): React.ReactElement {
             </div>
 
             {/* CO2 Avoided */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full h-24 bg-white">
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
               <div className="flex items-center gap-2">
                 <Leaf className="w-4 h-4 text-primary-50" />
               </div>
