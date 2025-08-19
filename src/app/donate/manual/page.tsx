@@ -1,6 +1,6 @@
 // pumpkin: test commit to trigger push
-'use client'
-export const dynamic = "force-dynamic";
+'use client';
+export const dynamic = 'force-dynamic';
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
@@ -27,7 +27,6 @@ import { useLanguage } from '@/hooks/useLanguage';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 
-
 interface DonationItem {
   id: string;
   name: string;
@@ -40,15 +39,22 @@ interface DonationItem {
 function ManualDonationPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { donationItems, addDonationItem, updateDonationItem, deleteDonationItem } = useDonationStore();
-  const updateDonation = useDatabase(state => state.updateDonation);
-  const updateFoodItem = useDatabase(state => state.updateFoodItem);
-  const donations = useDatabase(state => state.donations);
-  const foodItems = useDatabase(state => state.foodItems);
-  const currentUser = useDatabase(state => state.currentUser);
+  const {
+    donationItems,
+    addDonationItem,
+    updateDonationItem,
+    deleteDonationItem,
+  } = useDonationStore();
+  const updateDonation = useDatabase((state) => state.updateDonation);
+  const updateFoodItem = useDatabase((state) => state.updateFoodItem);
+  const donations = useDatabase((state) => state.donations);
+  const foodItems = useDatabase((state) => state.foodItems);
+  const currentUser = useDatabase((state) => state.currentUser);
   const { t } = useLanguage();
 
-  const [currentItem, setCurrentItem] = useState<Omit<DonationItem, 'id'> & { id: string | 'new' }>({
+  const [currentItem, setCurrentItem] = useState<
+    Omit<DonationItem, 'id'> & { id: string | 'new' }
+  >({
     id: 'new',
     name: '',
     quantity: '',
@@ -61,7 +67,7 @@ function ManualDonationPageInner() {
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
-  
+
   const hasItems = donationItems.length > 0;
 
   useEffect(() => {
@@ -69,12 +75,12 @@ function ManualDonationPageInner() {
     if (editItemId && currentUser) {
       setIsEditMode(true);
       const foundDonation = donations
-        .filter(d => d.id === editItemId && d.donor_id === currentUser.id)
-        .map(d => {
-          const foodItem = foodItems.find(fi => fi.id === d.food_item_id);
+        .filter((d) => d.id === editItemId && d.donor_id === currentUser.id)
+        .map((d) => {
+          const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
           return { ...d, food_item: foodItem! };
         })[0];
-      
+
       if (foundDonation) {
         const { food_item, quantity, id } = foundDonation;
         const currentAllergens = food_item.allergens || [];
@@ -82,7 +88,9 @@ function ManualDonationPageInner() {
           id,
           name: food_item.name,
           quantity: String(quantity).replace(' kg', ''),
-          allergens: Array.isArray(currentAllergens) ? currentAllergens : String(currentAllergens).split(','),
+          allergens: Array.isArray(currentAllergens)
+            ? currentAllergens
+            : String(currentAllergens).split(','),
           description: food_item.description,
           imageUrl: food_item.image_url || undefined,
         });
@@ -97,75 +105,82 @@ function ManualDonationPageInner() {
     if (!name) return [];
 
     // Check if it matches an existing food item
-    const existingFood = foodItems.find(item => 
-      item.name.toLowerCase() === name ||
-      item.name.toLowerCase().includes(name) ||
-      name.includes(item.name.toLowerCase())
+    const existingFood = foodItems.find(
+      (item) =>
+        item.name.toLowerCase() === name ||
+        item.name.toLowerCase().includes(name) ||
+        name.includes(item.name.toLowerCase())
     );
-    
-    if (existingFood && existingFood.allergens && existingFood.allergens.length > 0) {
-      const allergens = Array.isArray(existingFood.allergens) 
-        ? existingFood.allergens 
-        : String(existingFood.allergens).split(',').map(a => a.trim());
+
+    if (
+      existingFood &&
+      existingFood.allergens &&
+      existingFood.allergens.length > 0
+    ) {
+      const allergens = Array.isArray(existingFood.allergens)
+        ? existingFood.allergens
+        : String(existingFood.allergens)
+            .split(',')
+            .map((a) => a.trim());
       // Filter out 'None' if other allergens are present
-      return allergens.filter(a => a.toLowerCase() !== 'none');
+      return allergens.filter((a) => a.toLowerCase() !== 'none');
     }
 
     // Smart pattern matching for common food types
     const allergenSuggestions: { [key: string]: string[] } = {
       // Dairy products
-      'milk': ['Milk'],
-      'cheese': ['Milk'],
-      'butter': ['Milk'],
-      'cream': ['Milk'],
-      'yogurt': ['Milk'],
-      'quark': ['Milk'],
-      
+      milk: ['Milk'],
+      cheese: ['Milk'],
+      butter: ['Milk'],
+      cream: ['Milk'],
+      yogurt: ['Milk'],
+      quark: ['Milk'],
+
       // Gluten/Wheat
-      'bread': ['Wheat'],
-      'pasta': ['Wheat'],
-      'pizza': ['Wheat', 'Milk'],
-      'noodles': ['Wheat'],
-      'flour': ['Wheat'],
-      'sandwich': ['Wheat'],
-      'wrap': ['Wheat'],
-      'pie': ['Wheat', 'Eggs'],
-      'cake': ['Wheat', 'Eggs', 'Milk'],
-      
+      bread: ['Wheat'],
+      pasta: ['Wheat'],
+      pizza: ['Wheat', 'Milk'],
+      noodles: ['Wheat'],
+      flour: ['Wheat'],
+      sandwich: ['Wheat'],
+      wrap: ['Wheat'],
+      pie: ['Wheat', 'Eggs'],
+      cake: ['Wheat', 'Eggs', 'Milk'],
+
       // Fish & seafood
-      'fish': ['Fish'],
-      'salmon': ['Fish'],
-      'tuna': ['Fish'],
-      'cod': ['Fish'],
-      'shrimp': ['Shellfish'],
-      'crab': ['Shellfish'],
-      'lobster': ['Shellfish'],
-      'soup': ['Fish'], // Many soups contain fish stock
-      
+      fish: ['Fish'],
+      salmon: ['Fish'],
+      tuna: ['Fish'],
+      cod: ['Fish'],
+      shrimp: ['Shellfish'],
+      crab: ['Shellfish'],
+      lobster: ['Shellfish'],
+      soup: ['Fish'], // Many soups contain fish stock
+
       // Nuts
-      'nuts': ['Tree nuts'],
-      'almond': ['Tree nuts'],
-      'walnut': ['Tree nuts'],
-      'peanut': ['Peanuts'],
-      'hazelnut': ['Tree nuts'],
-      
+      nuts: ['Tree nuts'],
+      almond: ['Tree nuts'],
+      walnut: ['Tree nuts'],
+      peanut: ['Peanuts'],
+      hazelnut: ['Tree nuts'],
+
       // Eggs
-      'egg': ['Eggs'],
-      'mayonnaise': ['Eggs'],
-      'meatball': ['Eggs', 'Wheat'],
-      
+      egg: ['Eggs'],
+      mayonnaise: ['Eggs'],
+      meatball: ['Eggs', 'Wheat'],
+
       // Soy
-      'tofu': ['Soybeans'],
-      'soy': ['Soybeans'],
-      'miso': ['Soybeans'],
-      'tempeh': ['Soybeans'],
-      
+      tofu: ['Soybeans'],
+      soy: ['Soybeans'],
+      miso: ['Soybeans'],
+      tempeh: ['Soybeans'],
+
       // Vegan options
-      'vegan': ['None'],
-      'plant': ['None'],
-      'vegetable': ['None'],
-      'fruit': ['None'],
-      'salad': name.includes('nut') ? ['Tree nuts'] : [],
+      vegan: ['None'],
+      plant: ['None'],
+      vegetable: ['None'],
+      fruit: ['None'],
+      salad: name.includes('nut') ? ['Tree nuts'] : [],
     };
 
     // Check for pattern matches
@@ -178,17 +193,23 @@ function ManualDonationPageInner() {
     return []; // Default to empty for unrecognized items
   };
 
-  const handleCurrentItemChange = (field: keyof Omit<DonationItem, 'id'>, value: any) => {
-    setCurrentItem(prev => {
+  const handleCurrentItemChange = (
+    field: keyof Omit<DonationItem, 'id'>,
+    value: any
+  ) => {
+    setCurrentItem((prev) => {
       const updated = { ...prev, [field]: value };
-      
+
       // Reset error state when user makes changes to required fields
-      if (hasAttemptedSave && ((field === 'allergens' && value.length > 0) || 
-          (field === 'name' && value.trim()) || 
-          (field === 'quantity' && value.trim()))) {
+      if (
+        hasAttemptedSave &&
+        ((field === 'allergens' && value.length > 0) ||
+          (field === 'name' && value.trim()) ||
+          (field === 'quantity' && value.trim()))
+      ) {
         setHasAttemptedSave(false);
       }
-      
+
       // Auto-suggest allergens only if user hasn't set any allergens yet
       if (field === 'name' && value.trim() && prev.allergens.length === 0) {
         const suggestedAllergens = suggestAllergensForFood(value);
@@ -200,7 +221,7 @@ function ManualDonationPageInner() {
       } else if (field === 'name' && !value.trim()) {
         updated.allergens = []; // Clear allergens if name is cleared
       }
-      
+
       return updated;
     });
   };
@@ -211,12 +232,17 @@ function ManualDonationPageInner() {
 
   const handleSaveItem = async () => {
     setHasAttemptedSave(true);
-    if (!currentItem.name.trim() || !currentItem.quantity.trim() || currentItem.allergens.length === 0) return;
+    if (
+      !currentItem.name.trim() ||
+      !currentItem.quantity.trim() ||
+      currentItem.allergens.length === 0
+    )
+      return;
     setIsSaving(true);
 
     try {
       if (isEditMode && currentItem.id !== 'new') {
-        const donation = donations.find(d => d.id === currentItem.id);
+        const donation = donations.find((d) => d.id === currentItem.id);
         if (!donation) throw new Error('Donation not found');
 
         await updateFoodItem(donation.food_item_id, {
@@ -280,7 +306,7 @@ function ManualDonationPageInner() {
   };
 
   const handleEditItem = (id: string) => {
-    const itemToEdit = donationItems.find(item => item.id === id);
+    const itemToEdit = donationItems.find((item) => item.id === id);
     if (itemToEdit) {
       setCurrentItem({
         ...itemToEdit,
@@ -316,52 +342,88 @@ function ManualDonationPageInner() {
 
   const isFormVisible = !hasItems || showAddAnotherForm;
 
+  // Check if all mandatory fields are filled
+  const isFormValid =
+    currentItem.name.trim() !== '' &&
+    currentItem.quantity.trim() !== '' &&
+    currentItem.allergens.length > 0;
+
   const formContent = (
     <div className="flex flex-col gap-4">
       <div>
-        <label htmlFor="name" className="text-sm font-medium text-gray-700">{t('nameOfFood')}</label>
+        <label htmlFor="name" className="text-sm font-medium text-gray-700">
+          {t('nameOfFood')}
+        </label>
         <Input
           id="name"
           value={currentItem.name}
           onChange={(e) => handleCurrentItemChange('name', e.target.value)}
           placeholder={t('placeholderFoodName')}
-          className={hasAttemptedSave && !currentItem.name ? "border-red-500" : ""}
+          className={
+            hasAttemptedSave && !currentItem.name ? 'border-red-500' : ''
+          }
         />
       </div>
 
       <div>
-        <label htmlFor="quantity" className="text-sm font-medium text-gray-700">{t('quantityKg')}</label>
+        <label htmlFor="quantity" className="text-sm font-medium text-gray-700">
+          {t('quantityKg')}
+        </label>
         <Input
           id="quantity"
           type="number"
           value={currentItem.quantity}
           onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
           placeholder={t('placeholderQuantity')}
-          className={hasAttemptedSave && !currentItem.quantity ? "border-red-500" : ""}
+          className={
+            hasAttemptedSave && !currentItem.quantity ? 'border-red-500' : ''
+          }
         />
       </div>
-      
-        <AllergensDropdown
-          label={t('allergens')}
-          options={['Milk', 'Eggs', 'Fish', 'Shellfish', 'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans']}
-          value={currentItem.allergens}
-          onChange={(allergens) => handleCurrentItemChange('allergens', allergens)}
-          placeholder={t('selectAllergens')}
-          error={undefined}
-        />
 
-        <PhotoUpload
-          onImageUpload={handleImageUpload}
-          uploadedImage={currentItem.imageUrl}
-          hint={t('photosHelpIdentify')}
-        />
+      <AllergensDropdown
+        label={t('allergens')}
+        options={[
+          'Milk',
+          'Eggs',
+          'Fish',
+          'Shellfish',
+          'Tree nuts',
+          'Peanuts',
+          'Wheat',
+          'Soybeans',
+        ]}
+        value={currentItem.allergens}
+        onChange={(allergens) =>
+          handleCurrentItemChange('allergens', allergens)
+        }
+        placeholder={t('selectAllergens')}
+        error={
+          hasAttemptedSave && currentItem.allergens.length === 0
+            ? t('pleaseSelectAllergens')
+            : undefined
+        }
+      />
+
+      <PhotoUpload
+        onImageUpload={handleImageUpload}
+        uploadedImage={currentItem.imageUrl}
+        hint={t('photosHelpIdentify')}
+      />
 
       <div>
-        <label htmlFor="description" className="text-sm font-medium text-gray-700">{t('description')}</label>
+        <label
+          htmlFor="description"
+          className="text-sm font-medium text-gray-700"
+        >
+          {t('description')}
+        </label>
         <Textarea
           id="description"
           value={currentItem.description || ''}
-          onChange={(e) => handleCurrentItemChange('description', e.target.value)}
+          onChange={(e) =>
+            handleCurrentItemChange('description', e.target.value)
+          }
           placeholder={t('placeholderDescription')}
         />
       </div>
@@ -370,39 +432,48 @@ function ManualDonationPageInner() {
 
   return (
     <>
-    <PageContainer
-      header={(
-        <SecondaryNavbar 
-          title={isEditMode ? t('editFoodItem') : t('addFoodItem')} 
-          onBackClick={handleBackClick}
-          backHref="#" // Dummy href, onBackClick will override
-        />
-      )}
-      footer={(
-        <BottomActionBar>
-          {hasItems && !showAddAnotherForm ? (
-            <div className="flex justify-end">
-              <Button onClick={() => router.push('/donate/pickup-slot')}>
-                {t('continue')}
-              </Button>
-            </div>
-          ) : (
-            <div className="flex justify-end">
-              <Button onClick={handleSaveItem} disabled={isSaving}>
-                {isSaving ? t('saving') : (isEditMode ? t('saveChanges') : t('addItem'))}
-              </Button>
-            </div>
-          )}
-        </BottomActionBar>
-      )}
-      className="bg-white"
-      contentClassName="p-4"
-    >
+      <PageContainer
+        header={
+          <SecondaryNavbar
+            title={isEditMode ? t('editFoodItem') : t('addFoodItem')}
+            onBackClick={handleBackClick}
+            backHref="#" // Dummy href, onBackClick will override
+          />
+        }
+        footer={
+          <BottomActionBar>
+            {hasItems && !showAddAnotherForm ? (
+              <div className="flex justify-end">
+                <Button onClick={() => router.push('/donate/pickup-slot')}>
+                  {t('continue')}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleSaveItem}
+                  disabled={isSaving || !isFormValid}
+                >
+                  {isSaving
+                    ? t('saving')
+                    : isEditMode
+                      ? t('saveChanges')
+                      : t('addItem')}
+                </Button>
+              </div>
+            )}
+          </BottomActionBar>
+        }
+        className="bg-white"
+        contentClassName="p-4"
+      >
         {hasItems && !showAddAnotherForm ? (
           <div className="flex flex-col gap-4">
-            <h2 className="text-lg font-semibold">{t('currentItemsInDonation')}</h2>
-            {donationItems.map(item => (
-              <ItemPreview 
+            <h2 className="text-lg font-semibold">
+              {t('currentItemsInDonation')}
+            </h2>
+            {donationItems.map((item) => (
+              <ItemPreview
                 key={item.id}
                 name={item.name}
                 quantity={item.quantity}
@@ -420,18 +491,21 @@ function ManualDonationPageInner() {
               >
                 <span className="flex items-center gap-2 border-b border-interactive pb-1">
                   <PlusIcon size={20} />
-{t('addAnotherItem')}
+                  {t('addAnotherItem')}
                 </span>
               </button>
             </div>
           </div>
         ) : (
           <div>
-            <Progress value={(donationItems.length + 1) * 50} className="mb-4" />
+            <Progress
+              value={(donationItems.length + 1) * 50}
+              className="mb-4"
+            />
             {formContent}
           </div>
         )}
-    </PageContainer>
+      </PageContainer>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent>
@@ -439,10 +513,7 @@ function ManualDonationPageInner() {
             <DialogTitle>{t('changesSaved')}</DialogTitle>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              onClick={() => router.push('/donate')}
-              className="w-full"
-            >
+            <Button onClick={() => router.push('/donate')} className="w-full">
               {t('goBackToDashboard')}
             </Button>
           </DialogFooter>
@@ -461,4 +532,4 @@ function ManualDonationPage() {
   );
 }
 
-export default ManualDonationPage; 
+export default ManualDonationPage;
