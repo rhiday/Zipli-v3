@@ -24,6 +24,13 @@ interface RecurrenceSelectorProps {
   className?: string;
 }
 
+const RECURRENCE_OPTIONS = [
+  { key: 'never', label: 'Does not repeat' },
+  { key: 'daily', label: 'Daily' },
+  { key: 'weekly', label: 'Weekly' },
+  { key: 'custom', label: 'Custom' },
+] as const;
+
 export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
   value,
   onChange,
@@ -32,17 +39,7 @@ export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
   const { t } = useLanguage();
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
 
-  // Ensure value has a valid type
-  const safeValue = value || { type: 'never' };
-
-  const recurrenceOptions = [
-    { type: 'never' as const, label: t('doesNotRepeat') || 'Does not repeat' },
-    { type: 'daily' as const, label: t('daily') || 'Daily' },
-    { type: 'weekly' as const, label: t('weekly') || 'Weekly' },
-    { type: 'custom' as const, label: t('custom') || 'Custom...' },
-  ];
-
-  const handleRecurrenceTypeChange = (type: RecurrencePattern['type']) => {
+  const handleOptionSelect = (type: RecurrencePattern['type']) => {
     if (type === 'custom') {
       setIsCustomModalOpen(true);
       return;
@@ -51,7 +48,8 @@ export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
     const newPattern: RecurrencePattern = { type };
 
     if (type === 'weekly') {
-      newPattern.weeklyDays = [1]; // Default to Monday
+      // Default to Monday if switching to weekly
+      newPattern.weeklyDays = value.weeklyDays?.length ? value.weeklyDays : [1];
     }
 
     onChange(newPattern);
@@ -59,81 +57,138 @@ export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
 
   const handleWeeklyDaysChange = (days: number[]) => {
     onChange({
-      ...safeValue,
+      ...value,
       weeklyDays: days,
     });
   };
 
-  const handleCustomPatternSave = (
+  const handleCustomPattern = (
     customPattern: RecurrencePattern['customPattern']
   ) => {
     onChange({
       type: 'custom',
       customPattern,
     });
+    setIsCustomModalOpen(false);
   };
 
-  const getCustomPatternSummary = () => {
-    if (!safeValue.customPattern) return '';
+  const getDisplayText = () => {
+    switch (value.type) {
+      case 'never':
+        return t('doesNotRepeat') || 'Does not repeat';
+      case 'daily':
+        return t('daily') || 'Daily';
+      case 'weekly':
+        if (value.weeklyDays?.length) {
+          const dayNames = value.weeklyDays.map((dayIndex) => {
+            const dayMap = {
+              0: 'sunday',
+              1: 'monday',
+              2: 'tuesday',
+              3: 'wednesday',
+              4: 'thursday',
+              5: 'friday',
+              6: 'saturday',
+            };
+            return (
+              t(dayMap[dayIndex as keyof typeof dayMap] as any) ||
+              dayMap[dayIndex as keyof typeof dayMap]
+            );
+          });
+          return `${t('weekly') || 'Weekly'} (${dayNames.join(', ')})`;
+        }
+        return t('weekly') || 'Weekly';
+      case 'custom':
+        if (value.customPattern) {
+          const { frequency, unit, endType } = value.customPattern;
+          const unitText =
+            frequency === 1
+              ? unit === 'days'
+                ? t('day') || 'day'
+                : t('week') || 'week'
+              : unit === 'days'
+                ? t('days') || 'days'
+                : t('weeks') || 'weeks';
 
-    const { frequency, unit, endType, endDate, maxOccurrences } =
-      safeValue.customPattern;
+          let baseText = `${t('every') || 'Every'} ${frequency} ${unitText}`;
 
-    let summary = t('every') || 'Every';
-    summary += ` ${frequency} ${
-      frequency === 1
-        ? unit === 'days'
-          ? t('day')
-          : t('week')
-        : unit === 'days'
-          ? t('days')
-          : t('weeks')
-    }`;
+          if (endType === 'date' && value.customPattern.endDate) {
+            baseText += ` ${t('until') || 'until'} ${value.customPattern.endDate}`;
+          } else if (
+            endType === 'occurrences' &&
+            value.customPattern.maxOccurrences
+          ) {
+            baseText += ` (${value.customPattern.maxOccurrences} ${t('times') || 'times'})`;
+          }
 
-    if (endType === 'date' && endDate) {
-      summary += `, ${t('until') || 'until'} ${new Date(endDate).toLocaleDateString()}`;
-    } else if (endType === 'occurrences' && maxOccurrences) {
-      summary += `, ${maxOccurrences} ${t('times') || 'times'}`;
+          return baseText;
+        }
+        return t('custom') || 'Custom';
+      default:
+        return t('doesNotRepeat') || 'Does not repeat';
     }
-
-    return summary;
   };
 
   return (
     <div className={cn('space-y-4', className)}>
-      {/* Recurrence Type Options */}
+      {/* Main Options */}
       <div className="space-y-2">
-        {recurrenceOptions.map((option) => (
-          <label
-            key={option.type}
-            className="flex items-center gap-3 cursor-pointer"
+        {RECURRENCE_OPTIONS.map((option) => (
+          <button
+            key={option.key}
+            type="button"
+            onClick={() => handleOptionSelect(option.key)}
+            className={cn(
+              'w-full flex items-center justify-between p-3 rounded-[12px] border text-left transition-all duration-200',
+              'focus:outline-none focus:ring-2 focus:ring-interactive focus:ring-offset-2',
+              value.type === option.key
+                ? 'bg-[#F5F9EF] border-interactive text-interactive'
+                : 'bg-base border-border text-primary hover:bg-cloud hover:border-interactive'
+            )}
           >
-            <input
-              type="radio"
-              name="recurrenceType"
-              checked={safeValue.type === option.type}
-              onChange={() => handleRecurrenceTypeChange(option.type)}
-              className="w-4 h-4 text-interactive border-border focus:ring-interactive focus:ring-2"
-            />
-            <span className="text-bodyLg">
-              {option.label}
-              {option.type === 'custom' && safeValue.type === 'custom' && (
-                <span className="text-secondary text-body ml-2">
-                  ({getCustomPatternSummary()})
-                </span>
-              )}
+            <span className="font-medium">
+              {option.key === 'never' && (t('doesNotRepeat') || option.label)}
+              {option.key === 'daily' && (t('daily') || option.label)}
+              {option.key === 'weekly' && (t('weekly') || option.label)}
+              {option.key === 'custom' && (t('custom') || option.label)}
             </span>
-          </label>
+
+            {value.type === option.key && (
+              <div className="flex items-center justify-center w-5 h-5 rounded-full bg-interactive">
+                <svg
+                  className="w-3 h-3 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+            )}
+          </button>
         ))}
       </div>
 
       {/* Weekly Day Selector */}
-      {safeValue.type === 'weekly' && (
-        <div className="mt-6 p-4 bg-cloud rounded-md border">
+      {value.type === 'weekly' && (
+        <div className="pt-2">
           <WeeklyDaySelector
-            selectedDays={safeValue.weeklyDays || []}
+            selectedDays={value.weeklyDays || []}
             onChange={handleWeeklyDaysChange}
           />
+        </div>
+      )}
+
+      {/* Current Selection Summary */}
+      {value.type !== 'never' && (
+        <div className="p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+          <p className="text-sm text-secondary mb-1">
+            {t('recurrencePattern') || 'Recurrence pattern'}:
+          </p>
+          <p className="font-medium text-interactive">{getDisplayText()}</p>
         </div>
       )}
 
@@ -141,8 +196,8 @@ export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
       <CustomRecurrenceModal
         isOpen={isCustomModalOpen}
         onClose={() => setIsCustomModalOpen(false)}
-        onSave={handleCustomPatternSave}
-        initialPattern={safeValue.customPattern}
+        onSave={handleCustomPattern}
+        initialPattern={value.customPattern}
       />
     </div>
   );
