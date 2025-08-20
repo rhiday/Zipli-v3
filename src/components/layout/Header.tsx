@@ -31,73 +31,65 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const router = useRouter();
   const { t } = useLanguage();
 
-  // Get activity items based on user role
+  // Get activity items - show both donations and requests for all users
   const activityItems = React.useMemo(() => {
     if (!isInitialized || !currentUser) return [];
 
-    if (currentUser.role === 'food_donor') {
-      // Get donations for donors
-      return allDonations
-        .filter(
-          (d) =>
-            d.donor_id === currentUser.id &&
-            (d.status === 'available' || d.status === 'claimed')
-        )
-        .slice()
-        .sort((a, b) => {
-          // Fallback to pickup_time if created_at is not available (for existing donations)
-          const aTime = a.created_at
-            ? new Date(a.created_at).getTime()
-            : a.pickup_time
-              ? new Date(a.pickup_time).getTime()
-              : 0;
-          const bTime = b.created_at
-            ? new Date(b.created_at).getTime()
-            : b.pickup_time
-              ? new Date(b.pickup_time).getTime()
-              : 0;
-          return bTime - aTime;
-        })
-        .map((d) => {
-          const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
-          return {
-            id: d.id,
-            quantity: d.quantity,
-            name: foodItem?.name || 'Unknown Item',
-            created_at: d.created_at,
-            type: 'donation' as const,
-          };
-        });
-    } else if (currentUser.role === 'food_receiver') {
-      // Get requests for receivers
-      const allRequests = getAllRequests();
-      return allRequests
-        .filter((r) => r.user_id === currentUser.id && r.status === 'active')
-        .slice()
-        .sort((a, b) => {
-          const aTime = new Date(a.created_at).getTime();
-          const bTime = new Date(b.created_at).getTime();
-          return bTime - aTime;
-        })
-        .map((r) => {
-          // Parse request description for clean display
-          const parseRequestName = (desc: string) => {
-            const parts = desc.split(' | ');
-            const mainPart = parts[0] || desc; // "Request for 3 portions - Vegan"
-            return mainPart.replace('Request for ', ''); // Clean up to just "3 portions - Vegan"
-          };
+    const items: Array<{
+      id: string;
+      quantity: number;
+      name: string;
+      created_at: string;
+      type: 'donation' | 'request';
+    }> = [];
 
-          return {
-            id: r.id,
-            quantity: r.people_count,
-            name: parseRequestName(r.description),
-            created_at: r.created_at,
-            type: 'request' as const,
-          };
-        });
-    }
+    // Get user's donations (if any)
+    const userDonations = allDonations
+      .filter(
+        (d) =>
+          d.donor_id === currentUser.id &&
+          (d.status === 'available' || d.status === 'claimed')
+      )
+      .map((d) => {
+        const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
+        return {
+          id: d.id,
+          quantity: d.quantity,
+          name: foodItem?.name || 'Unknown Item',
+          created_at: d.created_at || d.pickup_time || new Date().toISOString(),
+          type: 'donation' as const,
+        };
+      });
 
-    return [];
+    // Get user's requests (if any)
+    const allRequests = getAllRequests();
+    const userRequests = allRequests
+      .filter((r) => r.user_id === currentUser.id && r.status === 'active')
+      .map((r) => {
+        // Parse request description for clean display
+        const parseRequestName = (desc: string) => {
+          const parts = desc.split(' | ');
+          const mainPart = parts[0] || desc; // "Request for 3 portions - Vegan"
+          return mainPart.replace('Request for ', ''); // Clean up to just "3 portions - Vegan"
+        };
+
+        return {
+          id: r.id,
+          quantity: r.people_count,
+          name: parseRequestName(r.description),
+          created_at: r.created_at,
+          type: 'request' as const,
+        };
+      });
+
+    // Combine and sort by creation date
+    items.push(...userDonations, ...userRequests);
+
+    return items.sort((a, b) => {
+      const aTime = new Date(a.created_at).getTime();
+      const bTime = new Date(b.created_at).getTime();
+      return bTime - aTime; // Most recent first
+    });
   }, [isInitialized, currentUser, allDonations, foodItems, getAllRequests]);
 
   // Debug: log the creation time order
