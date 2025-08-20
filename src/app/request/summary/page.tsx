@@ -94,20 +94,16 @@ export default function RequestSummaryPage() {
       }
 
       // Create the request in the database
+      // Note: Only including fields that exist in current database schema
       const requestPayload = {
         user_id: currentUser.id,
-        description: `Request for ${requestData.quantity} portions - ${requestData.allergens.join(', ')}`,
+        description: `Request for ${requestData.quantity} portions - ${requestData.allergens.join(', ')} | Address: ${address.trim()} | Instructions: ${instructions.trim() || 'None'} | Period: ${requestData.startDate} to ${requestData.endDate} | Recurrence: ${JSON.stringify(requestData.recurrencePattern)}`,
         people_count: parseInt(requestData.quantity) || 1,
-        start_date: requestData.startDate,
-        end_date: requestData.endDate,
         pickup_date: requestData.pickupDate,
         pickup_start_time: requestData.startTime,
         pickup_end_time: requestData.endTime,
         status: 'active' as const,
         is_recurring: requestData.recurrencePattern.type !== 'never',
-        recurrence_pattern: JSON.stringify(requestData.recurrencePattern),
-        address: address.trim(),
-        instructions: instructions.trim(),
       };
 
       console.log('Submitting request with payload:', requestPayload);
