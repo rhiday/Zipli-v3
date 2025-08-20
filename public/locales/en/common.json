@@ -79,12 +79,12 @@
   "englishLabel": "English",
   "enterQuantity": "Enter quantity",
   "enterYourFullAddress": "Enter your full address",
-  "environmentalAndSocialImpactData": "Click above to access more data for reporting and operation planning.",
+  "environmentalAndSocialImpactData": "Data on your financial, social and environmental impact helps with reporting, communicating and operation planning.",
   "error": "Error",
   "errorDetails": "Error details (development only)",
   "explore": "Explore",
   "exploreAvailableDonations": "Explore available listings",
-  "exportToPdf": "More impact data",
+  "exportToPdf": "Check out more impact data",
   "fieldRequired": "This field is required",
   "finish": "Finish",
   "finnish": "Finnish",
@@ -223,7 +223,7 @@
   "today": "Today",
   "tomorrow": "Tomorrow",
   "totalDonations": "Amount of listings (total)",
-  "totalFoodOffered": "Amount of food on the listing day",
+  "totalFoodOffered": "total weight of food in your latest food listing",
   "trackDonationStatus": "Track status of listings",
   "tryAgain": "Try Again",
   "typeDonationManually": "Type listing details manually",
@@ -244,5 +244,5 @@
   "whenDoYouNeed": "When do you need",
   "yesRemove": "Yes, remove",
   "yourActiveDonations": "Your active listings",
-  "yourImpact": "Your actions are making a difference! The impact of your latest activities:"
+  "yourImpact": "Your actions are making a difference! \\nThis is the impact of your latest activity:"
 }

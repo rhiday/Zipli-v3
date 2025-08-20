@@ -79,12 +79,12 @@
   "englishLabel": "English",
   "enterQuantity": "Syötä määrä",
   "enterYourFullAddress": "Syötä koko osoitteesi",
-  "environmentalAndSocialImpactData": "Siirry tarkastelemaan dataa luomastasi vaikuttavuudesta raportointia ja toiminnan suunnittelua varten.",
+  "environmentalAndSocialImpactData": "Keräämämme vaikuttavuusdata auttaa raportoimaan, viestimään ja suunnittelemaan toimintaa entistä paremmin.",
   "error": "Virhe",
   "errorDetails": "Virheen tiedot (vain kehityksessä)",
   "explore": "Tutki",
   "exploreAvailableDonations": "Tutki aktiivisia ilmoituksia",
-  "exportToPdf": "Lisää vaikuttavuusdataa",
+  "exportToPdf": "Täältä näet lisää vaikuttavuusdataa",
   "fieldRequired": "Tämä kenttä on pakollinen",
   "finish": "Valmis",
   "finnish": "Suomi",
@@ -223,7 +223,7 @@
   "today": "Tänään",
   "tomorrow": "Huomenna",
   "totalDonations": "Ilmoitusten määrä (yhteensä)",
-  "totalFoodOffered": "Ruuan määrä ilmoituspäivänä",
+  "totalFoodOffered": "viimeisimmän ilmoituksesi yhteenlaskettu kilomäärä",
   "trackDonationStatus": "Seuraa ilmoitusten tilaa",
   "tryAgain": "Yritä uudelleen",
   "typeDonationManually": "Syötä ilmoituksen tiedot käsin",
@@ -244,5 +244,5 @@
   "whenDoYouNeed": "Milloin tarvitset",
   "yesRemove": "Kyllä, poista",
   "yourActiveDonations": "Aktiiviset ilmoituksesi",
-  "yourImpact": "Teoillasi on aitoa merkitystä! Viimeisimpien aktiviteettiesi vaikutus:"
+  "yourImpact": "Teoillasi on aitoa merkitystä! \\nTässä viimeisimmän toimintasi vaikuttavuus:"
 }

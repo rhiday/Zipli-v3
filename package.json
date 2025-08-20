@@ -25,7 +25,10 @@
     "validate": "npm run type-check && npm run lint && npm run test",
     "build:analyze": "ANALYZE=true npm run build",
     "build:check": "npm run build && npm run start",
-    "clean": "rm -rf .next node_modules/.cache"
+    "clean": "rm -rf .next node_modules/.cache",
+    "lokalise:pull": "node scripts/lokalise-sync.js pull",
+    "lokalise:push": "node scripts/lokalise-sync.js push",
+    "lokalise:sync": "node scripts/lokalise-sync.js sync"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
