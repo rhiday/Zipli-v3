@@ -100,6 +100,10 @@ export default function PickupSlotPage() {
 
   const handleDeleteSlot = (id: string) => {
     deletePickupSlot(id);
+    // If this was the last pickup slot, show the add form
+    if (pickupSlots.length === 1) {
+      setShowAddForm(true);
+    }
   };
 
   const handleEditSlot = (id: string) => {
@@ -167,7 +171,8 @@ export default function PickupSlotPage() {
               onClick={handleSubmitDonation}
               disabled={
                 pickupSlots.length === 0 &&
-                (!currentSlot.date ||
+                (!showAddForm ||
+                  !currentSlot.date ||
                   !currentSlot.startTime ||
                   !currentSlot.endTime)
               }
@@ -240,6 +245,19 @@ export default function PickupSlotPage() {
           ))}
         </div>
 
+        {/* Show "Add pickup slot" button when no slots exist and form is not shown */}
+        {pickupSlots.length === 0 && !showAddForm && (
+          <div className="flex justify-center mt-6">
+            <Button
+              onClick={handleAddTimeSlotClick}
+              variant="secondary"
+              className="text-interactive border-interactive hover:bg-[#eafcd6]"
+            >
+              {t('addPickupSlot')}
+            </Button>
+          </div>
+        )}
+
         {showAddForm && (
           <div className="flex flex-col gap-6">
             {(pickupSlots.length > 0 || currentSlot.id !== 'new') && (
@@ -282,6 +300,7 @@ export default function PickupSlotPage() {
                 >
                   <Calendar
                     mode="single"
+                    weekStartsOn={1}
                     selected={currentSlot.date}
                     onSelect={(date) => handleCurrentSlotChange('date', date)}
                     initialFocus

@@ -121,6 +121,7 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
           >
             <Calendar
               mode="single"
+              weekStartsOn={1}
               selected={date}
               onSelect={(selectedDate) => {
                 onDateChange?.(selectedDate);

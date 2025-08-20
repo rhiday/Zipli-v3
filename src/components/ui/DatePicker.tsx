@@ -97,6 +97,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         >
           <Calendar
             mode="single"
+            weekStartsOn={1}
             selected={date}
             onSelect={(selectedDate) => {
               onDateChange?.(selectedDate);
