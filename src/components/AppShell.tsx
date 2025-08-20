@@ -11,7 +11,7 @@ interface AppShellProps {
 
 const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const pathname = usePathname();
-  const init = useDatabase(state => state.init);
+  const init = useDatabase((state) => state.init);
 
   // Initialize store for all routes (auth routes need it too for DevLoginSwitcher)
   useEffect(() => {
@@ -21,15 +21,17 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
 
-  // Hides bottom nav on all pages within the donation creation flow.
-  const donationFlowRegex =
-    /^\/donate\/(new|manual|pickup-slot|summary|thank-you|detail|[^/]+\/handover-confirm)/;
-  const hideBottomNav = donationFlowRegex.test(pathname);
+  // Hides bottom nav on all pages within the donation and request creation flows.
+  const flowRegex =
+    /^\/(donate|request)\/(new|manual|pickup-slot|summary|thank-you|success|detail|[^/]+\/handover-confirm)/;
+  const hideBottomNav = flowRegex.test(pathname);
 
   return (
     <AuthProvider>
       {isAuthRoute ? (
-        <> {/* No shell for auth routes but still need store init */}
+        <>
+          {' '}
+          {/* No shell for auth routes but still need store init */}
           {children}
         </>
       ) : (
@@ -37,9 +39,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
         <div className="min-h-screen bg-cream">
           <div className="relative mx-auto flex h-screen w-full max-w-lg flex-col bg-base shadow-lg">
             {/* Main content container */}
-            <main className={`flex-grow overflow-y-auto ${!hideBottomNav ? 'pb-[76px]' : ''}`}>
-              {children}
-            </main>
+            <main className="flex-grow overflow-y-auto">{children}</main>
             {/* BottomNav is now part of this container and positioned absolutely */}
             {!hideBottomNav && <BottomNav />}
           </div>
@@ -49,4 +49,4 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
   );
 };
 
-export default AppShell; 
+export default AppShell;
