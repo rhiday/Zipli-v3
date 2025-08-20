@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
-  const login = useDatabase(state => state.login);
+  const login = useDatabase((state) => state.login);
   const { t } = useLanguage();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -26,7 +26,7 @@ export default function LoginPage() {
 
     try {
       const response = await login(email, password);
-      
+
       if (response.error) {
         setError(response.error);
         setLoading(false);
@@ -35,23 +35,25 @@ export default function LoginPage() {
 
       if (response.data) {
         const user = response.data;
-        
+
         // Small delay to ensure store state is updated before redirect
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Redirect based on role
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // Redirect based on role - always to user's own dashboard
         switch (user.role) {
           case 'food_donor':
             router.push('/donate');
             break;
           case 'food_receiver':
-            router.push('/feed');
+            router.push('/receiver/dashboard');
             break;
           case 'city':
             router.push('/dashboard');
             break;
           default:
-            console.warn(`Unknown user role: ${user.role}, redirecting to generic dashboard.`);
+            console.warn(
+              `Unknown user role: ${user.role}, redirecting to generic dashboard.`
+            );
             router.push('/dashboard');
         }
       }
@@ -68,7 +70,9 @@ export default function LoginPage() {
           <LanguageSwitcher />
         </div>
         <div className="text-center">
-          <h1 className="text-titleSm font-display text-primary">{t('welcomeBack')}</h1>
+          <h1 className="text-titleSm font-display text-primary">
+            {t('welcomeBack')}
+          </h1>
           <p className="mt-2 text-body text-primary-75">
             {t('signInToAccount')}
           </p>
@@ -82,7 +86,10 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="email"
+              className="block text-label font-medium text-primary mb-1"
+            >
               {t('emailAddress')}
             </label>
             <Input
@@ -97,7 +104,10 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="password"
+              className="block text-label font-medium text-primary mb-1"
+            >
               {t('password')}
             </label>
             <Input
@@ -121,7 +131,10 @@ export default function LoginPage() {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 rounded border-border text-primary focus:ring-primary/50"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-body text-primary">
+              <label
+                htmlFor="remember-me"
+                className="ml-2 block text-body text-primary"
+              >
                 {t('rememberMe')}
               </label>
             </div>
@@ -159,7 +172,6 @@ export default function LoginPage() {
           </Link>
         </div>
       </div>
-
     </div>
   );
-} 
+}

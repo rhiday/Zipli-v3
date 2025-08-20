@@ -79,13 +79,22 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           const bTime = new Date(b.created_at).getTime();
           return bTime - aTime;
         })
-        .map((r) => ({
-          id: r.id,
-          quantity: r.people_count,
-          name: r.description,
-          created_at: r.created_at,
-          type: 'request' as const,
-        }));
+        .map((r) => {
+          // Parse request description for clean display
+          const parseRequestName = (desc: string) => {
+            const parts = desc.split(' | ');
+            const mainPart = parts[0] || desc; // "Request for 3 portions - Vegan"
+            return mainPart.replace('Request for ', ''); // Clean up to just "3 portions - Vegan"
+          };
+
+          return {
+            id: r.id,
+            quantity: r.people_count,
+            name: parseRequestName(r.description),
+            created_at: r.created_at,
+            type: 'request' as const,
+          };
+        });
     }
 
     return [];
