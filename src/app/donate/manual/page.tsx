@@ -445,7 +445,7 @@ function ManualDonationPageInner() {
         placeholder={t('selectAllergens')}
         error={
           hasAttemptedSave && currentItem.allergens.length === 0
-            ? t('pleaseSelectAllergens')
+            ? t('fieldRequired')
             : undefined
         }
       />
