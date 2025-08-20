@@ -41,13 +41,12 @@ export default function DonationThankYouPage() {
       </div>
       <h1 className="text-3xl font-bold mb-4 text-center">
         {isEditMode
-          ? t('donationUpdated') || 'Donation Updated!'
+          ? t('changesSaved') || 'Donation Updated!'
           : t('donationCreated') || 'Thank you!'}
       </h1>
       <p className="text-center text-base text-black mb-6 max-w-xs">
         {isEditMode
-          ? t('donationUpdateDescription') ||
-            'Your donation has been successfully updated.'
+          ? t('changesSaved') || 'Your donation has been successfully updated.'
           : t('thisIsWhomYouveHelped')}
       </p>
 
@@ -58,13 +57,13 @@ export default function DonationThankYouPage() {
             isEditMode
               ? [
                   {
-                    title: t('donationUpdated') || 'Donation Updated',
+                    title: t('changesSaved') || 'Donation Updated',
                     description:
-                      t('changesHaveBeenSaved') ||
+                      t('changesSaved') ||
                       'Your changes have been saved successfully.',
                   },
                   {
-                    title: t('matchingContinues') || 'Matching Continues',
+                    title: t('matchingInProgress') || 'Matching Continues',
                     description: t('lookingForMatches'),
                   },
                   {
