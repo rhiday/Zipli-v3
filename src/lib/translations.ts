@@ -261,7 +261,7 @@ export const translations = {
     yesRemove: 'Yes, remove',
     yourActiveDonations: 'Your active listings',
     yourImpact:
-      'Your actions are making a difference! \\nThis is the impact of your latest activity:',
+      'Your actions are making a difference!\nThis is the impact of your latest activity:',
     // Missing keys that were lost during sync
     fullNameLabel: 'Full Name',
     contactRequester: 'Contact Requester',
@@ -557,7 +557,7 @@ export const translations = {
     yesRemove: 'Kyllä, poista',
     yourActiveDonations: 'Aktiiviset ilmoituksesi',
     yourImpact:
-      'Teoillasi on aitoa merkitystä! \\nTässä viimeisimmän toimintasi vaikuttavuus:',
+      'Teoillasi on aitoa merkitystä!\nTässä viimeisimmän toimintasi vaikuttavuus:',
     // Missing keys that were lost during sync
     fullNameLabel: 'Koko nimi',
     contactRequester: 'Ota yhteyttä pyytäjään',
