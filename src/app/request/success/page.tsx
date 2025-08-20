@@ -50,9 +50,9 @@ export default function RequestSuccessPage() {
           ]}
         />
       </div>
-      <Link href="/feed">
+      <Link href="/receiver/dashboard">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-          {t('exploreAvailableDonations')}
+          {t('goBackToDashboard')}
         </button>
       </Link>
     </div>

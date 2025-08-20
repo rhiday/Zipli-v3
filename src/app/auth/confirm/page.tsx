@@ -14,7 +14,7 @@ function ConfirmPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
-  const verifyOtp = useDatabase(state => state.verifyOtp);
+  const verifyOtp = useDatabase((state) => state.verifyOtp);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ function ConfirmPageContent() {
 
     try {
       const response = await verifyOtp(email, verificationCode, 'signup');
-      
+
       if (response.error) {
         setError(response.error);
         setLoading(false);
@@ -44,7 +44,7 @@ function ConfirmPageContent() {
             router.push('/donate');
             break;
           case 'food_receiver':
-            router.push('/feed');
+            router.push('/receiver/dashboard');
             break;
           case 'city':
             router.push('/dashboard');
@@ -63,9 +63,12 @@ function ConfirmPageContent() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-titleSm font-display text-primary">Verify your email</h1>
+          <h1 className="text-titleSm font-display text-primary">
+            Verify your email
+          </h1>
           <p className="mt-2 text-body text-primary-75">
-            We've sent a verification code to {email}. Enter it below to complete your registration.
+            We've sent a verification code to {email}. Enter it below to
+            complete your registration.
           </p>
         </div>
 
@@ -77,7 +80,10 @@ function ConfirmPageContent() {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="verificationCode" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="verificationCode"
+              className="block text-label font-medium text-primary mb-1"
+            >
               Verification code
             </label>
             <Input
@@ -106,9 +112,7 @@ function ConfirmPageContent() {
         </form>
 
         <div className="text-center text-body">
-          <p className="text-primary-75 mb-2">
-            Didn't receive the code?
-          </p>
+          <p className="text-primary-75 mb-2">Didn't receive the code?</p>
           <button
             type="button"
             className="font-medium text-earth hover:text-primary"
@@ -136,17 +140,19 @@ function ConfirmPageContent() {
 
 export default function ConfirmPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
-        <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-body text-primary-75">Loading...</p>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+          <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-body text-primary-75">Loading...</p>
+            </div>
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <ConfirmPageContent />
     </Suspense>
   );
-} 
+}

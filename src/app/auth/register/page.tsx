@@ -17,15 +17,15 @@ export default function RegisterPage() {
     organizationName: '',
     contactNumber: '',
     address: '',
-    role: 'food_donor' as 'food_donor' | 'food_receiver' | 'city' | 'terminals'
+    role: 'food_donor' as 'food_donor' | 'food_receiver' | 'city' | 'terminals',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const register = useDatabase(state => state.register);
+  const register = useDatabase((state) => state.register);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,7 +69,7 @@ export default function RegisterPage() {
             router.push('/donate');
             break;
           case 'food_receiver':
-            router.push('/feed');
+            router.push('/receiver/dashboard');
             break;
           case 'city':
             router.push('/dashboard');
@@ -88,7 +88,9 @@ export default function RegisterPage() {
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-titleSm font-display text-primary">Create your account</h1>
+          <h1 className="text-titleSm font-display text-primary">
+            Create your account
+          </h1>
           <p className="mt-2 text-body text-primary-75">
             Join Zipli to start sharing food
           </p>
@@ -102,7 +104,10 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="email"
+              className="block text-label font-medium text-primary mb-1"
+            >
               Email address *
             </label>
             <Input
@@ -117,7 +122,10 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="fullName" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="fullName"
+              className="block text-label font-medium text-primary mb-1"
+            >
               Full name *
             </label>
             <Input
@@ -131,7 +139,10 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="role" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="role"
+              className="block text-label font-medium text-primary mb-1"
+            >
               I am a *
             </label>
             <Select
@@ -146,7 +157,10 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="organizationName" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="organizationName"
+              className="block text-label font-medium text-primary mb-1"
+            >
               Organization name
             </label>
             <Input
@@ -154,12 +168,17 @@ export default function RegisterPage() {
               name="organizationName"
               type="text"
               value={formData.organizationName}
-              onChange={(e) => handleInputChange('organizationName', e.target.value)}
+              onChange={(e) =>
+                handleInputChange('organizationName', e.target.value)
+              }
             />
           </div>
 
           <div>
-            <label htmlFor="contactNumber" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="contactNumber"
+              className="block text-label font-medium text-primary mb-1"
+            >
               Contact number
             </label>
             <Input
@@ -167,12 +186,17 @@ export default function RegisterPage() {
               name="contactNumber"
               type="tel"
               value={formData.contactNumber}
-              onChange={(e) => handleInputChange('contactNumber', e.target.value)}
+              onChange={(e) =>
+                handleInputChange('contactNumber', e.target.value)
+              }
             />
           </div>
 
           <div>
-            <label htmlFor="address" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="address"
+              className="block text-label font-medium text-primary mb-1"
+            >
               Address
             </label>
             <Input
@@ -185,7 +209,10 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="password"
+              className="block text-label font-medium text-primary mb-1"
+            >
               Password *
             </label>
             <Input
@@ -200,7 +227,10 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-label font-medium text-primary mb-1">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-label font-medium text-primary mb-1"
+            >
               Confirm password *
             </label>
             <Input
@@ -210,7 +240,9 @@ export default function RegisterPage() {
               autoComplete="new-password"
               required
               value={formData.confirmPassword}
-              onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+              onChange={(e) =>
+                handleInputChange('confirmPassword', e.target.value)
+              }
             />
           </div>
 
@@ -239,4 +271,4 @@ export default function RegisterPage() {
       </div>
     </div>
   );
-} 
+}

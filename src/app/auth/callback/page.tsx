@@ -11,7 +11,7 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       const { data, error } = await supabase.auth.getSession();
-      
+
       // Process the callback
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const accessToken = hashParams.get('access_token');
@@ -45,14 +45,16 @@ export default function AuthCallback() {
               router.push('/donate');
               break;
             case 'food_receiver':
-              router.push('/feed');
+              router.push('/receiver/dashboard');
               break;
             case 'terminals':
             case 'city':
               router.push('/dashboard');
               break;
             default:
-              console.warn(`Unknown user role: ${profile.role}, redirecting to generic dashboard.`);
+              console.warn(
+                `Unknown user role: ${profile.role}, redirecting to generic dashboard.`
+              );
               router.push('/dashboard');
           }
           return;
@@ -79,4 +81,4 @@ export default function AuthCallback() {
       </div>
     </div>
   );
-} 
+}
