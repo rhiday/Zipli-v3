@@ -3,7 +3,14 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { ArrowLeft, ShoppingBag, MapPin, Plus, Edit, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  ShoppingBag,
+  MapPin,
+  Plus,
+  Edit,
+  Trash2,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Tag from '@/components/ui/Tag';
@@ -21,17 +28,25 @@ import {
 } from '@/components/ui/dialog';
 import { useDatabase, DonationWithFoodItem } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useDonationStore } from '@/store/donation';
 
-export default function DonationDetailPage({ params }: { params: { id: string } }) {
+export default function DonationDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const { t } = useLanguage();
-  const currentUser = useDatabase(state => state.currentUser);
+  const currentUser = useDatabase((state) => state.currentUser);
   const router = useRouter();
-  const donations = useDatabase(state => state.donations);
-  const foodItems = useDatabase(state => state.foodItems);
-  const users = useDatabase(state => state.users);
-  const deleteDonation = useDatabase(state => state.deleteDonation);
+  const donations = useDatabase((state) => state.donations);
+  const foodItems = useDatabase((state) => state.foodItems);
+  const users = useDatabase((state) => state.users);
+  const deleteDonation = useDatabase((state) => state.deleteDonation);
+  const { setEditMode, clearDonation } = useDonationStore();
   const [donation, setDonation] = useState<DonationWithFoodItem | null>(null);
-  const [otherDonations, setOtherDonations] = useState<DonationWithFoodItem[]>([]);
+  const [otherDonations, setOtherDonations] = useState<DonationWithFoodItem[]>(
+    []
+  );
   const [totalDonations, setTotalDonations] = useState(0);
   const [donorDisplayName, setDonorDisplayName] = useState<string>('');
   const [isOwner, setIsOwner] = useState(false);
@@ -43,25 +58,35 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
   useEffect(() => {
     if (params.id) {
       // Find the donation by ID (regardless of owner)
-      const mainDonation = donations.find(d => d.id === params.id);
+      const mainDonation = donations.find((d) => d.id === params.id);
 
       if (mainDonation) {
-        const foodItem = foodItems.find(fi => fi.id === mainDonation.food_item_id);
+        const foodItem = foodItems.find(
+          (fi) => fi.id === mainDonation.food_item_id
+        );
         if (foodItem) {
           setDonation({ ...mainDonation, food_item: foodItem });
-          
+
           // Check if current user is the owner
-          const userIsOwner = currentUser && mainDonation.donor_id === currentUser.id;
+          const userIsOwner =
+            currentUser && mainDonation.donor_id === currentUser.id;
           setIsOwner(!!userIsOwner);
 
           // Resolve donor information and other donations for this donor (viewer-agnostic)
-          const donor = users.find(u => u.id === mainDonation.donor_id);
-          setDonorDisplayName(donor?.full_name || donor?.organization_name || '');
+          const donor = users.find((u) => u.id === mainDonation.donor_id);
+          setDonorDisplayName(
+            donor?.full_name || donor?.organization_name || ''
+          );
 
-          const donorDonations = donations.filter(d => d.donor_id === mainDonation.donor_id);
+          const donorDonations = donations.filter(
+            (d) => d.donor_id === mainDonation.donor_id
+          );
           const otherDons = donorDonations
-            .filter(d => d.id !== params.id)
-            .map(d => ({ ...d, food_item: foodItems.find(fi => fi.id === d.food_item_id)! }))
+            .filter((d) => d.id !== params.id)
+            .map((d) => ({
+              ...d,
+              food_item: foodItems.find((fi) => fi.id === d.food_item_id)!,
+            }))
             .slice(0, 4);
           setOtherDonations(otherDons);
           setTotalDonations(donorDonations.length);
@@ -75,6 +100,14 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
     if (!donation) return;
     deleteDonation(donation.id);
     router.push('/donate');
+  };
+
+  const handleEditListing = () => {
+    if (!donation) return;
+    // Clear current donation store and set edit mode
+    clearDonation();
+    setEditMode(true, donation.id);
+    router.push('/donate/manual');
   };
 
   if (loading) {
@@ -100,7 +133,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
       </div>
     );
   }
-  
+
   const donorName = donorDisplayName || t('generousDonor');
 
   return (
@@ -136,7 +169,9 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         <section>
-          <h1 className="text-2xl font-bold text-gray-900">{donation.food_item.name}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {donation.food_item.name}
+          </h1>
           <div className="mt-2 flex items-center gap-2 text-gray-600">
             <ShoppingBag className="h-5 w-5" />
             <span className="font-medium">{donation.quantity} kg</span>
@@ -148,12 +183,12 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
               (Array.isArray(donation.food_item.allergens)
                 ? donation.food_item.allergens
                 : String(donation.food_item.allergens).split(',')
-              ).map((tag: string) => (
-                <Tag key={tag}>{tag.trim()}</Tag>
-              ))}
+              ).map((tag: string) => <Tag key={tag}>{tag.trim()}</Tag>)}
           </div>
 
-          <p className="mt-4 text-gray-600 leading-relaxed">{donation.food_item.description}</p>
+          <p className="mt-4 text-gray-600 leading-relaxed">
+            {donation.food_item.description}
+          </p>
 
           <div className="mt-4 flex items-start gap-3 text-gray-600">
             <MapPin className="h-5 w-5 flex-shrink-0" />
@@ -161,7 +196,10 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
           </div>
 
           {isOwner ? (
-            <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+            <Dialog
+              open={showDeleteConfirm}
+              onOpenChange={setShowDeleteConfirm}
+            >
               <div className="mt-6 flex items-center gap-3">
                 <DialogTrigger asChild>
                   <Button
@@ -176,7 +214,7 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
                   variant="primary"
                   size="cta"
                   className="flex-1"
-                  onClick={() => router.push(`/donate/manual?id=${donation.id}`)}
+                  onClick={handleEditListing}
                 >
                   <Edit className="h-5 w-5" /> {t('editListing')}
                 </Button>
@@ -189,8 +227,15 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                  <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>{t('cancel')}</Button>
-                  <Button variant="destructive" onClick={handleRemoveListing}>{t('yesRemove')}</Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setShowDeleteConfirm(false)}
+                  >
+                    {t('cancel')}
+                  </Button>
+                  <Button variant="destructive" onClick={handleRemoveListing}>
+                    {t('yesRemove')}
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -212,29 +257,37 @@ export default function DonationDetailPage({ params }: { params: { id: string } 
 
         {/* Other Donations by Same Donor */}
         {otherDonations.length > 0 && (
-        <section className="bg-gray-50 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <span className="text-lg font-semibold">{getInitials(donorName)}</span>
-              </Avatar>
-              <div>
-                <p className="font-semibold text-gray-900">{donorName}</p>
-                <p className="text-sm text-gray-500">{totalDonations} {t('donations')}</p>
+          <section className="bg-gray-50 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Avatar>
+                  <span className="text-lg font-semibold">
+                    {getInitials(donorName)}
+                  </span>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-gray-900">{donorName}</p>
+                  <p className="text-sm text-gray-500">
+                    {totalDonations} {t('donations')}
+                  </p>
+                </div>
               </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => router.push(`/profile/${donation.donor_id}`)}
+              >
+                {t('viewProfile')}
+              </Button>
             </div>
-            <Button variant="secondary" size="sm" onClick={() => router.push(`/profile/${donation.donor_id}`)}>
-              {t('viewProfile')}
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {otherDonations.map((otherDonation) => (
-              <DonationCard key={otherDonation.id} donation={otherDonation} />
-            ))}
-          </div>
-        </section>
+            <div className="grid grid-cols-2 gap-4">
+              {otherDonations.map((otherDonation) => (
+                <DonationCard key={otherDonation.id} donation={otherDonation} />
+              ))}
+            </div>
+          </section>
         )}
       </main>
     </div>
   );
-} 
+}

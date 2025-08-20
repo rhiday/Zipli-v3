@@ -174,7 +174,7 @@ export default function BottomNav() {
                       variant="secondary"
                       size="lg"
                       className="w-full justify-start py-5 text-left"
-                      onClick={() => router.push('/donate/new')}
+                      onClick={() => router.push('/donate/manual')}
                     >
                       <ShoppingBag className="mr-3 h-5 w-5 text-primary" />
                       <div>

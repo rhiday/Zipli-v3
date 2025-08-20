@@ -44,6 +44,9 @@ function ManualDonationPageInner() {
     addDonationItem,
     updateDonationItem,
     deleteDonationItem,
+    isEditMode: storeEditMode,
+    editingDonationId,
+    setEditMode,
   } = useDonationStore();
   const updateDonation = useDatabase((state) => state.updateDonation);
   const updateFoodItem = useDatabase((state) => state.updateFoodItem);
@@ -71,8 +74,38 @@ function ManualDonationPageInner() {
   const hasItems = donationItems.length > 0;
 
   useEffect(() => {
+    // Handle edit mode from store
+    if (storeEditMode && editingDonationId && currentUser) {
+      setIsEditMode(true);
+      const foundDonation = donations
+        .filter(
+          (d) => d.id === editingDonationId && d.donor_id === currentUser.id
+        )
+        .map((d) => {
+          const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
+          return { ...d, food_item: foodItem! };
+        })[0];
+
+      if (foundDonation) {
+        const { food_item, quantity, id } = foundDonation;
+        const currentAllergens = food_item.allergens || [];
+        setCurrentItem({
+          id,
+          name: food_item.name,
+          quantity: String(quantity).replace(' kg', ''),
+          allergens: Array.isArray(currentAllergens)
+            ? currentAllergens
+            : String(currentAllergens).split(','),
+          description: food_item.description,
+          imageUrl: food_item.image_url || undefined,
+        });
+        setShowAddAnotherForm(true);
+      }
+    }
+
+    // Legacy support for URL-based editing
     const editItemId = searchParams.get('id');
-    if (editItemId && currentUser) {
+    if (editItemId && currentUser && !storeEditMode) {
       setIsEditMode(true);
       const foundDonation = donations
         .filter((d) => d.id === editItemId && d.donor_id === currentUser.id)
@@ -97,7 +130,14 @@ function ManualDonationPageInner() {
         setShowAddAnotherForm(true);
       }
     }
-  }, [searchParams, currentUser, donations, foodItems]);
+  }, [
+    searchParams,
+    currentUser,
+    donations,
+    foodItems,
+    storeEditMode,
+    editingDonationId,
+  ]);
 
   // Smart allergen suggestions based on food name
   const suggestAllergensForFood = (foodName: string): string[] => {
@@ -256,7 +296,12 @@ function ManualDonationPageInner() {
           quantity: parseFloat(currentItem.quantity) || 0,
         });
 
-        setShowSuccessDialog(true);
+        // In edit mode, continue to pickup slots instead of showing success dialog
+        if (storeEditMode) {
+          router.push('/donate/pickup-slot');
+        } else {
+          setShowSuccessDialog(true);
+        }
       } else {
         // This is for adding a new item, not editing.
         if (currentItem.id === 'new') {
