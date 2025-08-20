@@ -1,10 +1,25 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+interface RecurrencePattern {
+  type: 'never' | 'daily' | 'weekly' | 'custom';
+  weeklyDays?: number[];
+  customPattern?: {
+    frequency: number;
+    unit: 'days' | 'weeks';
+    endType: 'never' | 'date' | 'occurrences';
+    endDate?: string;
+    maxOccurrences?: number;
+  };
+}
+
 interface RequestFormData {
-  recurringInterval: string;
+  recurringInterval: string; // Keep for backward compatibility
+  recurrencePattern: RecurrencePattern;
   quantity: string;
   allergens: string[];
+  startDate: string;
+  endDate: string;
   pickupDate: string;
   startTime: string;
   endTime: string;
@@ -18,8 +33,13 @@ interface RequestState {
 
 const initialRequestData: RequestFormData = {
   recurringInterval: '',
+  recurrencePattern: {
+    type: 'never',
+  },
   quantity: '',
   allergens: ['Vegan', 'Low-lactose'],
+  startDate: '',
+  endDate: '',
   pickupDate: '',
   startTime: '09:00',
   endTime: '14:00',

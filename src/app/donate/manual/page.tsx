@@ -510,7 +510,7 @@ function ManualDonationPageInner() {
           </BottomActionBar>
         }
         className="bg-white"
-        contentClassName="p-4"
+        contentClassName="p-4 space-y-6"
       >
         {hasItems && !showAddAnotherForm ? (
           <div className="flex flex-col gap-4">

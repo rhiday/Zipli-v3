@@ -27,25 +27,25 @@ export const PageContainer: React.FC<PageContainerProps> = ({
   contentClassName,
 }) => {
   const pathname = usePathname();
-  const donationFlowRegex =
-    /^\/donate\/(new|manual|pickup-slot|summary|thank-you|detail|[^/]+\/handover-confirm)/;
-  const isBottomNavVisible = !donationFlowRegex.test(pathname || '');
+  const flowRegex =
+    /^\/(donate|request)\/(new|manual|pickup-slot|summary|thank-you|success|detail|[^/]+\/handover-confirm)/;
+  const isBottomNavVisible = !flowRegex.test(pathname || '');
 
   return (
-    <div className={cn('flex h-dvh min-h-0 w-full flex-col bg-base', className)}>
+    <div
+      className={cn('flex h-dvh min-h-0 w-full flex-col bg-base', className)}
+    >
       {header ? <div className="shrink-0">{header}</div> : null}
-      <main className={cn('min-h-0 flex-1 overflow-y-auto flex flex-col', contentClassName)}>
-        <div className="min-h-0 flex-1">{children}</div>
-        {footer ? (
-          <div className={cn('sticky', isBottomNavVisible ? 'bottom-[76px]' : 'bottom-0')}>
-            {footer}
-          </div>
-        ) : null}
+      <main className={cn('min-h-0 flex-1 overflow-y-auto', contentClassName)}>
+        {children}
       </main>
+      {footer ? (
+        <div className={cn('shrink-0', isBottomNavVisible ? 'mb-[76px]' : '')}>
+          {footer}
+        </div>
+      ) : null}
     </div>
   );
 };
 
 export default PageContainer;
-
-

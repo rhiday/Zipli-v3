@@ -3,7 +3,11 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon, ClockIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,6 +36,8 @@ interface TimeSlotSelectorProps {
   className?: string;
   datePlaceholder?: string; // e.g. "DD/MM/YYYY"
   dateFormat?: string; // e.g. 'dd/MM/yyyy'
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
@@ -47,22 +53,41 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
   onEndTimeChange,
   disabled = false,
   error,
-  className = "",
+  className = '',
   datePlaceholder = 'DD/MM/YYYY',
   dateFormat = 'dd/MM/yyyy',
+  minDate,
+  maxDate,
 }) => {
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [isStartTimeOpen, setIsStartTimeOpen] = useState(false);
   const [isEndTimeOpen, setIsEndTimeOpen] = useState(false);
 
+  // Create disabled dates object for Calendar component
+  const getDisabledDates = () => {
+    const disabled: any = {};
+
+    // Use minDate if provided, otherwise disable past dates
+    if (minDate) {
+      disabled.before = minDate;
+    } else {
+      disabled.before = new Date();
+    }
+
+    // Use maxDate if provided
+    if (maxDate) {
+      disabled.after = maxDate;
+    }
+
+    return disabled;
+  };
+
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn('space-y-4', className)}>
       {label && (
-        <Label className="text-lg font-medium text-gray-900">
-          {label}
-        </Label>
+        <Label className="text-lg font-medium text-gray-900">{label}</Label>
       )}
-      
+
       {/* Date Selection */}
       <div>
         <Label className="text-sm font-medium text-gray-700 mb-2 block">
@@ -74,8 +99,8 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
               variant="secondary"
               disabled={disabled}
               className={cn(
-                "rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base",
-                !date && "text-muted-foreground"
+                'rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base',
+                !date && 'text-muted-foreground'
               )}
             >
               {date ? (
@@ -90,7 +115,10 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+          <PopoverContent
+            className="w-auto p-0 bg-white border-gray-200"
+            align="start"
+          >
             <Calendar
               mode="single"
               selected={date}
@@ -98,7 +126,7 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                 onDateChange?.(selectedDate);
                 setIsDateOpen(false);
               }}
-              disabled={{ before: new Date() }}
+              disabled={getDisabledDates()}
               initialFocus
             />
           </PopoverContent>
@@ -118,11 +146,11 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                 variant="secondary"
                 disabled={disabled}
                 className={cn(
-                  "rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base",
-                  !startTime && "text-muted-foreground"
+                  'rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base',
+                  !startTime && 'text-muted-foreground'
                 )}
               >
-                <span className="text-black">{startTime || "--:--"}</span>
+                <span className="text-black">{startTime || '--:--'}</span>
                 <div className="pointer-events-none">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
                     <ClockIcon className="h-4 w-4 text-gray-400" />
@@ -130,7 +158,10 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                 </div>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+            <PopoverContent
+              className="w-auto p-0 bg-white border-gray-200"
+              align="start"
+            >
               <div className="max-h-60 overflow-y-auto">
                 {timeOptions.map((option) => (
                   <div
@@ -163,11 +194,11 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                 variant="secondary"
                 disabled={disabled}
                 className={cn(
-                  "rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base",
-                  !endTime && "text-muted-foreground"
+                  'rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base',
+                  !endTime && 'text-muted-foreground'
                 )}
               >
-                <span className="text-black">{endTime || "--:--"}</span>
+                <span className="text-black">{endTime || '--:--'}</span>
                 <div className="pointer-events-none">
                   <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
                     <ClockIcon className="h-4 w-4 text-gray-400" />
@@ -175,7 +206,10 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                 </div>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-white border-gray-200" align="start">
+            <PopoverContent
+              className="w-auto p-0 bg-white border-gray-200"
+              align="start"
+            >
               <div className="max-h-60 overflow-y-auto">
                 {timeOptions.map((option) => (
                   <div
@@ -198,9 +232,7 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
         </div>
       </div>
 
-      {error && (
-        <div className="text-sm text-red-600">{error}</div>
-      )}
+      {error && <div className="text-sm text-red-600">{error}</div>}
     </div>
   );
 };

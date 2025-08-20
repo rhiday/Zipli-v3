@@ -4,16 +4,16 @@ import { cn } from '@/lib/utils';
 
 // Define CVA variants for the Textarea, mirroring Input styles
 const textareaVariants = cva(
-  "flex min-h-[80px] w-full rounded-md border bg-base px-4 py-3.5 text-bodyLg ring-offset-background placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+  'flex min-h-[80px] w-full rounded-[12px] border bg-base px-4 py-3.5 text-bodyLg ring-offset-background placeholder:text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: "border-border focus-visible:ring-interactive",
-        error: "border-negative text-negative focus-visible:ring-negative",
+        default: 'border-border focus-visible:ring-interactive',
+        error: 'border-negative text-negative focus-visible:ring-negative',
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: 'default',
     },
   }
 );
@@ -37,4 +37,4 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 );
 Textarea.displayName = 'Textarea';
 
-export { Textarea }; 
+export { Textarea };

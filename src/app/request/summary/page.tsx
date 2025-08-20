@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { Check } from 'lucide-react';
 import { useRequestStore } from '@/store/request';
 import { useDatabase } from '@/store';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
@@ -50,8 +49,28 @@ export default function RequestSummaryPage() {
         return;
       }
 
-      if (!requestData.quantity || !requestData.pickupDate) {
+      if (
+        !requestData.quantity ||
+        !requestData.pickupDate ||
+        !requestData.startDate ||
+        !requestData.endDate
+      ) {
         alert('Please complete all required fields');
+        return;
+      }
+
+      // Validate date range
+      if (requestData.startDate > requestData.endDate) {
+        alert('Start date must be before end date');
+        return;
+      }
+
+      // Validate pickup date is within range
+      if (
+        requestData.pickupDate < requestData.startDate ||
+        requestData.pickupDate > requestData.endDate
+      ) {
+        alert('Pickup date must be within the request date range');
         return;
       }
 
@@ -79,11 +98,14 @@ export default function RequestSummaryPage() {
         user_id: currentUser.id,
         description: `Request for ${requestData.quantity} portions - ${requestData.allergens.join(', ')}`,
         people_count: parseInt(requestData.quantity) || 1,
+        start_date: requestData.startDate,
+        end_date: requestData.endDate,
         pickup_date: requestData.pickupDate,
         pickup_start_time: requestData.startTime,
         pickup_end_time: requestData.endTime,
         status: 'active' as const,
-        is_recurring: requestData.recurringInterval !== '',
+        is_recurring: requestData.recurrencePattern.type !== 'never',
+        recurrence_pattern: JSON.stringify(requestData.recurrencePattern),
         address: address.trim(),
         instructions: instructions.trim(),
       };
@@ -123,6 +145,65 @@ export default function RequestSummaryPage() {
     return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
   };
 
+  const formatRecurrencePattern = () => {
+    const pattern = requestData.recurrencePattern;
+    if (!pattern || pattern.type === 'never') {
+      return t('doesNotRepeat') || 'Does not repeat';
+    }
+
+    if (pattern.type === 'daily') {
+      return t('daily') || 'Daily';
+    }
+
+    if (pattern.type === 'weekly') {
+      if (!pattern.weeklyDays || pattern.weeklyDays.length === 0) {
+        return t('weekly') || 'Weekly';
+      }
+
+      const dayNames = [
+        t('sunday'),
+        t('monday'),
+        t('tuesday'),
+        t('wednesday'),
+        t('thursday'),
+        t('friday'),
+        t('saturday'),
+      ];
+
+      const selectedDayNames = pattern.weeklyDays
+        .sort()
+        .map((dayIndex) => dayNames[dayIndex])
+        .join(', ');
+
+      return `${t('weekly')} - ${selectedDayNames}`;
+    }
+
+    if (pattern.type === 'custom' && pattern.customPattern) {
+      const { frequency, unit, endType, endDate, maxOccurrences } =
+        pattern.customPattern;
+
+      let result = `${t('every')} ${frequency} ${
+        frequency === 1
+          ? unit === 'days'
+            ? t('day')
+            : t('week')
+          : unit === 'days'
+            ? t('days')
+            : t('weeks')
+      }`;
+
+      if (endType === 'date' && endDate) {
+        result += `, ${t('until')} ${formatDate(endDate)}`;
+      } else if (endType === 'occurrences' && maxOccurrences) {
+        result += `, ${maxOccurrences} ${t('times')}`;
+      }
+
+      return result;
+    }
+
+    return t('custom') || 'Custom';
+  };
+
   const handleBackClick = () => {
     router.back();
   };
@@ -141,14 +222,13 @@ export default function RequestSummaryPage() {
           </div>
         </>
       }
-      contentClassName="p-4 space-y-6 pb-24"
+      contentClassName="p-4 space-y-6"
       footer={
         <BottomActionBar>
           <div className="flex justify-end">
             <Button
               onClick={handleSubmitRequest}
-              className="w-full"
-              disabled={isSaving || !address.trim()}
+              disabled={!address.trim() || isSaving}
             >
               {isSaving ? t('continuing') : t('submitRequest')}
             </Button>
@@ -158,8 +238,8 @@ export default function RequestSummaryPage() {
       className="bg-white"
     >
       {/* Donation items (requested) */}
-      <div className="space-y-2">
-        <h2 className="text-lg font-semibold text-[#021d13]">
+      <div className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold text-[#021d13] mt-2">
           {t('donationItems')}
         </h2>
         <div className="flex items-start justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
@@ -198,9 +278,75 @@ export default function RequestSummaryPage() {
         </div>
       </div>
 
+      {/* Request Period */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-[#021d13] mt-6">
+          {t('requestPeriod') || 'Request Period'}
+        </h2>
+        <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+          <span className="font-semibold text-interactive">
+            {requestData.startDate && requestData.endDate
+              ? `${formatDate(requestData.startDate)} - ${formatDate(requestData.endDate)}`
+              : t('dateNotSet')}
+          </span>
+          <button
+            onClick={() => router.push('/request/new')}
+            className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
+            aria-label="Edit period"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                fill="#024209"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Recurrence Pattern */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-[#021d13] mt-6">
+          {t('recurringInterval') || 'Recurrence'}
+        </h2>
+        <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+          <span className="font-semibold text-interactive">
+            {formatRecurrencePattern()}
+          </span>
+          <button
+            onClick={() => router.push('/request/new')}
+            className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
+            aria-label="Edit recurrence"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                fill="#024209"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
       {/* Pickup schedule */}
-      <div className="space-y-2">
-        <h2 className="text-lg font-semibold text-[#021d13]">
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-[#021d13] mt-6">
           {t('pickupSchedule')}
         </h2>
         <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
@@ -234,13 +380,13 @@ export default function RequestSummaryPage() {
 
       {/* Delivery details */}
       <div className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-[#021d13]">
+        <h2 className="text-lg font-semibold text-[#021d13] mt-6">
           {t('deliveryDetails')}
         </h2>
         <div>
           <label
             htmlFor="address"
-            className="block text-black font-semibold mb-2"
+            className="block text-black font-semibold mb-3"
           >
             {t('address')}
           </label>
@@ -270,7 +416,7 @@ export default function RequestSummaryPage() {
         <div>
           <label
             htmlFor="driver-instructions"
-            className="block text-black font-semibold mb-2"
+            className="block text-black font-semibold mb-3"
           >
             {t('instructionsForDriver')}
           </label>
@@ -295,49 +441,6 @@ export default function RequestSummaryPage() {
             >
               {t('updateInstructionsInProfile')}
             </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Next Steps */}
-      <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-        <h3 className="font-medium text-gray-900">{t('nextSteps')}</h3>
-
-        <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-            <Check className="w-3 h-3 text-green-600" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-900">
-              {t('requestSubmitted')}
-            </p>
-            <p className="text-xs text-gray-600">{t('requestAddedToSystem')}</p>
-          </div>
-        </div>
-
-        <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center mt-0.5">
-            <span className="text-xs font-medium text-gray-600">2</span>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-900">
-              {t('matchingInProgress')}
-            </p>
-            <p className="text-xs text-gray-600">{t('lookingForMatches')}</p>
-          </div>
-        </div>
-
-        <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center mt-0.5">
-            <span className="text-xs font-medium text-gray-600">3</span>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-900">
-              {t('getNotified')}
-            </p>
-            <p className="text-xs text-gray-600">
-              {t('receiveNotificationWhenMatch')}
-            </p>
           </div>
         </div>
       </div>

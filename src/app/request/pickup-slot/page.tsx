@@ -29,7 +29,9 @@ export default function PickupSlotPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     requestData.pickupDate ? new Date(requestData.pickupDate) : undefined
   );
-  const [startTime, setStartTime] = useState<string>(requestData.startTime || '');
+  const [startTime, setStartTime] = useState<string>(
+    requestData.startTime || ''
+  );
   const [endTime, setEndTime] = useState<string>(requestData.endTime || '');
 
   const {
@@ -43,8 +45,9 @@ export default function PickupSlotPage() {
     }
 
     // Update store with pickup slot data
+    const pickupDateStr = selectedDate.toISOString().split('T')[0];
     setRequestData({
-      pickupDate: selectedDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      pickupDate: pickupDateStr,
       startTime: startTime,
       endTime: endTime,
     });
@@ -59,20 +62,20 @@ export default function PickupSlotPage() {
 
   return (
     <PageContainer
-      header={(
+      header={
         <>
-          <SecondaryNavbar 
-            title={t('pickupSlot')} 
-            backHref="/request/new" 
+          <SecondaryNavbar
+            title={t('pickupSlot')}
+            backHref="/request/new"
             onBackClick={handleBackClick}
           />
           <div className="px-4 pt-2">
             <Progress value={67} className="h-2 w-full" />
           </div>
         </>
-      )}
-      contentClassName="p-4"
-      footer={(
+      }
+      contentClassName="p-4 space-y-6"
+      footer={
         <BottomActionBar>
           <div className="flex justify-end">
             <Button
@@ -84,21 +87,27 @@ export default function PickupSlotPage() {
             </Button>
           </div>
         </BottomActionBar>
-      )}
+      }
       className="bg-white"
     >
-          <TimeSlotSelector
-            label={t('whenDoYouNeed')}
-            dateLabel={t('selectADay')}
-            startTimeLabel={t('startTime')}
-            endTimeLabel={t('endTime')}
-            date={selectedDate}
-            startTime={startTime}
-            endTime={endTime}
-            onDateChange={setSelectedDate}
-            onStartTimeChange={setStartTime}
-            onEndTimeChange={setEndTime}
-          />
+      <TimeSlotSelector
+        label={t('whenDoYouNeed')}
+        dateLabel={t('selectADay')}
+        startTimeLabel={t('startTime')}
+        endTimeLabel={t('endTime')}
+        date={selectedDate}
+        startTime={startTime}
+        endTime={endTime}
+        onDateChange={setSelectedDate}
+        onStartTimeChange={setStartTime}
+        onEndTimeChange={setEndTime}
+        minDate={
+          requestData.startDate ? new Date(requestData.startDate) : new Date()
+        }
+        maxDate={
+          requestData.endDate ? new Date(requestData.endDate) : undefined
+        }
+      />
     </PageContainer>
   );
 }

@@ -18,6 +18,8 @@ import { useRequestStore } from '@/store/request';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
+import { RecurrenceSelector } from '@/components/ui/RecurrenceSelector';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { useLanguage } from '@/hooks/useLanguage';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -29,12 +31,33 @@ type RequestFormInputs = {
   allergens: string[];
 };
 
+interface RecurrencePattern {
+  type: 'never' | 'daily' | 'weekly' | 'custom';
+  weeklyDays?: number[];
+  customPattern?: {
+    frequency: number;
+    unit: 'days' | 'weeks';
+    endType: 'never' | 'date' | 'occurrences';
+    endDate?: string;
+    maxOccurrences?: number;
+  };
+}
+
 export default function NewRequestPage() {
   const router = useRouter();
   const { t } = useLanguage();
   const { requestData, setRequestData } = useRequestStore();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>(
     requestData.allergens
+  );
+  const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern>(
+    requestData.recurrencePattern || { type: 'never' }
+  );
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    requestData.startDate ? new Date(requestData.startDate) : undefined
+  );
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    requestData.endDate ? new Date(requestData.endDate) : undefined
   );
 
   const {
@@ -60,14 +83,29 @@ export default function NewRequestPage() {
   const isFormValid =
     watchedFields.quantity &&
     watchedFields.quantity.trim() !== '' &&
+    startDate &&
+    endDate &&
     selectedAllergens.length > 0;
 
   const onSubmit = async (data: RequestFormInputs) => {
+    if (!startDate || !endDate) {
+      alert('Please select both start and end dates');
+      return;
+    }
+
+    if (startDate >= endDate) {
+      alert('End date must be after start date');
+      return;
+    }
+
     // Store form data and navigate to pickup slot
     setRequestData({
       recurringInterval: data.recurringInterval,
+      recurrencePattern: recurrencePattern,
       quantity: data.quantity,
       allergens: selectedAllergens,
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
     });
     router.push('/request/pickup-slot');
   };
@@ -90,7 +128,7 @@ export default function NewRequestPage() {
           </div>
         </>
       }
-      contentClassName=""
+      contentClassName="p-4 space-y-6"
       footer={
         <BottomActionBar>
           <div className="flex justify-end">
@@ -109,24 +147,15 @@ export default function NewRequestPage() {
     >
       <main className="contents">
         <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-6">
-          {/* Recurring Interval */}
+          {/* Recurrence Pattern */}
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              {t('recurringInterval')}
+            <Label className="text-sm font-medium text-gray-700 mb-3 block">
+              {t('recurringInterval') || 'Recurring interval'}
             </Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t('selectInterval')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">{t('daily')}</SelectItem>
-                <SelectItem value="weekly">{t('weekly')}</SelectItem>
-                <SelectItem value="monthly">{t('monthly')}</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-gray-500 mt-1">
-              {t('requestOnlyAllowsPreselected')}
-            </p>
+            <RecurrenceSelector
+              value={recurrencePattern}
+              onChange={setRecurrencePattern}
+            />
           </div>
 
           {/* Quantity */}
@@ -139,6 +168,38 @@ export default function NewRequestPage() {
               placeholder={t('enterQuantity')}
               className="w-full"
             />
+          </div>
+
+          {/* Start Date */}
+          <div>
+            <DatePicker
+              label={t('requestStartDate') || 'Request Start Date'}
+              date={startDate}
+              onDateChange={setStartDate}
+              placeholder="dd.mm.yyyy"
+              dateFormat="dd/MM/yyyy"
+              disablePastDates={true}
+              maxDate={endDate}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {t('whenYouNeedFoodFrom') || 'When you need food from'}
+            </p>
+          </div>
+
+          {/* End Date */}
+          <div>
+            <DatePicker
+              label={t('requestEndDate') || 'Request End Date'}
+              date={endDate}
+              onDateChange={setEndDate}
+              placeholder="dd.mm.yyyy"
+              dateFormat="dd/MM/yyyy"
+              disablePastDates={true}
+              minDate={startDate || new Date()}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {t('whenYouNeedFoodUntil') || 'When you need food until'}
+            </p>
           </div>
 
           {/* Allergies, intolerances & diets */}
