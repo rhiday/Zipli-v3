@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Input } from './Input';
@@ -31,7 +31,10 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   // Handle clicking outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -77,57 +80,60 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
         />
         {value.length > 0 && (
           <>
-            <div 
-              className="absolute left-3 right-12 top-1/2 -translate-y-1/2 flex gap-2 overflow-x-auto overflow-y-hidden pointer-events-auto scrollbar-hide" 
-              style={{ 
-                scrollbarWidth: 'none', 
+            <div
+              className="absolute left-3 right-12 top-1/2 -translate-y-1/2 flex gap-2 overflow-x-auto overflow-y-hidden pointer-events-auto scrollbar-hide"
+              style={{
+                scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch' // Smooth scrolling on iOS
+                WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
               }}
               onClick={(e) => e.stopPropagation()} // Prevent input click when scrolling
             >
               {value.map((v) => (
                 <div key={v} className="flex-shrink-0">
-                  <Chip
-                    label={v}
-                    selected
-                    onRemove={() => handleToggle(v)}
-                  />
+                  <Chip label={v} selected onRemove={() => handleToggle(v)} />
                 </div>
               ))}
             </div>
             {hasOverflow && (
-              <div className="absolute right-12 top-1/2 -translate-y-1/2 w-6 h-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+              <div className="absolute right-12 top-1/2 -translate-y-1/2 w-6 h-8 bg-gradient-to-l from-base to-transparent pointer-events-none" />
             )}
           </>
         )}
         {open && (
-          <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+          <div className="absolute left-0 right-0 mt-2 bg-base border border-border rounded-md shadow-lg z-20">
             {options.map((option) => (
               <div
                 key={option}
-                className={`flex items-center px-4 py-2 cursor-pointer transition-colors ${value.includes(option) ? 'bg-[#eafcd6]' : 'hover:bg-gray-50'}`}
+                className={`flex items-center px-4 py-2 cursor-pointer transition-colors ${value.includes(option) ? 'bg-positive/20' : 'hover:bg-cloud'}`}
                 onClick={() => handleToggle(option)}
               >
                 <input
                   type="checkbox"
                   checked={value.includes(option)}
                   readOnly
-                  className="mr-2 accent-[#a6f175]"
+                  className="mr-2 accent-positive"
                 />
-                <span className="text-[14px] font-manrope text-[#021d13]">{option}</span>
+                <span className="text-body text-primary">{option}</span>
               </div>
             ))}
           </div>
         )}
       </div>
       {error ? (
-        <div className="mt-1 text-[14px] font-manrope text-negative">{error}</div>
+        <div className="mt-1 text-[14px] font-manrope text-negative">
+          {error}
+        </div>
       ) : hint ? (
-        <div className="mt-1 text-[14px] font-manrope text-[rgba(2,29,19,0.60)]" style={{fontWeight: 400, fontStyle: 'normal', lineHeight: 'normal'}}>{hint}</div>
+        <div
+          className="mt-1 text-[14px] font-manrope text-[rgba(2,29,19,0.60)]"
+          style={{ fontWeight: 400, fontStyle: 'normal', lineHeight: 'normal' }}
+        >
+          {hint}
+        </div>
       ) : null}
     </div>
   );
 };
 
-AllergensDropdown.displayName = 'AllergensDropdown'; 
+AllergensDropdown.displayName = 'AllergensDropdown';

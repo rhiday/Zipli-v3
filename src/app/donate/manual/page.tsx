@@ -427,7 +427,7 @@ function ManualDonationPageInner() {
       </div>
 
       <AllergensDropdown
-        label={t('allergens')}
+        label={t('allergiesIntolerancesDiets')}
         options={[
           'Milk',
           'Eggs',
