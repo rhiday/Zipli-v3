@@ -15,6 +15,7 @@ import {
   Utensils,
   Euro,
   Leaf,
+  FileDown,
 } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
@@ -35,6 +36,7 @@ import {
 } from '@/components/ui/Skeleton';
 import { useDonationStore } from '@/store/donation';
 import { useLanguage } from '@/hooks/useLanguage';
+import { ActionButton } from '@/components/ui/action-button';
 
 type ProfileRow = {
   id: string;
@@ -293,19 +295,21 @@ export default function DonorDashboardPage(): React.ReactElement {
           </div>
         </section>
 
-        {/* Export to PDF as a text link */}
+        {/* Export to PDF as ActionButton */}
         <div className="my-4">
-          <a
+          <div
             onClick={handleExportPDF}
-            className="text-primary underline font-semibold cursor-pointer"
+            className="cursor-pointer"
             tabIndex={0}
             role="button"
           >
-            {t('exportToPdf')}
-          </a>
-          <span className="block text-sm text-primary-75 mt-1">
-            {t('environmentalAndSocialImpactData')}
-          </span>
+            <ActionButton
+              href="#"
+              title={t('exportToPdf')}
+              description={t('environmentalAndSocialImpactData')}
+              icon={<FileDown />}
+            />
+          </div>
         </div>
 
         {/* This is whom you've helped section - Hidden for now */}
