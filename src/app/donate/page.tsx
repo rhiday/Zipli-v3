@@ -308,14 +308,13 @@ export default function DonorDashboardPage(): React.ReactElement {
           </span>
         </div>
 
-        {/* This is whom you've helped section */}
-        <section>
+        {/* This is whom you've helped section - Hidden for now */}
+        {/* <section>
           <h2 className="text-lg font-semibold text-primary mb-3">
             {t('thisIsWhomYouveHelped')}
           </h2>
 
           <div className="space-y-4">
-            {/* Recipient 1 - Tsänssi */}
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full overflow-hidden relative">
                 <Image
@@ -332,7 +331,6 @@ export default function DonorDashboardPage(): React.ReactElement {
               </div>
             </div>
 
-            {/* Recipient 2 - Red cross */}
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full overflow-hidden relative">
                 <Image
@@ -350,7 +348,6 @@ export default function DonorDashboardPage(): React.ReactElement {
               </div>
             </div>
 
-            {/* Recipient 3 - Andreas church */}
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full overflow-hidden relative">
                 <Image
@@ -366,7 +363,7 @@ export default function DonorDashboardPage(): React.ReactElement {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
 
       <BottomNav />
