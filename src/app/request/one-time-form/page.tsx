@@ -7,14 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { DatePicker } from '@/components/ui/DatePicker';
-import { TimeSlotSelector } from '@/components/ui/TimeSlotSelector';
 import { useLanguage } from '@/hooks/useLanguage';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { OneTimeRequest } from '@/types/request.types';
-import { format } from 'date-fns';
 
 type OneTimeFormInputs = {
   description: string;
@@ -25,11 +22,6 @@ export default function OneTimeRequestForm() {
   const router = useRouter();
   const { t } = useLanguage();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
-  const [pickupDate, setPickupDate] = useState<Date | undefined>();
-  const [pickupTime, setPickupTime] = useState({
-    start: '09:00',
-    end: '14:00',
-  });
 
   const {
     register,
@@ -43,21 +35,15 @@ export default function OneTimeRequestForm() {
     watchedFields.description?.trim() &&
     watchedFields.quantity?.trim() &&
     Number(watchedFields.quantity) > 0 &&
-    selectedAllergens.length > 0 &&
-    pickupDate;
+    selectedAllergens.length > 0;
 
   const onSubmit = async (data: OneTimeFormInputs) => {
-    if (!pickupDate) return;
-
     try {
       const requestData: OneTimeRequest = {
         request_type: 'one-time',
         description: data.description,
         quantity: Number(data.quantity),
         allergens: selectedAllergens,
-        pickup_date: format(pickupDate, 'yyyy-MM-dd'),
-        pickup_start_time: pickupTime.start,
-        pickup_end_time: pickupTime.end,
       };
 
       // Log the structured data for testing
@@ -150,54 +136,6 @@ export default function OneTimeRequestForm() {
               : undefined
           }
         />
-
-        {/* Pickup Date */}
-        <DatePicker
-          label="Pickup Date"
-          date={pickupDate}
-          onDateChange={setPickupDate}
-          placeholder="dd.mm.yyyy"
-          dateFormat="dd/MM/yyyy"
-          disablePastDates={true}
-          error={
-            !pickupDate && watchedFields.description
-              ? 'Please select a pickup date'
-              : undefined
-          }
-        />
-
-        {/* Pickup Time */}
-        <div>
-          <label className="block text-label font-semibold mb-2">
-            Pickup Time Slot
-          </label>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-label text-secondary mb-1">
-                Start Time
-              </label>
-              <Input
-                type="time"
-                value={pickupTime.start}
-                onChange={(e) =>
-                  setPickupTime((prev) => ({ ...prev, start: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <label className="block text-label text-secondary mb-1">
-                End Time
-              </label>
-              <Input
-                type="time"
-                value={pickupTime.end}
-                onChange={(e) =>
-                  setPickupTime((prev) => ({ ...prev, end: e.target.value }))
-                }
-              />
-            </div>
-          </div>
-        </div>
       </form>
     </div>
   );

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { DatePicker } from '@/components/ui/DatePicker';
 import {
   RecurrenceScheduler,
   RecurrenceSchedule,
@@ -17,7 +16,6 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { RecurringRequest } from '@/types/request.types';
-import { format } from 'date-fns';
 
 type RecurringFormInputs = {
   description: string;
@@ -28,12 +26,6 @@ export default function RecurringRequestForm() {
   const router = useRouter();
   const { t } = useLanguage();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
-  const [pickupTime, setPickupTime] = useState({
-    start: '09:00',
-    end: '14:00',
-  });
   const [recurrenceSchedule, setRecurrenceSchedule] =
     useState<RecurrenceSchedule>({
       type: 'daily',
@@ -70,53 +62,22 @@ export default function RecurringRequestForm() {
     watchedFields.quantity?.trim() &&
     Number(watchedFields.quantity) > 0 &&
     selectedAllergens.length > 0 &&
-    startDate &&
-    endDate &&
     isScheduleValid();
 
   const onSubmit = async (data: RecurringFormInputs) => {
-    if (!startDate || !endDate) return;
-
     try {
       const requestData: RecurringRequest = {
         request_type: 'recurring',
         description: data.description,
         quantity: Number(data.quantity),
         allergens: selectedAllergens,
-        recurrence_schedule: recurrenceSchedule,
-        start_date: format(startDate, 'yyyy-MM-dd'),
-        end_date: format(endDate, 'yyyy-MM-dd'),
-        pickup_start_time: pickupTime.start,
-        pickup_end_time: pickupTime.end,
+        recurrence: recurrenceSchedule,
       };
 
       // Log the structured data for testing
       console.log('Recurring Request Data:', requestData);
       console.log('Recurrence Schedule:', recurrenceSchedule);
       console.log('Ready for Supabase:', JSON.stringify(requestData, null, 2));
-
-      // Calculate occurrences for display
-      if (recurrenceSchedule.type === 'daily') {
-        const days =
-          Math.ceil(
-            (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-          ) + 1;
-        console.log(`Will create ${days} daily occurrences`);
-      } else if (
-        recurrenceSchedule.type === 'weekly' &&
-        recurrenceSchedule.weeklyDays
-      ) {
-        console.log(
-          `Will create weekly occurrences on days: ${recurrenceSchedule.weeklyDays.join(', ')}`
-        );
-      } else if (
-        recurrenceSchedule.type === 'custom' &&
-        recurrenceSchedule.customDates
-      ) {
-        console.log(
-          `Will create ${recurrenceSchedule.customDates.length} custom date occurrences`
-        );
-      }
 
       // Store in session storage for now (will be replaced with Supabase)
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
@@ -233,8 +194,6 @@ export default function RecurringRequestForm() {
           label="Recurrence Schedule"
           value={recurrenceSchedule}
           onChange={setRecurrenceSchedule}
-          startDate={startDate}
-          endDate={endDate}
           hint={'Select how often you need food'}
           error={
             !isScheduleValid() && watchedFields.description
@@ -242,77 +201,6 @@ export default function RecurringRequestForm() {
               : undefined
           }
         />
-
-        {/* Date Range */}
-        <div className="space-y-4">
-          {/* Start Date */}
-          <DatePicker
-            label="Start Date"
-            date={startDate}
-            onDateChange={setStartDate}
-            placeholder="dd.mm.yyyy"
-            dateFormat="dd/MM/yyyy"
-            disablePastDates={true}
-            maxDate={endDate}
-            error={
-              !startDate && watchedFields.description
-                ? 'Please select a start date'
-                : undefined
-            }
-          />
-
-          {/* End Date */}
-          <DatePicker
-            label="End Date"
-            date={endDate}
-            onDateChange={setEndDate}
-            placeholder="dd.mm.yyyy"
-            dateFormat="dd/MM/yyyy"
-            disablePastDates={true}
-            minDate={startDate || new Date()}
-            error={
-              !endDate && watchedFields.description
-                ? 'Please select an end date'
-                : undefined
-            }
-          />
-        </div>
-
-        {/* Pickup Time */}
-        <div>
-          <label className="block text-label font-semibold mb-2">
-            Pickup Time Slot
-          </label>
-          <p className="text-label text-secondary mb-2">
-            This time will apply to all occurrences
-          </p>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-label text-secondary mb-1">
-                Start Time
-              </label>
-              <Input
-                type="time"
-                value={pickupTime.start}
-                onChange={(e) =>
-                  setPickupTime((prev) => ({ ...prev, start: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <label className="block text-label text-secondary mb-1">
-                End Time
-              </label>
-              <Input
-                type="time"
-                value={pickupTime.end}
-                onChange={(e) =>
-                  setPickupTime((prev) => ({ ...prev, end: e.target.value }))
-                }
-              />
-            </div>
-          </div>
-        </div>
 
         {/* Summary Info */}
         {isFormValid && (
@@ -326,10 +214,6 @@ export default function RecurringRequestForm() {
                 `Weekly on selected days`}
               {recurrenceSchedule.type === 'custom' &&
                 `${recurrenceSchedule.customDates?.length || 0} specific dates`}
-              {' from '}
-              {startDate && format(startDate, 'MMM dd, yyyy')}
-              {' to '}
-              {endDate && format(endDate, 'MMM dd, yyyy')}
             </p>
           </div>
         )}

@@ -23,8 +23,6 @@ export interface RecurrenceSchedule {
 interface RecurrenceSchedulerProps {
   value: RecurrenceSchedule;
   onChange: (schedule: RecurrenceSchedule) => void;
-  startDate?: Date;
-  endDate?: Date;
   className?: string;
   label?: string;
   error?: string;
@@ -40,8 +38,6 @@ const RECURRENCE_OPTIONS = [
 export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
   value,
   onChange,
-  startDate,
-  endDate,
   className = '',
   label = 'Recurrence Schedule',
   error,
@@ -177,9 +173,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
   };
 
   const isDateDisabled = (date: Date) => {
-    if (startDate && date < startDate) return true;
-    if (endDate && date > endDate) return true;
-    return false;
+    return date < new Date();
   };
 
   return (
