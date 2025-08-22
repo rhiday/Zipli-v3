@@ -8,7 +8,6 @@ import BottomNav from '@/components/BottomNav';
 import {
   ArrowRight,
   Info,
-  ChevronDown,
   PlusIcon,
   PackageIcon,
   Scale,
@@ -20,12 +19,6 @@ import {
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { jsPDF } from 'jspdf';
 import SummaryOverview from '@/components/SummaryOverview';
 import DonationCard from '@/components/donations/DonationCard';
@@ -63,32 +56,6 @@ export default function DonorDashboardPage(): React.ReactElement {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const allMonths = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
-  const currentDate = new Date();
-  const currentMonthIndex = currentDate.getMonth();
-  const lastThreeMonths = Array.from({ length: 3 }, (_, i) => {
-    const monthIndex = (currentMonthIndex - 2 + i + 12) % 12;
-    return allMonths[monthIndex];
-  });
-
-  const [selectedMonth, setSelectedMonth] = useState(
-    allMonths[currentMonthIndex]
-  );
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -146,11 +113,6 @@ export default function DonorDashboardPage(): React.ReactElement {
     doc.save('zipli-summary.pdf');
   }, []);
 
-  // Memoized month selection handler
-  const handleMonthSelect = useCallback((month: string) => {
-    setSelectedMonth(month);
-  }, []);
-
   if (loading) {
     return (
       <div className="min-h-screen pb-20">
@@ -206,31 +168,10 @@ export default function DonorDashboardPage(): React.ReactElement {
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         {/* This section is being removed as it's redundant with the header */}
         <section>
-          <div className="flex justify-between items-start gap-4 mb-4">
-            <h2 className="text-lg font-semibold text-primary flex-1">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-primary">
               {t('yourImpact')}
             </h2>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="underline underline-offset-4 inline-flex items-center gap-1 text-primary text-lg font-semibold focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-1 whitespace-nowrap"
-                >
-                  {selectedMonth}
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white">
-                {lastThreeMonths.map((month) => (
-                  <DropdownMenuItem
-                    key={month}
-                    onSelect={() => handleMonthSelect(month)}
-                  >
-                    {month}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
             {/* Total food offered - with green background */}
