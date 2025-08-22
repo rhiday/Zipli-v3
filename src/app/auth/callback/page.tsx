@@ -42,20 +42,22 @@ export default function AuthCallback() {
           const role = profile.role as Database['public']['Enums']['user_role'];
           switch (role) {
             case 'food_donor':
-              router.push('/donate');
+              router.push('/donor/dashboard');
               break;
             case 'food_receiver':
               router.push('/receiver/dashboard');
               break;
-            case 'terminals':
-            case 'city':
-              router.push('/dashboard');
+            case 'city_dashboard':
+              router.push('/city/dashboard');
+              break;
+            case 'terminal':
+              router.push('/terminal/dashboard');
               break;
             default:
               console.warn(
-                `Unknown user role: ${profile.role}, redirecting to generic dashboard.`
+                `Unknown user role: ${profile.role}, redirecting to feed.`
               );
-              router.push('/dashboard');
+              router.push('/feed');
           }
           return;
         }
