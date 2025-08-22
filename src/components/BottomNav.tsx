@@ -141,12 +141,10 @@ export default function BottomNav() {
                       <Clock className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          {t('oneTimeRequest') || 'One-time Request'}
+                          One-time Request
                         </p>
                         <p className="text-xs text-secondary">
-                          {t('createSingleRequest') ||
-                            'Create a single request for immediate needs'}
-                          .
+                          Create a single request for immediate needs .
                         </p>
                       </div>
                     </Button>
@@ -161,12 +159,10 @@ export default function BottomNav() {
                       <Calendar className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          {t('recurringRequest') || 'Recurring Request'}
+                          Recurring Request
                         </p>
                         <p className="text-xs text-secondary">
-                          {t('createRecurringRequest') ||
-                            'Set up a repeating schedule for ongoing needs'}
-                          .
+                          Set up a repeating schedule for ongoing needs .
                         </p>
                       </div>
                     </Button>

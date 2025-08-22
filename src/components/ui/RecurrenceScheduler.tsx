@@ -149,7 +149,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
   const getDisplayText = () => {
     switch (value.type) {
       case 'daily':
-        return t('daily') || 'Daily';
+        return 'Daily';
       case 'weekly':
         if (value.weeklyDays?.length) {
           const dayMap = {
@@ -167,7 +167,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
             .join(', ');
           return `Weekly (${days})`;
         }
-        return t('weekly') || 'Weekly';
+        return 'Weekly';
       case 'custom':
         const count = value.customDates?.length || 0;
         return count > 0 ? `Custom (${count} dates selected)` : 'Custom';
@@ -267,7 +267,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
           {/* Date Picker */}
           <div>
             <p className="text-label text-secondary mb-2">
-              {t('selectCustomDates') || 'Select specific dates'}
+              Select specific dates
             </p>
             <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
@@ -280,7 +280,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
                   )}
                 >
                   <span className="text-body text-primary">
-                    {t('clickToSelectDates') || 'Click to select dates'}
+                    Click to select dates
                   </span>
                   <CalendarIcon className="h-4 w-4 text-secondary" />
                 </button>
@@ -310,9 +310,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
           {/* Selected Dates Display */}
           {value.customDates && value.customDates.length > 0 && (
             <div>
-              <p className="text-label text-secondary mb-2">
-                {t('selectedDates') || 'Selected dates'}:
-              </p>
+              <p className="text-label text-secondary mb-2">Selected dates:</p>
               <div className="flex flex-wrap gap-2">
                 {value.customDates.map((dateStr) => (
                   <div
@@ -341,8 +339,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
       {value.type === 'daily' && (
         <div className="p-3 rounded-md bg-positive/10 border border-positive/20">
           <p className="text-label text-primary">
-            {t('dailyScheduleInfo') ||
-              'Request will repeat every day between the selected date range'}
+            Request will repeat every day between the selected date range
           </p>
         </div>
       )}

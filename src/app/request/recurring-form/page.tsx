@@ -132,7 +132,8 @@ export default function RecurringRequestForm() {
     <PageContainer
       header={
         <SecondaryNavbar
-          title={t('recurringRequest') || 'Recurring Request'}
+          title="Recurring Request"
+          backHref="/receiver/dashboard"
           onBackClick={() => router.back()}
         />
       }
@@ -145,9 +146,7 @@ export default function RecurringRequestForm() {
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting
-              ? t('submitting') || 'Submitting...'
-              : t('submitRequest') || 'Submit Request'}
+            {isSubmitting ? 'Submitting...' : 'Submit Request'}
           </Button>
         </BottomActionBar>
       }
@@ -158,16 +157,13 @@ export default function RecurringRequestForm() {
         {/* Food Description */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            {t('describeFoodNeeds') || 'Describe what type of food you need'}
+            Describe what type of food you need
           </label>
           <Textarea
             {...register('description', {
               required: 'Please describe the food you need',
             })}
-            placeholder={
-              t('foodDescriptionPlaceholder') ||
-              'e.g., Fresh vegetables, prepared meals, dairy products...'
-            }
+            placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
             variant={errors.description ? 'error' : 'default'}
             rows={4}
           />
@@ -181,7 +177,7 @@ export default function RecurringRequestForm() {
         {/* Quantity */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            {t('quantityPortions') || 'How many people is this for?'}
+            How many people is this for?
           </label>
           <Input
             {...register('quantity', {
@@ -192,7 +188,7 @@ export default function RecurringRequestForm() {
                 message: 'Please enter a valid number',
               },
             })}
-            placeholder={t('enterQuantity') || 'Enter number of people'}
+            placeholder="Enter number of people"
             type="number"
             variant={errors.quantity ? 'error' : 'default'}
           />
@@ -205,7 +201,7 @@ export default function RecurringRequestForm() {
 
         {/* Allergens */}
         <AllergensDropdown
-          label={t('allergiesIntolerancesDiets')}
+          label="Allergies, intolerances & diets"
           options={[
             'Milk',
             'Eggs',
@@ -224,7 +220,7 @@ export default function RecurringRequestForm() {
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-          placeholder={t('selectDietaryRestrictions')}
+          placeholder="Select dietary restrictions"
           error={
             !selectedAllergens.length && watchedFields.description
               ? 'Please select at least one option'
@@ -234,14 +230,12 @@ export default function RecurringRequestForm() {
 
         {/* Recurrence Schedule */}
         <RecurrenceScheduler
-          label={t('recurrenceSchedule') || 'Recurrence Schedule'}
+          label="Recurrence Schedule"
           value={recurrenceSchedule}
           onChange={setRecurrenceSchedule}
           startDate={startDate}
           endDate={endDate}
-          hint={
-            t('selectHowOftenYouNeedFood') || 'Select how often you need food'
-          }
+          hint={'Select how often you need food'}
           error={
             !isScheduleValid() && watchedFields.description
               ? 'Please complete the schedule selection'
@@ -253,7 +247,7 @@ export default function RecurringRequestForm() {
         <div className="space-y-4">
           {/* Start Date */}
           <DatePicker
-            label={t('startDate') || 'Start Date'}
+            label="Start Date"
             date={startDate}
             onDateChange={setStartDate}
             placeholder="dd.mm.yyyy"
@@ -269,7 +263,7 @@ export default function RecurringRequestForm() {
 
           {/* End Date */}
           <DatePicker
-            label={t('endDate') || 'End Date'}
+            label="End Date"
             date={endDate}
             onDateChange={setEndDate}
             placeholder="dd.mm.yyyy"
@@ -287,16 +281,15 @@ export default function RecurringRequestForm() {
         {/* Pickup Time */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            {t('pickupTimeSlot') || 'Pickup Time Slot'}
+            Pickup Time Slot
           </label>
           <p className="text-label text-secondary mb-2">
-            {t('sameTimeForAllOccurrences') ||
-              'This time will apply to all occurrences'}
+            This time will apply to all occurrences
           </p>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-label text-secondary mb-1">
-                {t('startTime') || 'Start Time'}
+                Start Time
               </label>
               <Input
                 type="time"
@@ -308,7 +301,7 @@ export default function RecurringRequestForm() {
             </div>
             <div>
               <label className="block text-label text-secondary mb-1">
-                {t('endTime') || 'End Time'}
+                End Time
               </label>
               <Input
                 type="time"
@@ -325,7 +318,7 @@ export default function RecurringRequestForm() {
         {isFormValid && (
           <div className="p-4 bg-positive/10 rounded-md border border-positive/20">
             <p className="text-label font-semibold text-primary mb-1">
-              {t('requestSummary') || 'Request Summary'}:
+              Request Summary:
             </p>
             <p className="text-label text-secondary">
               {recurrenceSchedule.type === 'daily' && 'Daily request'}

@@ -75,45 +75,18 @@ export default function OneTimeRequestForm() {
   };
 
   return (
-    <PageContainer
-      header={
-        <SecondaryNavbar
-          title={t('oneTimeRequest') || 'One-time Request'}
-          onBackClick={() => router.back()}
-        />
-      }
-      footer={
-        <BottomActionBar>
-          <Button
-            type="submit"
-            size="cta"
-            disabled={!isFormValid || isSubmitting}
-            onClick={handleSubmit(onSubmit)}
-            className="w-full"
-          >
-            {isSubmitting
-              ? t('submitting') || 'Submitting...'
-              : t('submitRequest') || 'Submit Request'}
-          </Button>
-        </BottomActionBar>
-      }
-      className="bg-white"
-      contentClassName="p-4 space-y-6"
-    >
+    <div className="bg-white p-4 space-y-6">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Food Description */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            {t('describeFoodNeeds') || 'Describe what type of food you need'}
+            Describe what type of food you need
           </label>
           <Textarea
             {...register('description', {
               required: 'Please describe the food you need',
             })}
-            placeholder={
-              t('foodDescriptionPlaceholder') ||
-              'e.g., Fresh vegetables, prepared meals, dairy products...'
-            }
+            placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
             variant={errors.description ? 'error' : 'default'}
             rows={4}
           />
@@ -127,7 +100,7 @@ export default function OneTimeRequestForm() {
         {/* Quantity */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            {t('quantityPortions') || 'How many people is this for?'}
+            How many people is this for?
           </label>
           <Input
             {...register('quantity', {
@@ -138,7 +111,7 @@ export default function OneTimeRequestForm() {
                 message: 'Please enter a valid number',
               },
             })}
-            placeholder={t('enterQuantity') || 'Enter number of people'}
+            placeholder="Enter number of people"
             type="number"
             variant={errors.quantity ? 'error' : 'default'}
           />
@@ -151,7 +124,7 @@ export default function OneTimeRequestForm() {
 
         {/* Allergens */}
         <AllergensDropdown
-          label={t('allergiesIntolerancesDiets')}
+          label="Allergies, intolerances & diets"
           options={[
             'Milk',
             'Eggs',
@@ -170,7 +143,7 @@ export default function OneTimeRequestForm() {
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-          placeholder={t('selectDietaryRestrictions')}
+          placeholder="Select dietary restrictions"
           error={
             !selectedAllergens.length && watchedFields.description
               ? 'Please select at least one option'
@@ -180,7 +153,7 @@ export default function OneTimeRequestForm() {
 
         {/* Pickup Date */}
         <DatePicker
-          label={t('pickupDate') || 'Pickup Date'}
+          label="Pickup Date"
           date={pickupDate}
           onDateChange={setPickupDate}
           placeholder="dd.mm.yyyy"
@@ -196,12 +169,12 @@ export default function OneTimeRequestForm() {
         {/* Pickup Time */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            {t('pickupTimeSlot') || 'Pickup Time Slot'}
+            Pickup Time Slot
           </label>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-label text-secondary mb-1">
-                {t('startTime') || 'Start Time'}
+                Start Time
               </label>
               <Input
                 type="time"
@@ -213,7 +186,7 @@ export default function OneTimeRequestForm() {
             </div>
             <div>
               <label className="block text-label text-secondary mb-1">
-                {t('endTime') || 'End Time'}
+                End Time
               </label>
               <Input
                 type="time"
@@ -226,6 +199,6 @@ export default function OneTimeRequestForm() {
           </div>
         </div>
       </form>
-    </PageContainer>
+    </div>
   );
 }
