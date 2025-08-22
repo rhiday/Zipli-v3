@@ -1,0 +1,325 @@
+/* Documentation Styles - Stripe/Shopify Inspired */
+
+/* Grid Cards */
+.grid-cards {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 my-6;
+}
+
+.grid-cards .card {
+  @apply p-6 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow;
+}
+
+.grid-cards .card h3 {
+  @apply text-lg font-semibold mb-2;
+}
+
+.grid-cards .card p {
+  @apply text-gray-600 mb-3;
+}
+
+.grid-cards .card a {
+  @apply text-primary font-medium hover:underline;
+}
+
+/* Tabs */
+.tabs {
+  @apply my-8;
+}
+
+.tab-buttons {
+  @apply flex border-b border-gray-200 mb-6;
+}
+
+.tab-buttons button {
+  @apply px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent hover:text-gray-900 transition-colors;
+}
+
+.tab-buttons button.active {
+  @apply text-primary border-primary;
+}
+
+.tab-content {
+  @apply hidden;
+}
+
+.tab-content.active {
+  @apply block;
+}
+
+/* Callouts */
+.callout {
+  @apply p-4 rounded-lg my-6 border-l-4;
+}
+
+.callout.info {
+  @apply bg-blue-50 border-blue-500;
+}
+
+.callout.warning {
+  @apply bg-yellow-50 border-yellow-500;
+}
+
+.callout.success {
+  @apply bg-green-50 border-green-500;
+}
+
+.callout.error {
+  @apply bg-red-50 border-red-500;
+}
+
+.callout.tip {
+  @apply bg-purple-50 border-purple-500;
+}
+
+/* Code Examples */
+.code-example {
+  @apply my-6 bg-gray-900 rounded-lg overflow-hidden;
+}
+
+.code-example .filename {
+  @apply px-4 py-2 bg-gray-800 text-gray-300 text-sm font-mono;
+}
+
+/* Step Indicators */
+.step-indicator {
+  @apply flex items-center justify-center gap-4 my-8;
+}
+
+.step-indicator .step {
+  @apply w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-sm font-medium;
+}
+
+.step-indicator .step.active {
+  @apply bg-primary text-white;
+}
+
+/* Deployment Flow */
+.deployment-flow {
+  @apply flex items-center justify-between my-8 px-4;
+}
+
+.flow-step {
+  @apply text-center flex-1;
+}
+
+.flow-step .number {
+  @apply inline-block w-10 h-10 bg-primary text-white rounded-full leading-10 font-semibold mb-2;
+}
+
+.flow-arrow {
+  @apply text-gray-400 text-2xl px-4;
+}
+
+/* Help Cards */
+.help-cards {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4 my-8;
+}
+
+.help-card {
+  @apply block p-6 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow text-center;
+}
+
+.help-card .icon {
+  @apply text-3xl mb-3 block;
+}
+
+.help-card h4 {
+  @apply font-semibold mb-2;
+}
+
+/* Pattern Grid */
+.pattern-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-6;
+}
+
+.pattern {
+  @apply p-4 bg-gray-50 rounded-lg;
+}
+
+.pattern h4 {
+  @apply font-semibold mb-2;
+}
+
+.pattern code {
+  @apply text-xs bg-gray-800 text-green-400 px-2 py-1 rounded;
+}
+
+/* Test Steps */
+.test-steps {
+  @apply space-y-4 my-6;
+}
+
+.test-steps .step {
+  @apply flex items-start gap-4 p-4 bg-gray-50 rounded-lg;
+}
+
+.step-number {
+  @apply w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-semibold;
+}
+
+/* Next Steps Grid */
+.next-steps-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4 my-8;
+}
+
+.next-card {
+  @apply block p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg hover:shadow-md transition-shadow;
+}
+
+.next-card .icon {
+  @apply text-2xl mb-3 block;
+}
+
+/* Interactive Section */
+.interactive-section {
+  @apply p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg my-8;
+}
+
+.button.primary {
+  @apply inline-block px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors;
+}
+
+/* Feedback */
+.feedback {
+  @apply text-center py-8 border-t border-gray-200 mt-12;
+}
+
+.feedback-buttons {
+  @apply flex justify-center gap-4 mt-4;
+}
+
+.feedback-buttons button {
+  @apply px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors;
+}
+
+/* Reading Time */
+.reading-time {
+  @apply text-sm text-gray-500 mb-4;
+}
+
+/* Demo Preview */
+.demo-preview {
+  @apply my-8 p-8 bg-gray-100 rounded-lg flex items-center justify-center;
+}
+
+/* Architecture Diagram */
+.architecture-diagram {
+  @apply my-6 p-6 bg-gray-50 rounded-lg;
+}
+
+.architecture-diagram .flow {
+  @apply text-center font-mono text-sm text-gray-600;
+}
+
+/* Checklist */
+.checklist {
+  @apply p-4 bg-green-50 border border-green-200 rounded-lg my-6 font-mono text-sm;
+}
+
+/* ADR Styles */
+.adr-header {
+  @apply flex items-center justify-between p-4 bg-gray-50 rounded-lg mb-6;
+}
+
+.adr-header .status {
+  @apply px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium;
+}
+
+.adr-header .date {
+  @apply text-gray-600 text-sm;
+}
+
+.adr-header .impact {
+  @apply px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium;
+}
+
+/* Problem Grid */
+.problem-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 my-6;
+}
+
+.problem-card {
+  @apply p-4 rounded-lg border-2;
+}
+
+.problem-card.critical {
+  @apply bg-red-50 border-red-300;
+}
+
+.problem-card.high {
+  @apply bg-orange-50 border-orange-300;
+}
+
+/* Decision Detail */
+.decision-detail {
+  @apply my-8 p-6 bg-gray-50 rounded-lg;
+}
+
+.before-after {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6 mb-6;
+}
+
+.before {
+  @apply p-4 bg-red-50 rounded-lg;
+}
+
+.after {
+  @apply p-4 bg-green-50 rounded-lg;
+}
+
+/* Metrics */
+.metrics {
+  @apply flex gap-6 my-4;
+}
+
+.metric {
+  @apply text-center;
+}
+
+.metric .value {
+  @apply block text-3xl font-bold text-primary;
+}
+
+.metric .label {
+  @apply text-sm text-gray-600;
+}
+
+/* Results Dashboard */
+.results-dashboard {
+  @apply grid grid-cols-2 md:grid-cols-4 gap-4 my-8;
+}
+
+.result-card {
+  @apply p-4 bg-white border border-gray-200 rounded-lg text-center;
+}
+
+.result-card.success {
+  @apply border-green-300 bg-green-50;
+}
+
+.metric-large {
+  @apply text-4xl font-bold text-primary my-2;
+}
+
+/* Lessons */
+.lessons {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 my-6;
+}
+
+.lesson {
+  @apply p-4 bg-blue-50 rounded-lg;
+}
+
+.lesson .icon {
+  @apply text-2xl mb-2 block;
+}
+
+/* Monitoring Checklist */
+.monitoring-checklist {
+  @apply p-4 bg-gray-100 rounded-lg my-6 font-mono text-sm;
+}
+
+/* ADR Footer */
+.adr-footer {
+  @apply flex flex-wrap gap-6 mt-12 pt-6 border-t border-gray-200 text-sm text-gray-600;
+}

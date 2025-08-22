@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
-import { tokens, saveTokens } from "@/lib/tokens";
-import { checkRateLimit, getClientIP } from "@/lib/validation";
+import { NextResponse } from 'next/server';
+import { tokens, saveTokens } from '@/lib/tokens';
+import { checkRateLimit, getClientIP } from '@/lib/validation';
+import { randomUUID } from 'crypto';
 
 // Secure CORS configuration - only allow specific origins
 const getAllowedOrigin = (origin: string | null) => {
@@ -8,29 +9,33 @@ const getAllowedOrigin = (origin: string | null) => {
     process.env.NEXT_PUBLIC_APP_URL,
     'http://localhost:3000',
     'http://localhost:3001',
-    'https://zipli-v3.vercel.app'
+    'https://zipli-v3.vercel.app',
   ].filter(Boolean);
-  
+
   return origin && allowedOrigins.includes(origin) ? origin : 'null';
 };
 
 // Specific user account that will be used for QR code login
-const QR_LOGIN_USER_EMAIL = "helsinki.airport@sodexo.com"; // Specific account for Helsinki Airport
+const QR_LOGIN_USER_EMAIL = 'helsinki.airport@sodexo.com'; // Specific account for Helsinki Airport
 
 export async function GET(request: Request) {
   try {
     // Rate limiting for QR token generation (more restrictive)
     const clientIP = getClientIP(request);
     const rateLimitResult = checkRateLimit(`qr-token-${clientIP}`, 10, 60000); // 10 requests per minute
-    
+
     if (!rateLimitResult.allowed) {
       return new NextResponse(
-        JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+        JSON.stringify({
+          error: 'Rate limit exceeded. Please try again later.',
+        }),
         {
           status: 429,
           headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': getAllowedOrigin(
+              request.headers.get('origin')
+            ),
             'X-RateLimit-Limit': '10',
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
@@ -42,10 +47,8 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     // QR token generation request
 
-    // Generate a unique token - simplified version without uuid dependency
-    const token =
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
+    // Generate a cryptographically secure token
+    const token = randomUUID() + randomUUID().replace(/-/g, '');
 
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 48); // Token valid for 24 hours
@@ -83,24 +86,28 @@ export async function GET(request: Request) {
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': getAllowedOrigin(
+            request.headers.get('origin')
+          ),
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         },
       }
     );
   } catch (error) {
-    console.error("QR token generation error:", error);
+    console.error('QR token generation error:', error);
     return new NextResponse(
-      JSON.stringify({ error: "Internal server error" }),
+      JSON.stringify({ error: 'Internal server error' }),
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': getAllowedOrigin(
+            request.headers.get('origin')
+          ),
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         },
       }
     );
@@ -112,10 +119,12 @@ export async function OPTIONS(request: Request) {
   return new NextResponse(null, {
     status: 204,
     headers: {
-      "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Max-Age": "86400",
+      'Access-Control-Allow-Origin': getAllowedOrigin(
+        request.headers.get('origin')
+      ),
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
     },
   });
 }

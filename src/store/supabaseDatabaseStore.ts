@@ -50,10 +50,18 @@ interface SupabaseDatabaseState {
 
   // Auth methods (maintaining compatibility with existing auth interface)
   login: (email: string, password: string) => Promise<AuthResponse>;
-  register: (email: string, password: string, userData: Partial<Profile>) => Promise<AuthResponse>;
+  register: (
+    email: string,
+    password: string,
+    userData: Partial<Profile>
+  ) => Promise<AuthResponse>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   updatePassword: (password: string) => Promise<{ error: string | null }>;
-  verifyOtp: (email: string, token: string, type: string) => Promise<AuthResponse>;
+  verifyOtp: (
+    email: string,
+    token: string,
+    type: string
+  ) => Promise<AuthResponse>;
   setCurrentUser: (email: string) => Promise<void>;
   updateUser: (updatedUser: Profile) => Promise<void>;
   logout: () => Promise<void>;
@@ -68,21 +76,35 @@ interface SupabaseDatabaseState {
   getDonationById: (id: string) => DonationWithFoodItem | undefined;
   getDonationsByDonor: (donorId: string) => DonationWithFoodItem[];
   getAllDonations: () => DonationWithFoodItem[];
-  addDonation: (donation: DonationInsert) => Promise<{ data: Donation | null; error: string | null }>;
-  updateDonation: (id: string, updates: DonationUpdate) => Promise<{ data: Donation | null; error: string | null }>;
+  addDonation: (
+    donation: DonationInsert
+  ) => Promise<{ data: Donation | null; error: string | null }>;
+  updateDonation: (
+    id: string,
+    updates: DonationUpdate
+  ) => Promise<{ data: Donation | null; error: string | null }>;
   deleteDonation: (id: string) => Promise<{ error: string | null }>;
 
   // Food item methods
-  addFoodItem: (foodItem: Omit<FoodItem, 'id' | 'created_at' | 'updated_at'>) => Promise<{ data: FoodItem | null; error: string | null }>;
-  updateFoodItem: (id: string, updates: Partial<FoodItem>) => Promise<{ data: FoodItem | null; error: string | null }>;
+  addFoodItem: (
+    foodItem: Omit<FoodItem, 'id' | 'created_at' | 'updated_at'>
+  ) => Promise<{ data: FoodItem | null; error: string | null }>;
+  updateFoodItem: (
+    id: string,
+    updates: Partial<FoodItem>
+  ) => Promise<{ data: FoodItem | null; error: string | null }>;
 
   // Request methods
   getAllRequests: () => Request[];
   getRequestById: (id: string) => Request | undefined;
-  addRequest: (requestData: RequestInsert) => Promise<{ data: Request | null; error: string | null }>;
-  updateRequest: (id: string, updates: RequestUpdate) => Promise<{ data: Request | null; error: string | null }>;
+  addRequest: (
+    requestData: RequestInsert
+  ) => Promise<{ data: Request | null; error: string | null }>;
+  updateRequest: (
+    id: string,
+    updates: RequestUpdate
+  ) => Promise<{ data: Request | null; error: string | null }>;
   deleteRequest: (id: string) => Promise<{ error: string | null }>;
-
 
   // Real-time methods
   setupRealtimeSubscriptions: () => void;
@@ -122,7 +144,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           console.log('📋 Getting current user...');
           const currentUser = await authService.getCurrentUser();
           console.log('👤 Current user:', currentUser?.full_name || 'None');
-          
+
           // Always fetch data from Supabase
           console.log('📦 Fetching data...');
           await Promise.all([
@@ -135,16 +157,17 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
           // Setup real-time subscriptions
           state.setupRealtimeSubscriptions();
-          set({ 
+          set({
             currentUser,
             isInitialized: true,
-            loading: false 
+            loading: false,
           });
         } catch (error) {
           console.error('❌ Initialization error:', error);
-          set({ 
-            error: error instanceof Error ? error.message : 'Initialization failed',
-            loading: false 
+          set({
+            error:
+              error instanceof Error ? error.message : 'Initialization failed',
+            loading: false,
           });
         }
       },
@@ -153,32 +176,36 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       login: async (email: string, password: string) => {
         try {
           set({ loading: true, error: null });
-          
+
           // Always use real Supabase authentication
           const result = await authService.signIn({ email, password });
-          
+
           if (result.data) {
             set({ currentUser: result.data });
             // Refresh data after login
             await get().fetchDonations();
             await get().fetchRequests();
           }
-          
+
           set({ loading: false });
           return result;
         } catch (error) {
           set({ loading: false });
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Login failed' 
+          return {
+            data: null,
+            error: error instanceof Error ? error.message : 'Login failed',
           };
         }
       },
 
-      register: async (email: string, password: string, userData: Partial<Profile>) => {
+      register: async (
+        email: string,
+        password: string,
+        userData: Partial<Profile>
+      ) => {
         try {
           set({ loading: true, error: null });
-          
+
           const result = await authService.signUp({
             email,
             password,
@@ -188,20 +215,21 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
               organization_name: userData.organization_name || undefined,
               contact_number: userData.contact_number || undefined,
               address: userData.address || undefined,
-            }
+            },
           });
-          
+
           if (result.data) {
             set({ currentUser: result.data });
           }
-          
+
           set({ loading: false });
           return result;
         } catch (error) {
           set({ loading: false });
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Registration failed' 
+          return {
+            data: null,
+            error:
+              error instanceof Error ? error.message : 'Registration failed',
           };
         }
       },
@@ -232,7 +260,10 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       updateUser: async (updatedUser: Profile) => {
         try {
-          const result = await authService.updateProfile(updatedUser.id, updatedUser);
+          const result = await authService.updateProfile(
+            updatedUser.id,
+            updatedUser
+          );
           if (result.data) {
             set({ currentUser: result.data });
           }
@@ -245,16 +276,16 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
         try {
           // Always sign out from Supabase
           await authService.signOut();
-          
+
           get().cleanupSubscriptions();
-          
-          set({ 
+
+          set({
             currentUser: null,
             // Keep users list for DevLoginSwitcher
             // Other data will be cleared
             donations: [],
             requests: [],
-                });
+          });
         } catch (error) {
           console.error('Logout error:', error);
         }
@@ -263,28 +294,25 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       // ===== DATA FETCHING METHODS =====
       fetchDonations: async () => {
         try {
-          // Simple fetch - just get donations
+          // OPTIMIZED: Single query with JOINs instead of N+1 queries
           const { data: donationsData, error: donationsError } = await supabase
             .from('donations')
-            .select('*')
+            .select(
+              `
+              *,
+              food_item:food_items(*),
+              donor:profiles!donations_donor_id_fkey(*)
+            `
+            )
             .order('created_at', { ascending: false });
 
           if (donationsError) throw donationsError;
 
-          // Fetch food items separately
-          const { data: foodItemsData, error: foodItemsError } = await supabase
-            .from('food_items')
-            .select('*');
-
-          if (foodItemsError) throw foodItemsError;
-
-          // Map donations with their food items and donors
-          const donations: DonationWithFoodItem[] = (donationsData || []).map(donation => {
-            const foodItem = foodItemsData?.find(fi => fi.id === donation.food_item_id);
-            const donor = get().users.find(u => u.id === donation.donor_id);
-            return {
+          // Transform the joined data to match expected format
+          const donations: DonationWithFoodItem[] = (donationsData || []).map(
+            (donation) => ({
               ...donation,
-              food_item: foodItem || {
+              food_item: donation.food_item || {
                 id: donation.food_item_id,
                 name: 'Unknown Item',
                 description: null,
@@ -296,9 +324,9 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
                 unit: null,
                 user_id: donation.donor_id,
                 created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
               },
-              donor: donor || {
+              donor: donation.donor || {
                 id: donation.donor_id,
                 full_name: 'Unknown Donor',
                 email: '',
@@ -311,15 +339,25 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
                 postal_code: null,
                 street_address: null,
                 created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              }
-            };
-          });
+                updated_at: new Date().toISOString(),
+              },
+            })
+          );
+
+          // Also fetch and cache food items separately for other uses
+          const { data: foodItemsData } = await supabase
+            .from('food_items')
+            .select('*');
 
           set({ donations, foodItems: foodItemsData || [] });
         } catch (error) {
           console.error('Error fetching donations:', error);
-          set({ error: error instanceof Error ? error.message : 'Failed to fetch donations' });
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch donations',
+          });
         }
       },
 
@@ -334,7 +372,12 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           set({ foodItems: data || [] });
         } catch (error) {
           console.error('Error fetching food items:', error);
-          set({ error: error instanceof Error ? error.message : 'Failed to fetch food items' });
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch food items',
+          });
         }
       },
 
@@ -349,7 +392,10 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           set({ users: data || [] });
         } catch (error) {
           console.error('Error fetching users:', error);
-          set({ error: error instanceof Error ? error.message : 'Failed to fetch users' });
+          set({
+            error:
+              error instanceof Error ? error.message : 'Failed to fetch users',
+          });
         }
       },
 
@@ -364,18 +410,22 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           set({ requests: data || [] });
         } catch (error) {
           console.error('Error fetching requests:', error);
-          set({ error: error instanceof Error ? error.message : 'Failed to fetch requests' });
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch requests',
+          });
         }
       },
 
-
       // ===== DONATION METHODS =====
       getDonationById: (id: string) => {
-        return get().donations.find(d => d.id === id);
+        return get().donations.find((d) => d.id === id);
       },
 
       getDonationsByDonor: (donorId: string) => {
-        return get().donations.filter(d => d.donor_id === donorId);
+        return get().donations.filter((d) => d.donor_id === donorId);
       },
 
       getAllDonations: () => {
@@ -391,15 +441,16 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .single();
 
           if (error) return { data: null, error: error.message };
-          
+
           // Refresh donations to get the full data with relations
           await get().fetchDonations();
-          
+
           return { data, error: null };
         } catch (error) {
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Failed to add donation' 
+          return {
+            data: null,
+            error:
+              error instanceof Error ? error.message : 'Failed to add donation',
           };
         }
       },
@@ -414,15 +465,18 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .single();
 
           if (error) return { data: null, error: error.message };
-          
+
           // Refresh donations
           await get().fetchDonations();
-          
+
           return { data, error: null };
         } catch (error) {
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Failed to update donation' 
+          return {
+            data: null,
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to update donation',
           };
         }
       },
@@ -435,15 +489,18 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .eq('id', id);
 
           if (error) return { error: error.message };
-          
+
           // Remove from local state
-          const donations = get().donations.filter(d => d.id !== id);
+          const donations = get().donations.filter((d) => d.id !== id);
           set({ donations });
-          
+
           return { error: null };
         } catch (error) {
-          return { 
-            error: error instanceof Error ? error.message : 'Failed to delete donation' 
+          return {
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to delete donation',
           };
         }
       },
@@ -458,16 +515,19 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .single();
 
           if (error) return { data: null, error: error.message };
-          
+
           // Add to local state
           const foodItems = [...get().foodItems, data];
           set({ foodItems });
-          
+
           return { data, error: null };
         } catch (error) {
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Failed to add food item' 
+          return {
+            data: null,
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to add food item',
           };
         }
       },
@@ -482,18 +542,21 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .single();
 
           if (error) return { data: null, error: error.message };
-          
+
           // Update local state
-          const foodItems = get().foodItems.map(item => 
+          const foodItems = get().foodItems.map((item) =>
             item.id === id ? { ...item, ...data } : item
           );
           set({ foodItems });
-          
+
           return { data, error: null };
         } catch (error) {
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Failed to update food item' 
+          return {
+            data: null,
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to update food item',
           };
         }
       },
@@ -504,7 +567,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       },
 
       getRequestById: (id: string) => {
-        return get().requests.find(r => r.id === id);
+        return get().requests.find((r) => r.id === id);
       },
 
       addRequest: async (requestData: RequestInsert) => {
@@ -516,16 +579,17 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .single();
 
           if (error) return { data: null, error: error.message };
-          
+
           // Add to local state
           const requests = [data, ...get().requests];
           set({ requests });
-          
+
           return { data, error: null };
         } catch (error) {
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Failed to add request' 
+          return {
+            data: null,
+            error:
+              error instanceof Error ? error.message : 'Failed to add request',
           };
         }
       },
@@ -540,18 +604,21 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .single();
 
           if (error) return { data: null, error: error.message };
-          
+
           // Update local state
-          const requests = get().requests.map(req => 
+          const requests = get().requests.map((req) =>
             req.id === id ? { ...req, ...data } : req
           );
           set({ requests });
-          
+
           return { data, error: null };
         } catch (error) {
-          return { 
-            data: null, 
-            error: error instanceof Error ? error.message : 'Failed to update request' 
+          return {
+            data: null,
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to update request',
           };
         }
       },
@@ -564,19 +631,21 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .eq('id', id);
 
           if (error) return { error: error.message };
-          
+
           // Remove from local state
-          const requests = get().requests.filter(r => r.id !== id);
+          const requests = get().requests.filter((r) => r.id !== id);
           set({ requests });
-          
+
           return { error: null };
         } catch (error) {
-          return { 
-            error: error instanceof Error ? error.message : 'Failed to delete request' 
+          return {
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to delete request',
           };
         }
       },
-
 
       // ===== REAL-TIME METHODS =====
       setupRealtimeSubscriptions: () => {
@@ -590,33 +659,80 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
         const subscriptions: RealtimeChannel[] = [];
 
         try {
-          // Subscribe to donations changes with unique channel names
+          // OPTIMIZED: Use stable channel names to prevent memory leaks
+          // Only refetch if user is affected by the change
           const donationsChannel = supabase
-            .channel(`donations_changes_${Date.now()}`)
-            .on('postgres_changes', 
+            .channel('donations_realtime')
+            .on(
+              'postgres_changes',
               { event: '*', schema: 'public', table: 'donations' },
-              () => {
-                console.log('Donations changed, refetching...');
-                get().fetchDonations();
+              (payload) => {
+                console.log(
+                  'Donations changed:',
+                  payload.eventType,
+                  (payload.new as any)?.id
+                );
+
+                // PERFORMANCE: Only refetch if current user is involved
+                const currentUser = get().currentUser;
+                if (!currentUser) return;
+
+                const newRecord = payload.new as any;
+                const oldRecord = payload.old as any;
+
+                const relevantChange =
+                  newRecord?.donor_id === currentUser.id ||
+                  oldRecord?.donor_id === currentUser.id ||
+                  payload.eventType === 'DELETE'; // Always refetch on deletes
+
+                if (relevantChange) {
+                  // Debounce rapid changes
+                  clearTimeout((window as any)._donationRefetchTimeout);
+                  (window as any)._donationRefetchTimeout = setTimeout(() => {
+                    get().fetchDonations();
+                  }, 100);
+                }
               }
             )
             .subscribe();
 
-          // Subscribe to requests changes with unique channel names
+          // OPTIMIZED: Similar pattern for requests
           const requestsChannel = supabase
-            .channel(`requests_changes_${Date.now()}`)
-            .on('postgres_changes',
+            .channel('requests_realtime')
+            .on(
+              'postgres_changes',
               { event: '*', schema: 'public', table: 'requests' },
-              () => {
-                console.log('Requests changed, refetching...');
-                get().fetchRequests();
+              (payload) => {
+                console.log(
+                  'Requests changed:',
+                  payload.eventType,
+                  (payload.new as any)?.id
+                );
+
+                const currentUser = get().currentUser;
+                if (!currentUser) return;
+
+                const newRecord = payload.new as any;
+                const oldRecord = payload.old as any;
+
+                const relevantChange =
+                  newRecord?.user_id === currentUser.id ||
+                  oldRecord?.user_id === currentUser.id ||
+                  payload.eventType === 'DELETE';
+
+                if (relevantChange) {
+                  clearTimeout((window as any)._requestRefetchTimeout);
+                  (window as any)._requestRefetchTimeout = setTimeout(() => {
+                    get().fetchRequests();
+                  }, 100);
+                }
               }
             )
             .subscribe();
 
           subscriptions.push(donationsChannel, requestsChannel);
           set({ subscriptions });
-          console.log('Real-time subscriptions set up successfully');
+          console.log('Optimized real-time subscriptions set up successfully');
         } catch (error) {
           console.error('Error setting up subscriptions:', error);
         }
@@ -624,7 +740,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       cleanupSubscriptions: () => {
         const { subscriptions } = get();
-        subscriptions.forEach(subscription => {
+        subscriptions.forEach((subscription) => {
           supabase.removeChannel(subscription);
         });
         set({ subscriptions: [] });
@@ -634,7 +750,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       name: 'supabase-database-storage',
       storage: createJSONStorage(() => localStorage),
       // Only persist user session, not the actual data (we'll fetch fresh data on init)
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         currentUser: state.currentUser,
         // Don't persist isInitialized so we always fetch fresh data on app restart
       }),
