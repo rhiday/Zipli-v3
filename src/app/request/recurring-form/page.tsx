@@ -11,6 +11,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Progress } from '@/components/ui/progress';
 import { RecurringRequest } from '@/types/request.types';
 
 type RecurringFormInputs = {
@@ -64,11 +65,16 @@ export default function RecurringRequestForm() {
   return (
     <PageContainer
       header={
-        <SecondaryNavbar
-          title="Recurring Request"
-          backHref="/receiver/dashboard"
-          onBackClick={() => router.back()}
-        />
+        <>
+          <SecondaryNavbar
+            title="Recurring Request"
+            backHref="/request/select-type"
+            onBackClick={() => router.back()}
+          />
+          <div className="px-4 pt-2">
+            <Progress value={33} className="h-2 w-full" />
+          </div>
+        </>
       }
       footer={
         <BottomActionBar>
@@ -84,7 +90,7 @@ export default function RecurringRequestForm() {
         </BottomActionBar>
       }
       className="bg-white"
-      contentClassName="p-4 space-y-6"
+      contentClassName="p-4 space-y-6 pb-24"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Food Description */}

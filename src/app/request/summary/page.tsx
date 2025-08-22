@@ -218,7 +218,7 @@ export default function RequestSummaryPage() {
           </div>
         </>
       }
-      contentClassName="p-4 space-y-6"
+      contentClassName="p-4 space-y-6 pb-24"
       footer={
         <BottomActionBar>
           <div className="flex justify-end">

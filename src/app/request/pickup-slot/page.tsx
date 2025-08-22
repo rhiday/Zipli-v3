@@ -114,11 +114,11 @@ export default function PickupSlotPage() {
             onBackClick={() => router.back()}
           />
           <div className="px-4 pt-2">
-            <Progress value={67} className="h-2 w-full" />
+            <Progress value={50} className="h-2 w-full" />
           </div>
         </>
       }
-      contentClassName="p-4 space-y-6"
+      contentClassName="p-4 space-y-6 pb-24"
       footer={
         <BottomActionBar>
           <Button
