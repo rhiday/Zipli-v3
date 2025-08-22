@@ -244,5 +244,11 @@
   "whenDoYouNeed": "When do you need",
   "yesRemove": "Yes, remove",
   "yourActiveDonations": "Your active listings",
-  "yourImpact": "Your actions are making a difference! \\nThis is the impact of your latest activity:"
+  "yourImpact": "Your actions are making a difference! \\nThis is the impact of your latest activity:",
+  "peopleServed": "People Served",
+  "foodRequested": "Food Requested",
+  "fulfilledRequests": "Fulfilled Requests",
+  "whosHelpedYou": "Who's Helped You",
+  "exportToPDF": "Export to PDF",
+  "requestHistoryAndImpactData": "Request history and impact data"
 }

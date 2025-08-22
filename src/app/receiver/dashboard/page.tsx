@@ -212,7 +212,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
         <section>
           <div className="flex justify-between items-start gap-4 mb-4">
             <h2 className="text-lg font-semibold text-primary flex-1">
-              Your Impact
+              {t('yourImpact')}
             </h2>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -246,7 +246,9 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.totalPeople}
                 </span>
-                <p className="text-sm text-primary-75 mt-1">People Served</p>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('peopleServed')}
+                </p>
               </div>
             </div>
             {/* Food Requested */}
@@ -258,7 +260,9 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.estimatedKg}kg
                 </span>
-                <p className="text-sm text-primary-75 mt-1">Food Requested</p>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('foodRequested')}
+                </p>
               </div>
             </div>
             {/* Active Requests */}
@@ -270,7 +274,9 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.activeRequests}
                 </span>
-                <p className="text-sm text-primary-75 mt-1">Active Requests</p>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('activeRequests')}
+                </p>
               </div>
             </div>
             {/* Fulfilled Requests */}
@@ -283,7 +289,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.fulfilledRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  Fulfilled Requests
+                  {t('fulfilledRequests')}
                 </p>
               </div>
             </div>
@@ -298,17 +304,17 @@ export default function ReceiverDashboardPage(): React.ReactElement {
             tabIndex={0}
             role="button"
           >
-            Export to PDF
+            {t('exportToPDF')}
           </a>
           <span className="block text-sm text-primary-75 mt-1">
-            Request history and impact data
+            {t('requestHistoryAndImpactData')}
           </span>
         </div>
 
         {/* Who's helped you section */}
         <section>
           <h2 className="text-lg font-semibold text-primary mb-3">
-            Who's Helped You
+            {t('whosHelpedYou')}
           </h2>
 
           <div className="space-y-4">
