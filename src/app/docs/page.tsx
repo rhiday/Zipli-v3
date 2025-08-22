@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -110,7 +110,7 @@ const docStructure = {
   },
 };
 
-export default function DocsPage() {
+function DocsContent() {
   const searchParams = useSearchParams();
   const [selectedDoc, setSelectedDoc] = useState('index.md');
   const [content, setContent] = useState('');
@@ -182,7 +182,10 @@ This documentation is being loaded. Please check back soon.`;
       );
 
       if (filteredItems.length > 0) {
-        acc[key] = { ...section, items: filteredItems };
+        acc[key as keyof typeof docStructure] = {
+          ...section,
+          items: filteredItems,
+        };
       }
 
       return acc;
@@ -322,9 +325,9 @@ This documentation is being loaded. Please check back soon.`;
             <article className="prose prose-lg max-w-none">
               <ReactMarkdown
                 components={{
-                  code({ node, inline, className, children, ...props }) {
+                  code({ className, children, ...props }: any) {
                     const match = /language-(\w+)/.exec(className || '');
-                    return !inline && match ? (
+                    return match ? (
                       <SyntaxHighlighter
                         style={vscDarkPlus}
                         language={match[1]}
@@ -401,5 +404,13 @@ This documentation is being loaded. Please check back soon.`;
         </main>
       </div>
     </div>
+  );
+}
+
+export default function DocsPage() {
+  return (
+    <Suspense fallback={<div>Loading documentation...</div>}>
+      <DocsContent />
+    </Suspense>
   );
 }
