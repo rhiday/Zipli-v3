@@ -183,7 +183,7 @@ export default function DonationSchedulePage() {
           </div>
         </>
       }
-      contentClassName="p-4 space-y-6 pb-32"
+      contentClassName="p-4 space-y-6"
       footer={
         <BottomActionBar>
           <Button

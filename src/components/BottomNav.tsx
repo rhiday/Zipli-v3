@@ -83,11 +83,18 @@ export default function BottomNav() {
     }
   }, [currentUser, t]);
 
-  // Only render for authenticated users and exclude admin pages
+  // Only render for authenticated users and exclude admin pages and form flows
   if (
     !currentUser ||
     pathname.includes('/admin/') ||
-    pathname.includes('/auth/')
+    pathname.includes('/auth/') ||
+    pathname.includes('/donate/manual') ||
+    pathname.includes('/donate/recurring-form') ||
+    pathname.includes('/donate/schedule') ||
+    pathname.includes('/donate/pickup-slot') ||
+    pathname.includes('/donate/summary') ||
+    pathname.includes('/request/') ||
+    pathname.includes('/profile/')
   ) {
     return null;
   }
