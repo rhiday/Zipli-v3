@@ -20,7 +20,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
-interface RequestSchedule {
+interface DonationSchedule {
   id: string;
   type: 'daily' | 'weekly' | 'custom';
   startDate?: Date;
@@ -35,19 +35,19 @@ interface RequestSchedule {
   }>;
 }
 
-export default function RequestSchedulePage() {
+export default function DonationSchedulePage() {
   const router = useRouter();
   const { t } = useLanguage();
-  const [requestData, setRequestData] = useState<any>(null);
+  const [donationData, setDonationData] = useState<any>(null);
   const [scheduleType, setScheduleType] = useState<
     'daily' | 'weekly' | 'custom'
   >('daily');
-  const [schedules, setSchedules] = useState<RequestSchedule[]>([]);
+  const [schedules, setSchedules] = useState<DonationSchedule[]>([]);
   const [showAddForm, setShowAddForm] = useState(true);
 
   // Current schedule form state
   const [currentSchedule, setCurrentSchedule] = useState<
-    Omit<RequestSchedule, 'id'> & { id: string | 'new' }
+    Omit<DonationSchedule, 'id'> & { id: string | 'new' }
   >({
     id: 'new',
     type: 'daily',
@@ -57,10 +57,10 @@ export default function RequestSchedulePage() {
   });
 
   useEffect(() => {
-    // Get request data from session storage
-    const storedRequest = sessionStorage.getItem('pendingRequest');
-    if (storedRequest) {
-      setRequestData(JSON.parse(storedRequest));
+    // Get donation data from session storage
+    const storedDonation = sessionStorage.getItem('pendingDonation');
+    if (storedDonation) {
+      setDonationData(JSON.parse(storedDonation));
     }
   }, []);
 
@@ -73,17 +73,17 @@ export default function RequestSchedulePage() {
     }));
   };
 
-  const handleScheduleChange = (field: keyof RequestSchedule, value: any) => {
+  const handleScheduleChange = (field: keyof DonationSchedule, value: any) => {
     setCurrentSchedule((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleAddSchedule = () => {
     if (!isScheduleValid()) return;
 
-    const newSchedule: RequestSchedule = {
+    const newSchedule: DonationSchedule = {
       ...currentSchedule,
       id: Date.now().toString(),
-    } as RequestSchedule;
+    } as DonationSchedule;
 
     setSchedules((prev) => [...prev, newSchedule]);
 
@@ -132,8 +132,8 @@ export default function RequestSchedulePage() {
     if (schedules.length === 0 && !isScheduleValid()) return;
 
     // Store schedule data
-    const requestWithSchedule = {
-      ...requestData,
+    const donationWithSchedule = {
+      ...donationData,
       schedules:
         schedules.length > 0
           ? schedules
@@ -141,13 +141,13 @@ export default function RequestSchedulePage() {
     };
 
     sessionStorage.setItem(
-      'pendingRequest',
-      JSON.stringify(requestWithSchedule)
+      'pendingDonation',
+      JSON.stringify(donationWithSchedule)
     );
-    router.push('/request/summary');
+    router.push('/donate/summary');
   };
 
-  const formatScheduleDisplay = (schedule: RequestSchedule) => {
+  const formatScheduleDisplay = (schedule: DonationSchedule) => {
     switch (schedule.type) {
       case 'daily':
         if (schedule.startDate && schedule.endDate) {
@@ -174,8 +174,8 @@ export default function RequestSchedulePage() {
       header={
         <>
           <SecondaryNavbar
-            title="Schedule Requests"
-            backHref="/request/recurring-form"
+            title="Donation Schedule"
+            backHref="/donate/recurring-form"
             onBackClick={() => router.back()}
           />
           <div className="px-4 pt-2">
@@ -198,9 +198,9 @@ export default function RequestSchedulePage() {
       className="bg-white"
     >
       <main className="contents">
-        <h2 className="text-xl font-semibold mb-2">Request Schedule</h2>
+        <h2 className="text-xl font-semibold mb-2">Donation Schedule</h2>
         <p className="text-sm text-gray-600 mb-4">
-          Set up when you need food delivered
+          Set up when you can provide food donations
         </p>
 
         {/* Schedule Type Selector */}
@@ -356,7 +356,7 @@ export default function RequestSchedulePage() {
                 </div>
 
                 <TimeSlotSelector
-                  label="Time Range"
+                  label="Available Time Range"
                   startTimeLabel="Start Time"
                   endTimeLabel="End Time"
                   startTime={currentSchedule.startTime}
@@ -386,7 +386,7 @@ export default function RequestSchedulePage() {
                   />
                 </div>
                 <TimeSlotSelector
-                  label="Time Range for Selected Days"
+                  label="Available Time Range for Selected Days"
                   startTimeLabel="Start Time"
                   endTimeLabel="End Time"
                   startTime={currentSchedule.startTime}
@@ -405,7 +405,7 @@ export default function RequestSchedulePage() {
             {scheduleType === 'custom' && (
               <div className="space-y-4">
                 <p className="text-sm text-gray-600">
-                  Select specific dates and times when you need food
+                  Select specific dates and times when you can donate food
                 </p>
                 {/* This would be implemented with a more complex date/time picker */}
                 <div className="p-4 bg-gray-50 rounded-lg">

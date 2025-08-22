@@ -12,14 +12,13 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
-import { RecurringRequest } from '@/types/request.types';
 
-type RecurringFormInputs = {
+type RecurringDonationFormInputs = {
   description: string;
   quantity: string;
 };
 
-export default function RecurringRequestForm() {
+export default function RecurringDonationForm() {
   const router = useRouter();
   const { t } = useLanguage();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
@@ -29,7 +28,7 @@ export default function RecurringRequestForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
-  } = useForm<RecurringFormInputs>();
+  } = useForm<RecurringDonationFormInputs>();
 
   const watchedFields = watch();
 
@@ -39,26 +38,26 @@ export default function RecurringRequestForm() {
     Number(watchedFields.quantity) > 0 &&
     selectedAllergens.length > 0;
 
-  const onSubmit = async (data: RecurringFormInputs) => {
+  const onSubmit = async (data: RecurringDonationFormInputs) => {
     try {
-      const requestData = {
-        request_type: 'recurring',
+      const donationData = {
+        donation_type: 'recurring',
         description: data.description,
         quantity: Number(data.quantity),
         allergens: selectedAllergens,
       };
 
       // Log the structured data for testing
-      console.log('Recurring Request Data:', requestData);
-      console.log('Ready for Supabase:', JSON.stringify(requestData, null, 2));
+      console.log('Recurring Donation Data:', donationData);
+      console.log('Ready for Supabase:', JSON.stringify(donationData, null, 2));
 
       // Store in session storage for now (will be replaced with Supabase)
-      sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
+      sessionStorage.setItem('pendingDonation', JSON.stringify(donationData));
 
-      // Navigate to schedule page (following donor flow pattern)
-      router.push('/request/schedule');
+      // Navigate to schedule page (following request flow pattern)
+      router.push('/donate/schedule');
     } catch (error) {
-      console.error('Failed to create recurring request:', error);
+      console.error('Failed to create recurring donation:', error);
     }
   };
 
@@ -67,8 +66,8 @@ export default function RecurringRequestForm() {
       header={
         <>
           <SecondaryNavbar
-            title="Recurring Request"
-            backHref="/request/select-type"
+            title="Recurring Donation"
+            backHref="/donate"
             onBackClick={() => router.back()}
           />
           <div className="px-4 pt-2">
@@ -96,11 +95,11 @@ export default function RecurringRequestForm() {
         {/* Food Description */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            Describe what type of food you need
+            Describe what type of food you want to donate
           </label>
           <Textarea
             {...register('description', {
-              required: 'Please describe the food you need',
+              required: 'Please describe the food you want to donate',
             })}
             placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
             variant={errors.description ? 'error' : 'default'}
@@ -116,7 +115,7 @@ export default function RecurringRequestForm() {
         {/* Quantity */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            How many people is this for?
+            Approximate quantity (kg)
           </label>
           <Input
             {...register('quantity', {
@@ -127,7 +126,7 @@ export default function RecurringRequestForm() {
                 message: 'Please enter a valid number',
               },
             })}
-            placeholder="Enter number of people"
+            placeholder="Enter quantity in kg"
             type="number"
             variant={errors.quantity ? 'error' : 'default'}
           />
@@ -140,7 +139,7 @@ export default function RecurringRequestForm() {
 
         {/* Allergens */}
         <AllergensDropdown
-          label="Allergies, intolerances & diets"
+          label="Allergens & dietary information"
           options={[
             'Milk',
             'Eggs',
@@ -159,7 +158,7 @@ export default function RecurringRequestForm() {
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-          placeholder="Select dietary restrictions"
+          placeholder="Select dietary information"
           error={
             !selectedAllergens.length && watchedFields.description
               ? 'Please select at least one option'

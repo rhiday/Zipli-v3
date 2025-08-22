@@ -89,7 +89,7 @@ export default function OneTimeRequestForm() {
         </BottomActionBar>
       }
       className="bg-white"
-      contentClassName="p-4 space-y-6 pb-24"
+      contentClassName="p-4 space-y-6 pb-32"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Food Description */}

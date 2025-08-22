@@ -118,7 +118,7 @@ export default function PickupSlotPage() {
           </div>
         </>
       }
-      contentClassName="p-4 space-y-6 pb-24"
+      contentClassName="p-4 space-y-6 pb-32"
       footer={
         <BottomActionBar>
           <Button
