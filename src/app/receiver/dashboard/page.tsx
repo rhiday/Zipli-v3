@@ -258,9 +258,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.estimatedKg}kg
                 </span>
-                <p className="text-sm text-primary-75 mt-1">
-                  {t('foodRequested')}
-                </p>
+                <p className="text-sm text-primary-75 mt-1">Food Requested</p>
               </div>
             </div>
             {/* Active Requests */}
@@ -287,7 +285,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.fulfilledRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('fulfilledRequests')}
+                  Fulfilled Requests
                 </p>
               </div>
             </div>
@@ -302,10 +300,10 @@ export default function ReceiverDashboardPage(): React.ReactElement {
             tabIndex={0}
             role="button"
           >
-            {t('exportToPDF')}
+            Export to PDF
           </a>
           <span className="block text-sm text-primary-75 mt-1">
-            {t('requestHistoryAndImpactData')}
+            Request history and impact data
           </span>
         </div>
 
