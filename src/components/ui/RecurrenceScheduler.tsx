@@ -13,11 +13,28 @@ import { Popover, PopoverContent, PopoverTrigger } from './popover';
 // Data structure for database integration
 export interface RecurrenceSchedule {
   type: 'daily' | 'weekly' | 'custom';
-  // For daily: no additional data needed
-  // For weekly: array of day indices (0=Sunday, 1=Monday, etc.)
+  // For daily: start and end dates with time range
+  dailySchedule?: {
+    startDate: string;
+    endDate: string;
+    startTime: string;
+    endTime: string;
+  };
+  // For weekly: array of day indices with time ranges
+  weeklySchedule?: Array<{
+    dayOfWeek: number; // 0=Sunday, 1=Monday, etc.
+    startTime: string;
+    endTime: string;
+  }>;
+  // For custom: array of specific dates with time ranges
+  customSchedule?: Array<{
+    date: string; // ISO date string
+    startTime: string;
+    endTime: string;
+  }>;
+  // Legacy fields for backward compatibility
   weeklyDays?: number[];
-  // For custom: array of specific dates
-  customDates?: string[]; // ISO date strings for database storage
+  customDates?: string[];
 }
 
 interface RecurrenceSchedulerProps {

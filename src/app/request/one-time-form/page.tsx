@@ -61,7 +61,30 @@ export default function OneTimeRequestForm() {
   };
 
   return (
-    <div className="bg-white p-4 space-y-6">
+    <PageContainer
+      header={
+        <SecondaryNavbar
+          title="One-time Request"
+          backHref="/request/select-type"
+          onBackClick={() => router.back()}
+        />
+      }
+      footer={
+        <BottomActionBar>
+          <Button
+            type="submit"
+            size="cta"
+            disabled={!isFormValid || isSubmitting}
+            onClick={handleSubmit(onSubmit)}
+            className="w-full"
+          >
+            {isSubmitting ? 'Submitting...' : 'Continue'}
+          </Button>
+        </BottomActionBar>
+      }
+      className="bg-white"
+      contentClassName="p-4 space-y-6"
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Food Description */}
         <div>
@@ -137,6 +160,6 @@ export default function OneTimeRequestForm() {
           }
         />
       </form>
-    </div>
+    </PageContainer>
   );
 }

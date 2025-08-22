@@ -237,47 +237,55 @@ export default function ReceiverDashboardPage(): React.ReactElement {
             </DropdownMenu>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
-            {/* People Served */}
-            <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-5 h-5 text-primary-50" />
+            {/* People Served - with green background */}
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-[#F5F9EF]">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.totalPeople}
                 </span>
+                <p className="text-sm text-primary-75 mt-1">People Served</p>
               </div>
-              <span className="text-sm text-primary-75">People Served</span>
             </div>
             {/* Food Requested */}
-            <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
-              <div className="flex items-center gap-2 mb-2">
-                <Scale className="w-5 h-5 text-primary-50" />
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
+              <div className="flex items-center gap-2">
+                <Scale className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.estimatedKg}kg
                 </span>
+                <p className="text-sm text-primary-75 mt-1">Food Requested</p>
               </div>
-              <span className="text-sm text-primary-75">Food Requested</span>
             </div>
             {/* Active Requests */}
-            <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-5 h-5 text-primary-50" />
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.activeRequests}
                 </span>
+                <p className="text-sm text-primary-75 mt-1">Active Requests</p>
               </div>
-              <span className="text-sm text-primary-75">Active Requests</span>
             </div>
             {/* Fulfilled Requests */}
-            <div className="flex flex-col items-start justify-between rounded-xl border border-primary-10 shadow-sm p-4 sm:p-5 w-full aspect-square">
-              <div className="flex items-center gap-2 mb-2">
-                <PackageIcon className="w-5 h-5 text-primary-50" />
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
+              <div className="flex items-center gap-2">
+                <PackageIcon className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.fulfilledRequests}
                 </span>
+                <p className="text-sm text-primary-75 mt-1">
+                  Fulfilled Requests
+                </p>
               </div>
-              <span className="text-sm text-primary-75">
-                Fulfilled Requests
-              </span>
             </div>
           </div>
         </section>

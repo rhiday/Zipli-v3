@@ -7,10 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import {
-  RecurrenceScheduler,
-  RecurrenceSchedule,
-} from '@/components/ui/RecurrenceScheduler';
 import { useLanguage } from '@/hooks/useLanguage';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -26,10 +22,6 @@ export default function RecurringRequestForm() {
   const router = useRouter();
   const { t } = useLanguage();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
-  const [recurrenceSchedule, setRecurrenceSchedule] =
-    useState<RecurrenceSchedule>({
-      type: 'daily',
-    });
 
   const {
     register,
@@ -40,50 +32,30 @@ export default function RecurringRequestForm() {
 
   const watchedFields = watch();
 
-  // Validation for form
-  const isScheduleValid = () => {
-    if (recurrenceSchedule.type === 'weekly') {
-      return (
-        recurrenceSchedule.weeklyDays &&
-        recurrenceSchedule.weeklyDays.length > 0
-      );
-    }
-    if (recurrenceSchedule.type === 'custom') {
-      return (
-        recurrenceSchedule.customDates &&
-        recurrenceSchedule.customDates.length > 0
-      );
-    }
-    return true; // Daily is always valid
-  };
-
   const isFormValid =
     watchedFields.description?.trim() &&
     watchedFields.quantity?.trim() &&
     Number(watchedFields.quantity) > 0 &&
-    selectedAllergens.length > 0 &&
-    isScheduleValid();
+    selectedAllergens.length > 0;
 
   const onSubmit = async (data: RecurringFormInputs) => {
     try {
-      const requestData: RecurringRequest = {
+      const requestData = {
         request_type: 'recurring',
         description: data.description,
         quantity: Number(data.quantity),
         allergens: selectedAllergens,
-        recurrence: recurrenceSchedule,
       };
 
       // Log the structured data for testing
       console.log('Recurring Request Data:', requestData);
-      console.log('Recurrence Schedule:', recurrenceSchedule);
       console.log('Ready for Supabase:', JSON.stringify(requestData, null, 2));
 
       // Store in session storage for now (will be replaced with Supabase)
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
-      // Navigate to pickup slot selection first (following donor flow pattern)
-      router.push('/request/pickup-slot');
+      // Navigate to schedule page (following donor flow pattern)
+      router.push('/request/schedule');
     } catch (error) {
       console.error('Failed to create recurring request:', error);
     }
@@ -107,7 +79,7 @@ export default function RecurringRequestForm() {
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Request'}
+            {isSubmitting ? 'Submitting...' : 'Continue'}
           </Button>
         </BottomActionBar>
       }
@@ -188,35 +160,6 @@ export default function RecurringRequestForm() {
               : undefined
           }
         />
-
-        {/* Recurrence Schedule */}
-        <RecurrenceScheduler
-          label="Recurrence Schedule"
-          value={recurrenceSchedule}
-          onChange={setRecurrenceSchedule}
-          hint={'Select how often you need food'}
-          error={
-            !isScheduleValid() && watchedFields.description
-              ? 'Please complete the schedule selection'
-              : undefined
-          }
-        />
-
-        {/* Summary Info */}
-        {isFormValid && (
-          <div className="p-4 bg-positive/10 rounded-md border border-positive/20">
-            <p className="text-label font-semibold text-primary mb-1">
-              Request Summary:
-            </p>
-            <p className="text-label text-secondary">
-              {recurrenceSchedule.type === 'daily' && 'Daily request'}
-              {recurrenceSchedule.type === 'weekly' &&
-                `Weekly on selected days`}
-              {recurrenceSchedule.type === 'custom' &&
-                `${recurrenceSchedule.customDates?.length || 0} specific dates`}
-            </p>
-          </div>
-        )}
       </form>
     </PageContainer>
   );
