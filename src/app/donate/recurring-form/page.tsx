@@ -35,8 +35,7 @@ export default function RecurringDonationForm() {
   const isFormValid =
     watchedFields.description?.trim() &&
     watchedFields.quantity?.trim() &&
-    Number(watchedFields.quantity) > 0 &&
-    selectedAllergens.length > 0;
+    Number(watchedFields.quantity) > 0;
 
   const onSubmit = async (data: RecurringDonationFormInputs) => {
     try {
@@ -159,11 +158,6 @@ export default function RecurringDonationForm() {
           value={selectedAllergens}
           onChange={setSelectedAllergens}
           placeholder="Select dietary information"
-          error={
-            !selectedAllergens.length && watchedFields.description
-              ? 'Please select at least one option'
-              : undefined
-          }
         />
       </form>
     </PageContainer>
