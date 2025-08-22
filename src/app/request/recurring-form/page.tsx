@@ -90,7 +90,7 @@ export default function RecurringRequestForm() {
         </BottomActionBar>
       }
       className="bg-white"
-      contentClassName="p-4 space-y-6 pb-32"
+      contentClassName="p-4 space-y-6 pb-40 min-h-[calc(100vh-200px)]"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Food Description */}
