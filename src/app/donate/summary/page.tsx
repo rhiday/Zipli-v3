@@ -76,11 +76,28 @@ export default function DonationSummaryPage() {
     const storedDonation = sessionStorage.getItem('pendingDonation');
     if (storedDonation) {
       const donationData = JSON.parse(storedDonation);
-      if (donationData.schedule) {
-        setRecurringSchedule(donationData.schedule);
+      if (donationData.recurringSchedules || donationData.schedule) {
+        setRecurringSchedule(
+          donationData.recurringSchedules || donationData.schedule
+        );
+
+        // For recurring donations, create a donation item from the stored data
+        if (
+          donationData.donation_type === 'recurring' &&
+          donationItems.length === 0
+        ) {
+          const { addDonationItem } = useDonationStore.getState();
+          addDonationItem({
+            id: Date.now().toString(),
+            name: donationData.description || 'Recurring Donation',
+            quantity: donationData.quantity?.toString() || '1',
+            allergens: donationData.allergens || [],
+            description: donationData.description || null,
+          });
+        }
       }
     }
-  }, [isInitialized, currentUser]);
+  }, [isInitialized, currentUser, donationItems.length]);
 
   const handleEditItem = (itemId: string) => {
     // Navigate back to manual page with edit mode for this item
@@ -326,47 +343,63 @@ export default function DonationSummaryPage() {
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
           {recurringSchedule ? 'Recurring Schedule' : t('pickupSchedule')}
         </h2>
-        <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
-          <span className="font-semibold text-interactive">
-            {recurringSchedule
-              ? `${recurringSchedule.frequency === 'daily' ? 'Every day' : recurringSchedule.days.join(', ')}, ${
-                  recurringSchedule.timeSlot === 'morning'
-                    ? '9:00 AM - 12:00 PM'
-                    : recurringSchedule.timeSlot === 'afternoon'
-                      ? '12:00 PM - 4:00 PM'
-                      : '4:00 PM - 8:00 PM'
-                }`
-              : pickupSlots.length > 0 && pickupSlots[0].date
+        {recurringSchedule && Array.isArray(recurringSchedule) ? (
+          // Multiple recurring schedules
+          recurringSchedule.map((schedule: any, index: number) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
+            >
+              <span className="font-semibold text-interactive">
+                {schedule.days?.join(', ')}, {schedule.startTime} -{' '}
+                {schedule.endTime}
+              </span>
+              <button
+                onClick={() => router.push('/donate/recurring-schedule')}
+                className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
+                aria-label="Edit schedule"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                    fill="#024209"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))
+        ) : (
+          // One-time pickup slot or old format
+          <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+            <span className="font-semibold text-interactive">
+              {pickupSlots.length > 0 && pickupSlots[0].date
                 ? `${formatSlotDate(pickupSlots[0].date)}, ${pickupSlots[0].startTime} - ${pickupSlots[0].endTime}`
                 : t('dateNotSet')}
-          </span>
-          <button
-            onClick={() =>
-              router.push(
-                recurringSchedule
-                  ? '/donate/schedule-simple'
-                  : '/donate/pickup-slot'
-              )
-            }
-            className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-            aria-label="Edit schedule"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+            </span>
+            <button
+              onClick={() => router.push('/donate/pickup-slot')}
+              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
+              aria-label="Edit schedule"
             >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
-                fill="#024209"
-              />
-            </svg>
-          </button>
-        </div>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                  fill="#024209"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Address & Instructions Section */}

@@ -264,12 +264,10 @@ export default function SimpleSchedulePage() {
         {/* Summary */}
         {(selectedDays.length > 0 || frequency === 'daily') &&
           selectedTimeSlot && (
-            <div className="p-4 bg-[#F5F9EF] rounded-lg border border-[#D9DBD5]">
-              <p className="text-sm text-gray-600 mb-1">Your schedule:</p>
-              <p className="font-medium text-[#024209]">
-                {frequency === 'daily' ? 'Every day' : selectedDays.join(', ')}
-              </p>
-              <p className="text-sm text-gray-600">
+            <div className="p-3 bg-[#F5F9EF] rounded-[12px] border border-[#D9DBD5]">
+              <p className="text-xs text-gray-600 mb-1">Your schedule:</p>
+              <p className="font-semibold text-interactive">
+                {frequency === 'daily' ? 'Every day' : selectedDays.join(', ')},{' '}
                 {TIME_SLOTS.find((s) => s.value === selectedTimeSlot)?.time}
               </p>
             </div>
