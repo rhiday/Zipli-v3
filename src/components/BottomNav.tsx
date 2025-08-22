@@ -91,6 +91,7 @@ export default function BottomNav() {
     pathname.includes('/donate/manual') ||
     pathname.includes('/donate/recurring-form') ||
     pathname.includes('/donate/schedule') ||
+    pathname.includes('/donate/schedule-simple') ||
     pathname.includes('/donate/pickup-slot') ||
     pathname.includes('/donate/summary') ||
     pathname.includes('/request/') ||

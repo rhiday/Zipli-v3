@@ -54,8 +54,8 @@ export default function RecurringDonationForm() {
       // Store in session storage for now (will be replaced with Supabase)
       sessionStorage.setItem('pendingDonation', JSON.stringify(donationData));
 
-      // Navigate to schedule page (following request flow pattern)
-      router.push('/donate/schedule');
+      // Navigate to simplified schedule page
+      router.push('/donate/schedule-simple');
     } catch (error) {
       console.error('Failed to create recurring donation:', error);
     }

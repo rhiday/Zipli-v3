@@ -46,6 +46,7 @@ export default function DonationSummaryPage() {
   const [updateInstructionsInProfile, setUpdateInstructionsInProfile] =
     useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
 
   const formatSlotDate = (date: Date | string | undefined) => {
     if (!date) return null;
@@ -68,6 +69,15 @@ export default function DonationSummaryPage() {
       // Pre-fill driver instructions from profile if available
       if ((currentUser as any).driver_instructions) {
         setInstructions((currentUser as any).driver_instructions);
+      }
+    }
+
+    // Check for recurring donation data in session storage
+    const storedDonation = sessionStorage.getItem('pendingDonation');
+    if (storedDonation) {
+      const donationData = JSON.parse(storedDonation);
+      if (donationData.schedule) {
+        setRecurringSchedule(donationData.schedule);
       }
     }
   }, [isInitialized, currentUser]);
@@ -314,16 +324,30 @@ export default function DonationSummaryPage() {
       {/* Pickup schedule */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('pickupSchedule')}
+          {recurringSchedule ? 'Recurring Schedule' : t('pickupSchedule')}
         </h2>
         <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <span className="font-semibold text-interactive">
-            {pickupSlots.length > 0 && pickupSlots[0].date
-              ? `${formatSlotDate(pickupSlots[0].date)}, ${pickupSlots[0].startTime} - ${pickupSlots[0].endTime}`
-              : t('dateNotSet')}
+            {recurringSchedule
+              ? `${recurringSchedule.frequency === 'daily' ? 'Every day' : recurringSchedule.days.join(', ')}, ${
+                  recurringSchedule.timeSlot === 'morning'
+                    ? '9:00 AM - 12:00 PM'
+                    : recurringSchedule.timeSlot === 'afternoon'
+                      ? '12:00 PM - 4:00 PM'
+                      : '4:00 PM - 8:00 PM'
+                }`
+              : pickupSlots.length > 0 && pickupSlots[0].date
+                ? `${formatSlotDate(pickupSlots[0].date)}, ${pickupSlots[0].startTime} - ${pickupSlots[0].endTime}`
+                : t('dateNotSet')}
           </span>
           <button
-            onClick={() => router.push('/donate/pickup-slot')}
+            onClick={() =>
+              router.push(
+                recurringSchedule
+                  ? '/donate/schedule-simple'
+                  : '/donate/pickup-slot'
+              )
+            }
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
             aria-label="Edit schedule"
           >
