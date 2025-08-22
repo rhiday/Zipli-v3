@@ -246,9 +246,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.totalPeople}
                 </span>
-                <p className="text-sm text-primary-75 mt-1">
-                  {t('peopleServed')}
-                </p>
+                <p className="text-sm text-primary-75 mt-1">People Served</p>
               </div>
             </div>
             {/* Food Requested */}
@@ -311,14 +309,13 @@ export default function ReceiverDashboardPage(): React.ReactElement {
           </span>
         </div>
 
-        {/* Who's helped you section */}
-        <section>
+        {/* Who's helped you section - Hidden for now */}
+        {/* <section>
           <h2 className="text-lg font-semibold text-primary mb-3">
             {t('whosHelpedYou')}
           </h2>
 
           <div className="space-y-4">
-            {/* Sample donors who have fulfilled requests */}
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full overflow-hidden relative">
                 <Image
@@ -351,7 +348,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
 
       <BottomNav />
