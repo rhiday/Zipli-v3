@@ -13,6 +13,8 @@ import {
   BarChart3,
   Users,
   TrendingUp,
+  Clock,
+  Calendar,
 } from 'lucide-react';
 import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -128,24 +130,48 @@ export default function BottomNav() {
             </DrawerHeader>
             <div className="grid gap-3 p-4">
               {currentUser?.role === 'food_receiver' ? (
-                <DrawerClose asChild>
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    className="w-full justify-start py-5 text-left"
-                    onClick={() => router.push('/request/new')}
-                  >
-                    <FileText className="mr-3 h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-semibold text-primary">
-                        {t('request')} {t('donate')}
-                      </p>
-                      <p className="text-xs text-secondary">
-                        {t('createDonation')}.
-                      </p>
-                    </div>
-                  </Button>
-                </DrawerClose>
+                <>
+                  <DrawerClose asChild>
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      className="w-full justify-start py-5 text-left"
+                      onClick={() => router.push('/request/one-time-form')}
+                    >
+                      <Clock className="mr-3 h-5 w-5 text-primary" />
+                      <div>
+                        <p className="font-semibold text-primary">
+                          {t('oneTimeRequest') || 'One-time Request'}
+                        </p>
+                        <p className="text-xs text-secondary">
+                          {t('createSingleRequest') ||
+                            'Create a single request for immediate needs'}
+                          .
+                        </p>
+                      </div>
+                    </Button>
+                  </DrawerClose>
+                  <DrawerClose asChild>
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      className="w-full justify-start py-5 text-left"
+                      onClick={() => router.push('/request/recurring-form')}
+                    >
+                      <Calendar className="mr-3 h-5 w-5 text-primary" />
+                      <div>
+                        <p className="font-semibold text-primary">
+                          {t('recurringRequest') || 'Recurring Request'}
+                        </p>
+                        <p className="text-xs text-secondary">
+                          {t('createRecurringRequest') ||
+                            'Set up a repeating schedule for ongoing needs'}
+                          .
+                        </p>
+                      </div>
+                    </Button>
+                  </DrawerClose>
+                </>
               ) : currentUser?.role === 'city' ? (
                 <>
                   <DrawerClose asChild>

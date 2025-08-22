@@ -22,10 +22,10 @@ export default function HomePage() {
           case 'food_receiver':
             router.push('/receiver/dashboard');
             break;
-          case 'city_dashboard':
+          case 'city':
             router.push('/city/dashboard');
             break;
-          case 'terminal':
+          case 'terminals':
             router.push('/terminal/dashboard');
             break;
           default:
