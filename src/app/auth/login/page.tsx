@@ -71,10 +71,10 @@ export default function LoginPage() {
         </div>
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">
-title="Default"
+            {t('welcomeBack')}
           </h1>
           <p className="mt-2 text-body text-primary-75">
-title="Default"
+            {t('signInToAccount')}
           </p>
         </div>
 
@@ -90,7 +90,7 @@ title="Default"
               htmlFor="email"
               className="block text-label font-medium text-primary mb-1"
             >
-title="Default"
+              {t('emailAddress')}
             </label>
             <Input
               id="email"
@@ -108,7 +108,7 @@ title="Default"
               htmlFor="password"
               className="block text-label font-medium text-primary mb-1"
             >
-title="Default"
+              {t('password')}
             </label>
             <Input
               id="password"
@@ -135,7 +135,7 @@ title="Default"
                 htmlFor="remember-me"
                 className="ml-2 block text-body text-primary"
               >
-title="Default"
+                {t('rememberMe')}
               </label>
             </div>
 
@@ -144,7 +144,7 @@ title="Default"
                 href="/auth/forgot-password"
                 className="font-medium text-earth hover:text-primary"
               >
-title="Default"
+                {t('forgotPassword')}
               </Link>
             </div>
           </div>
@@ -168,7 +168,7 @@ title="Default"
             href="/auth/register"
             className="font-medium text-earth hover:text-primary"
           >
-title="Default"
+            {t('signUp')}
           </Link>
         </div>
       </div>

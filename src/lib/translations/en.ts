@@ -48,6 +48,7 @@ export const en = {
   signUp: "Sign up",
   welcomeBack: "Welcome back",
   signInToAccount: "Sign in to your account",
+  emailAddress: "Email address",
   dontHaveAccount: "Don't have an account?",
   forgotPassword: "Forgot your password?",
   rememberMe: "Remember me",

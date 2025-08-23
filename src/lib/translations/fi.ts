@@ -48,6 +48,7 @@ export const fi = {
   signUp: "Rekisteröidy",
   welcomeBack: "Tervetuloa takaisin",
   signInToAccount: "Kirjaudu tilillesi",
+  emailAddress: "Sähköpostiosoite",
   dontHaveAccount: "Eikö sinulla ole tiliä?",
   forgotPassword: "Unohditko salasanan?",
   rememberMe: "Muista minut",
