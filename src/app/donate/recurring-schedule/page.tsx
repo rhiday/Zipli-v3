@@ -6,7 +6,7 @@ import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { Calendar, Clock, Trash2 } from 'lucide-react';
@@ -21,7 +21,13 @@ interface RecurringSchedule {
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const FULL_WEEKDAYS = [
-  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
 ];
 
 const TIME_OPTIONS = [
@@ -44,7 +50,7 @@ const TIME_OPTIONS = [
 
 export default function RecurringSchedulePage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const [donationData, setDonationData] = useState<any>(null);
 
   const [schedules, setSchedules] = useState<RecurringSchedule[]>([]);
@@ -131,7 +137,7 @@ export default function RecurringSchedulePage() {
       header={
         <>
           <SecondaryNavbar
-title="Default"
+            title={t('recurringDonation')}
             backHref="/donate/recurring-form"
             onBackClick={() => router.back()}
           />
@@ -170,7 +176,7 @@ title="Default"
                 <div className="flex gap-2">
                   <button
                     className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white"
-title="Default"
+                    title={t('recurringDonation')}
                   >
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <path
@@ -184,7 +190,7 @@ title="Default"
                   <button
                     onClick={() => removeSchedule(schedule.id)}
                     className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#CB0003] bg-white"
-title="Default"
+                    title={t('recurringDonation')}
                   >
                     <Trash2 className="w-4 h-4 text-[#CB0003]" />
                   </button>
