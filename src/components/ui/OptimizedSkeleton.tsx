@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 interface SkeletonProps {
   className?: string;
@@ -69,7 +70,7 @@ const Skeleton: React.FC<SkeletonProps> = React.memo(
   }
 );
 
-Skeleton.displayName = 'Skeleton';
+Skeleton.displayName = t('common.skeleton');
 
 // Donation Card Skeleton
 export const DonationCardSkeleton: React.FC = React.memo(() => (

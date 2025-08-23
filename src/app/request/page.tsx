@@ -7,6 +7,7 @@ import { useDatabase } from '@/store';
 import { PlusIcon, SearchIcon, UsersIcon, CalendarIcon, HandshakeIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
+import { useRequestsTranslation } from '@/lib/i18n-enhanced';
 
 type Request = {
   id: string;
@@ -21,6 +22,8 @@ type Request = {
 };
 
 export default function RequestsPage(): React.ReactElement {
+  const { t } = useRequestsTranslation();
+
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +49,7 @@ export default function RequestsPage(): React.ReactElement {
 
       setRequests(filteredByStatus);
     } catch (err: any) {
-      setError('Failed to load requests');
+      setError(t('pages.requests.failed_to_load_requests'));
     } finally {
       setLoading(false);
     }
@@ -100,7 +103,7 @@ export default function RequestsPage(): React.ReactElement {
               onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'fulfilled' | 'cancelled')}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Status" />
+                <SelectValue {t('pages.requests.status')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>

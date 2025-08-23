@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -7,6 +8,8 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: NextRequest) {
+  const { t } = useCommonTranslation();
+
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
   }
@@ -21,7 +24,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = `You are an intelligent assistant helping to fill out a food request form.
 Based on the user's spoken description of what they need, your task is to extract key details.
 
-1.  **Item Name (itemName):** A concise name for the item being requested (e.g., "Rice", "Apples", "Canned Soup").
+1.  **Item Name (itemName):** A concise name for the item being requested (e.g., t('common.rice'), t('common.apples'), t('common.canned_soup')).
 2.  **Quantity (quantity):** The numerical amount of the item requested. If the user mentions a range, pick the lower number. If no specific number, try to infer or default to 1. Output as a number.
 3.  **Notes (notes):** Any additional details, reasons for the request, or specific preferences mentioned by the user (e.g., "Urgently needed for a family of four.", "Preferably whole wheat bread.", "Any brand of canned soup is fine."). If no specific notes, use an empty string or a generic placeholder like "No additional notes.".
 
@@ -57,27 +60,27 @@ Ensure quantity is a number. Do not include any other text, explanations, or mar
         typeof parsedContent.quantity !== 'number' || 
         typeof parsedContent.notes === 'undefined' // Notes can be an empty string
       ) {
-        console.error('OpenAI response missing or has invalid types for key request fields:', content);
+        console.error(t('common.openai_response_missing_or_has'), content);
         // Attempt to provide sensible defaults
         const finalResponse = {
-            itemName: parsedContent.itemName || "Unknown Item",
+            itemName: parsedContent.itemName || 'Unknown item',
             quantity: typeof parsedContent.quantity === 'number' ? parsedContent.quantity : 1,
             notes: parsedContent.notes || "No additional notes provided.",
         };
-        console.warn('Returning response with some defaults due to missing/invalid fields from AI for request:', finalResponse);
+        console.warn(t('common.returning_response_with_some_d'), finalResponse);
         return NextResponse.json(finalResponse);
       }
       return NextResponse.json(parsedContent);
     } catch (parseError) {
-      console.error('Error parsing OpenAI JSON response for request:', parseError, 'Raw content:', content);
+      console.error('Error parsing OpenAI JSON response. Raw content:', content);
       return NextResponse.json({ error: 'Failed to parse AI response for request.', details: content }, { status: 500 });
     }
 
   } catch (error: any) {
-    console.error('Error processing request details:', error);
+    console.error(t('common.error_processing_request_detai'), error);
     if (error instanceof OpenAI.APIError) {
       return NextResponse.json({ error: error.message, type: error.type }, { status: error.status || 500 });
     }
-    return NextResponse.json({ error: 'Failed to process request details', details: error.message }, { status: 500 });
+    return NextResponse.json({ error: t('common.failed_to_process_request_deta'), details: error.message }, { status: 500 });
   }
 } 

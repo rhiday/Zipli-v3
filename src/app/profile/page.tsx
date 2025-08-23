@@ -122,7 +122,7 @@ export default function ProfilePage(): React.ReactElement {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-primary mb-1">
-                    {t('email')}
+title="Default"
                   </label>
                   <Input
                     type="email"
@@ -135,7 +135,7 @@ export default function ProfilePage(): React.ReactElement {
 
                 <div>
                   <label htmlFor="full_name" className="block text-sm font-medium text-primary mb-1">
-                    {t('fullNameLabel')}
+title="Default"
                   </label>
                   <Input
                     type="text"
@@ -143,13 +143,13 @@ export default function ProfilePage(): React.ReactElement {
                     name="full_name"
                     value={formData.full_name}
                     onChange={handleChange}
-                    placeholder={t('fullNameLabel')}
+                    placeholder = "FullNameLabel"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="organization_name" className="block text-sm font-medium text-primary mb-1">
-                    {t('organizationNameLabel')}
+title="Default"
                   </label>
                   <Input
                     type="text"
@@ -157,13 +157,13 @@ export default function ProfilePage(): React.ReactElement {
                     name="organization_name"
                     value={formData.organization_name}
                     onChange={handleChange}
-                    placeholder={t('organizationNameLabel')}
+                    placeholder = "OrganizationNameLabel"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="role" className="block text-sm font-medium text-primary mb-1">
-                    {t('role')}
+title="Default"
                   </label>
                   <Select
                     value={formData.role}
@@ -183,21 +183,21 @@ export default function ProfilePage(): React.ReactElement {
 
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-primary mb-1">
-                    {t('address')}
+title="Default"
                   </label>
                   <Textarea
                     id="address"
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                    placeholder={t('address')}
+                    placeholder = "Address"
                     rows={3}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="contact_number" className="block text-sm font-medium text-primary mb-1">
-                    {t('contactNumber')}
+title="Default"
                   </label>
                   <Input
                     type="tel"
@@ -205,13 +205,13 @@ export default function ProfilePage(): React.ReactElement {
                     name="contact_number"
                     value={formData.contact_number}
                     onChange={handleChange}
-                    placeholder={t('contactNumber')}
+                    placeholder = "ContactNumber"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="driver_instructions" className="block text-sm font-medium text-primary mb-1">
-                    {t('defaultDriverInstructions')}
+title="Default"
                   </label>
                   <Textarea
                     id="driver_instructions"
@@ -226,7 +226,7 @@ export default function ProfilePage(): React.ReactElement {
 
                 <div className="flex gap-3">
                   <Button type="submit" disabled={saving} className="flex-1">
-                    {saving ? t('saving') : t('saveChanges')}
+                    {saving ? t(t('pages.profile.saving')) : t('saveChanges')}
                   </Button>
                   <Button 
                     type="button" 
@@ -234,7 +234,7 @@ export default function ProfilePage(): React.ReactElement {
                     onClick={() => setIsEditing(false)}
                     className="flex-1"
                   >
-                    {t('cancel')}
+title="Default"
                   </Button>
                 </div>
               </form>
@@ -277,7 +277,7 @@ export default function ProfilePage(): React.ReactElement {
 
                 <div className="flex gap-3">
                   <Button onClick={() => setIsEditing(true)} className="flex-1">
-                    {t('editProfile')}
+title="Default"
                   </Button>
                   <Button 
                     variant="destructive" 

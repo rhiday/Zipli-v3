@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { LayoutGrid, Plus, Search, ShoppingBag, FileText, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 import {
   Dialog,
   DialogContent,
@@ -18,12 +19,14 @@ import {
 } from "@/components/ui/dialog";
 
 const navItems = [
-  { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
-  { href: '/feed', label: 'Explore', icon: Search },
-  { href: '#', label: 'Add', icon: Plus, isCentral: true },
+  { href: '/donate', label: t('common.navigation.dashboard'), icon: LayoutGrid },
+  { href: '/feed', label: t('common.explore'), icon: Search },
+  { href: '#', label: t('common.actions.add'), icon: Plus, isCentral: true },
 ];
 
 export default function DesktopGlobalNavbar() {
+  const { t } = useCommonTranslation();
+
   const { user, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 interface ChipProps {
   label: string;
@@ -40,4 +41,4 @@ export const Chip: React.FC<ChipProps> = ({ label, selected, onClick, onRemove, 
   );
 };
 
-Chip.displayName = 'Chip'; 
+Chip.displayName = t('common.chip'); 

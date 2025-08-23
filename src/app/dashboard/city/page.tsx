@@ -47,22 +47,22 @@ import {
 
 // Enhanced mock data with more realistic values
 const monthlyData = [
-  { month: 'Jan', donations: 145, recipients: 38, waste_diverted: 1850 },
-  { month: 'Feb', donations: 168, recipients: 42, waste_diverted: 2100 },
-  { month: 'Mar', donations: 192, recipients: 48, waste_diverted: 2380 },
-  { month: 'Apr', donations: 178, recipients: 51, waste_diverted: 2680 },
-  { month: 'May', donations: 203, recipients: 55, waste_diverted: 2950 },
-  { month: 'Jun', donations: 235, recipients: 58, waste_diverted: 3200 },
-  { month: 'Jul', donations: 251, recipients: 62, waste_diverted: 3450 },
-  { month: 'Aug', donations: 278, recipients: 67, waste_diverted: 3800 },
+  { month: t('pages.dashboard.jan'), donations: 145, recipients: 38, waste_diverted: 1850 },
+  { month: t('pages.dashboard.feb'), donations: 168, recipients: 42, waste_diverted: 2100 },
+  { month: t('pages.dashboard.mar'), donations: 192, recipients: 48, waste_diverted: 2380 },
+  { month: t('pages.dashboard.apr'), donations: 178, recipients: 51, waste_diverted: 2680 },
+  { month: t('pages.dashboard.may'), donations: 203, recipients: 55, waste_diverted: 2950 },
+  { month: t('pages.dashboard.jun'), donations: 235, recipients: 58, waste_diverted: 3200 },
+  { month: t('pages.dashboard.jul'), donations: 251, recipients: 62, waste_diverted: 3450 },
+  { month: t('pages.dashboard.aug'), donations: 278, recipients: 67, waste_diverted: 3800 },
 ];
 
 const partnerData = [
-  { name: 'Sodexo Helsinki Airport', donations: 45, category: 'Corporate' },
-  { name: "Alice's Restaurant", donations: 32, category: 'Restaurant' },
-  { name: 'School District #3', donations: 28, category: 'Education' },
-  { name: 'Kesko Citymarket', donations: 22, category: 'Retail' },
-  { name: 'Red Cross Helsinki', donations: 41, category: 'NGO' },
+  { name: t('pages.dashboard.sodexo_helsinki_airport'), donations: 45, category: t('pages.dashboard.corporate') },
+  { name: "Alice's Restaurant", donations: 32, category: "Restaurant" },
+  { name: 'School District #3', donations: 28, category: t('pages.dashboard.education') },
+  { name: t('pages.dashboard.kesko_citymarket'), donations: 22, category: t('pages.dashboard.retail') },
+  { name: t('pages.dashboard.red_cross_helsinki'), donations: 41, category: 'NGO' },
   { name: 'Tsänssi Charity', donations: 38, category: 'NGO' },
 ];
 
@@ -90,18 +90,7 @@ export default function CityDashboardPage(): React.ReactElement {
   const [loading, setLoading] = useState(true);
 
   const allMonths = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',
   ];
 
   const currentDate = new Date();
@@ -155,7 +144,7 @@ export default function CityDashboardPage(): React.ReactElement {
   const handleExportPDF = useCallback(() => {
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text('Helsinki City Food Waste Analytics', 10, 10);
+    doc.text(t('pages.dashboard.helsinki_city_food_waste_analy'), 10, 10);
     doc.setFontSize(12);
     doc.text(`Total food redistributed: 3,800kg this month`, 10, 20);
     doc.text(`Partner organizations: 42 active`, 10, 30);
@@ -330,14 +319,14 @@ export default function CityDashboardPage(): React.ReactElement {
                     dataKey="donations"
                     stroke="#22c55e"
                     strokeWidth={2}
-                    name="Donations"
+                    name = 'Donations'
                   />
                   <Line
                     type="monotone"
                     dataKey="recipients"
                     stroke="#3b82f6"
                     strokeWidth={2}
-                    name="Recipients"
+                    name = 'Recipients'
                   />
                 </LineChart>
               </ResponsiveContainer>

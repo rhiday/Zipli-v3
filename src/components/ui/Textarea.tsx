@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 // Define CVA variants for the Textarea, mirroring Input styles
 const textareaVariants = cva(
@@ -35,6 +36,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     );
   }
 );
-Textarea.displayName = 'Textarea';
+Textarea.displayName = t('common.textarea');
 
 export { Textarea };

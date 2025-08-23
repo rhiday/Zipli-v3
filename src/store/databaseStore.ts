@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import donationsData from '../../mockData/donations.json';
 import foodItemsData from '../../mockData/food_items.json';
 import usersData from '../../mockData/users.json';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 // Define interfaces for our data structures based on the JSON files
 interface FoodItem {
@@ -224,12 +225,12 @@ export const useDatabase = create<DatabaseState>()(
 
         const user = get().users.find((u) => u.email === email);
         if (!user) {
-          return { data: null, error: 'Invalid email or password' };
+          return { data: null, error: t('common.invalid_email_or_password') };
         }
 
         // Verify password matches the one stored in mock data
         if ((user as any).password !== password) {
-          return { data: null, error: 'Invalid email or password' };
+          return { data: null, error: t('common.invalid_email_or_password') };
         }
 
         set({ currentUser: user });
@@ -293,7 +294,7 @@ export const useDatabase = create<DatabaseState>()(
 
         const user = get().users.find((u) => u.email === email);
         if (!user) {
-          return { data: null, error: 'Invalid verification code' };
+          return { data: null, error: t('common.invalid_verification_code') };
         }
 
         // For mock purposes, accept any 6-digit code
@@ -302,7 +303,7 @@ export const useDatabase = create<DatabaseState>()(
           return { data: { user }, error: null };
         }
 
-        return { data: null, error: 'Invalid verification code' };
+        return { data: null, error: t('common.invalid_verification_code') };
       },
 
       setCurrentUser: (email) => {
@@ -367,6 +368,8 @@ export const useDatabase = create<DatabaseState>()(
 
         // Helper to generate a random date within the last 7 days
         function randomRecentISO() {
+  const { t } = useCommonTranslation();
+
           const now = new Date();
           const daysAgo = Math.floor(Math.random() * 7);
           const hoursAgo = Math.floor(Math.random() * 24);

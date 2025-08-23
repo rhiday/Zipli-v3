@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         return {
           id: d.id,
           quantity: d.quantity,
-          name: foodItem?.name || 'Unknown Item',
+          name: foodItem?.name  || 'Unknown_item',
           created_at: d.created_at || d.pickup_time || new Date().toISOString(),
           type: 'donation' as const,
         };
@@ -154,7 +154,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             <div className="flex items-center gap-2 mb-3">
               <span className="w-3 h-3 bg-[#18E170] rounded-full"></span>
               <span className="text-white font-semibold text-base">
-                {t('activity')}
+title="Default"
               </span>
             </div>
             <ul className="flex flex-col">
@@ -169,7 +169,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                     <span className="text-sm font-semibold text-white">
                       {item.type === 'donation'
                         ? t('donationLabel')
-                        : 'Request'}
+                        : t('common.request')}
                     </span>
                     <span className="text-white/90 text-sm ml-1">
                       ·{' '}
@@ -188,7 +188,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                       )
                     }
                   >
-                    {t('detail')}
+title="Default"
                   </button>
                 </li>
               ))}

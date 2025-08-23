@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -14,7 +15,7 @@ const Card = React.forwardRef<
     {...props}
   />
 ))
-Card.displayName = "Card"
+Card.displayName = 'Card'
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,

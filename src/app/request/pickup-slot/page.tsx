@@ -109,7 +109,7 @@ export default function PickupSlotPage() {
       header={
         <>
           <SecondaryNavbar
-            title="Pickup Slots"
+title="Default"
             backHref="/request/new"
             onBackClick={() => router.back()}
           />

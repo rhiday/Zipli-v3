@@ -56,7 +56,7 @@ export default function RecurringDonationForm() {
       // Navigate to recurring schedule page
       router.push('/donate/recurring-schedule');
     } catch (error) {
-      console.error('Failed to create recurring donation:', error);
+      console.error(t('pages.donations.failed_to_create_recurring_don'), error);
     }
   };
 
@@ -83,7 +83,7 @@ export default function RecurringDonationForm() {
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? 'Submitting...' : 'Continue'}
+            {isSubmitting ? 'Submitting...' : t('common.actions.continue')}
           </Button>
         </BottomActionBar>
       }
@@ -101,7 +101,7 @@ export default function RecurringDonationForm() {
               required: 'Please describe the food you want to donate',
             })}
             placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
-            variant={errors.description ? 'error' : 'default'}
+            variant={errors.description ? {t('common.status.error')} : 'default'}
             rows={4}
           />
           {errors.description && (
@@ -125,9 +125,9 @@ export default function RecurringDonationForm() {
                 message: 'Please enter a valid number',
               },
             })}
-            placeholder="Enter quantity in kg"
+title="Default"
             type="number"
-            variant={errors.quantity ? 'error' : 'default'}
+            variant={errors.quantity ? {t('common.status.error')} : 'default'}
           />
           {errors.quantity && (
             <div className="mt-1 text-[14px] font-manrope text-negative">
@@ -139,25 +139,14 @@ export default function RecurringDonationForm() {
         {/* Allergens */}
         <AllergensDropdown
           label="Allergens & dietary information"
-          options={[
-            'Milk',
-            'Eggs',
-            'Fish',
-            'Shellfish',
-            'Tree nuts',
-            'Peanuts',
-            'Wheat',
-            'Soybeans',
-            'Vegan',
-            'Vegetarian',
-            'Gluten-free',
-            'Halal',
-            'Kosher',
+          options={['Default', 'Eggs', 'Fish', 'Shellfish',
+            'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans', 'Vegan', 'Vegetarian',
+            'Gluten-free', 'Halal', 'Kosher',
             'Low-lactose',
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-          placeholder="Select dietary information"
+title="Default"
         />
       </form>
     </PageContainer>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 interface SkeletonProps {
   className?: string;
@@ -32,7 +33,7 @@ const Skeleton: React.FC<SkeletonProps> = React.memo(({
   );
 });
 
-Skeleton.displayName = 'Skeleton';
+Skeleton.displayName = t('common.skeleton');
 
 // Specialized skeleton components for common patterns
 export const SkeletonCard: React.FC<{ className?: string }> = React.memo(({ className }) => (

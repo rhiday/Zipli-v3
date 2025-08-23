@@ -3,8 +3,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import QRCode from 'react-qr-code';
 import { Button } from '@/components/ui/button';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 export default function QRLoginGenerator() {
+  const { t } = useCommonTranslation();
+
   const [token, setToken] = useState<string | null>(null);
   const [appUrl, setAppUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -19,7 +22,7 @@ export default function QRLoginGenerator() {
       // Add cache busting parameter to avoid cached responses
       const response = await fetch(`/api/auth/qr-token?t=${Date.now()}`);
       if (!response.ok) {
-        console.error('Error response:', response.status, response.statusText);
+        console.error(t('common.error_response'), response.status, response.statusText);
         throw new Error(`Failed to generate QR login token (${response.status})`);
       }
       
@@ -34,7 +37,7 @@ export default function QRLoginGenerator() {
       // Reset retries on success
       setRetries(0);
     } catch (err) {
-      console.error('Error generating QR token:', err);
+      console.error(t('common.error_generating_qr_token'), err);
       setError('Could not generate QR code. Please try again.');
       
       // Auto-retry up to 3 times with increasing delay

@@ -58,7 +58,7 @@ export default function RecurringRequestForm() {
       // Navigate to schedule page (following donor flow pattern)
       router.push('/request/schedule');
     } catch (error) {
-      console.error('Failed to create recurring request:', error);
+      console.error(t('pages.requests.failed_to_create_recurring_req'), error);
     }
   };
 
@@ -67,7 +67,7 @@ export default function RecurringRequestForm() {
       header={
         <>
           <SecondaryNavbar
-            title="Recurring Request"
+title="Default"
             backHref="/request/select-type"
             onBackClick={() => router.back()}
           />
@@ -85,7 +85,7 @@ export default function RecurringRequestForm() {
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? 'Submitting...' : 'Continue'}
+            {isSubmitting ? 'Submitting...' : t('common.actions.continue')}
           </Button>
         </BottomActionBar>
       }
@@ -103,7 +103,7 @@ export default function RecurringRequestForm() {
               required: 'Please describe the food you need',
             })}
             placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
-            variant={errors.description ? 'error' : 'default'}
+            variant={errors.description ? {t('common.status.error')} : 'default'}
             rows={4}
           />
           {errors.description && (
@@ -127,9 +127,9 @@ export default function RecurringRequestForm() {
                 message: 'Please enter a valid number',
               },
             })}
-            placeholder="Enter number of people"
+title="Default"
             type="number"
-            variant={errors.quantity ? 'error' : 'default'}
+            variant={errors.quantity ? {t('common.status.error')} : 'default'}
           />
           {errors.quantity && (
             <div className="mt-1 text-[14px] font-manrope text-negative">
@@ -141,25 +141,14 @@ export default function RecurringRequestForm() {
         {/* Allergens */}
         <AllergensDropdown
           label="Allergies, intolerances & diets"
-          options={[
-            'Milk',
-            'Eggs',
-            'Fish',
-            'Shellfish',
-            'Tree nuts',
-            'Peanuts',
-            'Wheat',
-            'Soybeans',
-            'Vegan',
-            'Vegetarian',
-            'Gluten-free',
-            'Halal',
-            'Kosher',
+          options={['Default', t('pages.requests.eggs'), t('pages.requests.fish'), t('pages.requests.shellfish'),
+            'Tree nuts', t('pages.requests.peanuts'), t('pages.requests.wheat'), t('pages.requests.soybeans'), t('pages.requests.vegan'), t('pages.requests.vegetarian'),
+            'Gluten-free', t('pages.requests.halal'), t('pages.requests.kosher'),
             'Low-lactose',
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-          placeholder="Select dietary restrictions"
+title="Default"
           error={
             !selectedAllergens.length && watchedFields.description
               ? 'Please select at least one option'

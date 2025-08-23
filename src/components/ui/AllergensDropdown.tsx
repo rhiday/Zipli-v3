@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Input } from './Input';
 import { Chip } from './Chip';
+import { useAllergenSelectorTranslation } from '@/lib/i18n-enhanced';
 
 interface AllergensDropdownProps {
   label: string;
@@ -23,7 +24,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   error,
   hint,
   disabled,
-  placeholder = 'Select...',
+  placeholder = "Select...",
 }) => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,7 +74,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           readOnly
           value={''}
           placeholder={value.length > 0 ? '' : placeholder}
-          variant={error ? 'error' : 'default'}
+          variant={error ? {t('common.status.error')} : 'default'}
           disabled={disabled}
           className="cursor-pointer"
           onClick={handleInputClick}

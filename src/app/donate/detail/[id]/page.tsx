@@ -122,13 +122,13 @@ export default function DonationDetailPage({
     return (
       <div className="flex min-h-screen flex-col items-center justify-center text-center">
         <h2 className="text-2xl font-bold mb-2">
-          {error ? t('error') : t('donationNotFound')}
+          {error ? t(t('common.status.error')) : t('donationNotFound')}
         </h2>
         <p className="text-muted-foreground">
           {error || t('couldNotLoadDetails')}
         </p>
         <Button onClick={() => router.back()} className="mt-4">
-          {t('goBack')}
+          Go Back
         </Button>
       </div>
     );
@@ -143,7 +143,7 @@ export default function DonationDetailPage({
         <Button
           onClick={() => router.back()}
           className="absolute top-12 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
-          aria-label="Go back"
+          Go Back
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -159,7 +159,7 @@ export default function DonationDetailPage({
           <div className="h-full w-full bg-gray-200 flex items-center justify-center">
             <Image
               src="/images/placeholder.svg"
-              alt={t('noImage')}
+              alt = 'NoImage'
               width={160}
               height={160}
             />
@@ -207,7 +207,7 @@ export default function DonationDetailPage({
                     size="cta"
                     className="flex-1"
                   >
-                    <Trash2 className="h-5 w-5" /> {t('removeListing')}
+                    <Trash2 className="h-5 w-5" /> Remove Listing
                   </Button>
                 </DialogTrigger>
                 <Button
@@ -216,14 +216,14 @@ export default function DonationDetailPage({
                   className="flex-1"
                   onClick={handleEditListing}
                 >
-                  <Edit className="h-5 w-5" /> {t('editListing')}
+                  <Edit className="h-5 w-5" /> Edit Listing
                 </Button>
               </div>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>{t('areYouSure')}</DialogTitle>
                   <DialogDescription>
-                    {t('removeListingConfirmation')}
+                    This will permanently remove the listing from public view. This action cannot be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -231,10 +231,10 @@ export default function DonationDetailPage({
                     variant="secondary"
                     onClick={() => setShowDeleteConfirm(false)}
                   >
-                    {t('cancel')}
+                    Cancel
                   </Button>
                   <Button variant="destructive" onClick={handleRemoveListing}>
-                    {t('yesRemove')}
+                    Yes, Remove
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -247,7 +247,7 @@ export default function DonationDetailPage({
                 className="w-full"
                 onClick={() => router.push(`/request/${params.id}`)}
               >
-                {t('requestThisDonation')}
+                Request this donation
               </Button>
             </div>
           )}
@@ -268,7 +268,7 @@ export default function DonationDetailPage({
                 <div>
                   <p className="font-semibold text-gray-900">{donorName}</p>
                   <p className="text-sm text-gray-500">
-                    {totalDonations} {t('donations')}
+                    {totalDonations} donations
                   </p>
                 </div>
               </div>
@@ -277,7 +277,7 @@ export default function DonationDetailPage({
                 size="sm"
                 onClick={() => router.push(`/profile/${donation.donor_id}`)}
               >
-                {t('viewProfile')}
+                View Profile
               </Button>
             </div>
             <div className="grid grid-cols-2 gap-4">

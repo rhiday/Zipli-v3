@@ -41,7 +41,7 @@ export default function FeedPage(): React.ReactElement {
           return {
             ...donation,
             food_item: foodItem,
-            donorName: donor.full_name || 'Anonymous',
+            donorName: donor.full_name  || 'Anonymous',
             pickupTime: (donation as any).pickup_time,
           };
         }
@@ -97,13 +97,13 @@ export default function FeedPage(): React.ReactElement {
       <div className="mx-auto max-w-7xl space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-titleLg font-display text-primary">
-            {t('exploreAvailableDonations')}
+title="Default"
           </h1>
           <div className="relative flex-1 sm:max-w-xs">
             <SearchIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary-50" />
             <Input
               type="text"
-              placeholder={t('searchDonations')}
+              placeholder = "SearchDonations"
               value={searchTerm}
               onChange={handleSearchChange}
               className="pl-10 pr-4 w-full"
@@ -121,7 +121,7 @@ export default function FeedPage(): React.ReactElement {
           <div className="text-center py-16">
             <h3 className="text-xl font-semibold text-primary">{t('noDonationsFound')}</h3>
             <p className="mt-2 text-primary-75">
-              {t('noDonationsMatchingSearch')}
+title="Default"
             </p>
           </div>
         )}

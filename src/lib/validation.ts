@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Common validation schemas
-export const emailSchema = z.string().email('Invalid email address');
+export const emailSchema = z.string().email(t('common.invalid_email_address'));
 export const passwordSchema = z.string().min(8, 'Password must be at least 8 characters');
 export const nameSchema = z.string().min(1, 'Name is required').max(100, 'Name is too long');
 export const quantitySchema = z.string().min(1, 'Quantity is required').max(50, 'Quantity description is too long');
@@ -41,10 +41,10 @@ export function validateRequestBody<T>(
       const firstError = error.errors[0];
       return { 
         success: false, 
-        error: firstError?.message || 'Validation failed' 
+        error: firstError?.message  || 'Validation_failed' 
       };
     }
-    return { success: false, error: 'Invalid request format' };
+    return { success: false, error: t('common.invalid_request_format') };
   }
 }
 

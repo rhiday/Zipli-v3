@@ -4,6 +4,7 @@ import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/lib/utils"
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 const Drawer = ({
   shouldScaleBackground = true,
@@ -14,7 +15,7 @@ const Drawer = ({
     {...props}
   />
 )
-Drawer.displayName = "Drawer"
+Drawer.displayName = 'Drawer'
 
 const DrawerTrigger = DrawerPrimitive.Trigger
 

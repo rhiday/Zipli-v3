@@ -43,10 +43,10 @@ function ImpactPage(): React.ReactElement {
   const [selectedPeriod, setSelectedPeriod] = useState('all');
 
   const periods = [
-    { value: 'all', label: 'All Time' },
+    { value: 'all', label: t('pages.impact.allTime') },
     { value: '30days', label: 'Last 30 Days' },
     { value: '90days', label: 'Last 3 Months' },
-    { value: '365days', label: 'Last Year' },
+    { value: '365days', label: t('pages.impact.lastYear') },
   ];
 
   useEffect(() => {
@@ -98,23 +98,23 @@ function ImpactPage(): React.ReactElement {
 
   // Mock trend data for visualizations
   const trendData = useMemo(() => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const months = ['Jan', t('pages.impact.feb'), t('pages.impact.mar'), t('pages.impact.apr'), t('pages.impact.may'), t('pages.impact.jun')];
     const donationTrend = [
-      { month: 'Jan', donations: 3, weight: 8 },
-      { month: 'Feb', donations: 5, weight: 12 },
-      { month: 'Mar', donations: 4, weight: 10 },
-      { month: 'Apr', donations: 7, weight: 18 },
-      { month: 'May', donations: 6, weight: 15 },
-      { month: 'Jun', donations: 8, weight: 21 },
+      { month: t('pages.impact.jan'), donations: 3, weight: 8 },
+      { month: t('pages.impact.feb'), donations: 5, weight: 12 },
+      { month: t('pages.impact.mar'), donations: 4, weight: 10 },
+      { month: t('pages.impact.apr'), donations: 7, weight: 18 },
+      { month: t('pages.impact.may'), donations: 6, weight: 15 },
+      { month: t('pages.impact.jun'), donations: 8, weight: 21 },
     ];
 
     const impactTrend = [
-      { month: 'Jan', co2: 2, cost: 20 },
-      { month: 'Feb', co2: 3, cost: 30 },
-      { month: 'Mar', co2: 2.5, cost: 25 },
-      { month: 'Apr', co2: 4, cost: 45 },
-      { month: 'May', co2: 3.5, cost: 37 },
-      { month: 'Jun', co2: 5, cost: 52 },
+      { month: t('pages.impact.jan'), co2: 2, cost: 20 },
+      { month: t('pages.impact.feb'), co2: 3, cost: 30 },
+      { month: t('pages.impact.mar'), co2: 2.5, cost: 25 },
+      { month: t('pages.impact.apr'), co2: 4, cost: 45 },
+      { month: t('pages.impact.may'), co2: 3.5, cost: 37 },
+      { month: t('pages.impact.jun'), co2: 5, cost: 52 },
     ];
 
     return { donationTrend, impactTrend };
@@ -151,7 +151,7 @@ function ImpactPage(): React.ReactElement {
     const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text('Zipli Impact Report', 10, 10);
+    doc.text(t('pages.impact.zipli_impact_report'), 10, 10);
     doc.setFontSize(12);
     doc.text(`Total food donated: ${impactStats.totalWeight}kg`, 10, 20);
     doc.text(`Portions created: ${impactStats.totalPortions}`, 10, 30);

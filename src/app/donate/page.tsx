@@ -107,7 +107,7 @@ function DonorDashboardPage(): React.ReactElement {
     const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text('Zipli Summary', 10, 10);
+    doc.text(t('pages.donations.zipli_summary'), 10, 10);
     doc.setFontSize(12);
     doc.text(`Total food offered: 46kg`, 10, 20);
     doc.text(`Portions offered: 131`, 10, 30);
@@ -119,7 +119,7 @@ function DonorDashboardPage(): React.ReactElement {
   if (loading) {
     return (
       <div className="min-h-screen pb-20">
-        <Header title={t('loading')} />
+        <Header title={'Loading'} />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
           <section>
@@ -173,7 +173,7 @@ function DonorDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-              {t('yourImpact')}
+title="Default"
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -187,7 +187,7 @@ function DonorDashboardPage(): React.ReactElement {
                   46kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('totalFoodOffered')}
+title="Default"
                 </p>
               </div>
             </div>
@@ -202,7 +202,7 @@ function DonorDashboardPage(): React.ReactElement {
                   131
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('portionsOffered')}
+title="Default"
                 </p>
               </div>
             </div>
@@ -217,7 +217,7 @@ function DonorDashboardPage(): React.ReactElement {
                   125€
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('savedInFoodDisposalCosts')}
+title="Default"
                 </p>
               </div>
             </div>
@@ -232,7 +232,7 @@ function DonorDashboardPage(): React.ReactElement {
                   10t
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('co2Avoided')}
+title="Default"
                 </p>
               </div>
             </div>
@@ -249,8 +249,8 @@ function DonorDashboardPage(): React.ReactElement {
           >
             <ActionButton
               href="#"
-              title={t('exportToPdf')}
-              description={t('environmentalAndSocialImpactData')}
+              title = 'ExportToPdf'
+              description = 'EnvironmentalAndSocialImpactData'
               icon={<FileDown />}
             />
           </div>
@@ -259,7 +259,7 @@ function DonorDashboardPage(): React.ReactElement {
         {/* This is whom you've helped section - Hidden for now */}
         {/* <section>
           <h2 className="text-lg font-semibold text-primary mb-3">
-            {t('thisIsWhomYouveHelped')}
+title="Default"
           </h2>
 
           <div className="space-y-4">

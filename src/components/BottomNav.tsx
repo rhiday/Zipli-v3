@@ -47,7 +47,7 @@ export default function BottomNav() {
         return [
           { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
           { href: '#', label: t('add'), icon: Plus, isCentral: true },
-          { href: '/impact', label: 'Impact', icon: TrendingUp },
+          { href: '/impact', label: t('common.impact'), icon: TrendingUp },
         ];
       case 'food_receiver':
         return [
@@ -57,7 +57,7 @@ export default function BottomNav() {
             icon: LayoutGrid,
           },
           { href: '#', label: t('request'), icon: Plus, isCentral: true },
-          { href: '/impact', label: 'Impact', icon: TrendingUp },
+          { href: '/impact', label: t('common.impact'), icon: TrendingUp },
         ];
       case 'city':
         return [
@@ -189,7 +189,7 @@ export default function BottomNav() {
                       <BarChart3 className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          {t('analytics')}
+title="Default"
                         </p>
                         <p className="text-xs text-secondary">
                           {t('overview')}.
@@ -242,7 +242,7 @@ export default function BottomNav() {
             <DrawerFooter className="pt-2">
               <DrawerClose asChild>
                 <Button variant="ghost" size="sm">
-                  {t('cancel')}
+title="Default"
                 </Button>
               </DrawerClose>
             </DrawerFooter>

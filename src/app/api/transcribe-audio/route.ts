@@ -15,7 +15,7 @@ async function toFile(stream: Readable, filename: string, mimetype: string): Pro
     chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
   }
   const blob = new Blob(chunks, { type: mimetype });
-  // Suppress TypeScript error for 'File' constructor arguments, as it works in this environment
+  // Suppress TypeScript error for {t('common.file')} constructor arguments, as it works in this environment
   // @ts-ignore
   return new File([blob], filename, { type: mimetype });
 }
@@ -82,11 +82,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ transcript: transcriptText });
 
   } catch (error: any) {
-    console.error('Error transcribing audio:', error);
+    console.error(t('common.error_transcribing_audio'), error);
     // Check if it's an OpenAI API error
     if (error instanceof OpenAI.APIError) {
       return NextResponse.json({ error: error.message, type: error.type }, { status: error.status || 500 });
     }
-    return NextResponse.json({ error: 'Failed to transcribe audio', details: error.message }, { status: 500 });
+    return NextResponse.json({ error: t('common.failed_to_transcribe_audio'), details: error.message }, { status: 500 });
   }
 } 

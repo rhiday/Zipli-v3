@@ -162,7 +162,7 @@ function ManualDonationPageInner() {
         : String(existingFood.allergens)
             .split(',')
             .map((a) => a.trim());
-      // Filter out 'None' if other allergens are present
+      // Filter out None if other allergens are present
       return allergens.filter((a) => a.toLowerCase() !== 'none');
     }
 
@@ -256,7 +256,7 @@ function ManualDonationPageInner() {
         if (suggestedAllergens.length > 0) {
           updated.allergens = suggestedAllergens;
         } else {
-          updated.allergens = ['None']; // Default to 'None' if no suggestions
+          updated.allergens = ['None']; // Default to None if no suggestions
         }
       } else if (field === 'name' && !value.trim()) {
         updated.allergens = []; // Clear allergens if name is cleared
@@ -329,7 +329,7 @@ function ManualDonationPageInner() {
         setHasAttemptedSave(false);
       }
     } catch (error) {
-      console.error('Failed to save changes:', error);
+      console.error(t('pages.donations.failed_to_save_changes'), error);
       // We can add a user-facing error message here later.
     } finally {
       setIsSaving(false);
@@ -397,13 +397,13 @@ function ManualDonationPageInner() {
     <div className="flex flex-col gap-4">
       <div>
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
-          {t('nameOfFood')}
+          Name of Food
         </label>
         <Input
           id="name"
           value={currentItem.name}
           onChange={(e) => handleCurrentItemChange('name', e.target.value)}
-          placeholder={t('placeholderFoodName')}
+          placeholder="Enter food name"
           className={
             hasAttemptedSave && !currentItem.name ? 'border-red-500' : ''
           }
@@ -412,14 +412,14 @@ function ManualDonationPageInner() {
 
       <div>
         <label htmlFor="quantity" className="text-sm font-medium text-gray-700">
-          {t('quantityKg')}
+          Quantity (kg)
         </label>
         <Input
           id="quantity"
           type="number"
           value={currentItem.quantity}
           onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
-          placeholder={t('placeholderQuantity')}
+          placeholder="Enter quantity"
           className={
             hasAttemptedSave && !currentItem.quantity ? 'border-red-500' : ''
           }
@@ -427,22 +427,16 @@ function ManualDonationPageInner() {
       </div>
 
       <AllergensDropdown
-        label={t('allergiesIntolerancesDiets')}
+        label="Allergies, Intolerances & Diets"
         options={[
-          'Milk',
-          'Eggs',
-          'Fish',
-          'Shellfish',
-          'Tree nuts',
-          'Peanuts',
-          'Wheat',
-          'Soybeans',
+          'Milk', 'Eggs', 'Fish', 'Shellfish',
+          'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans',
         ]}
         value={currentItem.allergens}
         onChange={(allergens) =>
           handleCurrentItemChange('allergens', allergens)
         }
-        placeholder={t('selectAllergens')}
+        placeholder="Select allergens"
         error={
           hasAttemptedSave && currentItem.allergens.length === 0
             ? t('fieldRequired')
@@ -453,7 +447,7 @@ function ManualDonationPageInner() {
       <PhotoUpload
         onImageUpload={handleImageUpload}
         uploadedImage={currentItem.imageUrl}
-        hint={t('photosHelpIdentify')}
+        hint="Photos help identify your food donation"
       />
 
       <div>
@@ -461,7 +455,7 @@ function ManualDonationPageInner() {
           htmlFor="description"
           className="text-sm font-medium text-gray-700"
         >
-          {t('description')}
+          Description
         </label>
         <Textarea
           id="description"
@@ -469,7 +463,7 @@ function ManualDonationPageInner() {
           onChange={(e) =>
             handleCurrentItemChange('description', e.target.value)
           }
-          placeholder={t('placeholderDescription')}
+          placeholder="Enter description"
         />
       </div>
     </div>
@@ -490,7 +484,7 @@ function ManualDonationPageInner() {
             {hasItems && !showAddAnotherForm ? (
               <div className="flex justify-end">
                 <Button onClick={() => router.push('/donate/pickup-slot')}>
-                  {t('continue')}
+                  Continue
                 </Button>
               </div>
             ) : (
@@ -500,7 +494,7 @@ function ManualDonationPageInner() {
                   disabled={isSaving || !isFormValid}
                 >
                   {isSaving
-                    ? t('saving')
+                    ? t(t('pages.donations.saving'))
                     : isEditMode
                       ? t('saveChanges')
                       : t('addItem')}
@@ -515,7 +509,7 @@ function ManualDonationPageInner() {
         {hasItems && !showAddAnotherForm ? (
           <div className="flex flex-col gap-4">
             <h2 className="text-lg font-semibold">
-              {t('currentItemsInDonation')}
+              Current Items in Donation
             </h2>
             {donationItems.map((item) => (
               <ItemPreview
@@ -536,7 +530,7 @@ function ManualDonationPageInner() {
               >
                 <span className="flex items-center gap-2 border-b border-interactive pb-1">
                   <PlusIcon size={20} />
-                  {t('addAnotherItem')}
+                  Add Another Item
                 </span>
               </button>
             </div>
@@ -559,7 +553,7 @@ function ManualDonationPageInner() {
           </DialogHeader>
           <DialogFooter>
             <Button onClick={() => router.push('/donate')} className="w-full">
-              {t('goBackToDashboard')}
+              Go Back to Dashboard
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -571,7 +565,7 @@ function ManualDonationPageInner() {
 function ManualDonationPage() {
   const { t } = useLanguage();
   return (
-    <Suspense fallback={<div>{t('loading')}</div>}>
+    <Suspense fallback={<div>{t(t('pages.donations.loading'))}</div>}>
       <ManualDonationPageInner />
     </Suspense>
   );

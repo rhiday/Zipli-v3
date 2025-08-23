@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
   src?: string | null;
@@ -27,6 +28,6 @@ const Avatar = React.forwardRef<
     </span>
   );
 });
-Avatar.displayName = 'Avatar';
+Avatar.displayName = t('common.avatar');
 
 export { Avatar }; 

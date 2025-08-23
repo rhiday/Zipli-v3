@@ -25,15 +25,15 @@ export default function RequestSuccessPage() {
         </svg>
       </div>
       <h1 className="text-3xl font-bold mb-4 text-center">
-        {t('requestSubmitted')}
+title="Default"
       </h1>
       <p className="text-center text-base text-black mb-6 max-w-xs">
-        {t('requestAddedToSystem')}
+title="Default"
       </p>
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
-          heading={t('nextSteps')}
+          heading = 'NextSteps'
           steps={[
             {
               title: t('requestSubmitted'),
@@ -52,7 +52,7 @@ export default function RequestSuccessPage() {
       </div>
       <Link href="/receiver/dashboard">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-          {t('goBackToDashboard')}
+title="Default"
         </button>
       </Link>
     </div>

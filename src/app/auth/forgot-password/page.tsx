@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
         setMessage(t('resetPasswordDesc'));
       }
     } catch (err) {
-      setError(t('networkError'));
+      setError(t(t('pages.auth.networkerror')));
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">{t('resetPassword')}</h1>
           <p className="mt-2 text-body text-primary-75">
-            {t('resetPasswordDesc')}
+title="Default"
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
             <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
-              {t('emailAddress')}
+title="Default"
             </label>
             <Input
               id="email"
@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={t('emailAddress')}
+              placeholder = "EmailAddress"
             />
           </div>
 

@@ -88,7 +88,7 @@ export default function DonationSummaryPage() {
         ) {
           const { addDonationItem } = useDonationStore.getState();
           addDonationItem({
-            name: donationData.description || 'Recurring Donation',
+            name: donationData.description  || 'Recurring_donation',
             quantity: donationData.quantity?.toString() || '1',
             allergens: donationData.allergens || [],
             description: donationData.description || null,
@@ -117,7 +117,7 @@ export default function DonationSummaryPage() {
     console.log('✏️ Edit mode:', isEditMode, 'ID:', editingDonationId);
 
     if (!address.trim() || !currentUser) {
-      console.error('❌ Validation failed: missing address or user');
+      console.error(t('pages.donations._validation_failed_missing_add'));
       return;
     }
 
@@ -200,9 +200,9 @@ export default function DonationSummaryPage() {
         console.log('✅ Donation updated successfully');
       } else {
         // Create mode: create new donations
-        console.log('🔄 Processing', donationItems.length, 'donation items...');
+        console.log(t('pages.donations._processing'), donationItems.length, 'donation items...');
         for (const item of donationItems) {
-          console.log('📦 Processing item:', item.name, 'qty:', item.quantity);
+          console.log(t('pages.donations._processing_item'), item.name, 'qty:', item.quantity);
 
           // First, find or create the food item in the database
           let foodItemId = '';
@@ -232,7 +232,7 @@ export default function DonationSummaryPage() {
 
             if (newFoodItemResult.error || !newFoodItemResult.data) {
               console.error(
-                '❌ Error creating food item:',
+                'Error creating food item',
                 newFoodItemResult.error
               );
               continue; // Skip this donation
@@ -257,7 +257,7 @@ export default function DonationSummaryPage() {
           const result = await addDonation(donationData);
 
           if (result.error) {
-            console.error('❌ Error creating donation:', result.error);
+            console.error(t('pages.donations._error_creating_donation'), result.error);
             // Continue with other donations even if one fails
           } else {
             console.log('✅ Donation created successfully:', result.data?.id);
@@ -285,7 +285,7 @@ export default function DonationSummaryPage() {
       <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">{t('noDonationItemsFound')}</p>
         <Button onClick={() => router.push('/donate/new')}>
-          {t('startNewDonation')}
+title="Default"
         </Button>
       </div>
     );
@@ -296,7 +296,7 @@ export default function DonationSummaryPage() {
       header={
         <>
           <SecondaryNavbar
-            title={t('donationSummary')}
+            title = 'DonationSummary'
             backHref="/donate/pickup-slot"
           />
           <div className="px-4 pt-2">
@@ -322,7 +322,7 @@ export default function DonationSummaryPage() {
       {/* Donation Items Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-2">
-          {t('donationItems')}
+title="Default"
         </h2>
         {donationItems.map((item, index) => (
           <ItemPreview
@@ -340,7 +340,7 @@ export default function DonationSummaryPage() {
       {/* Pickup schedule */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {recurringSchedule ? 'Recurring Schedule' : t('pickupSchedule')}
+          {recurringSchedule ? {t('pages.donations.recurring_schedule')} : t('pickupSchedule')}
         </h2>
         {recurringSchedule && Array.isArray(recurringSchedule) ? (
           // Multiple recurring schedules
@@ -356,7 +356,7 @@ export default function DonationSummaryPage() {
               <button
                 onClick={() => router.push('/donate/recurring-schedule')}
                 className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-                aria-label="Edit schedule"
+title="Default"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path
@@ -380,7 +380,7 @@ export default function DonationSummaryPage() {
             <button
               onClick={() => router.push('/donate/pickup-slot')}
               className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-              aria-label="Edit schedule"
+title="Default"
             >
               <svg
                 width="20"
@@ -404,14 +404,14 @@ export default function DonationSummaryPage() {
       {/* Address & Instructions Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('deliveryDetails')}
+title="Default"
         </h2>
         <div>
           <label
             htmlFor="address"
             className="block text-black font-semibold mb-3"
           >
-            {t('address')}
+title="Default"
           </label>
           <Textarea
             id="address"
@@ -432,7 +432,7 @@ export default function DonationSummaryPage() {
               htmlFor="update-address-profile"
               className="text-sm text-gray-600"
             >
-              {t('updateAddressInProfile')}
+title="Default"
             </label>
           </div>
         </div>
@@ -441,11 +441,11 @@ export default function DonationSummaryPage() {
             htmlFor="driver-instructions"
             className="block text-black font-semibold mb-3"
           >
-            {t('instructionsForDriver')}
+title="Default"
           </label>
           <Textarea
             id="driver-instructions"
-            placeholder={t('pleaseRingTheDoorbell')}
+            placeholder = "PleaseRingTheDoorbell"
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
@@ -462,7 +462,7 @@ export default function DonationSummaryPage() {
               htmlFor="update-instructions-profile"
               className="text-sm text-gray-600"
             >
-              {t('updateInstructionsInProfile')}
+title="Default"
             </label>
           </div>
         </div>

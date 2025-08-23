@@ -34,7 +34,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   disabled = false,
   error,
   className = '',
-  placeholder = 'dd.mm.yyyy',
+  placeholder = "dd.mm.yyyy",
   dateFormat = 'dd/MM/yyyy',
   disablePastDates = true,
   minDate,

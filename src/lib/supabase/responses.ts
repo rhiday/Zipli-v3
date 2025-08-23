@@ -1,4 +1,5 @@
 import type { Database } from './types';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 export type DonationRow = Database['public']['Tables']['donations']['Row'];
 export type FoodItemRow = Database['public']['Tables']['food_items']['Row'];

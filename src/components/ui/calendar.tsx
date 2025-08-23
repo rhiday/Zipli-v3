@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
 
 import { cn } from '@/lib/utils';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -14,6 +15,7 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const { t } = useCommonTranslation();
   return (
     <DayPicker
       weekStartsOn={1}
@@ -72,6 +74,6 @@ function Calendar({
     />
   );
 }
-Calendar.displayName = 'Calendar';
+Calendar.displayName = t('common.calendar');
 
 export { Calendar };

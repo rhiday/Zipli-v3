@@ -97,7 +97,7 @@ export default function RequestSummaryPage() {
       // Note: Only including fields that exist in current database schema
       const requestPayload = {
         user_id: currentUser.id,
-        description: `Request for ${requestData.quantity} portions - ${requestData.allergens.join(', ')} | Address: ${address.trim()} | Instructions: ${instructions.trim() || 'None'} | Period: ${requestData.startDate} to ${requestData.endDate} | Recurrence: ${JSON.stringify(requestData.recurrencePattern)}`,
+        description: `Request for ${requestData.quantity} portions - ${requestData.allergens.join(', ')} | Address: ${address.trim()} | Instructions: ${instructions.trim()  || 'None'} | Period: ${requestData.startDate} to ${requestData.endDate} | Recurrence: ${JSON.stringify(requestData.recurrencePattern)}`,
         people_count: parseInt(requestData.quantity) || 1,
         pickup_date: requestData.pickupDate,
         pickup_start_time: requestData.startTime,
@@ -111,7 +111,7 @@ export default function RequestSummaryPage() {
       const response = await addRequest(requestPayload);
 
       if (response.error) {
-        console.error('Error creating request:', response.error);
+        console.error(t('pages.requests.error_creating_request'), response.error);
         alert(`Failed to submit request: ${response.error}`);
         return;
       }
@@ -123,12 +123,12 @@ export default function RequestSummaryPage() {
         router.push('/request/success');
       } else {
         console.error('No data returned from addRequest');
-        alert('Failed to submit request - no data returned');
+        alert(t('pages.requests.failed_to_submit_request_no_da'));
       }
     } catch (error) {
-      console.error('Error submitting request:', error);
+      console.error(t('pages.requests.error_submitting_request'), error);
       alert(
-        `Failed to submit request: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to submit request: ${error instanceof Error ? error.message : t('pages.requests.unknown_error')}`
       );
     } finally {
       setIsSaving(false);
@@ -148,12 +148,12 @@ export default function RequestSummaryPage() {
     }
 
     if (pattern.type === 'daily') {
-      return t('daily') || 'Daily';
+      return t('daily')  || 'Daily';
     }
 
     if (pattern.type === 'weekly') {
       if (!pattern.weeklyDays || pattern.weeklyDays.length === 0) {
-        return t('weekly') || 'Weekly';
+        return t('weekly')  || 'Weekly';
       }
 
       const dayNames = [
@@ -197,7 +197,7 @@ export default function RequestSummaryPage() {
       return result;
     }
 
-    return t('custom') || 'Custom';
+    return t('custom')  || 'Custom';
   };
 
   const handleBackClick = () => {
@@ -209,7 +209,7 @@ export default function RequestSummaryPage() {
       header={
         <>
           <SecondaryNavbar
-            title={t('requestSummary')}
+            title = 'RequestSummary'
             backHref="/request/pickup-slot"
             onBackClick={handleBackClick}
           />
@@ -236,12 +236,12 @@ export default function RequestSummaryPage() {
       {/* Donation items (requested) */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-2">
-          {t('donationItems')}
+title="Default"
         </h2>
         <div className="flex items-start justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <div className="space-y-1">
             <div className="font-semibold text-[#024209]">
-              {t('donationLabel')}
+title="Default"
             </div>
             <div className="text-sm text-gray-600">
               {t('portions')}: {requestData.quantity || '—'}
@@ -254,7 +254,7 @@ export default function RequestSummaryPage() {
           <button
             onClick={() => router.push('/request/new')}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-            aria-label="Edit"
+title="Default"
           >
             <svg
               width="20"
@@ -277,7 +277,7 @@ export default function RequestSummaryPage() {
       {/* Request Period */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('requestPeriod') || 'Request Period'}
+          {t('requestPeriod')  || 'RequestPeriod'}
         </h2>
         <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <span className="font-semibold text-interactive">
@@ -288,7 +288,7 @@ export default function RequestSummaryPage() {
           <button
             onClick={() => router.push('/request/new')}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-            aria-label="Edit period"
+title="Default"
           >
             <svg
               width="20"
@@ -311,7 +311,7 @@ export default function RequestSummaryPage() {
       {/* Recurrence Pattern */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('recurringInterval') || 'Recurrence'}
+          {t('recurringInterval')  || 'Recurrence'}
         </h2>
         <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <span className="font-semibold text-interactive">
@@ -320,7 +320,7 @@ export default function RequestSummaryPage() {
           <button
             onClick={() => router.push('/request/new')}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-            aria-label="Edit recurrence"
+title="Default"
           >
             <svg
               width="20"
@@ -343,7 +343,7 @@ export default function RequestSummaryPage() {
       {/* Pickup schedule */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('pickupSchedule')}
+title="Default"
         </h2>
         <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <span className="font-semibold text-interactive">
@@ -354,7 +354,7 @@ export default function RequestSummaryPage() {
           <button
             onClick={() => router.push('/request/pickup-slot')}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-            aria-label="Edit schedule"
+title="Default"
           >
             <svg
               width="20"
@@ -377,14 +377,14 @@ export default function RequestSummaryPage() {
       {/* Delivery details */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('deliveryDetails')}
+title="Default"
         </h2>
         <div>
           <label
             htmlFor="address"
             className="block text-black font-semibold mb-3"
           >
-            {t('address')}
+title="Default"
           </label>
           <Textarea
             id="address"
@@ -405,7 +405,7 @@ export default function RequestSummaryPage() {
               htmlFor="update-address-profile"
               className="text-sm text-gray-600"
             >
-              {t('updateAddressInProfile')}
+title="Default"
             </label>
           </div>
         </div>
@@ -414,11 +414,11 @@ export default function RequestSummaryPage() {
             htmlFor="driver-instructions"
             className="block text-black font-semibold mb-3"
           >
-            {t('instructionsForDriver')}
+title="Default"
           </label>
           <Textarea
             id="driver-instructions"
-            placeholder={t('pleaseRingTheDoorbell')}
+            placeholder = "PleaseRingTheDoorbell"
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
@@ -435,7 +435,7 @@ export default function RequestSummaryPage() {
               htmlFor="update-instructions-profile"
               className="text-sm text-gray-600"
             >
-              {t('updateInstructionsInProfile')}
+title="Default"
             </label>
           </div>
         </div>

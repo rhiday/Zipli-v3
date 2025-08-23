@@ -119,7 +119,7 @@ export default function RequestDetailPage({
 
     // Extract clean request name
     const requestName = mainPart.replace('Request for ', ''); // "3 portions - Vegan"
-    const allergensPart = requestName.split(' - ').slice(1).join(', ') || ''; // "Vegan"
+    const allergensPart = requestName.split(' - ').slice(1).join(', ') || ''; // {t('pages.requests.vegan')}
     const quantityPart = requestName.split(' - ')[0] || ''; // "3 portions"
 
     return {
@@ -169,8 +169,7 @@ export default function RequestDetailPage({
   const requesterUser = users.find((u) => u.id === request.user_id);
   const requesterName =
     requesterUser?.full_name ||
-    requesterUser?.organization_name ||
-    'Anonymous Requester';
+    requesterUser?.organization_name  || 'Anonymous_requester';
 
   const statusClass = (() => {
     switch (request.status) {
@@ -192,7 +191,7 @@ export default function RequestDetailPage({
         <Button
           onClick={() => router.back()}
           className="absolute top-12 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
-          aria-label="Go back"
+title="Default"
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -294,7 +293,7 @@ export default function RequestDetailPage({
                 ) : (
                   <XIcon className="h-5 w-5" />
                 )}
-                {t('cancel') || 'Cancel Request'}
+                {t('cancel')  || 'Cancel_request'}
               </Button>
               <Button
                 variant="primary"
@@ -325,7 +324,7 @@ export default function RequestDetailPage({
                   window.location.href = `mailto:${email}?subject=Re: Food Request - ${requestInfo.requestName}`;
                 }}
               >
-                {t('contactRequester') || 'Contact Requester'}
+                {t('contactRequester')  || 'ContactRequester'}
               </Button>
             </div>
           )}

@@ -154,7 +154,7 @@ export default function PickupSlotPage() {
       header={
         <>
           <SecondaryNavbar
-            title={t('addPickupSlot')}
+            title = 'AddPickupSlot'
             backHref="/donate/manual"
             onBackClick={handleBackClick}
           />
@@ -177,7 +177,7 @@ export default function PickupSlotPage() {
                   !currentSlot.endTime)
               }
             >
-              {t('continue')}
+title="Default"
             </Button>
           </div>
         </BottomActionBar>
@@ -221,7 +221,7 @@ export default function PickupSlotPage() {
                 <button
                   onClick={() => handleDeleteSlot(slot.id)}
                   className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#CB0003] text-[#CB0003] hover:bg-black/5"
-                  aria-label="Delete"
+title="Default"
                 >
                   <svg
                     width="14"
@@ -253,7 +253,7 @@ export default function PickupSlotPage() {
               variant="secondary"
               className="text-interactive border-interactive hover:bg-[#eafcd6]"
             >
-              {t('addPickupSlot')}
+title="Default"
             </Button>
           </div>
         )}
@@ -270,7 +270,7 @@ export default function PickupSlotPage() {
             {/* Date Picker */}
             <div>
               <label className="block text-black font-semibold mb-3">
-                {t('selectDay')}
+title="Default"
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -315,7 +315,7 @@ export default function PickupSlotPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-black font-semibold mb-3">
-                  {t('startTime')}
+title="Default"
                 </label>
                 <Popover
                   open={openPopover === 'start'}
@@ -365,7 +365,7 @@ export default function PickupSlotPage() {
               </div>
               <div>
                 <label className="block text-black font-semibold mb-3">
-                  {t('endTime')}
+title="Default"
                 </label>
                 <Popover
                   open={openPopover === 'end'}
@@ -424,7 +424,7 @@ export default function PickupSlotPage() {
                     : 'text-gray-400 cursor-not-allowed')
                 }
               >
-                {t('addAnother')}
+title="Default"
               </button>
             </div>
           </div>

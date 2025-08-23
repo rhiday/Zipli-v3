@@ -29,7 +29,7 @@ export default function LanguageSwitcher({ compact = false }: Props) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            aria-label={t('language')}
+            aria-label={'Language'}
             className="px-3 py-1.5 border border-[#F3F4ED] rounded-full flex items-center gap-1.5 text-sm text-white bg-transparent hover:bg-white/5 transition-colors"
           >
             <Languages className="w-4 h-4 text-white" />
@@ -54,7 +54,7 @@ export default function LanguageSwitcher({ compact = false }: Props) {
     <div className="flex items-center gap-2">
       <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'fi')}>
         <SelectTrigger className="w-28">
-          <SelectValue placeholder={t('language')} />
+          <SelectValue placeholder={'Language'} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="en">{t('english')}</SelectItem>

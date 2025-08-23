@@ -156,7 +156,7 @@ export default function RequestSchedulePage() {
         return `Daily: ${schedule.startTime} - ${schedule.endTime}`;
       case 'weekly':
         if (schedule.weeklyDays?.length) {
-          const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const dayNames = ['Sun', t('pages.requests.mon'), t('pages.requests.tue'), t('pages.requests.wed'), t('pages.requests.thu'), t('pages.requests.fri'), t('pages.requests.sat')];
           const days = schedule.weeklyDays.map((d) => dayNames[d]).join(', ');
           return `Weekly: ${days}, ${schedule.startTime} - ${schedule.endTime}`;
         }
@@ -165,7 +165,7 @@ export default function RequestSchedulePage() {
         const count = schedule.customDates?.length || 0;
         return `Custom: ${count} dates selected`;
       default:
-        return 'Schedule';
+        return 'Default';
     }
   };
 
@@ -174,7 +174,7 @@ export default function RequestSchedulePage() {
       header={
         <>
           <SecondaryNavbar
-            title="Schedule Requests"
+title="Default"
             backHref="/request/recurring-form"
             onBackClick={() => router.back()}
           />
@@ -239,7 +239,7 @@ export default function RequestSchedulePage() {
                 <button
                   onClick={() => handleDeleteSchedule(schedule.id)}
                   className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#CB0003] text-[#CB0003] hover:bg-black/5"
-                  aria-label="Delete"
+title="Default"
                 >
                   <svg width="14" height="15" viewBox="0 0 14 15" fill="none">
                     <path
@@ -262,8 +262,8 @@ export default function RequestSchedulePage() {
           <div className="space-y-6">
             <h3 className="font-semibold text-black">
               {schedules.length > 0
-                ? 'Add Another Schedule'
-                : 'Configure Schedule'}
+                ? {t('pages.requests.add_another_schedule')}
+                : t('pages.requests.configure_schedule')}
             </h3>
 
             {/* Daily Schedule */}
@@ -356,9 +356,9 @@ export default function RequestSchedulePage() {
                 </div>
 
                 <TimeSlotSelector
-                  label="Time Range"
-                  startTimeLabel="Start Time"
-                  endTimeLabel="End Time"
+                  label = 'Time_range'
+                  startTimeLabel = 'StartTime'
+                  endTimeLabel = 'EndTime'
                   startTime={currentSchedule.startTime}
                   endTime={currentSchedule.endTime}
                   onStartTimeChange={(time) =>
@@ -387,8 +387,8 @@ export default function RequestSchedulePage() {
                 </div>
                 <TimeSlotSelector
                   label="Time Range for Selected Days"
-                  startTimeLabel="Start Time"
-                  endTimeLabel="End Time"
+                  startTimeLabel = 'StartTime'
+                  endTimeLabel = 'EndTime'
                   startTime={currentSchedule.startTime}
                   endTime={currentSchedule.endTime}
                   onStartTimeChange={(time) =>

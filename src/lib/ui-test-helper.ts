@@ -6,6 +6,7 @@
  */
 
 import { translations } from '@/lib/translations';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 // Check if a component uses design system colors
 export const validateDesignSystemUsage = (componentCode: string): string[] => {
@@ -141,7 +142,7 @@ export const pageValidationChecklist = {
   translations: '✓ Works in Finnish and English',
   userRoles: '✓ Tested with all user roles',
   accessibility: '✓ Keyboard navigation works',
-  noConsoleErrors: '✓ No console errors',
+  noConsoleErrors: t('common._no_console_errors'),
   buildSuccess: '✓ Build succeeds (pnpm build)'
 };
 

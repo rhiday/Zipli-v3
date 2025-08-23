@@ -2,6 +2,7 @@
 
 import React, { useCallback, useMemo, useEffect } from 'react';
 import { useDatabase } from '@/store';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 const DevLoginSwitcher: React.FC = React.memo(() => {
   const { users, login, currentUser, fetchUsers, isInitialized, init } =
@@ -28,14 +29,13 @@ const DevLoginSwitcher: React.FC = React.memo(() => {
         // Force a page refresh to ensure proper state
         window.location.href = '/';
       } catch (error) {
-        console.error('DevLoginSwitcher: Login error:', error);
+        console.error(t('common.devloginswitcher_login_error'), error);
 
         // Fallback to regular login
         try {
           const result = await login(user.email, 'password');
           if (result.error) {
-            console.error(
-              'DevLoginSwitcher: Fallback login failed:',
+            console.error('Translation key error',
               result.error
             );
           } else {
@@ -43,8 +43,7 @@ const DevLoginSwitcher: React.FC = React.memo(() => {
             window.location.href = '/';
           }
         } catch (fallbackError) {
-          console.error(
-            'DevLoginSwitcher: Both login methods failed:',
+          console.error('Translation key error',
             fallbackError
           );
         }

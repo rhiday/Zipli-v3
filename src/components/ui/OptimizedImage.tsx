@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 interface OptimizedImageProps {
   src: string;
@@ -52,7 +53,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = React.memo(
     containerClassName,
     sizes,
     quality = 75,
-    placeholder = 'blur',
+    placeholder = "blur",
     blurDataURL,
     onLoad,
     onError,
@@ -87,7 +88,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = React.memo(
         >
           <Image
             src="/images/placeholder.svg"
-            alt="Error loading image"
+            alt = 'Error_loading_image'
             fill={fill}
             width={!fill ? width : undefined}
             height={!fill ? height : undefined}

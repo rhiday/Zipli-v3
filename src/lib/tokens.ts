@@ -26,7 +26,7 @@ const getClientStorage = () => {
     const storedTokens = localStorage.getItem('qr_login_tokens');
     return storedTokens ? JSON.parse(storedTokens) : {};
   } catch (e) {
-    console.error('Error accessing localStorage:', e);
+    console.error(t('common.error_accessing_localstorage'), e);
     return {};
   }
 };
@@ -53,7 +53,7 @@ export const saveTokens = (tokens: Record<string, TokenData>) => {
     try {
       localStorage.setItem('qr_login_tokens', JSON.stringify(tokens));
     } catch (e) {
-      console.error('Error saving to localStorage:', e);
+      console.error(t('common.error_saving_to_localstorage'), e);
     }
   }
 };

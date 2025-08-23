@@ -26,9 +26,9 @@ interface RecurrenceSelectorProps {
 
 const RECURRENCE_OPTIONS = [
   { key: 'never', label: 'Does not repeat' },
-  { key: 'daily', label: 'Daily' },
-  { key: 'weekly', label: 'Weekly' },
-  { key: 'custom', label: 'Custom' },
+  { key: 'daily', label: t('common.daily') },
+  { key: 'weekly', label: t('common.weekly') },
+  { key: 'custom', label: t('common.custom') },
 ] as const;
 
 export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
@@ -77,7 +77,7 @@ export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
       case 'never':
         return t('doesNotRepeat') || 'Does not repeat';
       case 'daily':
-        return t('daily') || 'Daily';
+        return t('daily')  || 'Daily';
       case 'weekly':
         if (value.weeklyDays?.length) {
           const dayNames = value.weeklyDays.map((dayIndex) => {
@@ -95,9 +95,9 @@ export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
               dayMap[dayIndex as keyof typeof dayMap]
             );
           });
-          return `${t('weekly') || 'Weekly'} (${dayNames.join(', ')})`;
+          return `${t('weekly')  || 'Weekly'} (${dayNames.join(', ')})`;
         }
-        return t('weekly') || 'Weekly';
+        return t('weekly')  || 'Weekly';
       case 'custom':
         if (value.customPattern) {
           const { frequency, unit, endType } = value.customPattern;
@@ -110,7 +110,7 @@ export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
                 ? t('days') || 'days'
                 : t('weeks') || 'weeks';
 
-          let baseText = `${t('every') || 'Every'} ${frequency} ${unitText}`;
+          let baseText = `${t('every')  || 'Every'} ${frequency} ${unitText}`;
 
           if (endType === 'date' && value.customPattern.endDate) {
             baseText += ` ${t('until') || 'until'} ${value.customPattern.endDate}`;
@@ -123,7 +123,7 @@ export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
 
           return baseText;
         }
-        return t('custom') || 'Custom';
+        return t('custom')  || 'Custom';
       default:
         return t('doesNotRepeat') || 'Does not repeat';
     }

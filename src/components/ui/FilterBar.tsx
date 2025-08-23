@@ -4,10 +4,11 @@ import { Button } from './button';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { Dialog, DialogContent, DialogTrigger } from './dialog';
 import { FilterIcon } from 'lucide-react';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 const TYPE_OPTIONS = [
-  { label: 'Donations', value: 'donations' },
-  { label: 'Requests', value: 'requests' },
+  { label: t('common.donations'), value: 'donations' },
+  { label: t('common.requests'), value: 'requests' },
 ];
 const ALLERGENS = [
   'Lactose-Free',
@@ -19,8 +20,7 @@ const FOOD_TYPE_OPTIONS = [
   'Prepared meals',
   'Fresh produce',
   'Cold packaged foods',
-  'Bakery and Pastry',
-  'Other',
+  'Bakery and Pastry', t('common.other'),
 ];
 const DONATION_STATUSES = ['available', 'claimed', 'picked_up', 'cancelled'];
 const REQUEST_STATUSES = ['active', 'fulfilled', 'cancelled'];

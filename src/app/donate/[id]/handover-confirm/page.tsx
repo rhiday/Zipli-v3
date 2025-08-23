@@ -4,8 +4,11 @@ import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase/client";
+import { useDonationsTranslation } from '@/lib/i18n-enhanced';
 
 export default function HandoverConfirmPage() {
+  const { t } = useDonationsTranslation();
+
   const router = useRouter();
   const params = useParams();
   const [loading, setLoading] = useState(false);
@@ -48,7 +51,7 @@ export default function HandoverConfirmPage() {
             onClick={handleConfirm}
             disabled={loading}
           >
-            {loading ? "Confirming..." : "Confirm"}
+            {loading ? "Confirming..." : t('common.actions.confirm')}
           </Button>
           <Button
             variant="secondary"

@@ -60,7 +60,7 @@ export async function GET(request: Request) {
     if (!tokens[token]) {
       // Invalid token provided
       return new NextResponse(
-        JSON.stringify({ valid: false, message: "Invalid token" }),
+        JSON.stringify({ valid: false, message: t('common.invalid_token') }),
         {
           status: 404,
           headers: {
@@ -140,9 +140,9 @@ export async function GET(request: Request) {
       }
     );
   } catch (error) {
-    console.error("Token validation error:", error);
+    console.error(t('common.token_validation_error'), error);
     return new NextResponse(
-      JSON.stringify({ valid: false, message: "Internal server error" }),
+      JSON.stringify({ valid: false, message: t('common.internal_server_error') }),
       {
         status: 500,
         headers: {

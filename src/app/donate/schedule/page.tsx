@@ -174,7 +174,7 @@ export default function DonationSchedulePage() {
       header={
         <>
           <SecondaryNavbar
-            title="Donation Schedule"
+title="Default"
             backHref="/donate/recurring-form"
             onBackClick={() => router.back()}
           />
@@ -239,7 +239,7 @@ export default function DonationSchedulePage() {
                 <button
                   onClick={() => handleDeleteSchedule(schedule.id)}
                   className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#CB0003] text-[#CB0003] hover:bg-black/5"
-                  aria-label="Delete"
+title="Default"
                 >
                   <svg width="14" height="15" viewBox="0 0 14 15" fill="none">
                     <path
@@ -262,8 +262,8 @@ export default function DonationSchedulePage() {
           <div className="space-y-6">
             <h3 className="font-semibold text-black">
               {schedules.length > 0
-                ? 'Add Another Schedule'
-                : 'Configure Schedule'}
+                ? {t('pages.donations.add_another_schedule')}
+                : t('pages.donations.configure_schedule')}
             </h3>
 
             {/* Daily Schedule */}
@@ -356,9 +356,9 @@ export default function DonationSchedulePage() {
                 </div>
 
                 <TimeSlotSelector
-                  label="Available Time Range"
-                  startTimeLabel="Start Time"
-                  endTimeLabel="End Time"
+                  label = 'AvailableTimeRange'
+                  startTimeLabel = 'StartTime'
+                  endTimeLabel = 'EndTime'
                   startTime={currentSchedule.startTime}
                   endTime={currentSchedule.endTime}
                   onStartTimeChange={(time) =>
@@ -387,8 +387,8 @@ export default function DonationSchedulePage() {
                 </div>
                 <TimeSlotSelector
                   label="Available Time Range for Selected Days"
-                  startTimeLabel="Start Time"
-                  endTimeLabel="End Time"
+                  startTimeLabel = 'StartTime'
+                  endTimeLabel = 'EndTime'
                   startTime={currentSchedule.startTime}
                   endTime={currentSchedule.endTime}
                   onStartTimeChange={(time) =>

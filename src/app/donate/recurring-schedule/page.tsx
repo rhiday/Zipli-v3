@@ -21,13 +21,7 @@ interface RecurringSchedule {
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const FULL_WEEKDAYS = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
+  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
 ];
 
 const TIME_OPTIONS = [
@@ -137,7 +131,7 @@ export default function RecurringSchedulePage() {
       header={
         <>
           <SecondaryNavbar
-            title="Recurring schedule"
+title="Default"
             backHref="/donate/recurring-form"
             onBackClick={() => router.back()}
           />
@@ -176,7 +170,7 @@ export default function RecurringSchedulePage() {
                 <div className="flex gap-2">
                   <button
                     className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white"
-                    aria-label="Edit"
+title="Default"
                   >
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <path
@@ -190,7 +184,7 @@ export default function RecurringSchedulePage() {
                   <button
                     onClick={() => removeSchedule(schedule.id)}
                     className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#CB0003] bg-white"
-                    aria-label="Delete"
+title="Default"
                   >
                     <Trash2 className="w-4 h-4 text-[#CB0003]" />
                   </button>

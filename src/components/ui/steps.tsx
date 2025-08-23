@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 interface StepsProps extends React.HTMLAttributes<HTMLDivElement> {
   totalSteps: number;
@@ -26,6 +27,6 @@ const Steps = React.forwardRef<HTMLDivElement, StepsProps>(
   }
 );
 
-Steps.displayName = 'Steps';
+Steps.displayName = t('common.steps');
 
 export { Steps }; 

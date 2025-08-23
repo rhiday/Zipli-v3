@@ -15,7 +15,7 @@ export default function RequestTypeSelection() {
     <PageContainer
       header={
         <SecondaryNavbar
-          title="New Request"
+title="Default"
           backHref="/receiver/dashboard"
           onBackClick={() => router.back()}
         />

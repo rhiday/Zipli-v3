@@ -4,6 +4,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Languages, MessageSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { Database } from '@/lib/supabase/types';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 // Define ProfileRow using the Database type
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
@@ -13,7 +14,9 @@ interface MobileDashboardHeaderProps {
   getInitials: (name?: string | null) => string;
 }
 
-export default function MobileDashboardHeader({ profile, getInitials }: MobileDashboardHeaderProps) {
+export default function MobileDashboardHeader({
+  const { t } = useCommonTranslation();
+ profile, getInitials }: MobileDashboardHeaderProps) {
   const router = useRouter();
   return (
     <header className="bg-primary p-4 pt-10 text-white relative overflow-hidden md:hidden">
@@ -33,7 +36,7 @@ export default function MobileDashboardHeader({ profile, getInitials }: MobileDa
         </div>
         <p className="text-body font-semibold text-primary-25/80 mb-1">Good to see you!</p>
         <h1 className="text-displayXs font-semibold truncate font-display">
-          {profile?.organization_name || profile?.full_name || 'Donor'}
+          {profile?.organization_name || profile?.full_name  || 'Donor'}
         </h1>
       </div>
     </header>

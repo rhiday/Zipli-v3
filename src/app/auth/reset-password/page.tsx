@@ -47,7 +47,7 @@ function ResetPasswordPageContent() {
       // Success - redirect to login
       router.push('/auth/login?message=Password updated successfully');
     } catch (err) {
-      setError(t('networkError'));
+      setError(t(t('pages.auth.networkerror')));
       setLoading(false);
     }
   };
@@ -58,7 +58,7 @@ function ResetPasswordPageContent() {
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">{t('resetPassword')}</h1>
           <p className="mt-2 text-body text-primary-75">
-            {t('resetPasswordDesc')}
+title="Default"
           </p>
         </div>
 
@@ -71,7 +71,7 @@ function ResetPasswordPageContent() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
             <label htmlFor="password" className="block text-label font-medium text-primary mb-1">
-              {t('newPassword')}
+title="Default"
             </label>
             <Input
               id="password"
@@ -81,13 +81,13 @@ function ResetPasswordPageContent() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={t('newPassword')}
+              placeholder = "NewPassword"
             />
           </div>
 
           <div>
             <label htmlFor="confirmPassword" className="block text-label font-medium text-primary mb-1">
-              {t('confirmNewPassword')}
+title="Default"
             </label>
             <Input
               id="confirmPassword"
@@ -97,7 +97,7 @@ function ResetPasswordPageContent() {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder={t('confirmNewPassword')}
+              placeholder = "ConfirmNewPassword"
             />
           </div>
 

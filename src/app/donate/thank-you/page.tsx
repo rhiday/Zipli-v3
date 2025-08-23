@@ -52,18 +52,18 @@ export default function DonationThankYouPage() {
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
-          heading={t('nextSteps')}
+          heading = 'NextSteps'
           steps={
             isEditMode
               ? [
                   {
-                    title: t('changesSaved') || 'Donation Updated',
+                    title: t('changesSaved')  || 'Donation_updated',
                     description:
                       t('changesSaved') ||
                       'Your changes have been saved successfully.',
                   },
                   {
-                    title: t('matchingInProgress') || 'Matching Continues',
+                    title: t('matchingInProgress')  || 'Matching_continues',
                     description: t('lookingForMatches'),
                   },
                   {
@@ -90,7 +90,7 @@ export default function DonationThankYouPage() {
       </div>
       <Link href="/donate">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-          {t('goBackToDashboard')}
+title="Default"
         </button>
       </Link>
     </div>

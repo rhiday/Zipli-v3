@@ -3,6 +3,7 @@
  * A collection of reusable UI components for the application
  */
 import React from 'react';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 export interface CardProps {
   title: string;
@@ -21,7 +22,7 @@ export const Card: React.FC<CardProps> = ({ title, children, className = '' }) =
 
 export interface BadgeProps {
   label: string;
-  variant?: 'success' | 'info' | 'warning' | 'error' | 'default';
+  variant?: t('common.success_info_warning_error') | 'default';
   className?: string;
 }
 

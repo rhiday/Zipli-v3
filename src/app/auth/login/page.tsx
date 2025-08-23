@@ -71,10 +71,10 @@ export default function LoginPage() {
         </div>
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">
-            {t('welcomeBack')}
+title="Default"
           </h1>
           <p className="mt-2 text-body text-primary-75">
-            {t('signInToAccount')}
+title="Default"
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export default function LoginPage() {
               htmlFor="email"
               className="block text-label font-medium text-primary mb-1"
             >
-              {t('emailAddress')}
+title="Default"
             </label>
             <Input
               id="email"
@@ -108,7 +108,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="block text-label font-medium text-primary mb-1"
             >
-              {t('password')}
+title="Default"
             </label>
             <Input
               id="password"
@@ -135,7 +135,7 @@ export default function LoginPage() {
                 htmlFor="remember-me"
                 className="ml-2 block text-body text-primary"
               >
-                {t('rememberMe')}
+title="Default"
               </label>
             </div>
 
@@ -144,7 +144,7 @@ export default function LoginPage() {
                 href="/auth/forgot-password"
                 className="font-medium text-earth hover:text-primary"
               >
-                {t('forgotPassword')}
+title="Default"
               </Link>
             </div>
           </div>
@@ -168,7 +168,7 @@ export default function LoginPage() {
             href="/auth/register"
             className="font-medium text-earth hover:text-primary"
           >
-            {t('signUp')}
+title="Default"
           </Link>
         </div>
       </div>

@@ -43,9 +43,9 @@ const RequestCard: React.FC<RequestCardProps> = React.memo(({ request, className
       tomorrow.setDate(now.getDate() + 1);
       
       if (date.toDateString() === now.toDateString()) {
-        return 'Today';
+        return 'Default';
       } else if (date.toDateString() === tomorrow.toDateString()) {
-        return 'Tomorrow';
+        return 'Default';
       } else {
         return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
       }
@@ -104,7 +104,7 @@ const RequestCard: React.FC<RequestCardProps> = React.memo(({ request, className
           {/* Description */}
           <div>
             <h3 className="font-bold text-gray-900 text-lg mb-2 leading-tight line-clamp-2">
-              {description || 'Food Request'}
+              {description  || 'Food_request'}
             </h3>
           </div>
 

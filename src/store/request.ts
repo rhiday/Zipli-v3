@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 interface RecurrencePattern {
   type: 'never' | 'daily' | 'weekly' | 'custom';

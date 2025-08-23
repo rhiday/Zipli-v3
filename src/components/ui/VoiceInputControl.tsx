@@ -5,9 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Mic, StopCircle, Brain, Loader2 } from 'lucide-react';
 import { logger } from '../../../lib/logger';
 import { cn } from '@/lib/utils';
+import { useVoiceInputTranslation } from '@/lib/i18n-enhanced';
 
 // Helper function to detect iOS
 const isIOS = () => {
+  const { t } = useVoiceInputTranslation();
+
   if (typeof window === 'undefined') return false;
   return (
     [
@@ -19,7 +22,7 @@ const isIOS = () => {
       'iPod',
     ].includes(navigator.platform) ||
     // iPad on iOS 13 detection
-    (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
+    (navigator.userAgent.includes(t('components.voiceInput.mac')) && 'ontouchend' in document)
   );
 };
 
@@ -142,7 +145,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = React.memo(({
           const data = await processResponse.json();
           onProcessComplete(data);
         } catch (error: any) {
-          logger.error('Error during voice processing pipeline:', error);
+          logger.error(t('components.voiceInput.error_during_voice_processing_'), error);
           setServerError(error?.message || 'An error occurred. Please try again.');
           setIsTranscribing(false);
           setIsProcessingDetails(false);
@@ -152,7 +155,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = React.memo(({
       mediaRecorderRef.current.start();
       setIsRecording(true);
     } catch (error) {
-      logger.error('Error starting recording:', error);
+      logger.error(t('components.voiceInput.error_starting_recording'), error);
       setServerError(
         'Could not start recording. Please ensure microphone permissions are granted.'
       );
