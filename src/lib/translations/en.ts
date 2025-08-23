@@ -170,9 +170,6 @@ export const en = {
   // Pickup slot specific
   addPickupSlot: 'Add Pickup Slot',
   addPickupSlotButton: 'Add pickup slot',
-  selectDate: 'Select date',
-  startTime: 'Start time',
-  endTime: 'End time',
   dateLabel: 'Date',
   startTimeLabel: 'Start time',
   endTimeLabel: 'End time',

@@ -171,9 +171,6 @@ export const fi = {
   // Pickup slot specific
   addPickupSlot: 'Lisää noutovuoro',
   addPickupSlotButton: 'Lisää noutovuoro',
-  selectDate: 'Valitse päivämäärä',
-  startTime: 'Alkuaika',
-  endTime: 'Loppuaika',
   dateLabel: 'Päivämäärä',
   startTimeLabel: 'Alkuaika',
   endTimeLabel: 'Loppuaika',
