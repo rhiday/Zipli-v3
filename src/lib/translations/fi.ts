@@ -212,6 +212,14 @@ export const fi = {
   selectDays: 'Valitse päivät',
   timeRangeForSelectedDays: 'Aikaväli valituille päiville',
 
+  // Success page specific
+  nextSteps: 'Seuraavat vaiheet',
+  requestAddedToSystem: 'Pyyntö lisätty järjestelmään',
+  matchingInProgress: 'Yhteensovitus käynnissä',
+  lookingForMatches: 'Etsitään vastaavuuksia',
+  getNotified: 'Saat ilmoituksen',
+  receiveNotificationWhenMatch: 'Saat ilmoituksen kun vastine löytyy',
+
   // Common words
   available: 'Saatavilla',
   claimed: 'Varattu',

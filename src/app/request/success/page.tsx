@@ -33,7 +33,7 @@ export default function RequestSuccessPage() {
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
-          heading="Next Steps"
+          heading={t('nextSteps')}
           steps={[
             {
               title: t('requestSubmitted'),

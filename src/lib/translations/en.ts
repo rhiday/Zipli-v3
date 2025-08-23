@@ -211,6 +211,14 @@ export const en = {
   selectDays: 'Select Days',
   timeRangeForSelectedDays: 'Time Range for Selected Days',
 
+  // Success page specific
+  nextSteps: 'Next Steps',
+  requestAddedToSystem: 'Request added to system',
+  matchingInProgress: 'Matching in Progress',
+  lookingForMatches: 'Looking for matches',
+  getNotified: 'Get Notified',
+  receiveNotificationWhenMatch: 'Receive notification when match found',
+
   // Common words
   available: 'Available',
   claimed: 'Claimed',
