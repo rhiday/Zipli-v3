@@ -144,6 +144,11 @@ export const fi = {
   recurringDonation: "Toistuva lahjoitus",
   english: "English",
   finnish: "Suomi",
+  activity: "Aktiiviset tapahtumasi",
+  yourActiveItems: "Aktiiviset tapahtumasi",
+  activeDonations: "Aktiiviset ilmoitukset",
+  activeOffers: "Aktiiviset tarjoukset",
+  impactSummary: "Yhteenveto vaikuttavuudesta",
 
   // Common words
   available: "Saatavilla",

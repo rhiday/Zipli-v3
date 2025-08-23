@@ -144,6 +144,11 @@ export const en = {
   recurringDonation: "Recurring Donation",
   english: "English",
   finnish: "Finnish",
+  activity: "Your active items",
+  yourActiveItems: "Your active items",
+  activeDonations: "Active listings",
+  activeOffers: "Active offers",
+  impactSummary: "Impact summary",
 
   // Common words
   available: "Available",

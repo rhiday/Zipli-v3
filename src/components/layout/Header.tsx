@@ -154,7 +154,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             <div className="flex items-center gap-2 mb-3">
               <span className="w-3 h-3 bg-[#18E170] rounded-full"></span>
               <span className="text-white font-semibold text-base">
-title="Default"
+                {t('activity')}
               </span>
             </div>
             <ul className="flex flex-col">
@@ -188,7 +188,7 @@ title="Default"
                       )
                     }
                   >
-title="Default"
+                    {t('details')}
                   </button>
                 </li>
               ))}
