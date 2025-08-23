@@ -212,10 +212,10 @@ export default function RequestSchedulePage() {
                 key={type}
                 onClick={() => handleScheduleTypeChange(type)}
                 className={cn(
-                  'px-4 py-3 rounded-lg border text-sm font-medium transition-colors',
+                  'px-4 py-3 rounded-lg text-sm font-medium transition-colors',
                   scheduleType === type
-                    ? 'border-[#024209] bg-[#eafcd6] text-[#024209]'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                    ? 'bg-[#eafcd6] text-[#024209]'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
                 )}
               >
                 {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -279,7 +279,7 @@ export default function RequestSchedulePage() {
                     <PopoverTrigger asChild>
                       <Button
                         variant="secondary"
-                        className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
+                        className="rounded-[12px] bg-gray-50 px-4 py-3 w-full justify-between items-center font-normal text-base hover:bg-gray-100"
                       >
                         {currentSchedule.startDate ? (
                           <span className="text-black">
@@ -289,14 +289,14 @@ export default function RequestSchedulePage() {
                           <span className="text-gray-400">DD/MM/YYYY</span>
                         )}
                         <div className="pointer-events-none">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200">
                             <CalendarIcon className="h-4 w-4 text-gray-400" />
                           </div>
                         </div>
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-auto p-0 bg-white border-gray-200"
+                      className="w-auto p-0 bg-white"
                       align="start"
                     >
                       <Calendar
@@ -321,7 +321,7 @@ export default function RequestSchedulePage() {
                     <PopoverTrigger asChild>
                       <Button
                         variant="secondary"
-                        className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
+                        className="rounded-[12px] bg-gray-50 px-4 py-3 w-full justify-between items-center font-normal text-base hover:bg-gray-100"
                       >
                         {currentSchedule.endDate ? (
                           <span className="text-black">
@@ -331,14 +331,14 @@ export default function RequestSchedulePage() {
                           <span className="text-gray-400">DD/MM/YYYY</span>
                         )}
                         <div className="pointer-events-none">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200">
                             <CalendarIcon className="h-4 w-4 text-gray-400" />
                           </div>
                         </div>
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-auto p-0 bg-white border-gray-200"
+                      className="w-auto p-0 bg-white"
                       align="start"
                     >
                       <Calendar
