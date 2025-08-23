@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
@@ -21,7 +21,7 @@ type OneTimeFormInputs = {
 
 export default function OneTimeRequestForm() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
 
   const {
@@ -66,7 +66,7 @@ export default function OneTimeRequestForm() {
       header={
         <>
           <SecondaryNavbar
-title="Default"
+            title="Default"
             backHref="/request/select-type"
             onBackClick={() => router.back()}
           />
@@ -140,9 +140,20 @@ title="Default"
         {/* Allergens */}
         <AllergensDropdown
           label="Allergies, intolerances & diets"
-          options={['Default', 'Eggs', 'Fish', 'Shellfish',
-            'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans', 'Vegan', 'Vegetarian',
-            'Gluten-free', 'Halal', 'Kosher',
+          options={[
+            'Default',
+            'Eggs',
+            'Fish',
+            'Shellfish',
+            'Tree nuts',
+            'Peanuts',
+            'Wheat',
+            'Soybeans',
+            'Vegan',
+            'Vegetarian',
+            'Gluten-free',
+            'Halal',
+            'Kosher',
             'Low-lactose',
           ]}
           value={selectedAllergens}
