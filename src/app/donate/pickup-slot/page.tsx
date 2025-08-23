@@ -154,7 +154,7 @@ export default function PickupSlotPage() {
       header={
         <>
           <SecondaryNavbar
-            title = 'AddPickupSlot'
+            title={t('addPickupSlot')}
             backHref="/donate/manual"
             onBackClick={handleBackClick}
           />
@@ -177,7 +177,7 @@ export default function PickupSlotPage() {
                   !currentSlot.endTime)
               }
             >
-title="Default"
+              {t('continue')}
             </Button>
           </div>
         </BottomActionBar>
@@ -221,7 +221,7 @@ title="Default"
                 <button
                   onClick={() => handleDeleteSlot(slot.id)}
                   className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#CB0003] text-[#CB0003] hover:bg-black/5"
-title="Default"
+                  aria-label={t('delete')}
                 >
                   <svg
                     width="14"
@@ -253,7 +253,7 @@ title="Default"
               variant="secondary"
               className="text-interactive border-interactive hover:bg-[#eafcd6]"
             >
-title="Default"
+              {t('addPickupSlotButton')}
             </Button>
           </div>
         )}
@@ -270,7 +270,7 @@ title="Default"
             {/* Date Picker */}
             <div>
               <label className="block text-black font-semibold mb-3">
-title="Default"
+                {t('dateLabel')}
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -315,7 +315,7 @@ title="Default"
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-black font-semibold mb-3">
-title="Default"
+                  {t('startTimeLabel')}
                 </label>
                 <Popover
                   open={openPopover === 'start'}
@@ -365,7 +365,7 @@ title="Default"
               </div>
               <div>
                 <label className="block text-black font-semibold mb-3">
-title="Default"
+                  {t('endTimeLabel')}
                 </label>
                 <Popover
                   open={openPopover === 'end'}
@@ -424,7 +424,9 @@ title="Default"
                     : 'text-gray-400 cursor-not-allowed')
                 }
               >
-title="Default"
+                {currentSlot.id !== 'new'
+                  ? t('save')
+                  : t('addPickupSlotButton')}
               </button>
             </div>
           </div>
