@@ -241,7 +241,7 @@ export default function RequestSummaryPage() {
         <div className="flex items-start justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <div className="space-y-1">
             <div className="font-semibold text-[#024209]">
-              {requestData?.description || t('foodRequested')}
+              {t('foodRequested')}
             </div>
             <div className="text-sm text-gray-600">
               {t('portions')}: {requestData.quantity || '—'}
