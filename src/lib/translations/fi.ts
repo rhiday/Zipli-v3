@@ -135,6 +135,14 @@ export const fi = {
   completed: "Valmis",
   view: "Näytä",
   details: "Tiedot",
+  englishLabel: "English",
+  finnishLabel: "Suomi",
+  createListing: "Luo ilmoitus",
+  createListingFoodItem: "Luo ilmoitus foodItem",
+  luoIlmoitusFoodItem: "Luo ilmoitus foodItem",
+  recurringDonation: "Toistuva lahjoitus",
+  english: "English",
+  finnish: "Suomi",
 
   // Common words
   available: "Saatavilla",

@@ -135,6 +135,14 @@ export const en = {
   completed: "Completed",
   view: "View",
   details: "Details",
+  englishLabel: "English",
+  finnishLabel: "Finnish",
+  createListing: "Create listing",
+  createListingFoodItem: "Create listing foodItem",
+  luoIlmoitusFoodItem: "Luo ilmoitus foodItem",
+  recurringDonation: "Recurring Donation",
+  english: "English",
+  finnish: "Finnish",
 
   // Common words
   available: "Available",
