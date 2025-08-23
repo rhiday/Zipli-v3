@@ -16,8 +16,9 @@ export const useCommonTranslation = () => {
   const { t, language } = useTranslations();
   
   return {
-    t: (key: TranslationKey) => {
-      return t[key] || key; // Fallback to key if translation missing
+    t: (key: string) => {
+      // Allow any string key, return translation or fallback to key
+      return (t as any)[key] || key;
     },
     language,
   };

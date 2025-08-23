@@ -23,8 +23,15 @@ const useLanguageStore = create<LanguageState>()(
 export const useLanguage = () => {
   const { language, setLanguage } = useLanguageStore();
 
+  // Temporary fallback t function for pages not yet updated
+  const t = (key: string) => {
+    // Just return the key as fallback - actual translations are in the new system
+    return key;
+  };
+
   return {
     language,
     setLanguage,
+    t, // Temporary compatibility
   };
 };

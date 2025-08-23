@@ -17,7 +17,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import {
   Drawer,
   DrawerClose,
@@ -34,7 +34,7 @@ export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser } = useDatabase();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   // Define navigation items based on user role
   const navItems = useMemo(() => {

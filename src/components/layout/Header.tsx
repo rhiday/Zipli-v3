@@ -14,7 +14,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 interface HeaderProps {
   title?: string;
@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     getAllRequests,
   } = useDatabase();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   // Get activity items - show both donations and requests for all users
   const activityItems = React.useMemo(() => {

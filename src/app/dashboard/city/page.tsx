@@ -29,7 +29,7 @@ import {
   SkeletonDashboardStat,
   SkeletonRecipient,
 } from '@/components/ui/Skeleton';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import {
   LineChart,
   Line,
@@ -78,10 +78,20 @@ type CityDashboardData = {
 };
 
 export default function CityDashboardPage(): React.ReactElement {
+  // City dashboard disabled for now - redirect to main dashboard
+  const router = useRouter();
+  React.useEffect(() => {
+    router.push('/donate');
+  }, [router]);
+
+  return <div>Redirecting...</div>;
+}
+
+function _DisabledCityDashboardPage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized, getAllDonations, getAllRequests } =
     useDatabase();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const [dashboardData, setDashboardData] = useState<CityDashboardData>({
     profile: null,

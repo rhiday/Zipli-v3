@@ -11,7 +11,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import DonationCard from '@/components/donations/DonationCard';
 import { SkeletonCard } from '@/components/ui/Skeleton';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 // Simplified type for the feed
 type FeedItem = DonationWithFoodItem & { donorName: string; pickupTime?: string };
@@ -19,7 +19,7 @@ type FeedItem = DonationWithFoodItem & { donorName: string; pickupTime?: string 
 export default function FeedPage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, donations, foodItems, users, isInitialized } = useDatabase();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

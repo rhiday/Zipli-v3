@@ -28,7 +28,7 @@ import {
   DashboardSkeleton,
 } from '@/components/ui/OptimizedSkeleton';
 import { useDonationStore } from '@/store/donation';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { ActionButton } from '@/components/ui/action-button';
 
 type ProfileRow = {
@@ -50,7 +50,7 @@ function DonorDashboardPage(): React.ReactElement {
   const allDonations = useDatabase((state) => state.donations);
   const foodItems = useDatabase((state) => state.foodItems);
   const clearDonation = useDonationStore((state) => state.clearDonation);
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const [dashboardData, setDashboardData] = useState<DonorDashboardData>({
     profile: null,
@@ -173,7 +173,7 @@ function DonorDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-title="Default"
+              {t('yourImpact')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -187,7 +187,7 @@ title="Default"
                   46kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-title="Default"
+                  {t('totalFoodDonated')}
                 </p>
               </div>
             </div>
@@ -202,7 +202,7 @@ title="Default"
                   131
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-title="Default"
+                  {t('portionsOffered')}
                 </p>
               </div>
             </div>
@@ -217,7 +217,7 @@ title="Default"
                   125€
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-title="Default"
+                  {t('costSavings')}
                 </p>
               </div>
             </div>
@@ -232,7 +232,7 @@ title="Default"
                   10t
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-title="Default"
+                  {t('co2Avoided')}
                 </p>
               </div>
             </div>
@@ -249,8 +249,8 @@ title="Default"
           >
             <ActionButton
               href="#"
-              title = 'ExportToPdf'
-              description = 'EnvironmentalAndSocialImpactData'
+              title={t('exportToPdf')}
+              description={t('environmentalAndSocialImpactData')}
               icon={<FileDown />}
             />
           </div>

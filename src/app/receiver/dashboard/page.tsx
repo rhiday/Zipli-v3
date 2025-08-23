@@ -25,7 +25,7 @@ import {
   SkeletonDashboardStat,
   SkeletonRecipient,
 } from '@/components/ui/Skeleton';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { ActionButton } from '@/components/ui/action-button';
 
 type ProfileRow = {
@@ -42,7 +42,7 @@ type ReceiverDashboardData = {
 export default function ReceiverDashboardPage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized, getAllRequests } = useDatabase();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const [dashboardData, setDashboardData] = useState<ReceiverDashboardData>({
     profile: null,
@@ -176,7 +176,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-              Your Impact
+              {t('yourImpact')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -189,7 +189,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.totalPeople}
                 </span>
-                <p className="text-sm text-primary-75 mt-1">People Served</p>
+                <p className="text-sm text-primary-75 mt-1">{t('peopleServed')}</p>
               </div>
             </div>
             {/* Food Requested */}
@@ -201,7 +201,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.estimatedKg}kg
                 </span>
-                <p className="text-sm text-primary-75 mt-1">Food Requested</p>
+                <p className="text-sm text-primary-75 mt-1">{t('foodRequested')}</p>
               </div>
             </div>
             {/* Active Requests */}
@@ -214,7 +214,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.activeRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  Active Requests
+                  {t('activeRequests')}
                 </p>
               </div>
             </div>
@@ -228,7 +228,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.fulfilledRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  Fulfilled Requests
+                  {t('fulfilledRequests')}
                 </p>
               </div>
             </div>
@@ -245,8 +245,8 @@ export default function ReceiverDashboardPage(): React.ReactElement {
           >
             <ActionButton
               href="#"
-              title="Export Impact Report"
-              description="Request history and impact data"
+              title={t('exportImpactReport')}
+              description={t('requestHistoryAndImpactData')}
               icon={<FileDown />}
             />
           </div>

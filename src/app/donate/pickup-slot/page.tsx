@@ -17,7 +17,7 @@ import { EditIcon } from '@/components/ui/icons/EditIcon';
 import { DeleteIcon } from '@/components/ui/icons/DeleteIcon';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 
@@ -45,7 +45,7 @@ export default function PickupSlotPage() {
     deletePickupSlot,
     clearDonation,
   } = useDonationStore();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   // Helper function to safely format dates
   const formatSlotDate = (date: Date | undefined | string) => {

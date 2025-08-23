@@ -7,7 +7,7 @@ import { useDatabase } from '@/store';
 import { PlusIcon, SearchIcon, UsersIcon, CalendarIcon, HandshakeIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
-import { useRequestsTranslation } from '@/lib/i18n-enhanced';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 type Request = {
   id: string;
@@ -22,7 +22,7 @@ type Request = {
 };
 
 export default function RequestsPage(): React.ReactElement {
-  const { t } = useRequestsTranslation();
+  const { t } = useCommonTranslation();
 
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);

@@ -13,13 +13,13 @@ import {
 } from '@/components/ui/Select';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function ProfilePage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized } = useDatabase();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);

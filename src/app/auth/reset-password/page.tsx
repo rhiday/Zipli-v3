@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 function ResetPasswordPageContent() {
   const [password, setPassword] = useState('');
@@ -16,7 +16,7 @@ function ResetPasswordPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const updatePassword = useDatabase(state => state.updatePassword);
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

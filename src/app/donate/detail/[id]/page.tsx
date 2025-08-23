@@ -27,7 +27,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useDatabase, DonationWithFoodItem } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useDonationStore } from '@/store/donation';
 
 export default function DonationDetailPage({
@@ -35,7 +35,7 @@ export default function DonationDetailPage({
 }: {
   params: { id: string };
 }) {
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const currentUser = useDatabase((state) => state.currentUser);
   const router = useRouter();
   const donations = useDatabase((state) => state.donations);

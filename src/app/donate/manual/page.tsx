@@ -23,7 +23,7 @@ import { PlusIcon, Clock, MapPin } from 'lucide-react';
 
 import DonationCard from '@/components/donations/DonationCard';
 import { Textarea } from '@/components/ui/Textarea';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 
@@ -53,7 +53,7 @@ function ManualDonationPageInner() {
   const donations = useDatabase((state) => state.donations);
   const foodItems = useDatabase((state) => state.foodItems);
   const currentUser = useDatabase((state) => state.currentUser);
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const [currentItem, setCurrentItem] = useState<
     Omit<DonationItem, 'id'> & { id: string | 'new' }
@@ -563,7 +563,7 @@ function ManualDonationPageInner() {
 }
 
 function ManualDonationPage() {
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ManualDonationPageInner />
