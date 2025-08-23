@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
@@ -20,7 +20,7 @@ type RecurringDonationFormInputs = {
 
 export default function RecurringDonationForm() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
 
   const {
@@ -125,7 +125,7 @@ export default function RecurringDonationForm() {
                 message: 'Please enter a valid number',
               },
             })}
-placeholder="Enter quantity"
+            placeholder="Enter quantity"
             type="number"
             variant={errors.quantity ? 'error' : 'default'}
           />
@@ -139,9 +139,20 @@ placeholder="Enter quantity"
         {/* Allergens */}
         <AllergensDropdown
           label="Allergens & dietary information"
-          options={['Default', 'Eggs', 'Fish', 'Shellfish',
-            'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans', 'Vegan', 'Vegetarian',
-            'Gluten-free', 'Halal', 'Kosher',
+          options={[
+            'Default',
+            'Eggs',
+            'Fish',
+            'Shellfish',
+            'Tree nuts',
+            'Peanuts',
+            'Wheat',
+            'Soybeans',
+            'Vegan',
+            'Vegetarian',
+            'Gluten-free',
+            'Halal',
+            'Kosher',
             'Low-lactose',
           ]}
           value={selectedAllergens}
