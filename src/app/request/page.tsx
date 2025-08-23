@@ -103,7 +103,7 @@ export default function RequestsPage(): React.ReactElement {
               onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'fulfilled' | 'cancelled')}
             >
               <SelectTrigger className="w-full">
-                <SelectValue {t('pages.requests.status')} />
+                <SelectValue placeholder={t('pages.requests.status')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>

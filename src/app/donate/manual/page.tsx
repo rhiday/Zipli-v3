@@ -329,7 +329,7 @@ function ManualDonationPageInner() {
         setHasAttemptedSave(false);
       }
     } catch (error) {
-      console.error(t('pages.donations.failed_to_save_changes'), error);
+      console.error('Failed to save changes:', error);
       // We can add a user-facing error message here later.
     } finally {
       setIsSaving(false);
@@ -494,10 +494,10 @@ function ManualDonationPageInner() {
                   disabled={isSaving || !isFormValid}
                 >
                   {isSaving
-                    ? t(t('pages.donations.saving'))
+                    ? 'Saving...'
                     : isEditMode
-                      ? t('saveChanges')
-                      : t('addItem')}
+                      ? 'Save Changes'
+                      : 'Add Item'}
                 </Button>
               </div>
             )}
@@ -565,7 +565,7 @@ function ManualDonationPageInner() {
 function ManualDonationPage() {
   const { t } = useLanguage();
   return (
-    <Suspense fallback={<div>{t(t('pages.donations.loading'))}</div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       <ManualDonationPageInner />
     </Suspense>
   );

@@ -58,7 +58,7 @@ export default function RecurringRequestForm() {
       // Navigate to schedule page (following donor flow pattern)
       router.push('/request/schedule');
     } catch (error) {
-      console.error(t('pages.requests.failed_to_create_recurring_req'), error);
+      console.error('Failed to create recurring request:', error);
     }
   };
 
@@ -85,7 +85,7 @@ title="Default"
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? 'Submitting...' : t('common.actions.continue')}
+            {isSubmitting ? 'Submitting...' : 'Continue'}
           </Button>
         </BottomActionBar>
       }
@@ -103,7 +103,7 @@ title="Default"
               required: 'Please describe the food you need',
             })}
             placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
-            variant={errors.description ? {t('common.status.error')} : 'default'}
+            variant={errors.description ? 'error' : 'default'}
             rows={4}
           />
           {errors.description && (
@@ -127,9 +127,9 @@ title="Default"
                 message: 'Please enter a valid number',
               },
             })}
-title="Default"
+            placeholder="Default"
             type="number"
-            variant={errors.quantity ? {t('common.status.error')} : 'default'}
+            variant={errors.quantity ? 'error' : 'default'}
           />
           {errors.quantity && (
             <div className="mt-1 text-[14px] font-manrope text-negative">
@@ -141,14 +141,14 @@ title="Default"
         {/* Allergens */}
         <AllergensDropdown
           label="Allergies, intolerances & diets"
-          options={['Default', t('pages.requests.eggs'), t('pages.requests.fish'), t('pages.requests.shellfish'),
-            'Tree nuts', t('pages.requests.peanuts'), t('pages.requests.wheat'), t('pages.requests.soybeans'), t('pages.requests.vegan'), t('pages.requests.vegetarian'),
-            'Gluten-free', t('pages.requests.halal'), t('pages.requests.kosher'),
+          options={['Default', 'Eggs', 'Fish', 'Shellfish',
+            'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans', 'Vegan', 'Vegetarian',
+            'Gluten-free', 'Halal', 'Kosher',
             'Low-lactose',
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-title="Default"
+          placeholder="Default"
           error={
             !selectedAllergens.length && watchedFields.description
               ? 'Please select at least one option'

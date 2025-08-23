@@ -28,6 +28,6 @@ const Avatar = React.forwardRef<
     </span>
   );
 });
-Avatar.displayName = t('common.avatar');
+Avatar.displayName = 'Avatar';
 
 export { Avatar }; 

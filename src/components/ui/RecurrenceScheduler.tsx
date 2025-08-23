@@ -47,16 +47,16 @@ interface RecurrenceSchedulerProps {
 }
 
 const RECURRENCE_OPTIONS = [
-  { key: 'daily', label: t('common.daily') },
-  { key: 'weekly', label: t('common.weekly') },
-  { key: 'custom', label: t('common.custom') },
+  { key: 'daily', label: 'Daily' },
+  { key: 'weekly', label: 'Weekly' },
+  { key: 'custom', label: 'Custom' },
 ] as const;
 
 export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
   value,
   onChange,
   className = '',
-  label = t('common.recurrence_schedule'),
+  label = 'Recurrence Schedule',
   error,
   hint,
 }) => {
@@ -166,13 +166,13 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
       case 'weekly':
         if (value.weeklyDays?.length) {
           const dayMap = {
-            0: t('common.sun'),
-            1: t('common.mon'),
-            2: t('common.tue'),
-            3: t('common.wed'),
-            4: t('common.thu'),
-            5: t('common.fri'),
-            6: t('common.sat'),
+            0: 'Sun',
+            1: 'Mon',
+            2: 'Tue',
+            3: 'Wed',
+            4: 'Thu',
+            5: 'Fri',
+            6: 'Sat',
           };
           const days = value.weeklyDays
             .sort((a, b) => a - b)
@@ -183,7 +183,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
         return 'Default';
       case 'custom':
         const count = value.customDates?.length || 0;
-        return count > 0 ? `Custom (${count} dates selected)` : t('common.custom');
+        return count > 0 ? `Custom (${count} dates selected)` : 'Custom';
       default:
         return 'Select schedule...';
     }
@@ -203,7 +203,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
             value={getDisplayText()}
             className="cursor-pointer"
             onClick={() => setOpen(!open)}
-            variant={error ? {t('common.status.error')} : 'default'}
+            variant={error ? 'error' : 'default'}
           />
           {open && (
             <div className="absolute left-0 right-0 mt-2 bg-base border border-border rounded-md shadow-lg z-20 overflow-hidden">

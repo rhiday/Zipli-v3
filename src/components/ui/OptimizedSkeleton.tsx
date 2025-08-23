@@ -70,7 +70,7 @@ const Skeleton: React.FC<SkeletonProps> = React.memo(
   }
 );
 
-Skeleton.displayName = t('common.skeleton');
+Skeleton.displayName = 'Skeleton';
 
 // Donation Card Skeleton
 export const DonationCardSkeleton: React.FC = React.memo(() => (

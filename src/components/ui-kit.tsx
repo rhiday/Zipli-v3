@@ -22,7 +22,7 @@ export const Card: React.FC<CardProps> = ({ title, children, className = '' }) =
 
 export interface BadgeProps {
   label: string;
-  variant?: t('common.success_info_warning_error') | 'default';
+  variant?: 'success' | 'info' | 'warning' | 'error' | 'default';
   className?: string;
 }
 

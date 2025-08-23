@@ -41,4 +41,4 @@ export const Chip: React.FC<ChipProps> = ({ label, selected, onClick, onRemove, 
   );
 };
 
-Chip.displayName = t('common.chip'); 
+Chip.displayName = 'Chip'; 

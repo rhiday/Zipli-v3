@@ -56,7 +56,7 @@ export default function RecurringDonationForm() {
       // Navigate to recurring schedule page
       router.push('/donate/recurring-schedule');
     } catch (error) {
-      console.error(t('pages.donations.failed_to_create_recurring_don'), error);
+      console.error('Failed to create recurring donation:', error);
     }
   };
 
@@ -83,7 +83,7 @@ export default function RecurringDonationForm() {
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? 'Submitting...' : t('common.actions.continue')}
+            {isSubmitting ? 'Submitting...' : 'Continue'}
           </Button>
         </BottomActionBar>
       }
@@ -101,7 +101,7 @@ export default function RecurringDonationForm() {
               required: 'Please describe the food you want to donate',
             })}
             placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
-            variant={errors.description ? {t('common.status.error')} : 'default'}
+            variant={errors.description ? 'error' : 'default'}
             rows={4}
           />
           {errors.description && (
@@ -125,9 +125,9 @@ export default function RecurringDonationForm() {
                 message: 'Please enter a valid number',
               },
             })}
-title="Default"
+placeholder="Enter quantity"
             type="number"
-            variant={errors.quantity ? {t('common.status.error')} : 'default'}
+            variant={errors.quantity ? 'error' : 'default'}
           />
           {errors.quantity && (
             <div className="mt-1 text-[14px] font-manrope text-negative">
@@ -146,7 +146,7 @@ title="Default"
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-title="Default"
+          placeholder="Select allergens"
         />
       </form>
     </PageContainer>

@@ -22,36 +22,36 @@ const Sidebar: React.FC = React.memo(() => {
     switch (role) {
       case 'food_donor':
         return [
-          { href: '/donate', label: t('common.navigation.dashboard'), icon: LayoutGrid },
-          { href: '/donate/new', label: t('common.add_donation'), icon: ShoppingBag },
-          { href: '/feed', label: t('common.explore'), icon: Search },
-          { href: '/profile', label: t('common.navigation.profile'), icon: Users },
+          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
+          { href: '/donate/new', label: 'Add Donation', icon: ShoppingBag },
+          { href: '/feed', label: 'Explore', icon: Search },
+          { href: '/profile', label: 'Profile', icon: Users },
         ];
       case 'food_receiver':
         return [
-          { href: '/receiver/dashboard', label: t('common.navigation.dashboard'), icon: LayoutGrid },
-          { href: '/request/new', label: t('common.request_food'), icon: FileText },
-          { href: '/feed', label: t('common.explore'), icon: Search },
-          { href: '/profile', label: t('common.navigation.profile'), icon: Users },
+          { href: '/receiver/dashboard', label: 'Dashboard', icon: LayoutGrid },
+          { href: '/request/new', label: 'Request Food', icon: FileText },
+          { href: '/feed', label: 'Explore', icon: Search },
+          { href: '/profile', label: 'Profile', icon: Users },
         ];
       case 'city':
         return [
-          { href: '/city/dashboard', label: t('common.navigation.dashboard'), icon: LayoutGrid },
-          { href: '/city', label: t('common.analytics'), icon: BarChart3 },
-          { href: '/feed', label: t('common.overview'), icon: Users },
-          { href: '/profile', label: t('common.navigation.profile'), icon: Users },
+          { href: '/city/dashboard', label: 'Dashboard', icon: LayoutGrid },
+          { href: '/city', label: 'Analytics', icon: BarChart3 },
+          { href: '/feed', label: 'Overview', icon: Users },
+          { href: '/profile', label: 'Profile', icon: Users },
         ];
       case 'terminals':
         return [
-          { href: '/terminal/dashboard', label: t('common.terminal'), icon: LayoutGrid },
-          { href: '/feed', label: t('common.overview'), icon: Users },
-          { href: '/profile', label: t('common.navigation.profile'), icon: Users },
+          { href: '/terminal/dashboard', label: 'Terminal', icon: LayoutGrid },
+          { href: '/feed', label: 'Overview', icon: Users },
+          { href: '/profile', label: 'Profile', icon: Users },
         ];
       default:
         return [
-          { href: '/donate', label: t('common.navigation.dashboard'), icon: LayoutGrid },
-          { href: '/feed', label: t('common.explore'), icon: Search },
-          { href: '/profile', label: t('common.navigation.profile'), icon: Users },
+          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
+          { href: '/feed', label: 'Explore', icon: Search },
+          { href: '/profile', label: 'Profile', icon: Users },
         ];
     }
   }, [currentUser]);
@@ -120,7 +120,7 @@ const Sidebar: React.FC = React.memo(() => {
   );
 });
 
-Sidebar.displayName = t('common.sidebar');
+Sidebar.displayName = 'Sidebar';
 
 const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="min-h-screen bg-base flex">

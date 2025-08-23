@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -8,7 +7,6 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: NextRequest) {
-  const { t } = useCommonTranslation();
 
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
@@ -60,14 +58,14 @@ Ensure quantity is a number. Do not include any other text, explanations, or mar
         typeof parsedContent.quantity !== 'number' || 
         typeof parsedContent.notes === 'undefined' // Notes can be an empty string
       ) {
-        console.error(t('common.openai_response_missing_or_has'), content);
+        console.error('OpenAI response missing or has invalid fields:', content);
         // Attempt to provide sensible defaults
         const finalResponse = {
             itemName: parsedContent.itemName || 'Unknown item',
             quantity: typeof parsedContent.quantity === 'number' ? parsedContent.quantity : 1,
             notes: parsedContent.notes || "No additional notes provided.",
         };
-        console.warn(t('common.returning_response_with_some_d'), finalResponse);
+        console.warn('Returning response with some defaults applied:', finalResponse);
         return NextResponse.json(finalResponse);
       }
       return NextResponse.json(parsedContent);
@@ -77,10 +75,10 @@ Ensure quantity is a number. Do not include any other text, explanations, or mar
     }
 
   } catch (error: any) {
-    console.error(t('common.error_processing_request_detai'), error);
+    console.error('Error processing request details:', error);
     if (error instanceof OpenAI.APIError) {
       return NextResponse.json({ error: error.message, type: error.type }, { status: error.status || 500 });
     }
-    return NextResponse.json({ error: t('common.failed_to_process_request_deta'), details: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process request details', details: error.message }, { status: 500 });
   }
 } 

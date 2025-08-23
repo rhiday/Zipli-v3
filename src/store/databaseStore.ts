@@ -225,12 +225,12 @@ export const useDatabase = create<DatabaseState>()(
 
         const user = get().users.find((u) => u.email === email);
         if (!user) {
-          return { data: null, error: t('common.invalid_email_or_password') };
+          return { data: null, error: 'Invalid email or password' };
         }
 
         // Verify password matches the one stored in mock data
         if ((user as any).password !== password) {
-          return { data: null, error: t('common.invalid_email_or_password') };
+          return { data: null, error: 'Invalid email or password' };
         }
 
         set({ currentUser: user });
@@ -294,7 +294,7 @@ export const useDatabase = create<DatabaseState>()(
 
         const user = get().users.find((u) => u.email === email);
         if (!user) {
-          return { data: null, error: t('common.invalid_verification_code') };
+          return { data: null, error: 'Invalid verification code' };
         }
 
         // For mock purposes, accept any 6-digit code
@@ -303,7 +303,7 @@ export const useDatabase = create<DatabaseState>()(
           return { data: { user }, error: null };
         }
 
-        return { data: null, error: t('common.invalid_verification_code') };
+        return { data: null, error: 'Invalid verification code' };
       },
 
       setCurrentUser: (email) => {

@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
         setMessage(t('resetPasswordDesc'));
       }
     } catch (err) {
-      setError(t(t('pages.auth.networkerror')));
+      setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">{t('resetPassword')}</h1>
           <p className="mt-2 text-body text-primary-75">
-title="Default"
+            Enter your email to receive a password reset link
           </p>
         </div>
 
@@ -61,7 +61,7 @@ title="Default"
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
             <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
-title="Default"
+              Email
             </label>
             <Input
               id="email"

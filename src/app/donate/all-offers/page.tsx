@@ -61,7 +61,7 @@ export default function AllItemsPage(): React.ReactElement {
   const [items, setItems] = useState<DisplayItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string>(t('pages.donations.user'));
+  const [userName, setUserName] = useState<string>('User');
 
   const [filters, setFilters] = useState({
     type: 'donations',
@@ -177,7 +177,7 @@ export default function AllItemsPage(): React.ReactElement {
       setItems(fetchedItems);
     } catch (err: any) {
       setError(err.message || 'Failed to load items.');
-      console.error(t('pages.donations.error_fetching_items'), err);
+      console.error('Error fetching items:', err);
     } finally {
       setLoading(false);
     }
@@ -224,7 +224,7 @@ export default function AllItemsPage(): React.ReactElement {
       const date = new Date(donation.pickup_time);
       return `Pickup: ${date.toLocaleDateString()}, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
     } catch (error) {
-      console.error(t('pages.donations.error_formatting_pickup_window'), error);
+      console.error('Error formatting pickup window:', error);
       return 'Pickup time not available';
     }
   };

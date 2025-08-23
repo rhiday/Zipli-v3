@@ -119,7 +119,7 @@ class PerformanceMonitor {
     const connectionType = this.getConnectionType();
 
     console.group(
-      `📊 Performance Metrics (${isMobile ? {t('common.mobile')} : t('common.desktop')} - ${connectionType})`
+      `📊 Performance Metrics (${isMobile ? 'Mobile' : 'Desktop'} - ${connectionType})`
     );
     console.log('First Contentful Paint (FCP):', this.metrics.FCP, 'ms');
     console.log('Largest Contentful Paint (LCP):', this.metrics.LCP, 'ms');

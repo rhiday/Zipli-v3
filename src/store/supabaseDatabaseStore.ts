@@ -163,10 +163,10 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             loading: false,
           });
         } catch (error) {
-          console.error(t('common._initialization_error'), error);
+          console.error('Initialization error', error);
           set({
             error:
-              error instanceof Error ? error.message : t('common.initialization_failed'),
+              error instanceof Error ? error.message : 'Initialization failed',
             loading: false,
           });
         }
@@ -193,7 +193,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           set({ loading: false });
           return {
             data: null,
-            error: error instanceof Error ? error.message : t('common.login_failed'),
+            error: error instanceof Error ? error.message : 'Login failed',
           };
         }
       },
@@ -229,7 +229,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           return {
             data: null,
             error:
-              error instanceof Error ? error.message : t('common.registration_failed'),
+              error instanceof Error ? error.message : 'Registration failed',
           };
         }
       },
@@ -268,7 +268,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             set({ currentUser: result.data });
           }
         } catch (error) {
-          console.error(t('common.error_updating_user'), error);
+          console.error('Error updating user', error);
         }
       },
 
@@ -287,7 +287,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             requests: [],
           });
         } catch (error) {
-          console.error(t('common.logout_error'), error);
+          console.error('Logout error', error);
         }
       },
 
@@ -314,7 +314,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
               ...donation,
               food_item: donation.food_item || {
                 id: donation.food_item_id,
-                name: t('common.unknown_item'),
+                name: 'Unknown item',
                 description: null,
                 image_url: null,
                 allergens: null,
@@ -328,7 +328,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
               },
               donor: donation.donor || {
                 id: donation.donor_id,
-                full_name: t('common.unknown_donor'),
+                full_name: 'Unknown donor',
                 email: '',
                 role: 'food_donor' as any,
                 organization_name: '',
@@ -351,12 +351,12 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
           set({ donations, foodItems: foodItemsData || [] });
         } catch (error) {
-          console.error(t('common.error_fetching_donations'), error);
+          console.error('Error fetching donations', error);
           set({
             error:
               error instanceof Error
                 ? error.message
-                : t('common.failed_to_fetch_donations'),
+                : 'Failed to fetch donations',
           });
         }
       },
@@ -371,12 +371,12 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           if (error) throw error;
           set({ foodItems: data || [] });
         } catch (error) {
-          console.error(t('common.error_fetching_food_items'), error);
+          console.error('Error fetching food items', error);
           set({
             error:
               error instanceof Error
                 ? error.message
-                : t('common.failed_to_fetch_food_items'),
+                : 'Failed to fetch food items',
           });
         }
       },
@@ -391,10 +391,10 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           if (error) throw error;
           set({ users: data || [] });
         } catch (error) {
-          console.error(t('common.error_fetching_users'), error);
+          console.error('Error fetching users', error);
           set({
             error:
-              error instanceof Error ? error.message : t('common.failed_to_fetch_users'),
+              error instanceof Error ? error.message : 'Failed to fetch users',
           });
         }
       },
@@ -409,12 +409,12 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           if (error) throw error;
           set({ requests: data || [] });
         } catch (error) {
-          console.error(t('common.error_fetching_requests'), error);
+          console.error('Error fetching requests', error);
           set({
             error:
               error instanceof Error
                 ? error.message
-                : t('common.failed_to_fetch_requests'),
+                : 'Failed to fetch requests',
           });
         }
       },
@@ -450,7 +450,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           return {
             data: null,
             error:
-              error instanceof Error ? error.message : t('common.failed_to_add_donation'),
+              error instanceof Error ? error.message : 'Failed to add donation',
           };
         }
       },
@@ -476,7 +476,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             error:
               error instanceof Error
                 ? error.message
-                : t('common.failed_to_update_donation'),
+                : 'Failed to update donation',
           };
         }
       },
@@ -500,7 +500,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             error:
               error instanceof Error
                 ? error.message
-                : t('common.failed_to_delete_donation'),
+                : 'Failed to delete donation',
           };
         }
       },
@@ -527,7 +527,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             error:
               error instanceof Error
                 ? error.message
-                : t('common.failed_to_add_food_item'),
+                : 'Failed to add food item',
           };
         }
       },
@@ -556,7 +556,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             error:
               error instanceof Error
                 ? error.message
-                : t('common.failed_to_update_food_item'),
+                : 'Failed to update food item',
           };
         }
       },
@@ -589,7 +589,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           return {
             data: null,
             error:
-              error instanceof Error ? error.message : t('common.failed_to_add_request'),
+              error instanceof Error ? error.message : 'Failed to add request',
           };
         }
       },
@@ -618,7 +618,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             error:
               error instanceof Error
                 ? error.message
-                : t('common.failed_to_update_request'),
+                : 'Failed to update request',
           };
         }
       },
@@ -642,7 +642,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             error:
               error instanceof Error
                 ? error.message
-                : t('common.failed_to_delete_request'),
+                : 'Failed to delete request',
           };
         }
       },
@@ -734,7 +734,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           set({ subscriptions });
           console.log('Optimized real-time subscriptions set up successfully');
         } catch (error) {
-          console.error(t('common.error_setting_up_subscriptions'), error);
+          console.error('Error setting up subscriptions', error);
         }
       },
 

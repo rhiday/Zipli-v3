@@ -16,7 +16,7 @@ function QRLoginPageContent() {
 
   const handleQRLogin = async () => {
     if (!token) {
-      setError(t('pages.auth.invalid_qr_login_token'));
+      setError('Invalid QR login token');
       return;
     }
 

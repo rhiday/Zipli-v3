@@ -226,7 +226,7 @@ title="Default"
 
                 <div className="flex gap-3">
                   <Button type="submit" disabled={saving} className="flex-1">
-                    {saving ? t(t('pages.profile.saving')) : t('saveChanges')}
+                    {saving ? 'Saving...' : 'Save Changes'}
                   </Button>
                   <Button 
                     type="button" 

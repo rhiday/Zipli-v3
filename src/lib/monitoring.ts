@@ -57,7 +57,7 @@ class SimpleMonitoring {
 
     // In production, send to external service
     if (process.env.NODE_ENV === 'production' && severity === 'critical') {
-      this.sendToExternalService(t('common.status.error'), errorEvent);
+      this.sendToExternalService('error', errorEvent);
     }
   }
 
@@ -164,7 +164,7 @@ class SimpleMonitoring {
         }),
       });
     } catch (error) {
-      console.error(t('common.failed_to_send_monitoring_data'), error);
+      console.error('Failed to send monitoring data', error);
     }
   }
 }
@@ -174,7 +174,7 @@ export const monitoring = new SimpleMonitoring();
 
 // React Hook for error boundaries
 export function useErrorTracking() {
-  const { t } = useCommonTranslation();
+  // Removed translation dependency
 
   return {
     trackError: monitoring.trackError.bind(monitoring),

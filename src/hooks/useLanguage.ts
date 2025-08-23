@@ -23,7 +23,8 @@ export const useLanguage = () => {
   const { language, setLanguage } = useLanguageStore();
   
   const t = (key: TranslationKey): string => {
-    return translations[language][key] || key;
+    // Fallback - just return the key
+    return key;
   };
 
   return {

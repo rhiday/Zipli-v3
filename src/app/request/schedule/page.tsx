@@ -156,7 +156,7 @@ export default function RequestSchedulePage() {
         return `Daily: ${schedule.startTime} - ${schedule.endTime}`;
       case 'weekly':
         if (schedule.weeklyDays?.length) {
-          const dayNames = ['Sun', t('pages.requests.mon'), t('pages.requests.tue'), t('pages.requests.wed'), t('pages.requests.thu'), t('pages.requests.fri'), t('pages.requests.sat')];
+          const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
           const days = schedule.weeklyDays.map((d) => dayNames[d]).join(', ');
           return `Weekly: ${days}, ${schedule.startTime} - ${schedule.endTime}`;
         }
@@ -239,7 +239,7 @@ title="Default"
                 <button
                   onClick={() => handleDeleteSchedule(schedule.id)}
                   className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#CB0003] text-[#CB0003] hover:bg-black/5"
-title="Default"
+                  title="Default"
                 >
                   <svg width="14" height="15" viewBox="0 0 14 15" fill="none">
                     <path
@@ -262,8 +262,8 @@ title="Default"
           <div className="space-y-6">
             <h3 className="font-semibold text-black">
               {schedules.length > 0
-                ? {t('pages.requests.add_another_schedule')}
-                : t('pages.requests.configure_schedule')}
+                ? 'Add Another Schedule'
+                : 'Configure Schedule'}
             </h3>
 
             {/* Daily Schedule */}

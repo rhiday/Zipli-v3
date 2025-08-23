@@ -107,7 +107,7 @@ function DonorDashboardPage(): React.ReactElement {
     const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text(t('pages.donations.zipli_summary'), 10, 10);
+    doc.text('Zipli Donation Summary', 10, 10);
     doc.setFontSize(12);
     doc.text(`Total food offered: 46kg`, 10, 20);
     doc.text(`Portions offered: 131`, 10, 30);

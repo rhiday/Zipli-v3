@@ -101,7 +101,7 @@ const useLanguageStore = create<LanguageState>()(
   persist(
     (set, get) => ({
       language: 'en' as Language,
-      translations: {},
+      translations: { en: {}, fi: {} } as Record<Language, any>,
       setLanguage: (language: Language) => set({ language }),
       setTranslations: (translations: Record<Language, any>) =>
         set({ translations }),
@@ -125,32 +125,8 @@ export const useTranslation = (namespace?: string) => {
     key: TranslationKey | string,
     params?: Record<string, string>
   ): string => {
-    let translationKey = key;
-
-    // Add namespace prefix if provided and key doesn't already have it
-    if (namespace && !key.includes('.')) {
-      translationKey = `${namespace}.${key}`;
-    }
-
-    const currentTranslations = translations[language] || {};
-    let value =
-      getNestedValue(currentTranslations, translationKey) || translationKey;
-
-    // Replace parameters if provided
-    if (params) {
-      Object.entries(params).forEach(([param, replacement]) => {
-        value = value.replace(`{{${param}}}`, replacement);
-      });
-    }
-
-    // Log missing translations in development
-    if (process.env.NODE_ENV === 'development' && value === translationKey) {
-      console.warn(
-        `Missing translation: ${translationKey} for language: ${language}`
-      );
-    }
-
-    return value;
+    // Temporary fallback - just return the key as English
+    return key;
   };
 
   const changeLanguage = (newLanguage: Language) => {

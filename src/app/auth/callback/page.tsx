@@ -19,7 +19,7 @@ export default function AuthCallback() {
       const type = hashParams.get('type');
 
       if (error) {
-        console.error(t('pages.auth.auth_callback_error'), error);
+        console.error('Auth callback error:', error);
         router.push('/auth/login');
         return;
       }

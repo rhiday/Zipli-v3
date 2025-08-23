@@ -11,7 +11,7 @@ import {
 } from '@/lib/i18n-enhanced';
 
 export default function TestLokalisePage() {
-  const { language, changeLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const { t: tAuth } = useAuthTranslation();
   const { t: tDonations } = useDonationsTranslation();
   const { t: tCommon } = useCommonTranslation();
@@ -96,12 +96,12 @@ export default function TestLokalisePage() {
               Current Language: <strong>{language.toUpperCase()}</strong>
             </span>
             <Button
-              onClick={() => changeLanguage(language === 'en' ? 'fi' : 'en')}
+              onClick={() => setLanguage(language === 'en' ? 'fi' : 'en')}
               variant="secondary"
             >
               Switch to {language === 'en' ? 'Finnish' : 'English'}
             </Button>
-            <Button onClick={reloadTranslations} variant="outline">
+            <Button onClick={reloadTranslations} variant="secondary">
               🔄 Reload Translations
             </Button>
           </div>

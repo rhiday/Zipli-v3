@@ -15,8 +15,8 @@ interface MobileDashboardHeaderProps {
 }
 
 export default function MobileDashboardHeader({
+  profile, getInitials }: MobileDashboardHeaderProps) {
   const { t } = useCommonTranslation();
- profile, getInitials }: MobileDashboardHeaderProps) {
   const router = useRouter();
   return (
     <header className="bg-primary p-4 pt-10 text-white relative overflow-hidden md:hidden">

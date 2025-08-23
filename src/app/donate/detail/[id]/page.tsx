@@ -122,10 +122,10 @@ export default function DonationDetailPage({
     return (
       <div className="flex min-h-screen flex-col items-center justify-center text-center">
         <h2 className="text-2xl font-bold mb-2">
-          {error ? t(t('common.status.error')) : t('donationNotFound')}
+          {error ? 'Error' : 'Donation Not Found'}
         </h2>
         <p className="text-muted-foreground">
-          {error || t('couldNotLoadDetails')}
+          {error || 'Could not load donation details'}
         </p>
         <Button onClick={() => router.back()} className="mt-4">
           Go Back
@@ -134,7 +134,7 @@ export default function DonationDetailPage({
     );
   }
 
-  const donorName = donorDisplayName || t('generousDonor');
+  const donorName = donorDisplayName || 'Generous Donor';
 
   return (
     <div className="min-h-screen pb-20">
@@ -143,7 +143,6 @@ export default function DonationDetailPage({
         <Button
           onClick={() => router.back()}
           className="absolute top-12 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
-          Go Back
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -192,7 +191,7 @@ export default function DonationDetailPage({
 
           <div className="mt-4 flex items-start gap-3 text-gray-600">
             <MapPin className="h-5 w-5 flex-shrink-0" />
-            <span className="font-medium">{t('addressNotProvided')}</span>
+            <span className="font-medium">Address not provided</span>
           </div>
 
           {isOwner ? (
@@ -221,7 +220,7 @@ export default function DonationDetailPage({
               </div>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{t('areYouSure')}</DialogTitle>
+                  <DialogTitle>Are you sure?</DialogTitle>
                   <DialogDescription>
                     This will permanently remove the listing from public view. This action cannot be undone.
                   </DialogDescription>

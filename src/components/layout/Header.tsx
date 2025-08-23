@@ -168,8 +168,8 @@ title="Default"
                   <div>
                     <span className="text-sm font-semibold text-white">
                       {item.type === 'donation'
-                        ? t('donationLabel')
-                        : t('common.request')}
+                        ? 'Donation'
+                        : 'Request'}
                     </span>
                     <span className="text-white/90 text-sm ml-1">
                       ·{' '}

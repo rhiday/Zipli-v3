@@ -111,7 +111,7 @@ export default function RequestSummaryPage() {
       const response = await addRequest(requestPayload);
 
       if (response.error) {
-        console.error(t('pages.requests.error_creating_request'), response.error);
+        console.error('Error creating request:', response.error);
         alert(`Failed to submit request: ${response.error}`);
         return;
       }
@@ -123,12 +123,12 @@ export default function RequestSummaryPage() {
         router.push('/request/success');
       } else {
         console.error('No data returned from addRequest');
-        alert(t('pages.requests.failed_to_submit_request_no_da'));
+        alert('Failed to submit request: No data returned');
       }
     } catch (error) {
-      console.error(t('pages.requests.error_submitting_request'), error);
+      console.error('Error submitting request:', error);
       alert(
-        `Failed to submit request: ${error instanceof Error ? error.message : t('pages.requests.unknown_error')}`
+        `Failed to submit request: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     } finally {
       setIsSaving(false);

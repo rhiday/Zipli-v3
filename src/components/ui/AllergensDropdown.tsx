@@ -26,6 +26,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   disabled,
   placeholder = "Select...",
 }) => {
+  const { t } = useAllergenSelectorTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -74,7 +75,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           readOnly
           value={''}
           placeholder={value.length > 0 ? '' : placeholder}
-          variant={error ? {t('common.status.error')} : 'default'}
+          variant={error ? 'error' : 'default'}
           disabled={disabled}
           className="cursor-pointer"
           onClick={handleInputClick}
