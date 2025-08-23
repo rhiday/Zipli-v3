@@ -122,7 +122,7 @@ export default function ProfilePage(): React.ReactElement {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-primary mb-1">
-title="Default"
+                    {t('email')}
                   </label>
                   <Input
                     type="email"
@@ -135,7 +135,7 @@ title="Default"
 
                 <div>
                   <label htmlFor="full_name" className="block text-sm font-medium text-primary mb-1">
-title="Default"
+                    {t('fullName')}
                   </label>
                   <Input
                     type="text"
@@ -143,13 +143,13 @@ title="Default"
                     name="full_name"
                     value={formData.full_name}
                     onChange={handleChange}
-                    placeholder = "FullNameLabel"
+                    placeholder={t('fullName')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="organization_name" className="block text-sm font-medium text-primary mb-1">
-title="Default"
+                    {t('organizationName')}
                   </label>
                   <Input
                     type="text"
@@ -157,13 +157,13 @@ title="Default"
                     name="organization_name"
                     value={formData.organization_name}
                     onChange={handleChange}
-                    placeholder = "OrganizationNameLabel"
+                    placeholder={t('organizationName')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="role" className="block text-sm font-medium text-primary mb-1">
-title="Default"
+                    {t('role')}
                   </label>
                   <Select
                     value={formData.role}
@@ -183,7 +183,7 @@ title="Default"
 
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-primary mb-1">
-title="Default"
+                    {t('address')}
                   </label>
                   <Textarea
                     id="address"
@@ -197,7 +197,7 @@ title="Default"
 
                 <div>
                   <label htmlFor="contact_number" className="block text-sm font-medium text-primary mb-1">
-title="Default"
+                    {t('contactNumber')}
                   </label>
                   <Input
                     type="tel"
@@ -211,7 +211,7 @@ title="Default"
 
                 <div>
                   <label htmlFor="driver_instructions" className="block text-sm font-medium text-primary mb-1">
-title="Default"
+                    {t('instructionsForDriver')}
                   </label>
                   <Textarea
                     id="driver_instructions"
@@ -234,7 +234,7 @@ title="Default"
                     onClick={() => setIsEditing(false)}
                     className="flex-1"
                   >
-title="Default"
+                    {t('saveChanges')}
                   </Button>
                 </div>
               </form>
@@ -277,7 +277,7 @@ title="Default"
 
                 <div className="flex gap-3">
                   <Button onClick={() => setIsEditing(true)} className="flex-1">
-title="Default"
+                    {t('editProfile')}
                   </Button>
                   <Button 
                     variant="destructive" 
