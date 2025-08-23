@@ -1,11 +1,12 @@
 /**
- * Enhanced i18n system with contextual organization for Lokalise
- * Automatically syncs with Lokalise and provides page/section context
+ * Simple i18n system using static translation files
+ * All translations load from static en.ts and fi.ts files
+ * Lokalise is only for content management, not runtime loading
  */
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getTranslations } from './translations/index';
+import { getTranslations } from './translations';
 
 export type Language = 'en' | 'fi';
 
@@ -188,47 +189,11 @@ export const useCommonTranslation = () => {
   };
 };
 
-// Load translations from API or static files
+// No need to load translations - they're imported statically
 export const loadTranslations = async () => {
-  const { setTranslations } = useLanguageStore.getState();
-
-  try {
-    // Try to load from Lokalise API first
-    const response = await fetch('/api/translations');
-    if (response.ok) {
-      const translations = await response.json();
-      console.log('📥 Loaded translations from Lokalise API');
-      setTranslations(translations);
-      return;
-    }
-  } catch (error) {
-    console.warn(
-      'Could not load translations from Lokalise API, falling back to static files'
-    );
-  }
-
-  // Fallback to static files
-  try {
-    const [enResponse, fiResponse] = await Promise.all([
-      fetch('/locales/en/translations.json'),
-      fetch('/locales/fi/translations.json'),
-    ]);
-
-    if (enResponse.ok && fiResponse.ok) {
-      const [enTranslations, fiTranslations] = await Promise.all([
-        enResponse.json(),
-        fiResponse.json(),
-      ]);
-
-      console.log('📁 Loaded translations from static files');
-      setTranslations({
-        en: enTranslations,
-        fi: fiTranslations,
-      });
-    }
-  } catch (error) {
-    console.error('Failed to load translations:', error);
-  }
+  // Static translations are already loaded via imports
+  // This function exists for compatibility but does nothing
+  console.log('📁 Using static translations from en.ts and fi.ts files');
 };
 
 export default useTranslation;

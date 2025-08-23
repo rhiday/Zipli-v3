@@ -1,18 +1,15 @@
 'use client';
 
-import React from 'react';
-import { CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { NextSteps } from '@/components/ui/NextSteps';
-import { useLanguage } from '@/hooks/useLanguage';
 import { useDonationStore } from '@/store/donation';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 export default function DonationThankYouPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const { isEditMode, setEditMode, clearDonation } = useDonationStore();
 
   useEffect(() => {
@@ -52,18 +49,18 @@ export default function DonationThankYouPage() {
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
-          heading = 'NextSteps'
+          heading="NextSteps"
           steps={
             isEditMode
               ? [
                   {
-                    title: t('changesSaved')  || 'Donation_updated',
+                    title: t('changesSaved') || 'Donation_updated',
                     description:
                       t('changesSaved') ||
                       'Your changes have been saved successfully.',
                   },
                   {
-                    title: t('matchingInProgress')  || 'Matching_continues',
+                    title: t('matchingInProgress') || 'Matching_continues',
                     description: t('lookingForMatches'),
                   },
                   {
@@ -90,7 +87,7 @@ export default function DonationThankYouPage() {
       </div>
       <Link href="/donate">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-title="Default"
+          title="Default"
         </button>
       </Link>
     </div>

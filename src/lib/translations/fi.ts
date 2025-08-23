@@ -228,4 +228,26 @@ export const fi = {
   until: 'Asti',
   today: 'Tänään',
   tomorrow: 'Huomenna',
+
+  // Manual donation form specific
+  quantityKg: 'Määrä (kg)',
+  enterFoodName: 'Syötä ruoan nimi',
+  enterQuantity: 'Syötä määrä',
+  currentItemsInDonation: 'Nykyiset tuotteet lahjoituksessa',
+  addAnotherItem: 'Lisää toinen tuote',
+  goBackToDashboard: 'Takaisin kotinäkymään',
+  photosHelpIdentify: 'Kuvat auttavat tunnistamaan ruokalahjoituksesi',
+  enterDescription: 'Syötä kuvaus',
+  savingEllipsis: 'Tallennetaan...',
+  addItem: 'Lisää tuote',
+
+  // Recurring donation form specific
+  approximateQuantityKg: 'Arvioitu määrä (kg)',
+  pleaseDescribeFood: 'Kuvaile ruoka, jonka haluat lahjoittaa',
+  foodDescriptionPlaceholderLong:
+    'esim., Tuoreita vihanneksia, valmisruokia, maitotuotteita...',
+  quantityRequired: 'Määrä on pakollinen',
+  quantityMinimum: 'Määrän tulee olla vähintään 1',
+  enterValidNumber: 'Syötä kelvollinen numero',
+  allergensAndDietaryInfo: 'Allergeenit ja ruokavalio-tiedot',
 } as const;

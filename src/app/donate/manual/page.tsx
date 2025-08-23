@@ -1,31 +1,30 @@
 // pumpkin: test commit to trigger push
 'use client';
 export const dynamic = 'force-dynamic';
-import React, { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
-import { Input } from '@/components/ui/Input';
-import { Progress } from '@/components/ui/progress';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { PhotoUpload } from '@/components/ui/PhotoUpload';
-import { ItemPreview } from '@/components/ui/ItemPreview';
-import { useDonationStore } from '@/store/donation';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { useDatabase, DonationWithFoodItem } from '@/store';
-import { PlusIcon, Clock, MapPin } from 'lucide-react';
+import { Input } from '@/components/ui/Input';
+import { ItemPreview } from '@/components/ui/ItemPreview';
+import { PhotoUpload } from '@/components/ui/PhotoUpload';
+import { Progress } from '@/components/ui/progress';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { useDatabase } from '@/store';
+import { useDonationStore } from '@/store/donation';
+import { PlusIcon } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
-import DonationCard from '@/components/donations/DonationCard';
-import { Textarea } from '@/components/ui/Textarea';
-import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
+import { Textarea } from '@/components/ui/Textarea';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 interface DonationItem {
   id: string;
@@ -397,13 +396,13 @@ function ManualDonationPageInner() {
     <div className="flex flex-col gap-4">
       <div>
         <label htmlFor="name" className="text-sm font-medium text-gray-700">
-          Name of Food
+          {t('nameOfFood')}
         </label>
         <Input
           id="name"
           value={currentItem.name}
           onChange={(e) => handleCurrentItemChange('name', e.target.value)}
-          placeholder="Enter food name"
+          placeholder={t('enterFoodName')}
           className={
             hasAttemptedSave && !currentItem.name ? 'border-red-500' : ''
           }
@@ -412,14 +411,14 @@ function ManualDonationPageInner() {
 
       <div>
         <label htmlFor="quantity" className="text-sm font-medium text-gray-700">
-          Quantity (kg)
+          {t('quantityKg')}
         </label>
         <Input
           id="quantity"
           type="number"
           value={currentItem.quantity}
           onChange={(e) => handleCurrentItemChange('quantity', e.target.value)}
-          placeholder="Enter quantity"
+          placeholder={t('enterQuantity')}
           className={
             hasAttemptedSave && !currentItem.quantity ? 'border-red-500' : ''
           }
@@ -427,16 +426,22 @@ function ManualDonationPageInner() {
       </div>
 
       <AllergensDropdown
-        label="Allergies, Intolerances & Diets"
+        label={t('allergiesIntolerancesDiets')}
         options={[
-          'Milk', 'Eggs', 'Fish', 'Shellfish',
-          'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans',
+          'Milk',
+          'Eggs',
+          'Fish',
+          'Shellfish',
+          'Tree nuts',
+          'Peanuts',
+          'Wheat',
+          'Soybeans',
         ]}
         value={currentItem.allergens}
         onChange={(allergens) =>
           handleCurrentItemChange('allergens', allergens)
         }
-        placeholder="Select allergens"
+        placeholder={t('selectAllergens')}
         error={
           hasAttemptedSave && currentItem.allergens.length === 0
             ? t('fieldRequired')
@@ -447,7 +452,7 @@ function ManualDonationPageInner() {
       <PhotoUpload
         onImageUpload={handleImageUpload}
         uploadedImage={currentItem.imageUrl}
-        hint="Photos help identify your food donation"
+        hint={t('photosHelpIdentify')}
       />
 
       <div>
@@ -463,7 +468,7 @@ function ManualDonationPageInner() {
           onChange={(e) =>
             handleCurrentItemChange('description', e.target.value)
           }
-          placeholder="Enter description"
+          placeholder={t('enterDescription')}
         />
       </div>
     </div>
@@ -484,7 +489,7 @@ function ManualDonationPageInner() {
             {hasItems && !showAddAnotherForm ? (
               <div className="flex justify-end">
                 <Button onClick={() => router.push('/donate/pickup-slot')}>
-                  Continue
+                  {t('continue')}
                 </Button>
               </div>
             ) : (
@@ -494,10 +499,10 @@ function ManualDonationPageInner() {
                   disabled={isSaving || !isFormValid}
                 >
                   {isSaving
-                    ? 'Saving...'
+                    ? t('savingEllipsis')
                     : isEditMode
-                      ? 'Save Changes'
-                      : 'Add Item'}
+                      ? t('saveChanges')
+                      : t('addItem')}
                 </Button>
               </div>
             )}
@@ -509,7 +514,7 @@ function ManualDonationPageInner() {
         {hasItems && !showAddAnotherForm ? (
           <div className="flex flex-col gap-4">
             <h2 className="text-lg font-semibold">
-              Current Items in Donation
+              {t('currentItemsInDonation')}
             </h2>
             {donationItems.map((item) => (
               <ItemPreview
@@ -530,7 +535,7 @@ function ManualDonationPageInner() {
               >
                 <span className="flex items-center gap-2 border-b border-interactive pb-1">
                   <PlusIcon size={20} />
-                  Add Another Item
+                  {t('addAnotherItem')}
                 </span>
               </button>
             </div>
@@ -553,7 +558,7 @@ function ManualDonationPageInner() {
           </DialogHeader>
           <DialogFooter>
             <Button onClick={() => router.push('/donate')} className="w-full">
-              Go Back to Dashboard
+              {t('goBackToDashboard')}
             </Button>
           </DialogFooter>
         </DialogContent>

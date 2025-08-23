@@ -26,6 +26,8 @@ export default function OneTimeRequestForm() {
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>(
     requestData.allergens || []
   );
+  const [allergensInteracted, setAllergensInteracted] = useState(false);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const {
     register,
@@ -47,6 +49,13 @@ export default function OneTimeRequestForm() {
     selectedAllergens.length > 0;
 
   const onSubmit = async (data: OneTimeFormInputs) => {
+    setAttemptedSubmit(true);
+
+    // Check if form is valid before proceeding
+    if (!isFormValid) {
+      return;
+    }
+
     try {
       // Update the store with form data
       setRequestData({
@@ -167,10 +176,16 @@ export default function OneTimeRequestForm() {
             'Low-lactose',
           ]}
           value={selectedAllergens}
-          onChange={setSelectedAllergens}
+          onChange={(allergens) => {
+            setSelectedAllergens(allergens);
+            if (!allergensInteracted) {
+              setAllergensInteracted(true);
+            }
+          }}
           placeholder={t('selectAllergens')}
           error={
-            !selectedAllergens.length && watchedFields.description
+            !selectedAllergens.length &&
+            (allergensInteracted || attemptedSubmit)
               ? t('selectAllergens')
               : undefined
           }

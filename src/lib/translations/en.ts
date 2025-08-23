@@ -227,6 +227,28 @@ export const en = {
   until: 'Until',
   today: 'Today',
   tomorrow: 'Tomorrow',
+
+  // Manual donation form specific
+  quantityKg: 'Quantity (kg)',
+  enterFoodName: 'Enter food name',
+  enterQuantity: 'Enter quantity',
+  currentItemsInDonation: 'Current Items in Donation',
+  addAnotherItem: 'Add Another Item',
+  goBackToDashboard: 'Go Back to Dashboard',
+  photosHelpIdentify: 'Photos help identify your food donation',
+  enterDescription: 'Enter description',
+  savingEllipsis: 'Saving...',
+  addItem: 'Add Item',
+
+  // Recurring donation form specific
+  approximateQuantityKg: 'Approximate quantity (kg)',
+  pleaseDescribeFood: 'Please describe the food you want to donate',
+  foodDescriptionPlaceholderLong:
+    'e.g., Fresh vegetables, prepared meals, dairy products...',
+  quantityRequired: 'Quantity is required',
+  quantityMinimum: 'Quantity must be at least 1',
+  enterValidNumber: 'Please enter a valid number',
+  allergensAndDietaryInfo: 'Allergens & dietary information',
 } as const;
 
 export type TranslationKey = keyof typeof en;

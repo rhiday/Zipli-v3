@@ -1,10 +1,19 @@
-// Old translation system - replaced by static translations
-// Keeping this file to avoid breaking imports during migration
+// Translation system - loads from static en.ts and fi.ts files
+// All translations come from static files, Lokalise is only for content management
 
 export type Language = 'en' | 'fi';
 export type TranslationKey = string;
 
+// Import static translations
+import { en } from './translations/en';
+import { fi } from './translations/fi';
+
 export const translations = {
-  en: {} as Record<string, string>,
-  fi: {} as Record<string, string>,
+  en,
+  fi,
 } as const;
+
+// Simple translation getter
+export const getTranslations = (language: Language) => {
+  return language === 'fi' ? fi : en;
+};
