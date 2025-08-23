@@ -368,7 +368,6 @@ export const useDatabase = create<DatabaseState>()(
 
         // Helper to generate a random date within the last 7 days
         function randomRecentISO() {
-  const { t } = useCommonTranslation();
 
           const now = new Date();
           const daysAgo = Math.floor(Math.random() * 7);

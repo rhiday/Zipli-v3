@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function LoginPage() {
@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const login = useDatabase((state) => state.login);
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

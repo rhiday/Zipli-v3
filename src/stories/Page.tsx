@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Header } from './Header';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
+// Removed unused import
 import './page.css';
 
 type User = {

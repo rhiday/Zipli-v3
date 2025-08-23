@@ -1,10 +1,10 @@
-// Translations disabled - using fallback system
-// All translations now handled by i18n-enhanced.ts fallback
+// Old translation system - replaced by static translations
+// Keeping this file to avoid breaking imports during migration
 
 export type Language = 'en' | 'fi';
-export type TranslationKey = string; // Simplified for fallback
+export type TranslationKey = string;
 
 export const translations = {
-  en: {},
-  fi: {}
+  en: {} as Record<string, string>,
+  fi: {} as Record<string, string>,
 } as const;

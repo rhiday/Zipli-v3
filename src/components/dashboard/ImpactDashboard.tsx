@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Info, ChevronDown } from 'lucide-react';
 import ExportCard from './ExportCard';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface ImpactDashboardProps {
   totalWeight?: number;
