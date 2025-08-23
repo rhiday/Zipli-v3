@@ -18,7 +18,7 @@ export interface TranslationStructure {
     status: Record<string, string>;
     time: Record<string, string>;
   };
-  
+
   // Page-specific translations
   pages: {
     auth: {
@@ -47,7 +47,7 @@ export interface TranslationStructure {
     profile: Record<string, string>;
     impact: Record<string, string>;
   };
-  
+
   // Component-specific translations
   components: {
     donationCard: Record<string, string>;
@@ -60,7 +60,7 @@ export interface TranslationStructure {
 }
 
 // Flattened key type for easy access
-export type TranslationKey = 
+export type TranslationKey =
   | `common.actions.${string}`
   | `common.navigation.${string}`
   | `common.forms.${string}`
@@ -103,7 +103,8 @@ const useLanguageStore = create<LanguageState>()(
       language: 'en' as Language,
       translations: {},
       setLanguage: (language: Language) => set({ language }),
-      setTranslations: (translations: Record<Language, any>) => set({ translations }),
+      setTranslations: (translations: Record<Language, any>) =>
+        set({ translations }),
     }),
     {
       name: 'i18n-enhanced-storage',
@@ -119,30 +120,36 @@ function getNestedValue(obj: any, path: string): string {
 // Enhanced useTranslation hook with context awareness
 export const useTranslation = (namespace?: string) => {
   const { language, translations, setLanguage } = useLanguageStore();
-  
-  const t = (key: TranslationKey | string, params?: Record<string, string>): string => {
+
+  const t = (
+    key: TranslationKey | string,
+    params?: Record<string, string>
+  ): string => {
     let translationKey = key;
-    
+
     // Add namespace prefix if provided and key doesn't already have it
     if (namespace && !key.includes('.')) {
       translationKey = `${namespace}.${key}`;
     }
-    
+
     const currentTranslations = translations[language] || {};
-    let value = getNestedValue(currentTranslations, translationKey) || translationKey;
-    
+    let value =
+      getNestedValue(currentTranslations, translationKey) || translationKey;
+
     // Replace parameters if provided
     if (params) {
       Object.entries(params).forEach(([param, replacement]) => {
         value = value.replace(`{{${param}}}`, replacement);
       });
     }
-    
+
     // Log missing translations in development
     if (process.env.NODE_ENV === 'development' && value === translationKey) {
-      console.warn(`Missing translation: ${translationKey} for language: ${language}`);
+      console.warn(
+        `Missing translation: ${translationKey} for language: ${language}`
+      );
     }
-    
+
     return value;
   };
 
@@ -171,12 +178,18 @@ export const useProfileTranslation = () => useTranslation('pages.profile');
 export const useImpactTranslation = () => useTranslation('pages.impact');
 
 // Component-specific translation helpers
-export const useDonationCardTranslation = () => useTranslation('components.donationCard');
-export const useRequestCardTranslation = () => useTranslation('components.requestCard');
-export const useFoodItemFormTranslation = () => useTranslation('components.foodItemForm');
-export const usePickupSchedulerTranslation = () => useTranslation('components.pickupScheduler');
-export const useVoiceInputTranslation = () => useTranslation('components.voiceInput');
-export const useAllergenSelectorTranslation = () => useTranslation('components.allergenSelector');
+export const useDonationCardTranslation = () =>
+  useTranslation('components.donationCard');
+export const useRequestCardTranslation = () =>
+  useTranslation('components.requestCard');
+export const useFoodItemFormTranslation = () =>
+  useTranslation('components.foodItemForm');
+export const usePickupSchedulerTranslation = () =>
+  useTranslation('components.pickupScheduler');
+export const useVoiceInputTranslation = () =>
+  useTranslation('components.voiceInput');
+export const useAllergenSelectorTranslation = () =>
+  useTranslation('components.allergenSelector');
 
 // Common translations helper
 export const useCommonTranslation = () => useTranslation('common');
@@ -184,37 +197,43 @@ export const useCommonTranslation = () => useTranslation('common');
 // Load translations from API or static files
 export const loadTranslations = async () => {
   const { setTranslations } = useLanguageStore.getState();
-  
+
   try {
-    // Try to load from API first (for Lokalise integration)
+    // Try to load from Lokalise API first
     const response = await fetch('/api/translations');
     if (response.ok) {
       const translations = await response.json();
+      console.log('📥 Loaded translations from Lokalise API');
       setTranslations(translations);
       return;
     }
   } catch (error) {
-    console.warn('Could not load translations from API, falling back to static files');
+    console.warn(
+      'Could not load translations from Lokalise API, falling back to static files'
+    );
   }
-  
+
   // Fallback to static files
   try {
     const [enResponse, fiResponse] = await Promise.all([
       fetch('/locales/en/translations.json'),
-      fetch('/locales/fi/translations.json')
+      fetch('/locales/fi/translations.json'),
     ]);
-    
-    const [enTranslations, fiTranslations] = await Promise.all([
-      enResponse.json(),
-      fiResponse.json()
-    ]);
-    
-    setTranslations({
-      en: enTranslations,
-      fi: fiTranslations
-    });
+
+    if (enResponse.ok && fiResponse.ok) {
+      const [enTranslations, fiTranslations] = await Promise.all([
+        enResponse.json(),
+        fiResponse.json(),
+      ]);
+
+      console.log('📁 Loaded translations from static files');
+      setTranslations({
+        en: enTranslations,
+        fi: fiTranslations,
+      });
+    }
   } catch (error) {
-    console.error(t('common.failed_to_load_translations'), error);
+    console.error('Failed to load translations:', error);
   }
 };
 
