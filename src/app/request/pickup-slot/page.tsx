@@ -15,7 +15,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { EditIcon } from '@/components/ui/icons/EditIcon';
 import { DeleteIcon } from '@/components/ui/icons/DeleteIcon';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 
@@ -34,7 +34,7 @@ interface PickupSlot {
 
 export default function PickupSlotPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const [pickupSlots, setPickupSlots] = useState<PickupSlot[]>([
     {
@@ -109,7 +109,7 @@ export default function PickupSlotPage() {
       header={
         <>
           <SecondaryNavbar
-title="Default"
+            title={t('pickupSchedule')}
             backHref="/request/new"
             onBackClick={() => router.back()}
           />
@@ -135,7 +135,7 @@ title="Default"
       <div className="space-y-6">
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            When can you pick up the food?
+            {t('pickupSchedule')}?
           </h2>
           <p className="text-sm text-gray-600 mb-4">
             Add one or more pickup time slots to give donors flexibility.
@@ -151,7 +151,7 @@ title="Default"
             >
               <div className="flex items-start justify-between mb-3">
                 <h3 className="font-medium text-gray-900">
-                  Pickup Slot {index + 1}
+                  {t('pickupSlot')} {index + 1}
                 </h3>
                 {pickupSlots.length > 1 && (
                   <button
@@ -167,7 +167,7 @@ title="Default"
                 {/* Date Picker */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date
+                    {t('dateLabel')}
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -198,7 +198,7 @@ title="Default"
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Start Time
+                      {t('startTimeLabel')}
                     </label>
                     <select
                       value={slot.startTime}
@@ -216,7 +216,7 @@ title="Default"
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      End Time
+                      {t('endTimeLabel')}
                     </label>
                     <select
                       value={slot.endTime}
@@ -240,7 +240,7 @@ title="Default"
 
         {/* Add Slot Button */}
         <Button variant="secondary" onClick={addPickupSlot} className="w-full">
-          Add Another Slot
+          {t('addPickupSlotButton')}
         </Button>
       </div>
     </PageContainer>

@@ -11,7 +11,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon, ClockIcon } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import {
@@ -37,7 +37,7 @@ interface RequestSchedule {
 
 export default function RequestSchedulePage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const [requestData, setRequestData] = useState<any>(null);
   const [scheduleType, setScheduleType] = useState<
     'daily' | 'weekly' | 'custom'
@@ -174,7 +174,7 @@ export default function RequestSchedulePage() {
       header={
         <>
           <SecondaryNavbar
-title="Default"
+            title={t('requestSchedule')}
             backHref="/request/recurring-form"
             onBackClick={() => router.back()}
           />
@@ -198,14 +198,14 @@ title="Default"
       className="bg-white"
     >
       <main className="contents">
-        <h2 className="text-xl font-semibold mb-2">Request Schedule</h2>
+        <h2 className="text-xl font-semibold mb-2">{t('requestSchedule')}</h2>
         <p className="text-sm text-gray-600 mb-4">
           Set up when you need food delivered
         </p>
 
         {/* Schedule Type Selector */}
         <div className="space-y-4 mb-6">
-          <h3 className="font-semibold text-black">Schedule Type</h3>
+          <h3 className="font-semibold text-black">{t('scheduleType')}</h3>
           <div className="grid grid-cols-3 gap-2">
             {(['daily', 'weekly', 'custom'] as const).map((type) => (
               <button
@@ -227,7 +227,9 @@ title="Default"
         {/* Existing Schedules */}
         {schedules.length > 0 && (
           <div className="space-y-4 mb-6">
-            <h3 className="font-semibold text-black">Configured Schedules</h3>
+            <h3 className="font-semibold text-black">
+              {t('configuredSchedules')}
+            </h3>
             {schedules.map((schedule) => (
               <div
                 key={schedule.id}
@@ -239,7 +241,7 @@ title="Default"
                 <button
                   onClick={() => handleDeleteSchedule(schedule.id)}
                   className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#CB0003] text-[#CB0003] hover:bg-black/5"
-                  title="Default"
+                  aria-label={t('delete')}
                 >
                   <svg width="14" height="15" viewBox="0 0 14 15" fill="none">
                     <path
@@ -262,8 +264,8 @@ title="Default"
           <div className="space-y-6">
             <h3 className="font-semibold text-black">
               {schedules.length > 0
-                ? 'Add Another Schedule'
-                : 'Configure Schedule'}
+                ? t('addAnotherSchedule')
+                : t('configureSchedule')}
             </h3>
 
             {/* Daily Schedule */}
@@ -271,7 +273,7 @@ title="Default"
               <div className="space-y-4">
                 <div>
                   <label className="block text-black font-semibold mb-3">
-                    Start Date
+                    {t('startDate')}
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -313,7 +315,7 @@ title="Default"
 
                 <div>
                   <label className="block text-black font-semibold mb-3">
-                    End Date
+                    {t('endDate')}
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -356,9 +358,9 @@ title="Default"
                 </div>
 
                 <TimeSlotSelector
-                  label = 'Time_range'
-                  startTimeLabel = 'StartTime'
-                  endTimeLabel = 'EndTime'
+                  label="Time_range"
+                  startTimeLabel="StartTime"
+                  endTimeLabel="EndTime"
                   startTime={currentSchedule.startTime}
                   endTime={currentSchedule.endTime}
                   onStartTimeChange={(time) =>
@@ -376,7 +378,7 @@ title="Default"
               <div className="space-y-4">
                 <div>
                   <label className="block text-black font-semibold mb-3">
-                    Select Days
+                    {t('selectDays')}
                   </label>
                   <WeeklyDaySelector
                     selectedDays={currentSchedule.weeklyDays || []}
@@ -386,9 +388,9 @@ title="Default"
                   />
                 </div>
                 <TimeSlotSelector
-                  label="Time Range for Selected Days"
-                  startTimeLabel = 'StartTime'
-                  endTimeLabel = 'EndTime'
+                  label={t('timeRangeForSelectedDays')}
+                  startTimeLabel="StartTime"
+                  endTimeLabel="EndTime"
                   startTime={currentSchedule.startTime}
                   endTime={currentSchedule.endTime}
                   onStartTimeChange={(time) =>
@@ -430,7 +432,7 @@ title="Default"
                     : 'text-gray-400 cursor-not-allowed'
                 )}
               >
-                Add Schedule
+                {t('addSlot')}
               </button>
             </div>
           </div>

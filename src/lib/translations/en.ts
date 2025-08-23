@@ -202,6 +202,14 @@ export const en = {
   describeFood: 'Describe what type of food you need',
   foodDescriptionPlaceholder:
     'e.g., Fresh vegetables, prepared meals, dairy products...',
+  scheduleType: 'Schedule Type',
+  configuredSchedules: 'Configured Schedules',
+  addAnotherSchedule: 'Add Another Schedule',
+  configureSchedule: 'Configure Schedule',
+  startDate: 'Start Date',
+  endDate: 'End Date',
+  selectDays: 'Select Days',
+  timeRangeForSelectedDays: 'Time Range for Selected Days',
 
   // Common words
   available: 'Available',

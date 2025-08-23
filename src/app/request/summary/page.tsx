@@ -7,7 +7,7 @@ import { useRequestStore } from '@/store/request';
 import { useDatabase } from '@/store';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { SummaryCard, AllergenChips } from '@/components/ui/SummaryCard';
 import { Textarea } from '@/components/ui/Textarea';
 import { format } from 'date-fns';
@@ -16,7 +16,7 @@ import BottomActionBar from '@/components/ui/BottomActionBar';
 
 export default function RequestSummaryPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const { requestData, clearRequest } = useRequestStore();
   const { currentUser, addRequest } = useDatabase();
 
@@ -97,7 +97,7 @@ export default function RequestSummaryPage() {
       // Note: Only including fields that exist in current database schema
       const requestPayload = {
         user_id: currentUser.id,
-        description: `Request for ${requestData.quantity} portions - ${requestData.allergens.join(', ')} | Address: ${address.trim()} | Instructions: ${instructions.trim()  || 'None'} | Period: ${requestData.startDate} to ${requestData.endDate} | Recurrence: ${JSON.stringify(requestData.recurrencePattern)}`,
+        description: `Request for ${requestData.quantity} portions - ${requestData.allergens.join(', ')} | Address: ${address.trim()} | Instructions: ${instructions.trim() || 'None'} | Period: ${requestData.startDate} to ${requestData.endDate} | Recurrence: ${JSON.stringify(requestData.recurrencePattern)}`,
         people_count: parseInt(requestData.quantity) || 1,
         pickup_date: requestData.pickupDate,
         pickup_start_time: requestData.startTime,
@@ -148,12 +148,12 @@ export default function RequestSummaryPage() {
     }
 
     if (pattern.type === 'daily') {
-      return t('daily')  || 'Daily';
+      return t('daily') || 'Daily';
     }
 
     if (pattern.type === 'weekly') {
       if (!pattern.weeklyDays || pattern.weeklyDays.length === 0) {
-        return t('weekly')  || 'Weekly';
+        return t('weekly') || 'Weekly';
       }
 
       const dayNames = [
@@ -197,7 +197,7 @@ export default function RequestSummaryPage() {
       return result;
     }
 
-    return t('custom')  || 'Custom';
+    return t('custom') || 'Custom';
   };
 
   const handleBackClick = () => {
@@ -209,7 +209,7 @@ export default function RequestSummaryPage() {
       header={
         <>
           <SecondaryNavbar
-            title = 'RequestSummary'
+            title={t('requestSummary')}
             backHref="/request/pickup-slot"
             onBackClick={handleBackClick}
           />
@@ -236,12 +236,12 @@ export default function RequestSummaryPage() {
       {/* Donation items (requested) */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-2">
-title="Default"
+          {t('foodRequested')}
         </h2>
         <div className="flex items-start justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <div className="space-y-1">
             <div className="font-semibold text-[#024209]">
-title="Default"
+              {requestData?.description || t('foodRequested')}
             </div>
             <div className="text-sm text-gray-600">
               {t('portions')}: {requestData.quantity || '—'}
@@ -254,7 +254,7 @@ title="Default"
           <button
             onClick={() => router.push('/request/new')}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-title="Default"
+            aria-label={t('edit')}
           >
             <svg
               width="20"
@@ -277,7 +277,7 @@ title="Default"
       {/* Request Period */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('requestPeriod')  || 'RequestPeriod'}
+          {t('requestPeriod')}
         </h2>
         <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <span className="font-semibold text-interactive">
@@ -288,7 +288,7 @@ title="Default"
           <button
             onClick={() => router.push('/request/new')}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-title="Default"
+            aria-label={t('edit')}
           >
             <svg
               width="20"
@@ -311,7 +311,7 @@ title="Default"
       {/* Recurrence Pattern */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('recurringInterval')  || 'Recurrence'}
+          Recurrence
         </h2>
         <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <span className="font-semibold text-interactive">
@@ -320,7 +320,7 @@ title="Default"
           <button
             onClick={() => router.push('/request/new')}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-title="Default"
+            aria-label={t('edit')}
           >
             <svg
               width="20"
@@ -343,7 +343,7 @@ title="Default"
       {/* Pickup schedule */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-title="Default"
+          {t('pickupSchedule')}
         </h2>
         <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <span className="font-semibold text-interactive">
@@ -354,7 +354,7 @@ title="Default"
           <button
             onClick={() => router.push('/request/pickup-slot')}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-title="Default"
+            aria-label={t('edit')}
           >
             <svg
               width="20"
@@ -377,14 +377,14 @@ title="Default"
       {/* Delivery details */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-title="Default"
+          {t('deliveryDetails')}
         </h2>
         <div>
           <label
             htmlFor="address"
             className="block text-black font-semibold mb-3"
           >
-title="Default"
+            {t('address')}
           </label>
           <Textarea
             id="address"
@@ -405,7 +405,7 @@ title="Default"
               htmlFor="update-address-profile"
               className="text-sm text-gray-600"
             >
-title="Default"
+              {t('updateAddressInProfile')}
             </label>
           </div>
         </div>
@@ -414,11 +414,11 @@ title="Default"
             htmlFor="driver-instructions"
             className="block text-black font-semibold mb-3"
           >
-title="Default"
+            {t('driverInstructions')}
           </label>
           <Textarea
             id="driver-instructions"
-            placeholder = "PleaseRingTheDoorbell"
+            placeholder={t('pleaseRingTheDoorbell')}
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
@@ -435,7 +435,7 @@ title="Default"
               htmlFor="update-instructions-profile"
               className="text-sm text-gray-600"
             >
-title="Default"
+              {t('updateInstructionsInProfile')}
             </label>
           </div>
         </div>

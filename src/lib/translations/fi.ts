@@ -203,6 +203,14 @@ export const fi = {
   describeFood: 'Kuvaile millaista ruokaa tarvitset',
   foodDescriptionPlaceholder:
     'esim., Tuoreita vihanneksia, valmisruokia, maitotuotteita...',
+  scheduleType: 'Aikataulun tyyppi',
+  configuredSchedules: 'Määritetyt aikataulut',
+  addAnotherSchedule: 'Lisää toinen aikataulu',
+  configureSchedule: 'Määritä aikataulu',
+  startDate: 'Alkupäivä',
+  endDate: 'Loppupäivä',
+  selectDays: 'Valitse päivät',
+  timeRangeForSelectedDays: 'Aikaväli valituille päiville',
 
   // Common words
   available: 'Saatavilla',

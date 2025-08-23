@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
@@ -21,7 +21,7 @@ type RecurringFormInputs = {
 
 export default function RecurringRequestForm() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
 
   const {
@@ -67,7 +67,7 @@ export default function RecurringRequestForm() {
       header={
         <>
           <SecondaryNavbar
-title="Default"
+            title={t('recurringRequest')}
             backHref="/request/select-type"
             onBackClick={() => router.back()}
           />
@@ -85,7 +85,7 @@ title="Default"
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? 'Submitting...' : 'Continue'}
+            {isSubmitting ? t('continuing') : t('continue')}
           </Button>
         </BottomActionBar>
       }
@@ -96,13 +96,13 @@ title="Default"
         {/* Food Description */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            Describe what type of food you need
+            {t('describeFood')}
           </label>
           <Textarea
             {...register('description', {
               required: 'Please describe the food you need',
             })}
-            placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
+            placeholder={t('foodDescriptionPlaceholder')}
             variant={errors.description ? 'error' : 'default'}
             rows={4}
           />
@@ -116,7 +116,7 @@ title="Default"
         {/* Quantity */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            How many people is this for?
+            {t('peopleCount')}?
           </label>
           <Input
             {...register('quantity', {
@@ -127,7 +127,7 @@ title="Default"
                 message: 'Please enter a valid number',
               },
             })}
-            placeholder="Default"
+            placeholder={t('enterNumberOfPeople')}
             type="number"
             variant={errors.quantity ? 'error' : 'default'}
           />
@@ -140,18 +140,28 @@ title="Default"
 
         {/* Allergens */}
         <AllergensDropdown
-          label="Allergies, intolerances & diets"
-          options={['Default', 'Eggs', 'Fish', 'Shellfish',
-            'Tree nuts', 'Peanuts', 'Wheat', 'Soybeans', 'Vegan', 'Vegetarian',
-            'Gluten-free', 'Halal', 'Kosher',
+          label={t('allergiesIntolerancesDiets')}
+          options={[
+            'Eggs',
+            'Fish',
+            'Shellfish',
+            'Tree nuts',
+            'Peanuts',
+            'Wheat',
+            'Soybeans',
+            'Vegan',
+            'Vegetarian',
+            'Gluten-free',
+            'Halal',
+            'Kosher',
             'Low-lactose',
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-          placeholder="Default"
+          placeholder={t('selectAllergens')}
           error={
             !selectedAllergens.length && watchedFields.description
-              ? 'Please select at least one option'
+              ? t('selectAllergens')
               : undefined
           }
         />

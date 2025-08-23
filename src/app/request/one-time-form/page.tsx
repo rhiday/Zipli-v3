@@ -66,7 +66,7 @@ export default function OneTimeRequestForm() {
       header={
         <>
           <SecondaryNavbar
-            title="Default"
+            title={t('oneTimeRequest')}
             backHref="/request/select-type"
             onBackClick={() => router.back()}
           />
@@ -84,7 +84,7 @@ export default function OneTimeRequestForm() {
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? 'Submitting...' : 'Continue'}
+            {isSubmitting ? t('continuing') : t('continue')}
           </Button>
         </BottomActionBar>
       }
@@ -95,13 +95,13 @@ export default function OneTimeRequestForm() {
         {/* Food Description */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            Describe what type of food you need
+            {t('describeFood')}
           </label>
           <Textarea
             {...register('description', {
               required: 'Please describe the food you need',
             })}
-            placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
+            placeholder={t('foodDescriptionPlaceholder')}
             variant={errors.description ? 'error' : 'default'}
             rows={4}
           />
@@ -115,7 +115,7 @@ export default function OneTimeRequestForm() {
         {/* Quantity */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            How many people is this for?
+            {t('peopleCount')}?
           </label>
           <Input
             {...register('quantity', {
@@ -126,7 +126,7 @@ export default function OneTimeRequestForm() {
                 message: 'Please enter a valid number',
               },
             })}
-            placeholder="Default"
+            placeholder={t('enterNumberOfPeople')}
             type="number"
             variant={errors.quantity ? 'error' : 'default'}
           />
@@ -139,9 +139,8 @@ export default function OneTimeRequestForm() {
 
         {/* Allergens */}
         <AllergensDropdown
-          label="Allergies, intolerances & diets"
+          label={t('allergiesIntolerancesDiets')}
           options={[
-            'Default',
             'Eggs',
             'Fish',
             'Shellfish',
@@ -158,10 +157,10 @@ export default function OneTimeRequestForm() {
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-          placeholder="Default"
+          placeholder={t('selectAllergens')}
           error={
             !selectedAllergens.length && watchedFields.description
-              ? 'Please select at least one option'
+              ? t('selectAllergens')
               : undefined
           }
         />
