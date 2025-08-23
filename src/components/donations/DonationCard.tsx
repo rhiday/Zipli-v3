@@ -19,7 +19,8 @@ interface DonationCardProps {
 const DonationCard: React.FC<DonationCardProps> = React.memo(
   ({ donation, donorName, pickupTime, className }) => {
     const { t } = useLanguage();
-    const { users } = useDatabase();
+    // Use selector to only get what we need and prevent re-renders
+    const users = useDatabase((state) => state.users);
 
     // All hooks must be called before any early returns
     const [imgError, setImgError] = useState(false);
@@ -116,7 +117,10 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(
                 src={food_item.image_url}
                 alt={food_item.name}
                 fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 className="object-cover"
+                loading="lazy"
+                quality={75}
                 onError={handleImageError}
               />
             ) : (
@@ -124,8 +128,10 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(
                 <Image
                   src="/images/placeholder.svg"
                   alt={t('noImage')}
-                  layout="fill"
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   className="object-cover"
+                  priority={false}
                 />
               </div>
             )}

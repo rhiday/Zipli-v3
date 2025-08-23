@@ -1,0 +1,147 @@
+/* Mobile Performance Optimizations */
+
+/* Use GPU acceleration for transforms */
+.group-hover\:-translate-y-1,
+.transition-all,
+.transition-transform,
+.transition-opacity {
+  will-change: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* Optimize hover effects on mobile */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover effects on touch devices */
+  .group-hover\:-translate-y-1:hover {
+    transform: none !important;
+  }
+
+  /* Use tap highlights instead */
+  .group:active .group-hover\:-translate-y-1 {
+    transform: translateY(-2px);
+  }
+}
+
+/* Reduce animation complexity on low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Optimize scroll performance */
+.overflow-auto,
+.overflow-scroll,
+.overflow-x-auto,
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent layout shift during image loading */
+img {
+  content-visibility: auto;
+}
+
+/* Optimize large lists rendering */
+.donation-list,
+.request-list {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* Hardware acceleration for modals and overlays */
+.fixed,
+[role='dialog'],
+[data-radix-collection-item] {
+  transform: translateZ(0);
+}
+
+/* Optimize touch targets for mobile */
+@media (max-width: 768px) {
+  button,
+  a,
+  [role='button'],
+  [role='link'],
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Optimize tap delay */
+  * {
+    touch-action: manipulation;
+  }
+}
+
+/* Reduce paint areas for frequently updated elements */
+.animate-pulse,
+.animate-spin,
+.animate-bounce {
+  will-change: transform;
+  contain: layout style paint;
+}
+
+/* Optimize font loading */
+.font-sans,
+.font-display {
+  font-display: swap;
+}
+
+/* Reduce reflows for fixed elements */
+.fixed-bottom,
+.sticky,
+.fixed {
+  contain: layout;
+  z-index: 10;
+}
+
+/* Performance hints for cards and list items */
+.rounded-2xl,
+.rounded-xl,
+.rounded-lg {
+  transform: translateZ(0);
+  will-change: auto;
+}
+
+/* Optimize shadow rendering on mobile */
+@media (max-width: 768px) {
+  .shadow-sm {
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  .shadow {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  }
+
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+}
+
+/* Optimize backdrop filters for mobile */
+@supports not (backdrop-filter: blur(0px)) {
+  .backdrop-blur-sm,
+  .backdrop-blur {
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* Container queries for responsive components */
+@container (max-width: 400px) {
+  .card-content {
+    padding: 0.75rem;
+  }
+}

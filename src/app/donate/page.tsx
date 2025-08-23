@@ -19,14 +19,14 @@ import {
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
 import Image from 'next/image';
-import { jsPDF } from 'jspdf';
+import { loadJsPDF } from '@/lib/lazy-imports';
 import SummaryOverview from '@/components/SummaryOverview';
 import DonationCard from '@/components/donations/DonationCard';
 import { useDatabase, DonationWithFoodItem } from '@/store';
 import {
-  SkeletonDashboardStat,
-  SkeletonRecipient,
-} from '@/components/ui/Skeleton';
+  DonationCardSkeleton,
+  DashboardSkeleton,
+} from '@/components/ui/OptimizedSkeleton';
 import { useDonationStore } from '@/store/donation';
 import { useLanguage } from '@/hooks/useLanguage';
 import { ActionButton } from '@/components/ui/action-button';
@@ -42,9 +42,11 @@ type DonorDashboardData = {
   donations: DonationWithFoodItem[];
 };
 
-export default function DonorDashboardPage(): React.ReactElement {
+function DonorDashboardPage(): React.ReactElement {
   const router = useRouter();
-  const { currentUser, isInitialized } = useDatabase();
+  // Use selectors to prevent unnecessary re-renders
+  const currentUser = useDatabase((state) => state.currentUser);
+  const isInitialized = useDatabase((state) => state.isInitialized);
   const allDonations = useDatabase((state) => state.donations);
   const foodItems = useDatabase((state) => state.foodItems);
   const clearDonation = useDonationStore((state) => state.clearDonation);
@@ -101,7 +103,8 @@ export default function DonorDashboardPage(): React.ReactElement {
   }, [isInitialized, currentUser, router, allDonations, foodItems]);
 
   // Memoized PDF generation function
-  const handleExportPDF = useCallback(() => {
+  const handleExportPDF = useCallback(async () => {
+    const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text('Zipli Summary', 10, 10);
@@ -150,7 +153,7 @@ export default function DonorDashboardPage(): React.ReactElement {
 
             <div className="space-y-4">
               {Array.from({ length: 3 }, (_, i) => (
-                <SkeletonRecipient key={i} />
+                <DonationCardSkeleton key={i} />
               ))}
             </div>
           </section>
@@ -318,3 +321,5 @@ export default function DonorDashboardPage(): React.ReactElement {
     </div>
   );
 }
+
+export default React.memo(DonorDashboardPage);

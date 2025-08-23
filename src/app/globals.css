@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import mobile performance optimizations */
+@import './mobile-performance.css';
+
+/* Shimmer animation for skeleton loading */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* Hide scrollbar for AllergensDropdown chips */
 .scrollbar-hide {
   -ms-overflow-style: none; /* Internet Explorer 10+ */

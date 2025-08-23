@@ -25,13 +25,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { jsPDF } from 'jspdf';
+import { loadJsPDF } from '@/lib/lazy-imports';
 import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
 
-export default function ImpactPage(): React.ReactElement {
+function ImpactPage(): React.ReactElement {
   const router = useRouter();
-  const { currentUser, isInitialized } = useDatabase();
+  // Use selectors to prevent unnecessary re-renders
+  const currentUser = useDatabase((state) => state.currentUser);
+  const isInitialized = useDatabase((state) => state.isInitialized);
   const allDonations = useDatabase((state) => state.donations);
   const allRequests = useDatabase((state) => state.requests);
   const foodItems = useDatabase((state) => state.foodItems);
@@ -145,7 +147,8 @@ export default function ImpactPage(): React.ReactElement {
   }, [filteredData]);
 
   // Handle PDF export
-  const handleExportPDF = useCallback(() => {
+  const handleExportPDF = useCallback(async () => {
+    const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text('Zipli Impact Report', 10, 10);
@@ -546,3 +549,5 @@ export default function ImpactPage(): React.ReactElement {
     </div>
   );
 }
+
+export default React.memo(ImpactPage);
