@@ -5,6 +5,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getTranslations } from './translations/index';
 
 export type Language = 'en' | 'fi';
 
@@ -125,7 +126,14 @@ export const useTranslation = (namespace?: string) => {
     key: TranslationKey | string,
     params?: Record<string, string>
   ): string => {
-    // Temporary fallback - just return the key as English
+    // Get static translations
+    const staticTranslations = getTranslations(language);
+
+    // Try to get translation from static files
+    const translation = (staticTranslations as any)[key];
+    if (translation) return translation;
+
+    // Fallback to key if no translation found
     return key;
   };
 
@@ -168,7 +176,17 @@ export const useAllergenSelectorTranslation = () =>
   useTranslation('components.allergenSelector');
 
 // Common translations helper
-export const useCommonTranslation = () => useTranslation('common');
+export const useCommonTranslation = () => {
+  const { language } = useLanguageStore();
+
+  return {
+    t: (key: string) => {
+      const staticTranslations = getTranslations(language);
+      return (staticTranslations as any)[key] || key;
+    },
+    language,
+  };
+};
 
 // Load translations from API or static files
 export const loadTranslations = async () => {

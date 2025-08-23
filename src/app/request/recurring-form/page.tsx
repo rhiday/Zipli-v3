@@ -12,7 +12,7 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
-import { RecurringRequest } from '@/types/request.types';
+import { useRequestStore } from '@/store/request';
 
 type RecurringFormInputs = {
   description: string;
@@ -22,14 +22,22 @@ type RecurringFormInputs = {
 export default function RecurringRequestForm() {
   const router = useRouter();
   const { t } = useCommonTranslation();
-  const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
+  const { setRequestData, requestData } = useRequestStore();
+  const [selectedAllergens, setSelectedAllergens] = useState<string[]>(
+    requestData.allergens || []
+  );
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
-  } = useForm<RecurringFormInputs>();
+  } = useForm<RecurringFormInputs>({
+    defaultValues: {
+      description: requestData.description || '',
+      quantity: requestData.quantity ? requestData.quantity.toString() : '',
+    },
+  });
 
   const watchedFields = watch();
 
@@ -41,18 +49,21 @@ export default function RecurringRequestForm() {
 
   const onSubmit = async (data: RecurringFormInputs) => {
     try {
+      // Update the store with form data
+      setRequestData({
+        request_type: 'recurring',
+        description: data.description,
+        quantity: Number(data.quantity),
+        allergens: selectedAllergens,
+      });
+
+      // Store in session storage for backward compatibility
       const requestData = {
         request_type: 'recurring',
         description: data.description,
         quantity: Number(data.quantity),
         allergens: selectedAllergens,
       };
-
-      // Log the structured data for testing
-      console.log('Recurring Request Data:', requestData);
-      console.log('Ready for Supabase:', JSON.stringify(requestData, null, 2));
-
-      // Store in session storage for now (will be replaced with Supabase)
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
       // Navigate to schedule page (following donor flow pattern)

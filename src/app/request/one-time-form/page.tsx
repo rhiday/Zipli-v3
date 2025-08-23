@@ -12,7 +12,7 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
-import { OneTimeRequest } from '@/types/request.types';
+import { useRequestStore } from '@/store/request';
 
 type OneTimeFormInputs = {
   description: string;
@@ -22,14 +22,22 @@ type OneTimeFormInputs = {
 export default function OneTimeRequestForm() {
   const router = useRouter();
   const { t } = useCommonTranslation();
-  const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
+  const { setRequestData, requestData } = useRequestStore();
+  const [selectedAllergens, setSelectedAllergens] = useState<string[]>(
+    requestData.allergens || []
+  );
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
-  } = useForm<OneTimeFormInputs>();
+  } = useForm<OneTimeFormInputs>({
+    defaultValues: {
+      description: requestData.description || '',
+      quantity: requestData.quantity ? requestData.quantity.toString() : '',
+    },
+  });
 
   const watchedFields = watch();
   const isFormValid =
@@ -40,18 +48,21 @@ export default function OneTimeRequestForm() {
 
   const onSubmit = async (data: OneTimeFormInputs) => {
     try {
-      const requestData: OneTimeRequest = {
+      // Update the store with form data
+      setRequestData({
+        request_type: 'one-time',
+        description: data.description,
+        quantity: Number(data.quantity),
+        allergens: selectedAllergens,
+      });
+
+      // Store in session storage for backward compatibility
+      const requestData = {
         request_type: 'one-time',
         description: data.description,
         quantity: Number(data.quantity),
         allergens: selectedAllergens,
       };
-
-      // Log the structured data for testing
-      console.log('One-time Request Data:', requestData);
-      console.log('Ready for Supabase:', JSON.stringify(requestData, null, 2));
-
-      // Store in session storage for now (will be replaced with Supabase)
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
       // Navigate to pickup slot selection (following donor flow pattern)

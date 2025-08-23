@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/useLanguage';
-import { loadTranslations } from '@/lib/i18n-enhanced';
 import {
+  loadTranslations,
   useAuthTranslation,
-  useDonationsTranslation,
   useCommonTranslation,
+  useDonationsTranslation,
 } from '@/lib/i18n-enhanced';
+import { useEffect, useState } from 'react';
 
 export default function TestLokalisePage() {
   const { language, setLanguage } = useLanguage();
@@ -157,7 +157,8 @@ export default function TestLokalisePage() {
               <strong>Current Language:</strong> {language}
             </div>
             <div>
-              <strong>Browser Language:</strong> {navigator.language}
+              <strong>Browser Language:</strong>{' '}
+              {typeof window !== 'undefined' ? navigator.language : 'N/A (SSR)'}
             </div>
             <div>
               <strong>Translations Status:</strong>{' '}

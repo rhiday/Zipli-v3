@@ -98,7 +98,7 @@ export default function RequestSummaryPage() {
       const requestPayload = {
         user_id: currentUser.id,
         description: `Request for ${requestData.quantity} portions - ${requestData.allergens.join(', ')} | Address: ${address.trim()} | Instructions: ${instructions.trim() || 'None'} | Period: ${requestData.startDate} to ${requestData.endDate} | Recurrence: ${JSON.stringify(requestData.recurrencePattern)}`,
-        people_count: parseInt(requestData.quantity) || 1,
+        people_count: requestData.quantity || 1,
         pickup_date: requestData.pickupDate,
         pickup_start_time: requestData.startTime,
         pickup_end_time: requestData.endTime,
