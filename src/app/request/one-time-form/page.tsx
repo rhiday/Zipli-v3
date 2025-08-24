@@ -14,6 +14,7 @@ import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { useRequestStore } from '@/store/request';
 import { useAutoSave } from '@/lib/auto-save';
+import { toast } from '@/hooks/use-toast';
 
 type OneTimeFormInputs = {
   description: string;
@@ -68,10 +69,27 @@ export default function OneTimeRequestForm() {
   });
 
   const onSubmit = async (data: OneTimeFormInputs) => {
+    console.log('One-time form onSubmit called', {
+      data,
+      isFormValid,
+      selectedAllergens,
+    });
     setAttemptedSubmit(true);
 
     // Check if form is valid before proceeding
     if (!isFormValid) {
+      console.log('Form validation failed', {
+        description: watchedFields.description?.trim(),
+        quantity: watchedFields.quantity?.trim(),
+        quantityNumber: Number(watchedFields.quantity),
+        allergensLength: selectedAllergens.length,
+      });
+      toast({
+        title: 'Please complete all fields',
+        description:
+          'Make sure you have filled in all required information including allergens/dietary restrictions.',
+        variant: 'error',
+      });
       return;
     }
 
@@ -96,6 +114,8 @@ export default function OneTimeRequestForm() {
       // Clear auto-saved data on successful submission
       clear();
 
+      console.log('Request data saved, navigating...', { isEditMode });
+
       // Navigate based on edit mode
       if (isEditMode) {
         // In edit mode, go back to summary
@@ -105,7 +125,12 @@ export default function OneTimeRequestForm() {
         router.push('/request/pickup-slot');
       }
     } catch (error) {
-      console.error('Failed to create request:', error);
+      console.error('Failed to create request - full error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save your request. Please try again.',
+        variant: 'error',
+      });
     }
   };
 
