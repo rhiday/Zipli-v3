@@ -30,6 +30,9 @@ export default function OneTimeRequestForm() {
   const [allergensInteracted, setAllergensInteracted] = useState(false);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
+  // Check if we're in edit mode (coming from summary with existing data)
+  const isEditMode = Boolean(requestData.description);
+
   const {
     register,
     handleSubmit,
@@ -93,8 +96,14 @@ export default function OneTimeRequestForm() {
       // Clear auto-saved data on successful submission
       clear();
 
-      // Navigate to pickup slot selection (following donor flow pattern)
-      router.push('/request/pickup-slot');
+      // Navigate based on edit mode
+      if (isEditMode) {
+        // In edit mode, go back to summary
+        router.push('/request/summary');
+      } else {
+        // In create mode, go to pickup slot selection
+        router.push('/request/pickup-slot');
+      }
     } catch (error) {
       console.error('Failed to create request:', error);
     }
@@ -131,13 +140,19 @@ export default function OneTimeRequestForm() {
       footer={
         <BottomActionBar>
           <Button
-            type="submit"
+            type="button"
             size="cta"
             disabled={!isFormValid || isSubmitting}
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? t('continuing') : t('continue')}
+            {isSubmitting
+              ? isEditMode
+                ? t('saving')
+                : t('continuing')
+              : isEditMode
+                ? t('saveChanges')
+                : t('continue')}
           </Button>
         </BottomActionBar>
       }

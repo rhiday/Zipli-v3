@@ -30,6 +30,9 @@ export default function RecurringRequestForm() {
   const [allergensInteracted, setAllergensInteracted] = useState(false);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
+  // Check if we're in edit mode (coming from summary with existing data)
+  const isEditMode = Boolean(requestData.description);
+
   const {
     register,
     handleSubmit,
@@ -76,8 +79,14 @@ export default function RecurringRequestForm() {
       };
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
-      // Navigate to schedule page (following donor flow pattern)
-      router.push('/request/schedule');
+      // Navigate based on edit mode
+      if (isEditMode) {
+        // In edit mode, go back to summary
+        router.push('/request/summary');
+      } else {
+        // In create mode, go to schedule page
+        router.push('/request/schedule');
+      }
     } catch (error) {
       console.error('Failed to create recurring request:', error);
     }
@@ -100,13 +109,19 @@ export default function RecurringRequestForm() {
       footer={
         <BottomActionBar>
           <Button
-            type="submit"
+            type="button"
             size="cta"
             disabled={!isFormValid || isSubmitting}
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? t('continuing') : t('continue')}
+            {isSubmitting
+              ? isEditMode
+                ? t('saving')
+                : t('continuing')
+              : isEditMode
+                ? t('saveChanges')
+                : t('continue')}
           </Button>
         </BottomActionBar>
       }
