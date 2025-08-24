@@ -11,7 +11,11 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon, ClockIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { format, isValid, isAfter, addDays } from 'date-fns';
+import {
+  validatePickupDateTime,
+  sanitizeTimeString,
+} from '@/lib/date-time-validation';
 
 // Generate time options (00:00 to 23:30 in 30-minute intervals)
 const timeOptions = Array.from({ length: 48 }, (_, i) => {
@@ -38,6 +42,9 @@ interface TimeSlotSelectorProps {
   dateFormat?: string; // e.g. 'dd/MM/yyyy'
   minDate?: Date;
   maxDate?: Date;
+  validateOnChange?: boolean;
+  onValidationError?: (errors: string[]) => void;
+  businessHoursOnly?: boolean;
 }
 
 export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
@@ -58,10 +65,63 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
   dateFormat = 'dd/MM/yyyy',
   minDate,
   maxDate,
+  validateOnChange = true,
+  onValidationError,
+  businessHoursOnly = true,
 }) => {
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [isStartTimeOpen, setIsStartTimeOpen] = useState(false);
   const [isEndTimeOpen, setIsEndTimeOpen] = useState(false);
+
+  // Filter time options for business hours if needed
+  const getFilteredTimeOptions = () => {
+    if (!businessHoursOnly) return timeOptions;
+
+    return timeOptions.filter((time) => {
+      const [hours] = time.split(':').map(Number);
+      return hours >= 8 && hours <= 20; // Business hours: 8 AM to 8 PM
+    });
+  };
+
+  const validateTimeSlot = () => {
+    if (!date || !startTime || !endTime) return;
+
+    const validation = validatePickupDateTime(date, startTime, endTime);
+    if (!validation.isValid) {
+      onValidationError?.(validation.errors);
+    }
+  };
+
+  const handleDateChange = (selectedDate: Date | undefined) => {
+    onDateChange?.(selectedDate);
+    if (validateOnChange && selectedDate && startTime && endTime) {
+      setTimeout(validateTimeSlot, 0);
+    }
+  };
+
+  const handleStartTimeChange = (time: string) => {
+    try {
+      const sanitizedTime = sanitizeTimeString(time);
+      onStartTimeChange?.(sanitizedTime);
+      if (validateOnChange && date && endTime) {
+        setTimeout(validateTimeSlot, 0);
+      }
+    } catch (error) {
+      onValidationError?.(['Invalid time format']);
+    }
+  };
+
+  const handleEndTimeChange = (time: string) => {
+    try {
+      const sanitizedTime = sanitizeTimeString(time);
+      onEndTimeChange?.(sanitizedTime);
+      if (validateOnChange && date && startTime) {
+        setTimeout(validateTimeSlot, 0);
+      }
+    } catch (error) {
+      onValidationError?.(['Invalid time format']);
+    }
+  };
 
   // Create disabled dates object for Calendar component
   const getDisabledDates = () => {
@@ -74,13 +134,17 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
       disabled.before = new Date();
     }
 
-    // Use maxDate if provided
+    // Use maxDate if provided, otherwise limit to 1 year
     if (maxDate) {
       disabled.after = maxDate;
+    } else {
+      disabled.after = addDays(new Date(), 365);
     }
 
     return disabled;
   };
+
+  const filteredTimeOptions = getFilteredTimeOptions();
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -124,7 +188,7 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
               weekStartsOn={1}
               selected={date}
               onSelect={(selectedDate) => {
-                onDateChange?.(selectedDate);
+                handleDateChange(selectedDate);
                 setIsDateOpen(false);
               }}
               disabled={getDisabledDates()}
@@ -164,7 +228,7 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
               align="start"
             >
               <div className="max-h-60 overflow-y-auto">
-                {timeOptions.map((option) => (
+                {filteredTimeOptions.map((option) => (
                   <div
                     key={option}
                     className={cn(
@@ -172,7 +236,7 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                       startTime === option && 'bg-[#eafcd6] font-semibold'
                     )}
                     onClick={() => {
-                      onStartTimeChange?.(option);
+                      handleStartTimeChange(option);
                       setIsStartTimeOpen(false);
                     }}
                   >
@@ -212,7 +276,7 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
               align="start"
             >
               <div className="max-h-60 overflow-y-auto">
-                {timeOptions.map((option) => (
+                {filteredTimeOptions.map((option) => (
                   <div
                     key={option}
                     className={cn(
@@ -220,7 +284,7 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
                       endTime === option && 'bg-[#eafcd6] font-semibold'
                     )}
                     onClick={() => {
-                      onEndTimeChange?.(option);
+                      handleEndTimeChange(option);
                       setIsEndTimeOpen(false);
                     }}
                   >

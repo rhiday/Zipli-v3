@@ -17,6 +17,8 @@ export default function DonationThankYouPage() {
     if (isEditMode) {
       setEditMode(false);
     }
+    // Clear any session storage data
+    sessionStorage.removeItem('pendingDonation');
   }, [isEditMode, setEditMode]);
 
   return (
@@ -43,8 +45,8 @@ export default function DonationThankYouPage() {
       </h1>
       <p className="text-center text-base text-black mb-6 max-w-xs">
         {isEditMode
-          ? t('changesSaved') || 'Your donation has been successfully updated.'
-          : t('thisIsWhomYouveHelped')}
+          ? 'Your donation has been successfully updated.'
+          : t('requestAddedToSystem')}
       </p>
 
       <div className="w-full max-w-md mb-8">
@@ -85,9 +87,9 @@ export default function DonationThankYouPage() {
           }
         />
       </div>
-      <Link href="/donate">
+      <Link href="/donor/dashboard">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-          title="Default"
+          {t('goBackToDashboard')}
         </button>
       </Link>
     </div>

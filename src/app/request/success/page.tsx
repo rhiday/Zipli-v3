@@ -1,12 +1,20 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { NextSteps } from '@/components/ui/NextSteps';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useRequestStore } from '@/store/request';
 
 export default function RequestSuccessPage() {
   const { t } = useCommonTranslation();
+  const { clearRequest } = useRequestStore();
+
+  useEffect(() => {
+    // Clear any session storage data
+    sessionStorage.removeItem('pendingRequest');
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-white">
       <div className="mt-12 mb-8">

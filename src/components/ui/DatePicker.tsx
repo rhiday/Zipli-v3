@@ -11,7 +11,8 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { format, isValid, isAfter, addDays } from 'date-fns';
+import { sanitizeDateString } from '@/lib/date-time-validation';
 
 interface DatePickerProps {
   label?: string;
@@ -25,6 +26,9 @@ interface DatePickerProps {
   disablePastDates?: boolean;
   minDate?: Date;
   maxDate?: Date;
+  validateOnChange?: boolean;
+  maxFutureDays?: number;
+  onValidationError?: (error: string) => void;
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -34,13 +38,66 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   disabled = false,
   error,
   className = '',
-  placeholder = "dd.mm.yyyy",
+  placeholder = 'dd.mm.yyyy',
   dateFormat = 'dd/MM/yyyy',
   disablePastDates = true,
   minDate,
   maxDate,
+  validateOnChange = true,
+  maxFutureDays = 365,
+  onValidationError,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const validateDate = (selectedDate: Date | undefined): string | null => {
+    if (!selectedDate) return null;
+
+    if (!isValid(selectedDate)) {
+      return 'Invalid date selected';
+    }
+
+    const now = new Date();
+
+    if (
+      disablePastDates &&
+      !isAfter(selectedDate, now) &&
+      selectedDate.toDateString() !== now.toDateString()
+    ) {
+      return 'Date must be today or in the future';
+    }
+
+    if (
+      minDate &&
+      !isAfter(selectedDate, minDate) &&
+      selectedDate.toDateString() !== minDate.toDateString()
+    ) {
+      return `Date must be on or after ${format(minDate, dateFormat)}`;
+    }
+
+    if (maxDate && isAfter(selectedDate, maxDate)) {
+      return `Date must be on or before ${format(maxDate, dateFormat)}`;
+    }
+
+    const maxFutureDate = addDays(now, maxFutureDays);
+    if (isAfter(selectedDate, maxFutureDate)) {
+      return `Date must be within ${maxFutureDays} days`;
+    }
+
+    return null;
+  };
+
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    if (validateOnChange && selectedDate) {
+      const validationError = validateDate(selectedDate);
+      if (validationError) {
+        onValidationError?.(validationError);
+        return;
+      }
+    }
+
+    onDateChange?.(selectedDate);
+    setIsOpen(false);
+  };
 
   const getDisabledDates = () => {
     const disabled: any = {};
@@ -55,6 +112,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
     if (maxDate) {
       disabled.after = maxDate;
+    } else {
+      // Default max date based on maxFutureDays
+      const maxFutureDate = addDays(new Date(), maxFutureDays);
+      disabled.after = maxFutureDate;
     }
 
     return disabled;
@@ -99,10 +160,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             mode="single"
             weekStartsOn={1}
             selected={date}
-            onSelect={(selectedDate) => {
-              onDateChange?.(selectedDate);
-              setIsOpen(false);
-            }}
+            onSelect={handleDateSelect}
             disabled={getDisabledDates()}
             initialFocus
           />

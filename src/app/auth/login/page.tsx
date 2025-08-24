@@ -48,13 +48,13 @@ export default function LoginPage() {
             router.push('/receiver/dashboard');
             break;
           case 'city':
-            router.push('/dashboard');
+            router.push('/city/dashboard');
             break;
           default:
             console.warn(
               `Unknown user role: ${user.role}, redirecting to generic dashboard.`
             );
-            router.push('/dashboard');
+            router.push('/donor/dashboard');
         }
       }
     } catch (err) {

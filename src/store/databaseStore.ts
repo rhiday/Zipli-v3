@@ -4,6 +4,7 @@ import donationsData from '../../mockData/donations.json';
 import foodItemsData from '../../mockData/food_items.json';
 import usersData from '../../mockData/users.json';
 import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import type { CleanupableStore } from '@/lib/store-cleanup';
 
 // Define interfaces for our data structures based on the JSON files
 interface FoodItem {
@@ -71,7 +72,7 @@ interface AuthError {
 }
 
 // Define the store's state and actions
-interface DatabaseState {
+interface DatabaseState extends CleanupableStore {
   donations: Donation[];
   foodItems: FoodItem[];
   users: User[];
@@ -117,6 +118,11 @@ interface DatabaseState {
   ) => Promise<{ data: Request | null; error: string | null }>;
   updateRequest: (id: string, updates: Partial<Request>) => void;
   deleteRequest: (id: string) => void;
+
+  // Memory management methods
+  cleanup: () => void;
+  clearCache: () => void;
+  resetState: () => void;
 }
 
 // Mock request data
@@ -467,6 +473,42 @@ export const useDatabase = create<DatabaseState>()(
         set((state) => ({
           requests: state.requests.filter((r) => r.id !== id),
         }));
+      },
+
+      // Memory management methods
+      cleanup: () => {
+        const state = get();
+        // Clear large arrays partially to free memory
+        if (state.donations.length > 100) {
+          set((state) => ({
+            donations: state.donations.slice(-50), // Keep only last 50
+          }));
+        }
+        if (state.requests.length > 100) {
+          set((state) => ({
+            requests: state.requests.slice(-50), // Keep only last 50
+          }));
+        }
+        console.log('Database store cleanup completed');
+      },
+
+      clearCache: () => {
+        // Clear any cached computed values or temporary data
+        // For now, this is a no-op but can be extended
+        console.log('Database store cache cleared');
+      },
+
+      resetState: () => {
+        // Emergency reset - clear everything except current user
+        const currentUser = get().currentUser;
+        set({
+          donations: [],
+          foodItems: [],
+          users: currentUser ? [currentUser] : [],
+          requests: [],
+          isInitialized: false,
+        });
+        console.log('Database store state reset');
       },
     }),
     {

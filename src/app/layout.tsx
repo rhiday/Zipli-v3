@@ -6,6 +6,8 @@ import { Manrope, Space_Grotesk } from 'next/font/google'; // Import fonts
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
 import DevSwitcherOverlay from '@/components/dev/DevSwitcherOverlay';
 import LangSetter from '@/components/LangSetter';
+import { Toaster } from '@/components/ui/toaster';
+import { EdgeCaseProvider } from '@/components/EdgeCaseProvider';
 import Script from 'next/script';
 
 // Configure fonts
@@ -53,10 +55,13 @@ export default function RootLayout({
     <html className={`${manrope.variable} ${spaceGrotesk.variable}`}>
       <body>
         <LangSetter />
-        <ErrorBoundary>
-          <AppShell>{children}</AppShell>
-          {isDev && <DevSwitcherOverlay />}
-        </ErrorBoundary>
+        <EdgeCaseProvider>
+          <ErrorBoundary>
+            <AppShell>{children}</AppShell>
+            <Toaster />
+            {isDev && <DevSwitcherOverlay />}
+          </ErrorBoundary>
+        </EdgeCaseProvider>
         {/* Performance monitoring in development */}
         {isDev && (
           <Script

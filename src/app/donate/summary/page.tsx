@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
+import { toast } from '@/hooks/use-toast';
 import { SummaryCard } from '@/components/ui/SummaryCard';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -88,7 +89,7 @@ export default function DonationSummaryPage() {
         ) {
           const { addDonationItem } = useDonationStore.getState();
           addDonationItem({
-            name: donationData.description  || 'Recurring_donation',
+            name: donationData.description || 'Recurring_donation',
             quantity: donationData.quantity?.toString() || '1',
             allergens: donationData.allergens || [],
             description: donationData.description || null,
@@ -265,15 +266,21 @@ export default function DonationSummaryPage() {
         }
       }
 
-      // Clear the donation store after confirming
+      // Clear the donation store and session storage after confirming
       const clearDonation = useDonationStore.getState().clearDonation;
       clearDonation();
+      sessionStorage.removeItem('pendingDonation');
 
-      router.push('/donate/thank-you');
+      // Use replace to prevent back navigation issues
+      router.replace('/donate/thank-you');
     } catch (error) {
       console.error(`Error ${action} donations:`, error);
       // Show error message to user
-      alert(`There was an error ${action} your donation. Please try again.`);
+      toast({
+        title: `Error ${action} donation`,
+        description: `There was an error ${action} your donation. Please try again.`,
+        variant: 'error',
+      });
     } finally {
       setIsSaving(false);
     }

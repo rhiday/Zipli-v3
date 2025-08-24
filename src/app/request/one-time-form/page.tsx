@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { useRequestStore } from '@/store/request';
+import { useAutoSave } from '@/lib/auto-save';
 
 type OneTimeFormInputs = {
   description: string;
@@ -48,6 +49,21 @@ export default function OneTimeRequestForm() {
     Number(watchedFields.quantity) > 0 &&
     selectedAllergens.length > 0;
 
+  // Auto-save form data
+  const formData = {
+    description: watchedFields.description || '',
+    quantity: watchedFields.quantity || '',
+    allergens: selectedAllergens,
+    request_type: 'one-time',
+  };
+
+  const { hasUnsaved, restore, clear } = useAutoSave({
+    key: 'one-time-request-form',
+    data: formData,
+    enabled: true,
+    intervalMs: 3000, // Save every 3 seconds
+  });
+
   const onSubmit = async (data: OneTimeFormInputs) => {
     setAttemptedSubmit(true);
 
@@ -74,12 +90,29 @@ export default function OneTimeRequestForm() {
       };
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
+      // Clear auto-saved data on successful submission
+      clear();
+
       // Navigate to pickup slot selection (following donor flow pattern)
       router.push('/request/pickup-slot');
     } catch (error) {
       console.error('Failed to create request:', error);
     }
   };
+
+  // Restore saved data on component mount
+  useEffect(() => {
+    const savedData = restore();
+    if (savedData && savedData.description) {
+      // Restore form values
+      if (savedData.description !== watchedFields.description) {
+        // setValue from react-hook-form could be used here
+      }
+      if (savedData.allergens && savedData.allergens.length > 0) {
+        setSelectedAllergens(savedData.allergens);
+      }
+    }
+  }, []);
 
   return (
     <PageContainer

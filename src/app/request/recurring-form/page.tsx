@@ -13,6 +13,7 @@ import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { useRequestStore } from '@/store/request';
+import AutoSaveFormWrapper from '@/components/forms/AutoSaveFormWrapper';
 
 type RecurringFormInputs = {
   description: string;
@@ -112,86 +113,99 @@ export default function RecurringRequestForm() {
       className="bg-white"
       contentClassName="p-4 space-y-6"
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Food Description */}
-        <div>
-          <label className="block text-label font-semibold mb-2">
-            {t('describeFood')}
-          </label>
-          <Textarea
-            {...register('description', {
-              required: 'Please describe the food you need',
-            })}
-            placeholder={t('foodDescriptionPlaceholder')}
-            variant={errors.description ? 'error' : 'default'}
-            rows={4}
-          />
-          {errors.description && (
-            <div className="mt-1 text-[14px] font-manrope text-negative">
-              {errors.description.message}
-            </div>
-          )}
-        </div>
+      <AutoSaveFormWrapper
+        formId="recurring-request-form"
+        formData={{
+          description: watchedFields.description || '',
+          quantity: watchedFields.quantity || '',
+          allergens: selectedAllergens,
+          request_type: 'recurring',
+        }}
+        enabled={true}
+        intervalMs={3000}
+        showStatus={true}
+      >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Food Description */}
+          <div>
+            <label className="block text-label font-semibold mb-2">
+              {t('describeFood')}
+            </label>
+            <Textarea
+              {...register('description', {
+                required: 'Please describe the food you need',
+              })}
+              placeholder={t('foodDescriptionPlaceholder')}
+              variant={errors.description ? 'error' : 'default'}
+              rows={4}
+            />
+            {errors.description && (
+              <div className="mt-1 text-[14px] font-manrope text-negative">
+                {errors.description.message}
+              </div>
+            )}
+          </div>
 
-        {/* Quantity */}
-        <div>
-          <label className="block text-label font-semibold mb-2">
-            {t('peopleCount')}?
-          </label>
-          <Input
-            {...register('quantity', {
-              required: 'Quantity is required',
-              min: { value: 1, message: 'Quantity must be at least 1' },
-              pattern: {
-                value: /^\d+$/,
-                message: 'Please enter a valid number',
-              },
-            })}
-            placeholder={t('enterNumberOfPeople')}
-            type="number"
-            variant={errors.quantity ? 'error' : 'default'}
-          />
-          {errors.quantity && (
-            <div className="mt-1 text-[14px] font-manrope text-negative">
-              {errors.quantity.message}
-            </div>
-          )}
-        </div>
+          {/* Quantity */}
+          <div>
+            <label className="block text-label font-semibold mb-2">
+              {t('peopleCount')}?
+            </label>
+            <Input
+              {...register('quantity', {
+                required: 'Quantity is required',
+                min: { value: 1, message: 'Quantity must be at least 1' },
+                pattern: {
+                  value: /^\d+$/,
+                  message: 'Please enter a valid number',
+                },
+              })}
+              placeholder={t('enterNumberOfPeople')}
+              type="number"
+              variant={errors.quantity ? 'error' : 'default'}
+            />
+            {errors.quantity && (
+              <div className="mt-1 text-[14px] font-manrope text-negative">
+                {errors.quantity.message}
+              </div>
+            )}
+          </div>
 
-        {/* Allergens */}
-        <AllergensDropdown
-          label={t('allergiesIntolerancesDiets')}
-          options={[
-            'Eggs',
-            'Fish',
-            'Shellfish',
-            'Tree nuts',
-            'Peanuts',
-            'Wheat',
-            'Soybeans',
-            'Vegan',
-            'Vegetarian',
-            'Gluten-free',
-            'Halal',
-            'Kosher',
-            'Low-lactose',
-          ]}
-          value={selectedAllergens}
-          onChange={(allergens) => {
-            setSelectedAllergens(allergens);
-            if (!allergensInteracted) {
-              setAllergensInteracted(true);
+          {/* Allergens */}
+          <AllergensDropdown
+            label={t('allergiesIntolerancesDiets')}
+            options={[
+              'Eggs',
+              'Fish',
+              'Shellfish',
+              'Tree nuts',
+              'Peanuts',
+              'Wheat',
+              'Soybeans',
+              'Vegan',
+              'Vegetarian',
+              'Gluten-free',
+              'Halal',
+              'Kosher',
+              'Low-lactose',
+            ]}
+            value={selectedAllergens}
+            onChange={(allergens) => {
+              setSelectedAllergens(allergens);
+              if (!allergensInteracted) {
+                setAllergensInteracted(true);
+              }
+            }}
+            placeholder={t('selectAllergens')}
+            error={
+              !selectedAllergens.length &&
+              (allergensInteracted || attemptedSubmit)
+                ? t('selectAllergens')
+                : undefined
             }
-          }}
-          placeholder={t('selectAllergens')}
-          error={
-            !selectedAllergens.length &&
-            (allergensInteracted || attemptedSubmit)
-              ? t('selectAllergens')
-              : undefined
-          }
-        />
-      </form>
+          />
+        </form>
+      </AutoSaveFormWrapper>
     </PageContainer>
   );
 }

@@ -72,10 +72,10 @@ export default function RegisterPage() {
             router.push('/receiver/dashboard');
             break;
           case 'city':
-            router.push('/dashboard');
+            router.push('/city/dashboard');
             break;
           default:
-            router.push('/dashboard');
+            router.push('/donor/dashboard');
         }
       }
     } catch (err) {

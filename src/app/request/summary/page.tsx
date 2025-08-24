@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { toast } from '@/hooks/use-toast';
 import { useRequestStore } from '@/store/request';
 import { useDatabase } from '@/store';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
@@ -66,17 +67,29 @@ export default function RequestSummaryPage() {
 
     if (!address.trim() || !currentUser) {
       console.error('Validation failed: missing address or user');
-      alert('Please enter your address');
+      toast({
+        title: 'Address required',
+        description: 'Please enter your address to continue',
+        variant: 'error',
+      });
       return;
     }
 
     if (!requestData.description || !requestData.quantity) {
-      alert('Please complete your food request details');
+      toast({
+        title: 'Request details required',
+        description: 'Please complete your food request details',
+        variant: 'error',
+      });
       return;
     }
 
     if (pickupSlots.length === 0 && !recurringSchedule) {
-      alert('Please add at least one pickup slot');
+      toast({
+        title: 'Pickup slot required',
+        description: 'Please add at least one pickup slot',
+        variant: 'error',
+      });
       return;
     }
 
@@ -135,11 +148,18 @@ export default function RequestSummaryPage() {
         allergens: requestData.allergens || [],
         start_date: sessionData.startDate || null,
         end_date: sessionData.endDate || null,
-        pickup_date: pickupSlots.length > 0 ? formattedSlots[0].date : null,
+        pickup_date:
+          pickupSlots.length > 0 && formattedSlots[0]?.date
+            ? formattedSlots[0].date
+            : new Date().toISOString().split('T')[0],
         pickup_start_time:
-          pickupSlots.length > 0 ? formattedSlots[0].start_time : null,
+          pickupSlots.length > 0 && formattedSlots[0]?.start_time
+            ? formattedSlots[0].start_time
+            : '09:00',
         pickup_end_time:
-          pickupSlots.length > 0 ? formattedSlots[0].end_time : null,
+          pickupSlots.length > 0 && formattedSlots[0]?.end_time
+            ? formattedSlots[0].end_time
+            : '17:00',
         pickup_slots: formattedSlots, // Save all pickup slots
         status: 'active' as const,
         is_recurring: !!recurringSchedule,
@@ -151,25 +171,38 @@ export default function RequestSummaryPage() {
 
       if (response.error) {
         console.error('Error creating request:', response.error);
-        alert(`Failed to submit request: ${response.error}`);
+        toast({
+          title: 'Request submission failed',
+          description: `${response.error}`,
+          variant: 'error',
+        });
         return;
       }
 
       if (response.data) {
         console.log('✅ Request created successfully:', response.data.id);
 
-        // Clear the request store after confirming
+        // Clear the request store and session storage after confirming
         clearRequest();
-        router.push('/request/success');
+        sessionStorage.removeItem('pendingRequest');
+
+        // Use replace to prevent back navigation issues
+        router.replace('/request/success');
       } else {
         console.error('No data returned from addRequest');
-        alert('Failed to submit request: No data returned');
+        toast({
+          title: 'Request submission failed',
+          description: 'No data returned from server',
+          variant: 'error',
+        });
       }
     } catch (error) {
       console.error('Error submitting request:', error);
-      alert(
-        `Failed to submit request: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      toast({
+        title: 'Request submission error',
+        description: `${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: 'error',
+      });
     } finally {
       setIsSaving(false);
     }

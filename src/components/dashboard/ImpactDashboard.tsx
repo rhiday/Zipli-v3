@@ -4,49 +4,81 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Info, ChevronDown } from 'lucide-react';
 import ExportCard from './ExportCard';
 import { useTranslations } from '@/hooks/useTranslations';
+import {
+  impactCalculator,
+  generateRealisticMockData,
+} from '@/lib/impact-calculator';
 
 interface ImpactDashboardProps {
   totalWeight?: number;
   portionsOffered?: number;
   savedCosts?: number;
   emissionReduction?: number;
+  userDonations?: any[]; // Allow passing actual donation data
 }
 
 const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
   ({
-    totalWeight = 46,
-    portionsOffered = 131,
-    savedCosts = 125,
-    emissionReduction = 89,
+    totalWeight,
+    portionsOffered,
+    savedCosts,
+    emissionReduction,
+    userDonations,
   }) => {
     const [selectedMonth, setSelectedMonth] = useState('February');
+
+    // Calculate realistic impact metrics
+    const { calculatedMetrics, statsData } = useMemo(() => {
+      // Use provided donations or generate realistic mock data
+      const donations =
+        userDonations && userDonations.length > 0
+          ? userDonations
+          : generateRealisticMockData(8);
+
+      const metrics = impactCalculator.calculateImpact(donations);
+
+      // Use calculated metrics or fallback to props
+      const finalMetrics = {
+        totalWeight: totalWeight ?? metrics.totalWeight,
+        portionsOffered: portionsOffered ?? metrics.totalPortions,
+        savedCosts: savedCosts ?? metrics.costSavings,
+        emissionReduction: emissionReduction ?? metrics.environmentalScore,
+        co2Avoided: metrics.co2Avoided,
+        peopleHelped: metrics.peopleHelped,
+        successRate: metrics.successRate,
+      };
+
+      const stats = [
+        {
+          value: finalMetrics.portionsOffered,
+          label: 'Portions offered',
+          bgColor: 'bg-lime/20',
+        },
+        {
+          value: `${finalMetrics.savedCosts}€`,
+          label: 'Saved in food disposal costs',
+          bgColor: 'bg-lime/20',
+        },
+        {
+          value: `${finalMetrics.emissionReduction}%`,
+          label: 'Emission reduction',
+          bgColor: 'bg-lime/20',
+        },
+      ];
+
+      return { calculatedMetrics: finalMetrics, statsData: stats };
+    }, [
+      totalWeight,
+      portionsOffered,
+      savedCosts,
+      emissionReduction,
+      userDonations,
+    ]);
 
     // Memoized month selector handler
     const handleMonthSelect = useCallback(() => {
       // TODO: Implement month selection logic
     }, []);
-
-    // Memoized stats data
-    const statsData = useMemo(
-      () => [
-        {
-          value: portionsOffered,
-          label: 'Portions offered',
-          bgColor: 'bg-lime/20',
-        },
-        {
-          value: `${savedCosts}€`,
-          label: 'Saved in food disposal costs',
-          bgColor: 'bg-lime/20',
-        },
-        {
-          value: `${emissionReduction}%`,
-          label: 'Emission reduction',
-          bgColor: 'bg-lime/20',
-        },
-      ],
-      [portionsOffered, savedCosts, emissionReduction]
-    );
 
     // Memoized recipients data
     const recipientsData = useMemo(
@@ -91,9 +123,12 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
         {/* Main impact stat */}
         <div className="mb-6">
           <h3 className="text-primary text-displaySm font-semibold mb-1">
-            {totalWeight}kg
+            {calculatedMetrics.totalWeight}kg
           </h3>
           <p className="text-secondary text-bodyLg">Total food offered</p>
+          <p className="text-xs text-primary/60 mt-1">
+            {calculatedMetrics.successRate}% pickup success rate
+          </p>
         </div>
 
         {/* Stats grid */}

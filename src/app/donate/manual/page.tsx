@@ -25,6 +25,9 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { Textarea } from '@/components/ui/Textarea';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useAutoSave } from '@/lib/auto-save';
+import AutoSaveFormWrapper from '@/components/forms/AutoSaveFormWrapper';
+import { toast } from '@/hooks/use-toast';
 
 interface DonationItem {
   id: string;
@@ -295,6 +298,10 @@ function ManualDonationPageInner() {
           quantity: parseFloat(currentItem.quantity) || 0,
         });
 
+        // Clear auto-saved data on successful save
+        clear();
+        clearItemsList();
+
         // In edit mode, continue to pickup slots instead of showing success dialog
         if (storeEditMode) {
           router.push('/donate/pickup-slot');
@@ -326,6 +333,7 @@ function ManualDonationPageInner() {
           imageUrl: undefined,
         });
         setHasAttemptedSave(false);
+        clear(); // Clear auto-saved data after adding item
       }
     } catch (error) {
       console.error('Failed to save changes:', error);
@@ -391,6 +399,22 @@ function ManualDonationPageInner() {
     currentItem.name.trim() !== '' &&
     currentItem.quantity.trim() !== '' &&
     currentItem.allergens.length > 0;
+
+  // Auto-save current item data
+  const { hasUnsaved, restore, clear } = useAutoSave({
+    key: `donation-item-${currentItem.id}`,
+    data: currentItem,
+    enabled: showAddAnotherForm,
+    intervalMs: 2000, // Save every 2 seconds when form is visible
+  });
+
+  // Auto-save donation items list
+  const { clear: clearItemsList } = useAutoSave({
+    key: 'donation-items-list',
+    data: donationItems,
+    enabled: true,
+    intervalMs: 5000, // Save items list every 5 seconds
+  });
 
   const formContent = (
     <div className="flex flex-col gap-4">
@@ -541,13 +565,39 @@ function ManualDonationPageInner() {
             </div>
           </div>
         ) : (
-          <div>
-            <Progress
-              value={(donationItems.length + 1) * 50}
-              className="mb-4"
-            />
-            {formContent}
-          </div>
+          <AutoSaveFormWrapper
+            formId={`donation-form-${currentItem.id}`}
+            formData={currentItem}
+            enabled={showAddAnotherForm}
+            intervalMs={2000}
+            onRestore={(data) => {
+              setCurrentItem((prev) => ({ ...prev, ...data }));
+              toast({
+                title: 'Form data restored',
+                description: 'Your previous work has been recovered',
+                variant: 'success',
+              });
+            }}
+            onClear={() => {
+              setCurrentItem({
+                id: 'new',
+                name: '',
+                quantity: '',
+                allergens: [],
+                description: null,
+                imageUrl: undefined,
+              });
+            }}
+            showStatus={true}
+          >
+            <div>
+              <Progress
+                value={(donationItems.length + 1) * 50}
+                className="mb-4"
+              />
+              {formContent}
+            </div>
+          </AutoSaveFormWrapper>
         )}
       </PageContainer>
 
