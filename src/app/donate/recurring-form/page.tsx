@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { ALLERGENS_AND_DIETARY_OPTIONS } from '@/constants/allergens';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -140,7 +139,6 @@ export default function RecurringDonationForm() {
         {/* Allergens */}
         <AllergensDropdown
           label="Allergens & dietary information"
-          options={ALLERGENS_AND_DIETARY_OPTIONS}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
           placeholder="Select allergens"

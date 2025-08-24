@@ -2,7 +2,6 @@
 'use client';
 export const dynamic = 'force-dynamic';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { ALLERGENS_AND_DIETARY_OPTIONS } from '@/constants/allergens';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -452,7 +451,6 @@ function ManualDonationPageInner() {
 
       <AllergensDropdown
         label={t('allergiesIntolerancesDiets')}
-        options={ALLERGENS_AND_DIETARY_OPTIONS}
         value={currentItem.allergens}
         onChange={(allergens) =>
           handleCurrentItemChange('allergens', allergens)

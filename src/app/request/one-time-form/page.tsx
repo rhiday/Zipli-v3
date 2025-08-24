@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/Input';
 import { Progress } from '@/components/ui/progress';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Textarea } from '@/components/ui/Textarea';
-import { ALLERGENS_AND_DIETARY_OPTIONS } from '@/constants/allergens';
 import { toast } from '@/hooks/use-toast';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useAutoSave } from '@/lib/auto-save';
@@ -234,7 +233,6 @@ export default function OneTimeRequestForm() {
         {/* Allergens */}
         <AllergensDropdown
           label={t('allergiesIntolerancesDiets')}
-          options={ALLERGENS_AND_DIETARY_OPTIONS}
           value={selectedAllergens}
           onChange={(allergens) => {
             setSelectedAllergens(allergens);
