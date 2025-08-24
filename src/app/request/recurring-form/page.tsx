@@ -1,20 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/Textarea';
-import { Input } from '@/components/ui/Input';
-import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { useCommonTranslation } from '@/hooks/useTranslations';
-import PageContainer from '@/components/layout/PageContainer';
-import BottomActionBar from '@/components/ui/BottomActionBar';
-import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
-import { Progress } from '@/components/ui/progress';
-import { useRequestStore } from '@/store/request';
 import AutoSaveFormWrapper from '@/components/forms/AutoSaveFormWrapper';
+import PageContainer from '@/components/layout/PageContainer';
+import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
+import BottomActionBar from '@/components/ui/BottomActionBar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/Input';
+import { Progress } from '@/components/ui/progress';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Textarea } from '@/components/ui/Textarea';
+import { ALLERGENS_AND_DIETARY_OPTIONS } from '@/constants/allergens';
 import { toast } from '@/hooks/use-toast';
+import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useRequestStore } from '@/store/request';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 type RecurringFormInputs = {
   description: string;
@@ -214,21 +215,7 @@ export default function RecurringRequestForm() {
           {/* Allergens */}
           <AllergensDropdown
             label={t('allergiesIntolerancesDiets')}
-            options={[
-              'Eggs',
-              'Fish',
-              'Shellfish',
-              'Tree nuts',
-              'Peanuts',
-              'Wheat',
-              'Soybeans',
-              'Vegan',
-              'Vegetarian',
-              'Gluten-free',
-              'Halal',
-              'Kosher',
-              'Low-lactose',
-            ]}
+            options={ALLERGENS_AND_DIETARY_OPTIONS}
             value={selectedAllergens}
             onChange={(allergens) => {
               setSelectedAllergens(allergens);

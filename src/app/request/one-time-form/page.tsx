@@ -1,20 +1,21 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/Textarea';
-import { Input } from '@/components/ui/Input';
-import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
+import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import BottomActionBar from '@/components/ui/BottomActionBar';
-import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/Input';
 import { Progress } from '@/components/ui/progress';
-import { useRequestStore } from '@/store/request';
-import { useAutoSave } from '@/lib/auto-save';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Textarea } from '@/components/ui/Textarea';
+import { ALLERGENS_AND_DIETARY_OPTIONS } from '@/constants/allergens';
 import { toast } from '@/hooks/use-toast';
+import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useAutoSave } from '@/lib/auto-save';
+import { useRequestStore } from '@/store/request';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 type OneTimeFormInputs = {
   description: string;
@@ -233,21 +234,7 @@ export default function OneTimeRequestForm() {
         {/* Allergens */}
         <AllergensDropdown
           label={t('allergiesIntolerancesDiets')}
-          options={[
-            'Eggs',
-            'Fish',
-            'Shellfish',
-            'Tree nuts',
-            'Peanuts',
-            'Wheat',
-            'Soybeans',
-            'Vegan',
-            'Vegetarian',
-            'Gluten-free',
-            'Halal',
-            'Kosher',
-            'Low-lactose',
-          ]}
+          options={ALLERGENS_AND_DIETARY_OPTIONS}
           value={selectedAllergens}
           onChange={(allergens) => {
             setSelectedAllergens(allergens);

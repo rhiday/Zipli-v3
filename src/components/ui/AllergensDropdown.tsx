@@ -24,7 +24,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   error,
   hint,
   disabled,
-  placeholder = "Select...",
+  placeholder = 'Select...',
 }) => {
   const { t } = useAllergenSelectorTranslation();
   const [open, setOpen] = useState(false);
@@ -103,7 +103,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           </>
         )}
         {open && (
-          <div className="absolute left-0 right-0 mt-2 bg-base border border-border rounded-md shadow-lg z-20">
+          <div className="absolute left-0 right-0 mt-2 bg-base border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
             {options.map((option) => (
               <div
                 key={option}
