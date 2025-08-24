@@ -260,6 +260,19 @@ export const en = {
         availableTimeRangeForSelectedDays:
           'Available Time Range for Selected Days',
       },
+      thankYou: {
+        title: 'Thank you!',
+        subtitle: 'Your donation has been added to our system.',
+        donationUpdated: 'Donation Updated!',
+        changesHaveBeenSaved: 'Your changes have been saved successfully.',
+        requestSubmitted: 'Request Submitted',
+        matchingInProgress: 'Matching in progress',
+        lookingForMatches: 'We are looking for matches for your donation',
+        getNotified: 'Get notified',
+        receiveNotificationWhenMatch:
+          'You will receive a notification when we find a match',
+        goBackToDashboard: 'Go back to dashboard',
+      },
     },
     requests: {
       create: {
@@ -369,6 +382,14 @@ export const en = {
       allergiesIntolerances: 'Allergies, intolerances & diets',
       selectAllergens: 'Select allergens',
       selectDietaryRestrictions: 'Select dietary restrictions...',
+    },
+    bottomNav: {
+      overview: 'Overview',
+      explore: 'Explore',
+      createDonation: 'Create Donation',
+      analytics: 'Analytics',
+      donate: 'Donate',
+      foodItem: 'Food Item',
     },
     pickupScheduler: {
       pickupSchedule: 'Pickup schedule',

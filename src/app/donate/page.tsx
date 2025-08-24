@@ -173,7 +173,7 @@ function DonorDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-              {t('yourImpact')}
+              {t('pages.donate.dashboard.yourImpact')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -187,7 +187,7 @@ function DonorDashboardPage(): React.ReactElement {
                   46kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('totalFoodDonated')}
+                  {t('pages.donate.dashboard.totalFoodDonated')}
                 </p>
               </div>
             </div>
@@ -202,7 +202,7 @@ function DonorDashboardPage(): React.ReactElement {
                   131
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('portionsOffered')}
+                  {t('pages.donate.dashboard.portionsOffered')}
                 </p>
               </div>
             </div>
@@ -217,7 +217,7 @@ function DonorDashboardPage(): React.ReactElement {
                   125€
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('costSavings')}
+                  {t('pages.donate.dashboard.costSavings')}
                 </p>
               </div>
             </div>
@@ -232,7 +232,7 @@ function DonorDashboardPage(): React.ReactElement {
                   10t
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('co2Avoided')}
+                  {t('pages.donate.dashboard.co2Avoided')}
                 </p>
               </div>
             </div>
@@ -249,8 +249,10 @@ function DonorDashboardPage(): React.ReactElement {
           >
             <ActionButton
               href="#"
-              title={t('exportToPdf')}
-              description={t('environmentalAndSocialImpactData')}
+              title={t('pages.donate.dashboard.exportToPdf')}
+              description={t(
+                'pages.donate.dashboard.environmentalAndSocialImpactData'
+              )}
               icon={<FileDown />}
             />
           </div>

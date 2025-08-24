@@ -43,7 +43,8 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(
         donorName ||
         donorFromStore?.full_name ||
         donorFromStore?.organization_name;
-      const displayDonor = resolvedDonorName || t('generousDonor');
+      const displayDonor =
+        resolvedDonorName || t('pages.donate.detail.generousDonor');
       const displayDistance = distance || '2.4km'; // TODO: replace with real value if available
       const displayTime =
         pickupTime ||
@@ -72,17 +73,17 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(
 
     // Memoized time formatter
     const formattedPickupTime = React.useMemo(() => {
-      if (!displayData?.displayTime) return t('availableNow');
+      if (!displayData?.displayTime) return t('common.time.availableNow');
       try {
         const date = new Date(displayData.displayTime);
         // If time is in the future, show 'Tomorrow until ...' or 'Until ...'
         const now = new Date();
         if (date.getDate() === now.getDate() + 1) {
-          return `${t('tomorrow')} ${t('until')} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+          return `${t('common.time.tomorrow')} ${t('common.time.until')} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
         }
-        return `${t('until')} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+        return `${t('common.time.until')} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
       } catch (e) {
-        return t('availableNow');
+        return t('common.time.availableNow');
       }
     }, [displayData?.displayTime, t]);
 
@@ -138,7 +139,7 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(
           </div>
           <div>
             <h3 className="truncate font-bold text-gray-900 text-lg mb-1 leading-tight">
-              {food_item.name || t('untitledItem')}
+              {food_item.name || t('components.donationCard.untitledItem')}
             </h3>
             <div className="flex items-center gap-1 text-base text-gray-700 mb-1 truncate">
               <span>
@@ -147,7 +148,7 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(
               </span>
               <span className="mx-1">·</span>
               <span className="text-gray-500 truncate">
-                {t('from')} {displayData.displayDonor}
+                {t('pages.donate.detail.from')} {displayData.displayDonor}
               </span>
             </div>
             <div className="text-xs text-gray-500 truncate">

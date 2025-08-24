@@ -176,7 +176,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-              {t('yourImpact')}
+              {t('pages.donate.dashboard.yourImpact')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -189,7 +189,9 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.totalPeople}
                 </span>
-                <p className="text-sm text-primary-75 mt-1">{t('peopleServed')}</p>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('pages.donate.dashboard.peopleHelped')}
+                </p>
               </div>
             </div>
             {/* Food Requested */}
@@ -201,7 +203,9 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.estimatedKg}kg
                 </span>
-                <p className="text-sm text-primary-75 mt-1">{t('foodRequested')}</p>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('pages.donate.dashboard.totalFoodDonated')}
+                </p>
               </div>
             </div>
             {/* Active Requests */}
@@ -214,7 +218,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.activeRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('activeRequests')}
+                  {t('pages.donate.dashboard.activeDonations')}
                 </p>
               </div>
             </div>
@@ -228,7 +232,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.fulfilledRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('fulfilledRequests')}
+                  {t('pages.donate.dashboard.completedDonations')}
                 </p>
               </div>
             </div>
@@ -245,8 +249,8 @@ export default function ReceiverDashboardPage(): React.ReactElement {
           >
             <ActionButton
               href="#"
-              title={t('exportImpactReport')}
-              description={t('requestHistoryAndImpactData')}
+              title={t('pages.donate.dashboard.exportToPdf')}
+              description={t('pages.donate.dashboard.detailedAnalytics')}
               icon={<FileDown />}
             />
           </div>

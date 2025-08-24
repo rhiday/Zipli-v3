@@ -69,16 +69,33 @@ export default function BottomNav() {
         return [
           {
             href: '/terminal/dashboard',
-            label: t('dashboard'),
+            label: t('common.navigation.dashboard'),
             icon: LayoutGrid,
           },
-          { href: '/feed', label: t('overview'), icon: Users },
+          {
+            href: '/feed',
+            label: t('components.bottomNav.overview'),
+            icon: Users,
+          },
         ];
       default:
         return [
-          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
-          { href: '#', label: t('add'), icon: Plus, isCentral: true },
-          { href: '/feed', label: t('explore'), icon: Search },
+          {
+            href: '/donate',
+            label: t('common.navigation.dashboard'),
+            icon: LayoutGrid,
+          },
+          {
+            href: '#',
+            label: t('common.actions.add'),
+            icon: Plus,
+            isCentral: true,
+          },
+          {
+            href: '/feed',
+            label: t('components.bottomNav.explore'),
+            icon: Search,
+          },
         ];
     }
   }, [currentUser, t]);
@@ -134,7 +151,7 @@ export default function BottomNav() {
           <DrawerContent className="bg-base">
             <DrawerHeader className="text-center">
               <DrawerTitle className="text-lg font-semibold text-primary">
-                {t('createDonation')}?
+                {t('components.bottomNav.createDonation')}?
               </DrawerTitle>
             </DrawerHeader>
             <div className="grid gap-3 p-4">
@@ -189,10 +206,10 @@ export default function BottomNav() {
                       <BarChart3 className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          {t('analytics')}
+                          {t('components.bottomNav.analytics')}
                         </p>
                         <p className="text-xs text-secondary">
-                          {t('overview')}.
+                          {t('components.bottomNav.overview')}.
                         </p>
                       </div>
                     </Button>
@@ -210,10 +227,11 @@ export default function BottomNav() {
                       <ShoppingBag className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          {t('donate')} {t('foodItem')}
+                          {t('components.bottomNav.donate')}{' '}
+                          {t('components.bottomNav.foodItem')}
                         </p>
                         <p className="text-xs text-secondary">
-                          {t('createDonation')}.
+                          {t('components.bottomNav.createDonation')}.
                         </p>
                       </div>
                     </Button>
@@ -242,7 +260,7 @@ export default function BottomNav() {
             <DrawerFooter className="pt-2">
               <DrawerClose asChild>
                 <Button variant="ghost" size="sm">
-                  {t('close')}
+                  {t('common.actions.close')}
                 </Button>
               </DrawerClose>
             </DrawerFooter>

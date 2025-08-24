@@ -4,12 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/Select';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
@@ -37,7 +37,7 @@ export default function ProfilePage(): React.ReactElement {
 
   useEffect(() => {
     if (!isInitialized) return;
-    
+
     if (!currentUser) {
       router.push('/auth/login');
       return;
@@ -55,11 +55,15 @@ export default function ProfilePage(): React.ReactElement {
     setLoading(false);
   }, [currentUser, isInitialized, router]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -86,11 +90,16 @@ export default function ProfilePage(): React.ReactElement {
 
   const formatRole = (role: string) => {
     switch (role) {
-      case 'food_donor': return t('foodDonor');
-      case 'food_receiver': return t('foodReceiver');
-      case 'terminals': return t('terminalOperator');
-      case 'city': return t('city');
-      default: return role || t('notSet');
+      case 'food_donor':
+        return t('pages.auth.register.foodDonor');
+      case 'food_receiver':
+        return t('pages.auth.register.foodReceiver');
+      case 'terminals':
+        return t('pages.auth.register.terminalOperator');
+      case 'city':
+        return t('pages.auth.register.cityOfficial');
+      default:
+        return role || t('common.status.unavailable');
     }
   };
 
@@ -106,7 +115,9 @@ export default function ProfilePage(): React.ReactElement {
     <div className="min-h-screen bg-cream p-4">
       <div className="mx-auto max-w-lg">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-primary">{t('profile')}</h1>
+          <h1 className="text-2xl font-bold text-primary">
+            {t('common.navigation.profile')}
+          </h1>
           <LanguageSwitcher />
         </div>
 
@@ -121,8 +132,11 @@ export default function ProfilePage(): React.ReactElement {
             {isEditing ? (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-primary mb-1">
-                    {t('email')}
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-primary mb-1"
+                  >
+                    {t('pages.auth.register.email')}
                   </label>
                   <Input
                     type="email"
@@ -134,8 +148,11 @@ export default function ProfilePage(): React.ReactElement {
                 </div>
 
                 <div>
-                  <label htmlFor="full_name" className="block text-sm font-medium text-primary mb-1">
-                    {t('fullName')}
+                  <label
+                    htmlFor="full_name"
+                    className="block text-sm font-medium text-primary mb-1"
+                  >
+                    {t('pages.auth.register.fullName')}
                   </label>
                   <Input
                     type="text"
@@ -143,13 +160,16 @@ export default function ProfilePage(): React.ReactElement {
                     name="full_name"
                     value={formData.full_name}
                     onChange={handleChange}
-                    placeholder={t('fullName')}
+                    placeholder={t('pages.auth.register.fullName')}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="organization_name" className="block text-sm font-medium text-primary mb-1">
-                    {t('organizationName')}
+                  <label
+                    htmlFor="organization_name"
+                    className="block text-sm font-medium text-primary mb-1"
+                  >
+                    {t('pages.auth.register.organizationName')}
                   </label>
                   <Input
                     type="text"
@@ -157,47 +177,70 @@ export default function ProfilePage(): React.ReactElement {
                     name="organization_name"
                     value={formData.organization_name}
                     onChange={handleChange}
-                    placeholder={t('organizationName')}
+                    placeholder={t('pages.auth.register.organizationName')}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="role" className="block text-sm font-medium text-primary mb-1">
-                    {t('role')}
+                  <label
+                    htmlFor="role"
+                    className="block text-sm font-medium text-primary mb-1"
+                  >
+                    {t('pages.auth.register.role')}
                   </label>
                   <Select
                     value={formData.role}
-                    onValueChange={(value) => handleChange({ target: { name: 'role', value } } as React.ChangeEvent<HTMLSelectElement>)}
+                    onValueChange={(value) =>
+                      handleChange({
+                        target: { name: 'role', value },
+                      } as React.ChangeEvent<HTMLSelectElement>)
+                    }
                   >
                     <SelectTrigger id="role" name="role">
-                      <SelectValue placeholder={`${t('iAmA')}...`} />
+                      <SelectValue
+                        placeholder={`${t('pages.auth.register.iAmA')}...`}
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="food_donor">{t('foodDonor')}</SelectItem>
-                      <SelectItem value="food_receiver">{t('foodReceiver')}</SelectItem>
-                      <SelectItem value="terminals">{t('terminalOperator')}</SelectItem>
-                      <SelectItem value="city">{t('city')}</SelectItem>
+                      <SelectItem value="food_donor">
+                        {t('pages.auth.register.foodDonor')}
+                      </SelectItem>
+                      <SelectItem value="food_receiver">
+                        {t('pages.auth.register.foodReceiver')}
+                      </SelectItem>
+                      <SelectItem value="terminals">
+                        {t('pages.auth.register.terminalOperator')}
+                      </SelectItem>
+                      <SelectItem value="city">
+                        {t('pages.auth.register.cityOfficial')}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <label htmlFor="address" className="block text-sm font-medium text-primary mb-1">
-                    {t('address')}
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium text-primary mb-1"
+                  >
+                    {t('pages.auth.register.address')}
                   </label>
                   <Textarea
                     id="address"
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                    placeholder = "Address"
+                    placeholder="Address"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="contact_number" className="block text-sm font-medium text-primary mb-1">
-                    {t('contactNumber')}
+                  <label
+                    htmlFor="contact_number"
+                    className="block text-sm font-medium text-primary mb-1"
+                  >
+                    {t('pages.auth.register.contactNumber')}
                   </label>
                   <Input
                     type="tel"
@@ -205,12 +248,15 @@ export default function ProfilePage(): React.ReactElement {
                     name="contact_number"
                     value={formData.contact_number}
                     onChange={handleChange}
-                    placeholder = "ContactNumber"
+                    placeholder="ContactNumber"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="driver_instructions" className="block text-sm font-medium text-primary mb-1">
+                  <label
+                    htmlFor="driver_instructions"
+                    className="block text-sm font-medium text-primary mb-1"
+                  >
                     {t('instructionsForDriver')}
                   </label>
                   <Textarea
@@ -221,71 +267,103 @@ export default function ProfilePage(): React.ReactElement {
                     placeholder="e.g. Please ring the doorbell, Leave at reception"
                     rows={3}
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('defaultDriverInstructions')}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {t('defaultDriverInstructions')}
+                  </p>
                 </div>
 
                 <div className="flex gap-3">
                   <Button type="submit" disabled={saving} className="flex-1">
-                    {saving ? 'Saving...' : 'Save Changes'}
+                    {saving
+                      ? t('common.actions.saving')
+                      : t('common.actions.save')}
                   </Button>
-                  <Button 
-                    type="button" 
-                    variant="secondary" 
+                  <Button
+                    type="button"
+                    variant="secondary"
                     onClick={() => setIsEditing(false)}
                     className="flex-1"
                   >
-                    {t('saveChanges')}
+                    {t('common.actions.cancel')}
                   </Button>
                 </div>
               </form>
             ) : (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">{t('email')}</label>
+                  <label className="block text-sm font-medium text-primary mb-1">
+                    {t('pages.auth.register.email')}
+                  </label>
                   <p className="text-gray-900">{formData.email}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">{t('fullNameLabel')}</label>
-                  <p className="text-gray-900">{formData.full_name || t('notSet')}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">
+                    {t('pages.auth.register.fullName')}
+                  </label>
+                  <p className="text-gray-900">
+                    {formData.full_name || t('common.status.unavailable')}
+                  </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">{t('organizationNameLabel')}</label>
-                  <p className="text-gray-900">{formData.organization_name || t('notSet')}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">
+                    {t('pages.auth.register.organizationName')}
+                  </label>
+                  <p className="text-gray-900">
+                    {formData.organization_name ||
+                      t('common.status.unavailable')}
+                  </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">{t('role')}</label>
+                  <label className="block text-sm font-medium text-primary mb-1">
+                    {t('pages.auth.register.role')}
+                  </label>
                   <p className="text-gray-900">{formatRole(formData.role)}</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">{t('address')}</label>
-                  <p className="text-gray-900">{formData.address || t('notSet')}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">
+                    {t('pages.auth.register.address')}
+                  </label>
+                  <p className="text-gray-900">
+                    {formData.address || t('common.status.unavailable')}
+                  </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">{t('contactNumber')}</label>
-                  <p className="text-gray-900">{formData.contact_number || t('notSet')}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">
+                    {t('pages.auth.register.contactNumber')}
+                  </label>
+                  <p className="text-gray-900">
+                    {formData.contact_number || t('common.status.unavailable')}
+                  </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-1">{t('defaultDriverInstructions')}</label>
-                  <p className="text-gray-900">{formData.driver_instructions || t('notSet')}</p>
+                  <label className="block text-sm font-medium text-primary mb-1">
+                    {t('defaultDriverInstructions')}
+                  </label>
+                  <p className="text-gray-900">
+                    {formData.driver_instructions ||
+                      t('common.status.unavailable')}
+                  </p>
                 </div>
 
                 <div className="flex gap-3">
                   <Button onClick={() => setIsEditing(true)} className="flex-1">
-                    {t('editProfile')}
+                    {t('common.actions.edit')}
                   </Button>
-                  <Button 
-                    variant="destructive" 
+                  <Button
+                    variant="destructive"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
                     className="flex-1"
                   >
-                    {isLoggingOut ? t('loggingOut') : t('logout')}
+                    {isLoggingOut
+                      ? t('common.actions.processing')
+                      : t('common.navigation.logout')}
                   </Button>
                 </div>
               </div>

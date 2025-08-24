@@ -40,13 +40,13 @@ export default function DonationThankYouPage() {
       </div>
       <h1 className="text-3xl font-bold mb-4 text-center">
         {isEditMode
-          ? t('changesSaved') || 'Donation Updated!'
-          : t('donationCreated') || 'Thank you!'}
+          ? t('pages.donate.thankYou.donationUpdated') || 'Donation Updated!'
+          : t('pages.donate.thankYou.title') || 'Thank you!'}
       </h1>
       <p className="text-center text-base text-black mb-6 max-w-xs">
         {isEditMode
           ? 'Your donation has been successfully updated.'
-          : t('requestAddedToSystem')}
+          : t('pages.donate.thankYou.subtitle')}
       </p>
 
       <div className="w-full max-w-md mb-8">
@@ -56,32 +56,40 @@ export default function DonationThankYouPage() {
             isEditMode
               ? [
                   {
-                    title: t('changesSaved') || 'Donation_updated',
+                    title:
+                      t('pages.donate.thankYou.donationUpdated') ||
+                      'Donation_updated',
                     description:
-                      t('changesSaved') ||
+                      t('pages.donate.thankYou.changesHaveBeenSaved') ||
                       'Your changes have been saved successfully.',
                   },
                   {
-                    title: t('matchingInProgress') || 'Matching_continues',
-                    description: t('lookingForMatches'),
+                    title:
+                      t('pages.donate.thankYou.matchingInProgress') ||
+                      'Matching_continues',
+                    description: t('pages.donate.thankYou.lookingForMatches'),
                   },
                   {
-                    title: t('getNotified'),
-                    description: t('receiveNotificationWhenMatch'),
+                    title: t('pages.donate.thankYou.getNotified'),
+                    description: t(
+                      'pages.donate.thankYou.receiveNotificationWhenMatch'
+                    ),
                   },
                 ]
               : [
                   {
-                    title: t('requestSubmitted'),
-                    description: t('requestAddedToSystem'),
+                    title: t('pages.donate.thankYou.requestSubmitted'),
+                    description: t('pages.donate.thankYou.subtitle'),
                   },
                   {
-                    title: t('matchingInProgress'),
-                    description: t('lookingForMatches'),
+                    title: t('pages.donate.thankYou.matchingInProgress'),
+                    description: t('pages.donate.thankYou.lookingForMatches'),
                   },
                   {
-                    title: t('getNotified'),
-                    description: t('receiveNotificationWhenMatch'),
+                    title: t('pages.donate.thankYou.getNotified'),
+                    description: t(
+                      'pages.donate.thankYou.receiveNotificationWhenMatch'
+                    ),
                   },
                 ]
           }
@@ -89,7 +97,7 @@ export default function DonationThankYouPage() {
       </div>
       <Link href="/donor/dashboard">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-          {t('goBackToDashboard')}
+          {t('pages.donate.thankYou.goBackToDashboard')}
         </button>
       </Link>
     </div>

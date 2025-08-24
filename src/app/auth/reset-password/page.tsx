@@ -147,9 +147,7 @@ export default function ResetPasswordPage() {
           <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-body text-primary-75">
-                {t('common.actions.loading')}
-              </p>
+              <p className="mt-4 text-body text-primary-75">Loading...</p>
             </div>
           </div>
         </div>

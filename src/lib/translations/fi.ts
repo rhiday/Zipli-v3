@@ -259,6 +259,19 @@ export const fi = {
         availableTimeRangeForSelectedDays:
           'Saatavilla oleva aikaväli valituille päiville',
       },
+      thankYou: {
+        title: 'Kiitos!',
+        subtitle: 'Lahjoituksesi on lisätty järjestelmäämme.',
+        donationUpdated: 'Lahjoitus päivitetty!',
+        changesHaveBeenSaved: 'Muutoksesi on tallennettu onnistuneesti.',
+        requestSubmitted: 'Pyyntö lähetetty',
+        matchingInProgress: 'Vastaavuushaku käynnissä',
+        lookingForMatches: 'Etsimme lahjoituksellesi vastaanottajia',
+        getNotified: 'Saat ilmoituksen',
+        receiveNotificationWhenMatch:
+          'Saat ilmoituksen kun löydämme vastaanottajan',
+        goBackToDashboard: 'Palaa kojelauttaan',
+      },
     },
     requests: {
       create: {
@@ -368,6 +381,14 @@ export const fi = {
       allergiesIntolerances: 'Allergiat, intoleranssit ja ruokavaliot',
       selectAllergens: 'Valitse allergeenit',
       selectDietaryRestrictions: 'Valitse ruokavaliorajoitukset...',
+    },
+    bottomNav: {
+      overview: 'Yleiskatsaus',
+      explore: 'Selaa',
+      createDonation: 'Luo lahjoitus',
+      analytics: 'Analytiikka',
+      donate: 'Lahjoita',
+      foodItem: 'Ruoka-aine',
     },
     pickupScheduler: {
       pickupSchedule: 'Noutaikataulu',
