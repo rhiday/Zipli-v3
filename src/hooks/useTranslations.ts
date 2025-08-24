@@ -27,9 +27,9 @@ function getTranslationWithFallback(
     const currentTranslations = translations[currentLang];
 
     // Helper function to get nested property value
-    function getNestedValue(obj: any, path: string): any {
+    const getNestedValue = (obj: any, path: string): any => {
       return path.split('.').reduce((current, key) => current?.[key], obj);
-    }
+    };
 
     // 1. Try current language with nested key support
     if (currentTranslations) {
