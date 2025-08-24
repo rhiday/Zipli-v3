@@ -7,7 +7,6 @@ import {
   type TranslationKey,
   translations,
 } from '@/lib/translations/index';
-import { toast } from '@/hooks/use-toast';
 
 const MISSING_TRANSLATION_CACHE = new Set<string>();
 
@@ -18,7 +17,7 @@ export const useTranslations = () => {
   return { t, language };
 };
 
-// Enhanced translation function with robust fallback system
+// Enhanced translation function with robust fallback system and nested key support
 function getTranslationWithFallback(
   key: string,
   currentLang: string,
@@ -27,34 +26,53 @@ function getTranslationWithFallback(
   try {
     const currentTranslations = translations[currentLang];
 
-    // 1. Try current language
-    if (currentTranslations && currentTranslations[key]) {
-      return currentTranslations[key];
+    // Helper function to get nested property value
+    function getNestedValue(obj: any, path: string): any {
+      return path.split('.').reduce((current, key) => current?.[key], obj);
     }
 
-    // 2. Fallback to English
-    if (currentLang !== 'en' && translations.en && translations.en[key]) {
-      // Only show warning once per missing key
-      if (!MISSING_TRANSLATION_CACHE.has(`${currentLang}:${key}`)) {
-        MISSING_TRANSLATION_CACHE.add(`${currentLang}:${key}`);
-
-        if (process.env.NODE_ENV === 'development') {
-          toast({
-            title: 'Missing translation',
-            description: `Key "${key}" not found in ${currentLang}`,
-            variant: 'warning',
-          });
-        }
+    // 1. Try current language with nested key support
+    if (currentTranslations) {
+      const value = getNestedValue(currentTranslations, key);
+      if (value && typeof value === 'string') {
+        return value;
       }
+      // Also try flat key as fallback for backwards compatibility
+      if (currentTranslations[key]) {
+        return currentTranslations[key];
+      }
+    }
 
-      return translations.en[key];
+    // 2. Fallback to English with nested key support
+    if (currentLang !== 'en' && translations.en) {
+      const englishValue = getNestedValue(translations.en, key);
+      if (englishValue && typeof englishValue === 'string') {
+        // Only show warning once per missing key
+        if (!MISSING_TRANSLATION_CACHE.has(`${currentLang}:${key}`)) {
+          MISSING_TRANSLATION_CACHE.add(`${currentLang}:${key}`);
+
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(
+              `Missing translation: ${key} in ${currentLang}, using English fallback`
+            );
+          }
+        }
+        return englishValue;
+      }
+      // Also try flat key as fallback for backwards compatibility
+      if (translations.en[key]) {
+        return translations.en[key];
+      }
     }
 
     // 3. Return formatted key name as last resort
-    const readableKey = key
-      .split(/[._-]/)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+    const readableKey =
+      key
+        .split('.')
+        .pop() // Get the last part of the key (e.g., 'profile' from 'common.navigation.profile')
+        ?.split(/[_-]/)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ') || key;
 
     // Log missing translation for debugging
     if (
@@ -63,12 +81,6 @@ function getTranslationWithFallback(
     ) {
       MISSING_TRANSLATION_CACHE.add(key);
       console.warn(`Missing translation key: ${key}`);
-
-      toast({
-        title: 'Translation missing',
-        description: `Key "${key}" not found in any language`,
-        variant: 'error',
-      });
     }
 
     return readableKey;

@@ -176,7 +176,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-              {t('pages.donate.dashboard.yourImpact')}
+              {t('pages.impact.title')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -190,7 +190,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.totalPeople}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('pages.donate.dashboard.peopleHelped')}
+                  {t('pages.impact.peopleHelped')}
                 </p>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.estimatedKg}kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('pages.donate.dashboard.totalFoodDonated')}
+                  {t('pages.impact.totalFoodDonated')}
                 </p>
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.activeRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('pages.donate.dashboard.activeDonations')}
+                  {t('pages.dashboard.receiver.activeRequests')}
                 </p>
               </div>
             </div>
@@ -232,7 +232,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.fulfilledRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('pages.donate.dashboard.completedDonations')}
+                  {t('pages.impact.completedDonations')}
                 </p>
               </div>
             </div>
@@ -249,8 +249,8 @@ export default function ReceiverDashboardPage(): React.ReactElement {
           >
             <ActionButton
               href="#"
-              title={t('pages.donate.dashboard.exportToPdf')}
-              description={t('pages.donate.dashboard.detailedAnalytics')}
+              title={t('pages.dashboard.donor.exportToPdf')}
+              description={t('pages.impact.detailedAnalytics')}
               icon={<FileDown />}
             />
           </div>
