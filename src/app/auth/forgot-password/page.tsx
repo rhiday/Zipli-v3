@@ -12,7 +12,7 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const resetPassword = useDatabase(state => state.resetPassword);
+  const resetPassword = useDatabase((state) => state.resetPassword);
   const { t } = useCommonTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,14 +23,14 @@ export default function ForgotPasswordPage() {
 
     try {
       const response = await resetPassword(email);
-      
+
       if (response.error) {
         setError(response.error);
       } else {
-        setMessage(t('resetPasswordDesc'));
+        setMessage(t('pages.auth.forgotPassword.checkEmail'));
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError(t('pages.auth.login.networkError'));
     } finally {
       setLoading(false);
     }
@@ -40,9 +40,11 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-titleSm font-display text-primary">{t('resetPassword')}</h1>
+          <h1 className="text-titleSm font-display text-primary">
+            {t('pages.auth.forgotPassword.title')}
+          </h1>
           <p className="mt-2 text-body text-primary-75">
-            Enter your email to receive a password reset link
+            {t('pages.auth.forgotPassword.subtitle')}
           </p>
         </div>
 
@@ -60,8 +62,11 @@ export default function ForgotPasswordPage() {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
-              Email
+            <label
+              htmlFor="email"
+              className="block text-label font-medium text-primary mb-1"
+            >
+              {t('pages.auth.forgotPassword.email')}
             </label>
             <Input
               id="email"
@@ -71,7 +76,7 @@ export default function ForgotPasswordPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder = "EmailAddress"
+              placeholder="EmailAddress"
             />
           </div>
 
@@ -83,7 +88,9 @@ export default function ForgotPasswordPage() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? t('sendingResetLink') : t('sendResetLink')}
+              {loading
+                ? t('pages.auth.forgotPassword.sendingResetLink')
+                : t('pages.auth.forgotPassword.sendResetLink')}
             </Button>
           </div>
         </form>
@@ -93,10 +100,10 @@ export default function ForgotPasswordPage() {
             href="/auth/login"
             className="font-medium text-earth hover:text-primary"
           >
-            ← {t('backToLogin')}
+            ← {t('pages.auth.forgotPassword.backToLogin')}
           </Link>
         </div>
       </div>
     </div>
   );
-} 
+}

@@ -28,7 +28,7 @@ export default function LoginPage() {
       const response = await login(email, password);
 
       if (response.error) {
-        setError(response.error);
+        setError(t('pages.auth.login.invalidCredentials'));
         setLoading(false);
         return;
       }
@@ -58,7 +58,7 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('pages.auth.login.networkError'));
       setLoading(false);
     }
   };
@@ -71,10 +71,10 @@ export default function LoginPage() {
         </div>
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">
-            {t('welcomeBack')}
+            {t('pages.auth.login.welcomeBack')}
           </h1>
           <p className="mt-2 text-body text-primary-75">
-            {t('signInToAccount')}
+            {t('pages.auth.login.title')}
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export default function LoginPage() {
               htmlFor="email"
               className="block text-label font-medium text-primary mb-1"
             >
-              {t('emailAddress')}
+              {t('pages.auth.login.email')}
             </label>
             <Input
               id="email"
@@ -108,7 +108,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="block text-label font-medium text-primary mb-1"
             >
-              {t('password')}
+              {t('pages.auth.login.password')}
             </label>
             <Input
               id="password"
@@ -135,7 +135,7 @@ export default function LoginPage() {
                 htmlFor="remember-me"
                 className="ml-2 block text-body text-primary"
               >
-                {t('rememberMe')}
+                {t('pages.auth.login.rememberMe')}
               </label>
             </div>
 
@@ -144,7 +144,7 @@ export default function LoginPage() {
                 href="/auth/forgot-password"
                 className="font-medium text-earth hover:text-primary"
               >
-                {t('forgotPassword')}
+                {t('pages.auth.login.forgotPassword')}
               </Link>
             </div>
           </div>
@@ -157,18 +157,22 @@ export default function LoginPage() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? t('signingIn') : t('signIn')}
+              {loading
+                ? t('pages.auth.login.signingIn')
+                : t('pages.auth.login.signIn')}
             </Button>
           </div>
         </form>
 
         <div className="text-center text-body">
-          <span className="text-inactive">{t('dontHaveAccount')}</span>{' '}
+          <span className="text-inactive">
+            {t('pages.auth.login.dontHaveAccount')}
+          </span>{' '}
           <Link
             href="/auth/register"
             className="font-medium text-earth hover:text-primary"
           >
-            {t('signUp')}
+            {t('pages.auth.login.signUp')}
           </Link>
         </div>
       </div>
