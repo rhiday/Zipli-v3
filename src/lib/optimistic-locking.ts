@@ -408,7 +408,7 @@ export function useOptimisticLocking() {
 
 // Utility functions
 export function createVersionedResource<T extends Record<string, any>>(
-  data: T
+  data: T & { id: string }
 ): T & LockableResource {
   return {
     ...data,

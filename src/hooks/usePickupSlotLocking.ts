@@ -141,7 +141,7 @@ export function usePickupSlotLocking(donationId: string, userId: string) {
       const updateResult = await performUpdate(
         'pickup-slot',
         slotId,
-        lockResult.data!.version,
+        (lockResult.data as any)?.version || slot.version,
         updateData,
         userId
       );
@@ -155,7 +155,7 @@ export function usePickupSlotLocking(donationId: string, userId: string) {
               ? {
                   ...s,
                   ...updateData,
-                  version: updateResult.data!.version || s.version + 1,
+                  version: (updateResult.data as any)?.version || s.version + 1,
                 }
               : s
           ),
@@ -165,7 +165,7 @@ export function usePickupSlotLocking(donationId: string, userId: string) {
         await releaseLock(
           'pickup-slot',
           slotId,
-          updateResult.data!.version || slot.version + 1,
+          (updateResult.data as any)?.version || slot.version + 1,
           userId
         );
         setState((prev) => ({
@@ -239,7 +239,7 @@ export function usePickupSlotLocking(donationId: string, userId: string) {
       const updateResult = await performUpdate(
         'pickup-slot',
         slotId,
-        lockResult.data!.version,
+        (lockResult.data as any)?.version || slot.version,
         updateData,
         userId
       );
@@ -252,7 +252,7 @@ export function usePickupSlotLocking(donationId: string, userId: string) {
               ? {
                   ...s,
                   ...updateData,
-                  version: updateResult.data!.version || s.version + 1,
+                  version: (updateResult.data as any)?.version || s.version + 1,
                 }
               : s
           ),
@@ -261,7 +261,7 @@ export function usePickupSlotLocking(donationId: string, userId: string) {
         await releaseLock(
           'pickup-slot',
           slotId,
-          updateResult.data!.version || slot.version + 1,
+          (updateResult.data as any)?.version || slot.version + 1,
           userId
         );
         setState((prev) => ({
@@ -285,7 +285,7 @@ export function usePickupSlotLocking(donationId: string, userId: string) {
       setState((prev) => ({
         ...prev,
         lockedSlots: new Set(
-          [...prev.lockedSlots].filter((id) => id !== slotId)
+          Array.from(prev.lockedSlots).filter((id) => id !== slotId)
         ),
       }));
 

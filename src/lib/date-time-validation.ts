@@ -83,7 +83,7 @@ export const dateStringSchema = z
   .string()
   .min(1, 'Date is required')
   .refine(isValidDateString, 'Invalid date format. Use YYYY-MM-DD')
-  .transform(parseISO)
+  .transform((val) => parseISO(val))
   .refine(isValid, 'Invalid date')
   .refine(isFutureDate, 'Date must be in the future')
   .refine(isWithinValidRange, `Date must be within ${MAX_FUTURE_DAYS} days`);
@@ -92,7 +92,7 @@ export const pickupDateSchema = z
   .string()
   .min(1, 'Pickup date is required')
   .refine(isValidDateString, 'Invalid pickup date format. Use YYYY-MM-DD')
-  .transform(parseISO)
+  .transform((val) => parseISO(val))
   .refine(isValid, 'Invalid pickup date')
   .refine((date) => {
     const minTime = new Date(Date.now() + MIN_FUTURE_MINUTES * 60 * 1000);
@@ -128,7 +128,7 @@ export const dateTimeStringSchema = z
   .string()
   .min(1, 'Date and time is required')
   .refine(isValidDateTimeString, 'Invalid date-time format. Use ISO 8601')
-  .transform(parseISO)
+  .transform((val) => parseISO(val))
   .refine(isValid, 'Invalid date and time')
   .refine(isFutureDate, 'Date and time must be in the future')
   .refine(isWithinValidRange, `Date must be within ${MAX_FUTURE_DAYS} days`);

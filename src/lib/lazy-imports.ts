@@ -21,11 +21,8 @@ export const loadQRCode = async () => {
   return QRCode.default;
 };
 
-// OpenAI - only loaded when AI features are used
-export const loadOpenAI = async () => {
-  const { OpenAI } = await import('openai');
-  return OpenAI;
-};
+// OpenAI - removed as per YC demo requirements
+// AI features have been disabled for this version
 
 // Syntax Highlighter - only loaded on docs page
 export const loadSyntaxHighlighter = async () => {
