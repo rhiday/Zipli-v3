@@ -272,7 +272,14 @@ export default function RequestSummaryPage() {
             </div>
           </div>
           <button
-            onClick={() => router.push('/request/select-type')}
+            onClick={() => {
+              // Navigate directly to the appropriate edit form based on request type
+              if (recurringSchedule) {
+                router.push('/request/recurring-form');
+              } else {
+                router.push('/request/one-time-form');
+              }
+            }}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
             aria-label={t('edit')}
           >
