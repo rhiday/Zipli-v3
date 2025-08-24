@@ -50,9 +50,9 @@ export default function RequestSummaryPage() {
     // Check for recurring request data in session storage
     const storedRequest = sessionStorage.getItem('pendingRequest');
     if (storedRequest) {
-      const requestData = JSON.parse(storedRequest);
-      if (requestData.recurringSchedules) {
-        setRecurringSchedule(requestData.recurringSchedules);
+      const sessionRequestData = JSON.parse(storedRequest);
+      if (sessionRequestData.recurringSchedules) {
+        setRecurringSchedule(sessionRequestData.recurringSchedules);
       }
     }
   }, [currentUser]);
@@ -123,16 +123,24 @@ export default function RequestSummaryPage() {
         end_time: slot.endTime,
       }));
 
+      // Get session data for additional fields
+      const storedRequest = sessionStorage.getItem('pendingRequest');
+      const sessionData = storedRequest ? JSON.parse(storedRequest) : {};
+
       // Create the request in the database
       const requestPayload = {
         user_id: currentUser.id,
-        description: `${requestData.description} - ${requestData.allergens.join(', ')}`,
+        description: requestData.description,
         people_count: requestData.quantity || 1,
+        allergens: requestData.allergens || [],
+        start_date: sessionData.startDate || null,
+        end_date: sessionData.endDate || null,
         pickup_date: pickupSlots.length > 0 ? formattedSlots[0].date : null,
         pickup_start_time:
           pickupSlots.length > 0 ? formattedSlots[0].start_time : null,
         pickup_end_time:
           pickupSlots.length > 0 ? formattedSlots[0].end_time : null,
+        pickup_slots: formattedSlots, // Save all pickup slots
         status: 'active' as const,
         is_recurring: !!recurringSchedule,
       };

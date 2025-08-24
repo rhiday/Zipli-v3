@@ -11,6 +11,8 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { Calendar, Clock, Trash2 } from 'lucide-react';
 import { useRequestStore } from '@/store/request';
+import { Input } from '@/components/ui/Input';
+import { format } from 'date-fns';
 
 interface RecurringSchedule {
   id: string;
@@ -60,10 +62,18 @@ export default function RequestSchedulePage() {
   const [showTimeSelector, setShowTimeSelector] = useState(false);
   const [editingTime, setEditingTime] = useState<'start' | 'end' | null>(null);
 
+  // Date fields
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   useEffect(() => {
     const storedRequest = sessionStorage.getItem('pendingRequest');
     if (storedRequest) {
-      setRequestData(JSON.parse(storedRequest));
+      const data = JSON.parse(storedRequest);
+      setRequestData(data);
+      // Initialize dates if they exist
+      if (data.startDate) setStartDate(data.startDate);
+      if (data.endDate) setEndDate(data.endDate);
     }
   }, []);
 
@@ -100,7 +110,9 @@ export default function RequestSchedulePage() {
   };
 
   const canAddSchedule = selectedDays.length > 0;
-  const canContinue = schedules.length > 0 || canAddSchedule;
+  const hasValidDates =
+    startDate && endDate && new Date(startDate) <= new Date(endDate);
+  const canContinue = hasValidDates && (schedules.length > 0 || canAddSchedule);
 
   const handleContinue = () => {
     // If there's a pending schedule, add it
@@ -123,6 +135,8 @@ export default function RequestSchedulePage() {
     const requestWithSchedule = {
       ...requestData,
       recurringSchedules: finalSchedules,
+      startDate: startDate,
+      endDate: endDate,
     };
 
     sessionStorage.setItem(
@@ -199,6 +213,46 @@ export default function RequestSchedulePage() {
             ))}
           </div>
         )}
+
+        {/* Request Period */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">{t('requestPeriod')}</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                {t('startDate')}
+              </label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                min={format(new Date(), 'yyyy-MM-dd')}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                {t('endDate')}
+              </label>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                min={startDate || format(new Date(), 'yyyy-MM-dd')}
+                className="w-full"
+              />
+            </div>
+          </div>
+          {startDate && endDate && (
+            <div className="p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+              <div className="text-sm font-semibold text-[#024209]">
+                {t('requestPeriod')}:{' '}
+                {format(new Date(startDate), 'dd.MM.yyyy')} -{' '}
+                {format(new Date(endDate), 'dd.MM.yyyy')}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Add Schedule Form */}
         <div className="space-y-4">
