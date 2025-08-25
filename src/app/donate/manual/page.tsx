@@ -314,14 +314,14 @@ function ManualDonationPageInner() {
           // This part uses the old zustand store, which you might want to refactor later
           addDonationItem({
             ...currentItem,
-            quantity: currentItem.quantity,
+            quantity: Number(currentItem.quantity),
             unit: 'kg',
           });
         } else {
           updateDonationItem({
             ...currentItem,
             id: currentItem.id,
-            quantity: currentItem.quantity,
+            quantity: Number(currentItem.quantity),
             unit: 'kg',
           });
         }
