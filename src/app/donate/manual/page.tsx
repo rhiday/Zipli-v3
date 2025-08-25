@@ -254,9 +254,8 @@ function ManualDonationPageInner() {
         const suggestedAllergens = suggestAllergensForFood(value);
         if (suggestedAllergens.length > 0) {
           updated.allergens = suggestedAllergens;
-        } else {
-          updated.allergens = ['None']; // Default to None if no suggestions
         }
+        // Don't automatically add 'None' - let user select it from dropdown
       } else if (field === 'name' && !value.trim()) {
         updated.allergens = []; // Clear allergens if name is cleared
       }
@@ -428,6 +427,7 @@ function ManualDonationPageInner() {
       <AllergensDropdown
         label={t('allergiesIntolerancesDiets')}
         options={[
+          'None',
           'Milk',
           'Eggs',
           'Fish',

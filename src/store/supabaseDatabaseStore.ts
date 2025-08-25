@@ -204,9 +204,12 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
         userData: Partial<Profile>
       ) => {
         try {
+          console.log('📝 Store.register - Starting registration for:', email);
+          console.log('📝 Store.register - User data:', userData);
+
           set({ loading: true, error: null });
 
-          const result = await authService.signUp({
+          const signUpData = {
             email,
             password,
             userData: {
@@ -216,15 +219,38 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
               contact_number: userData.contact_number || undefined,
               address: userData.address || undefined,
             },
+          };
+
+          console.log(
+            '📝 Store.register - Calling authService.signUp with:',
+            signUpData
+          );
+
+          const result = await authService.signUp(signUpData);
+
+          console.log('📝 Store.register - Auth service result:', {
+            hasData: !!result.data,
+            error: result.error,
+            userData: result.data,
           });
 
           if (result.data) {
+            console.log(
+              '📝 Store.register - Setting current user:',
+              result.data
+            );
             set({ currentUser: result.data });
+          } else if (result.error) {
+            console.error(
+              '📝 Store.register - Registration failed:',
+              result.error
+            );
           }
 
           set({ loading: false });
           return result;
         } catch (error) {
+          console.error('📝 Store.register - Caught exception:', error);
           set({ loading: false });
           return {
             data: null,

@@ -4,12 +4,12 @@
 // =====================================================
 
 import { supabase } from '@/lib/supabase/client';
-import { 
-  Profile, 
-  ProfileInsert, 
-  ProfileUpdate, 
-  UserRole, 
-  AuthResponse 
+import {
+  Profile,
+  ProfileInsert,
+  ProfileUpdate,
+  UserRole,
+  AuthResponse,
 } from '@/types/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -37,6 +37,11 @@ class AuthService {
    */
   async signUp(data: SignUpData): Promise<AuthResponse> {
     try {
+      console.log('🔐 AuthService.signUp - Starting signup with:', {
+        email: data.email,
+        userData: data.userData,
+      });
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -47,26 +52,52 @@ class AuthService {
         },
       });
 
+      console.log('🔐 AuthService.signUp - Supabase response:', {
+        hasUser: !!authData?.user,
+        userId: authData?.user?.id,
+        error: authError,
+        errorMessage: authError?.message,
+        errorStatus: (authError as any)?.status,
+        errorCode: (authError as any)?.code,
+      });
+
       if (authError) {
+        console.error('🔐 AuthService.signUp - Auth error details:', {
+          message: authError.message,
+          status: (authError as any)?.status,
+          code: (authError as any)?.code,
+          details: (authError as any)?.details,
+          hint: (authError as any)?.hint,
+          fullError: authError,
+        });
         return { data: null, error: authError.message };
       }
 
       if (!authData.user) {
+        console.error('🔐 AuthService.signUp - No user returned from Supabase');
         return { data: null, error: 'Failed to create user' };
       }
 
       // Get the created profile (created by database trigger)
+      console.log(
+        '🔐 AuthService.signUp - Fetching profile for user:',
+        authData.user.id
+      );
       const profile = await this.getProfile(authData.user.id);
-      
+
       if (!profile) {
+        console.error('🔐 AuthService.signUp - Profile not found after signup');
         return { data: null, error: 'Failed to create user profile' };
       }
 
+      console.log('🔐 AuthService.signUp - Success! Profile:', profile);
       return { data: profile, error: null };
     } catch (error) {
-      return { 
-        data: null, 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      console.error('🔐 AuthService.signUp - Caught exception:', error);
+      return {
+        data: null,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
@@ -76,10 +107,11 @@ class AuthService {
    */
   async signIn(data: SignInData): Promise<AuthResponse> {
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
+        });
 
       if (authError) {
         return { data: null, error: authError.message };
@@ -91,16 +123,17 @@ class AuthService {
 
       // Get the user's profile
       const profile = await this.getProfile(authData.user.id);
-      
+
       if (!profile) {
         return { data: null, error: 'User profile not found' };
       }
 
       return { data: profile, error: null };
     } catch (error) {
-      return { 
-        data: null, 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      return {
+        data: null,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
@@ -113,8 +146,9 @@ class AuthService {
       const { error } = await supabase.auth.signOut();
       return { error: error?.message || null };
     } catch (error) {
-      return { 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      return {
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
@@ -124,8 +158,10 @@ class AuthService {
    */
   async getCurrentUser(): Promise<Profile | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
         return null;
       }
@@ -163,7 +199,10 @@ class AuthService {
   /**
    * Update user profile
    */
-  async updateProfile(userId: string, updates: ProfileUpdate): Promise<{ data: Profile | null; error: string | null }> {
+  async updateProfile(
+    userId: string,
+    updates: ProfileUpdate
+  ): Promise<{ data: Profile | null; error: string | null }> {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -178,9 +217,10 @@ class AuthService {
 
       return { data, error: null };
     } catch (error) {
-      return { 
-        data: null, 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      return {
+        data: null,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
@@ -196,8 +236,9 @@ class AuthService {
 
       return { error: error?.message || null };
     } catch (error) {
-      return { 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      return {
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
@@ -208,13 +249,14 @@ class AuthService {
   async updatePassword(newPassword: string): Promise<{ error: string | null }> {
     try {
       const { error } = await supabase.auth.updateUser({
-        password: newPassword
+        password: newPassword,
       });
 
       return { error: error?.message || null };
     } catch (error) {
-      return { 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      return {
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
@@ -222,13 +264,18 @@ class AuthService {
   /**
    * Verify OTP (for email confirmation, password reset, etc.)
    */
-  async verifyOtp(email: string, token: string, type: 'signup' | 'recovery' | 'email_change'): Promise<AuthResponse> {
+  async verifyOtp(
+    email: string,
+    token: string,
+    type: 'signup' | 'recovery' | 'email_change'
+  ): Promise<AuthResponse> {
     try {
-      const { data: authData, error: authError } = await supabase.auth.verifyOtp({
-        email,
-        token,
-        type,
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.verifyOtp({
+          email,
+          token,
+          type,
+        });
 
       if (authError) {
         return { data: null, error: authError.message };
@@ -239,16 +286,17 @@ class AuthService {
       }
 
       const profile = await this.getProfile(authData.user.id);
-      
+
       if (!profile) {
         return { data: null, error: 'User profile not found' };
       }
 
       return { data: profile, error: null };
     } catch (error) {
-      return { 
-        data: null, 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      return {
+        data: null,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
@@ -286,7 +334,9 @@ class AuthService {
    */
   async getSession() {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       return session;
     } catch (error) {
       console.error('Error getting session', error);
@@ -312,9 +362,10 @@ class AuthService {
 
       return { data: profile, error: null };
     } catch (error) {
-      return { 
-        data: null, 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      return {
+        data: null,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   }
