@@ -21,6 +21,7 @@ export const fi = {
   totalFoodDonated: 'Viimeisimmän ilmoituksesi yhteenlaskettu kilomäärä',
   donations: 'Ilmoitukset',
   donation: 'Ilmoitus',
+  noActiveItems: 'Sinulla ei ole aktiivisia ilmoituksia tai pyyntöjä',
   showMore: 'Näytä lisää',
   showLess: 'Näytä vähemmän',
   costSavings: 'Säästetty tuotanto- ja jätekustannuksissa (keskiarvo)',

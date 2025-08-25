@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         return {
           id: d.id,
           quantity: d.quantity,
-          name: foodItem?.name  || 'Unknown_item',
+          name: foodItem?.name || 'Unknown_item',
           created_at: d.created_at || d.pickup_time || new Date().toISOString(),
           type: 'donation' as const,
         };
@@ -145,9 +145,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         {activityItems.length === 0 ? (
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 bg-[#18E170] rounded-full shrink-0"></span>
-            <span className="text-white/80">
-              You don't have any active donations or requests
-            </span>
+            <span className="text-white/80">{t('noActiveItems')}</span>
           </div>
         ) : (
           <>
@@ -167,9 +165,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                 >
                   <div>
                     <span className="text-sm font-semibold text-white">
-                      {item.type === 'donation'
-                        ? 'Donation'
-                        : 'Request'}
+                      {item.type === 'donation' ? 'Donation' : 'Request'}
                     </span>
                     <span className="text-white/90 text-sm ml-1">
                       ·{' '}
