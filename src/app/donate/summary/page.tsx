@@ -279,14 +279,19 @@ export default function DonationSummaryPage() {
     }
   };
 
-  // Show loading if no donation data
-  if (donationItems.length === 0) {
+  // Redirect if no donation data instead of showing error
+  useEffect(() => {
+    if (isInitialized && donationItems.length === 0 && !recurringSchedule) {
+      // Redirect to donate page if there are no items
+      router.push('/donate');
+    }
+  }, [isInitialized, donationItems.length, recurringSchedule, router]);
+
+  // Show loading while checking donation data
+  if (!isInitialized || (donationItems.length === 0 && !recurringSchedule)) {
     return (
-      <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
-        <p className="text-gray-600">{t('noDonationItemsFound')}</p>
-        <Button onClick={() => router.push('/donate/new')}>
-          Start New Donation
-        </Button>
+      <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center">
+        <div className="animate-pulse text-gray-500">Loading...</div>
       </div>
     );
   }
