@@ -227,7 +227,8 @@ export default function RequestSchedulePage() {
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 min={format(new Date(), 'yyyy-MM-dd')}
-                className="w-full"
+                className="w-full rounded-[12px] border-[#D9DBD5] bg-white text-lg px-4 py-4 focus:border-[#024209] focus:ring-2 focus:ring-[#024209]/20"
+                placeholder="dd.mm.yyyy"
               />
             </div>
             <div>
@@ -239,7 +240,8 @@ export default function RequestSchedulePage() {
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 min={startDate || format(new Date(), 'yyyy-MM-dd')}
-                className="w-full"
+                className="w-full rounded-[12px] border-[#D9DBD5] bg-white text-lg px-4 py-4 focus:border-[#024209] focus:ring-2 focus:ring-[#024209]/20"
+                placeholder="dd.mm.yyyy"
               />
             </div>
           </div>
