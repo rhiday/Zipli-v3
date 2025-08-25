@@ -248,7 +248,7 @@ export default function DonationSummaryPage() {
           const donationData = {
             food_item_id: foodItemId,
             donor_id: currentUser.id,
-            quantity: parseInt(item.quantity) || 1,
+            quantity: item.quantity || 1,
             status: 'available' as const,
             pickup_slots: formattedSlots,
             pickup_time: null,

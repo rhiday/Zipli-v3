@@ -295,7 +295,7 @@ function ManualDonationPageInner() {
         });
 
         await updateDonation(currentItem.id, {
-          quantity: parseFloat(currentItem.quantity) || 0,
+          quantity: currentItem.quantity || 0,
         });
 
         // Clear auto-saved data on successful save
