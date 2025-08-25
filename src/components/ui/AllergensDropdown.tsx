@@ -68,7 +68,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   const hasOverflow = value.length > 3;
 
   return (
-    <div className="w-full" ref={containerRef}>
+    <div className="w-full relative z-50" ref={containerRef}>
       <label className="block text-label font-semibold mb-2">{label}</label>
       <div className="relative">
         <Input
@@ -103,7 +103,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           </>
         )}
         {open && (
-          <div className="absolute left-0 right-0 mt-2 bg-base border border-border rounded-md shadow-lg z-50">
+          <div className="absolute left-0 right-0 mt-2 bg-base border border-border rounded-md shadow-lg z-[9999]">
             {options.map((option) => (
               <div
                 key={option}
