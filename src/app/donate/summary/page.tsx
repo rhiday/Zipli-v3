@@ -90,7 +90,8 @@ export default function DonationSummaryPage() {
           const { addDonationItem } = useDonationStore.getState();
           addDonationItem({
             name: donationData.description || 'Recurring_donation',
-            quantity: donationData.quantity?.toString() || '1',
+            quantity: Number(donationData.quantity) || 1,
+            unit: 'kg',
             allergens: donationData.allergens || [],
             description: donationData.description || null,
           });
