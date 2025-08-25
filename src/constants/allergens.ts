@@ -5,6 +5,7 @@
 
 // Allergen keys mapped to translation keys
 export const ALLERGEN_TRANSLATION_KEYS = [
+  { key: 'notSpecified', fallback: 'Not specified' },
   { key: 'allergens.glutenFree', fallback: 'Gluten-free' },
   { key: 'allergens.lactoseFree', fallback: 'Lactose-free' },
   { key: 'allergens.lowLactose', fallback: 'Low-lactose' },
