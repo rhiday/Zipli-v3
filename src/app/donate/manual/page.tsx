@@ -365,7 +365,7 @@ function ManualDonationPageInner() {
       setCurrentItem({
         ...itemToEdit,
         description: itemToEdit.description ?? '',
-        quantity: itemToEdit.quantity.replace(' kg', ''),
+        quantity: itemToEdit.quantity.toString(),
       });
       setShowAddAnotherForm(true);
     }
