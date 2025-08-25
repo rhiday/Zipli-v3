@@ -11,6 +11,7 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { Calendar, Clock, Trash2 } from 'lucide-react';
 import { useDonationStore } from '@/store/donation';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { format } from 'date-fns';
 
 interface RecurringSchedule {
@@ -180,30 +181,20 @@ export default function RecurringSchedulePage() {
             {t('donationPeriod') || 'Donation Period'}
           </h2>
           <div className="space-y-4">
-            <div>
-              <label className="block text-label font-semibold mb-3">
-                {t('startDate')}
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                min={format(new Date(), 'yyyy-MM-dd')}
-                className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between hover:border-[#024209] focus:border-[#024209] focus:ring-2 focus:ring-[#024209]/20 focus:outline-none transition-colors duration-200 text-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-label font-semibold mb-3">
-                {t('endDate')}
-              </label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                min={startDate || format(new Date(), 'yyyy-MM-dd')}
-                className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between hover:border-[#024209] focus:border-[#024209] focus:ring-2 focus:ring-[#024209]/20 focus:outline-none transition-colors duration-200 text-lg"
-              />
-            </div>
+            <DatePicker
+              label={t('startDate')}
+              value={startDate}
+              onChange={setStartDate}
+              min={format(new Date(), 'yyyy-MM-dd')}
+              placeholder="DD/MM/YYYY"
+            />
+            <DatePicker
+              label={t('endDate')}
+              value={endDate}
+              onChange={setEndDate}
+              min={startDate || format(new Date(), 'yyyy-MM-dd')}
+              placeholder="DD/MM/YYYY"
+            />
           </div>
           {startDate && endDate && (
             <div className="p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
