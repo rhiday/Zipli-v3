@@ -74,9 +74,9 @@ export const COMPONENT_PATTERNS = {
   inputBase: `w-full px-3 py-2 rounded-${RADIUS.md} border border-${COLORS.border} bg-${COLORS.base} text-${COLORS.primary}`,
 
   // Layout containers
-  pageContainer: 'min-h-dvh bg-cream',
+  pageContainer: 'min-h-screen bg-cream',
   contentContainer:
-    'relative mx-auto flex h-dvh w-full max-w-lg flex-col bg-base shadow-lg',
+    'relative mx-auto flex h-screen w-full max-w-lg flex-col bg-base shadow-lg',
 } as const;
 
 // Breakpoint helpers

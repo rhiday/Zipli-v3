@@ -37,11 +37,6 @@ class AuthService {
    */
   async signUp(data: SignUpData): Promise<AuthResponse> {
     try {
-      console.log('🔐 AuthService.signUp - Starting signup with:', {
-        email: data.email,
-        userData: data.userData,
-      });
-
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -52,48 +47,23 @@ class AuthService {
         },
       });
 
-      console.log('🔐 AuthService.signUp - Supabase response:', {
-        hasUser: !!authData?.user,
-        userId: authData?.user?.id,
-        error: authError,
-        errorMessage: authError?.message,
-        errorStatus: (authError as any)?.status,
-        errorCode: (authError as any)?.code,
-      });
-
       if (authError) {
-        console.error('🔐 AuthService.signUp - Auth error details:', {
-          message: authError.message,
-          status: (authError as any)?.status,
-          code: (authError as any)?.code,
-          details: (authError as any)?.details,
-          hint: (authError as any)?.hint,
-          fullError: authError,
-        });
         return { data: null, error: authError.message };
       }
 
       if (!authData.user) {
-        console.error('🔐 AuthService.signUp - No user returned from Supabase');
         return { data: null, error: 'Failed to create user' };
       }
 
       // Get the created profile (created by database trigger)
-      console.log(
-        '🔐 AuthService.signUp - Fetching profile for user:',
-        authData.user.id
-      );
       const profile = await this.getProfile(authData.user.id);
 
       if (!profile) {
-        console.error('🔐 AuthService.signUp - Profile not found after signup');
         return { data: null, error: 'Failed to create user profile' };
       }
 
-      console.log('🔐 AuthService.signUp - Success! Profile:', profile);
       return { data: profile, error: null };
     } catch (error) {
-      console.error('🔐 AuthService.signUp - Caught exception:', error);
       return {
         data: null,
         error:
