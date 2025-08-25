@@ -19,20 +19,23 @@
     transition: none !important;
     animation: none !important;
   }
+
+  /* Force disable specific problematic classes */
+  .transition-all,
+  .transition-colors,
+  .transition-transform,
+  .animate-spin,
+  .animate-pulse,
+  .animate-bounce,
+  .group-hover\:-translate-y-1,
+  .hover\:-translate-y-1 {
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
-/* DISABLED: GPU acceleration causing font rendering issues on mobile Safari
-.group-hover\:-translate-y-1,
-.transition-all,
-.transition-transform,
-.transition-opacity {
-  will-change: auto;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-perspective: 1000px;
-  perspective: 1000px;
-}
-*/
+/* All GPU acceleration completely removed for stability */
 
 /* Optimize hover effects on mobile */
 @media (hover: none) and (pointer: coarse) {
@@ -80,12 +83,7 @@ img {
   contain-intrinsic-size: 0 500px;
 }
 
-/* DISABLED: Hardware acceleration causing UI glitches
-.fixed.gpu-accelerate,
-[role='dialog'].gpu-accelerate {
-  transform: translateZ(0);
-}
-*/
+/* Hardware acceleration completely removed */
 
 /* Optimize touch targets for mobile */
 @media (max-width: 768px) {
@@ -106,14 +104,7 @@ img {
   }
 }
 
-/* DISABLED: Animations causing UI glitches on mobile Safari
-.animate-pulse,
-.animate-spin,
-.animate-bounce {
-  will-change: transform;
-  contain: layout style paint;
-}
-*/
+/* All animations disabled on mobile for stability */
 
 /* Optimize font loading */
 .font-sans,
@@ -129,14 +120,7 @@ img {
   z-index: 10;
 }
 
-/* DISABLED: Transform hints causing UI glitches
-.rounded-2xl.animate,
-.rounded-xl.animate,
-.rounded-lg.animate {
-  transform: translateZ(0);
-  will-change: auto;
-}
-*/
+/* Transform hints completely removed */
 
 /* Optimize shadow rendering on mobile */
 @media (max-width: 768px) {
