@@ -136,13 +136,17 @@ export default function RequestSummaryPage() {
         start_date: sessionData.startDate || null,
         end_date: sessionData.endDate || null,
         pickup_date:
-          pickupSlots.length > 0
+          pickupSlots.length > 0 && formattedSlots[0]?.date
             ? formattedSlots[0].date
             : new Date().toISOString().split('T')[0], // Use today's date as fallback
         pickup_start_time:
-          pickupSlots.length > 0 ? formattedSlots[0].start_time : '09:00',
+          pickupSlots.length > 0 && formattedSlots[0]?.start_time
+            ? formattedSlots[0].start_time
+            : '09:00',
         pickup_end_time:
-          pickupSlots.length > 0 ? formattedSlots[0].end_time : '17:00',
+          pickupSlots.length > 0 && formattedSlots[0]?.end_time
+            ? formattedSlots[0].end_time
+            : '17:00',
         pickup_slots: formattedSlots, // Save all pickup slots
         status: 'active' as const,
         is_recurring: !!recurringSchedule,
