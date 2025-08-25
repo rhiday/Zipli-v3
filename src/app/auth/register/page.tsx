@@ -30,32 +30,54 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🎯 RegisterPage - Form submitted with data:', formData);
+
     setLoading(true);
     setError(null);
 
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
+      console.error('🎯 RegisterPage - Password mismatch');
       setError('Passwords do not match');
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
+      console.error('🎯 RegisterPage - Password too short');
       setError('Password must be at least 6 characters long');
       setLoading(false);
       return;
     }
 
     try {
-      const response = await register(formData.email, formData.password, {
+      const registrationData = {
         full_name: formData.fullName,
         role: formData.role,
         organization_name: formData.organizationName,
         contact_number: formData.contactNumber,
         address: formData.address,
+      };
+
+      console.log('🎯 RegisterPage - Calling register with:', {
+        email: formData.email,
+        userData: registrationData,
+      });
+
+      const response = await register(
+        formData.email,
+        formData.password,
+        registrationData
+      );
+
+      console.log('🎯 RegisterPage - Registration response:', {
+        hasData: !!response.data,
+        error: response.error,
+        data: response.data,
       });
 
       if (response.error) {
+        console.error('🎯 RegisterPage - Registration error:', response.error);
         setError(response.error);
         setLoading(false);
         return;
@@ -64,6 +86,11 @@ export default function RegisterPage() {
       // Registration successful - redirect to appropriate dashboard
       if (response.data) {
         const user = response.data;
+        console.log(
+          '🎯 RegisterPage - Success! Redirecting user with role:',
+          user.role
+        );
+
         switch (user.role) {
           case 'food_donor':
             router.push('/donate');
@@ -79,6 +106,7 @@ export default function RegisterPage() {
         }
       }
     } catch (err) {
+      console.error('🎯 RegisterPage - Caught exception:', err);
       setError('An error occurred during registration. Please try again.');
       setLoading(false);
     }
