@@ -536,7 +536,7 @@ function ManualDonationPageInner() {
               <ItemPreview
                 key={item.id}
                 name={item.name}
-                quantity={item.quantity}
+                quantity={`${item.quantity} ${item.unit || 'kg'}`}
                 description={item.description || undefined}
                 imageUrl={item.imageUrl}
                 allergens={item.allergens}
