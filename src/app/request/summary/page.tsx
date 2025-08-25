@@ -140,13 +140,9 @@ export default function RequestSummaryPage() {
         user_id: currentUser.id,
         description: requestData.description,
         people_count: requestData.quantity || 1,
-        allergens: requestData.allergens || [],
-        start_date: sessionData.startDate || null,
-        end_date: sessionData.endDate || null,
         pickup_date: (primarySlot?.date as string) || fallbackDate,
         pickup_start_time: (primarySlot?.start_time as string) || fallbackStart,
         pickup_end_time: (primarySlot?.end_time as string) || fallbackEnd,
-        pickup_slots: formattedSlots, // Save all pickup slots
         status: 'active' as const,
         is_recurring: !!recurringSchedule,
       };
