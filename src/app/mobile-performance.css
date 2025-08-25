@@ -58,10 +58,9 @@ img {
   contain-intrinsic-size: 0 500px;
 }
 
-/* Hardware acceleration for modals and overlays */
-.fixed,
-[role='dialog'],
-[data-radix-collection-item] {
+/* Hardware acceleration for modals and overlays - only when needed */
+.fixed.gpu-accelerate,
+[role='dialog'].gpu-accelerate {
   transform: translateZ(0);
 }
 
