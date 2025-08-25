@@ -1,9 +1,9 @@
 'use client';
 import { AuthProvider } from '@/components/auth/AuthProvider';
+import { useDatabase } from '@/store';
+import { usePathname } from 'next/navigation';
 import React, { useEffect } from 'react';
 import BottomNav from './BottomNav';
-import { usePathname } from 'next/navigation';
-import { useDatabase } from '@/store';
 
 interface AppShellProps {
   children: React.ReactNode;

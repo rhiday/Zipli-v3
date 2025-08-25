@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { useRequestStore } from '@/store/request';
-import { useDatabase } from '@/store';
-import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
-import { Progress } from '@/components/ui/progress';
-import { useCommonTranslation } from '@/hooks/useTranslations';
-import { AllergenChips } from '@/components/ui/SummaryCard';
-import { Textarea } from '@/components/ui/Textarea';
-import { format } from 'date-fns';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { AllergenChips } from '@/components/ui/SummaryCard';
+import { Textarea } from '@/components/ui/Textarea';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useDatabase } from '@/store';
+import type { RequestInsert } from '@/types/supabase';
+import { useRequestStore } from '@/store/request';
+import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function RequestSummaryPage() {
   const router = useRouter();
@@ -127,19 +128,24 @@ export default function RequestSummaryPage() {
       const storedRequest = sessionStorage.getItem('pendingRequest');
       const sessionData = storedRequest ? JSON.parse(storedRequest) : {};
 
-      // Create the request in the database
-      const requestPayload = {
+      // Ensure required string fields for type-safe insert
+      const now = new Date();
+      const primarySlot = formattedSlots[0] || null;
+      const fallbackDate = now.toISOString().split('T')[0];
+      const fallbackStart = '09:00';
+      const fallbackEnd = '17:00';
+
+      // Create the request in the database with explicit type
+      const requestPayload: RequestInsert = {
         user_id: currentUser.id,
         description: requestData.description,
         people_count: requestData.quantity || 1,
         allergens: requestData.allergens || [],
         start_date: sessionData.startDate || null,
         end_date: sessionData.endDate || null,
-        pickup_date: pickupSlots.length > 0 ? formattedSlots[0].date : null,
-        pickup_start_time:
-          pickupSlots.length > 0 ? formattedSlots[0].start_time : null,
-        pickup_end_time:
-          pickupSlots.length > 0 ? formattedSlots[0].end_time : null,
+        pickup_date: (primarySlot?.date as string) || fallbackDate,
+        pickup_start_time: (primarySlot?.start_time as string) || fallbackStart,
+        pickup_end_time: (primarySlot?.end_time as string) || fallbackEnd,
         pickup_slots: formattedSlots, // Save all pickup slots
         status: 'active' as const,
         is_recurring: !!recurringSchedule,

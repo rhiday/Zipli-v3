@@ -1,48 +1,28 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import BottomNav from '@/components/BottomNav';
-import {
-  ChevronDown,
-  TrendingUp,
-  Building2,
-  Users,
-  Leaf,
-  Euro,
-  MapPin,
-  Calendar,
-} from 'lucide-react';
 import Header from '@/components/layout/Header';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { jsPDF } from 'jspdf';
-import { useDatabase } from '@/store';
-import {
-  SkeletonDashboardStat,
-  SkeletonRecipient,
-} from '@/components/ui/Skeleton';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useDatabase } from '@/store';
+import { jsPDF } from 'jspdf';
+import { Building2, ChevronDown, Euro, Leaf, TrendingUp } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  LineChart,
+  CartesianGrid,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
 
 // Enhanced mock data with more realistic values

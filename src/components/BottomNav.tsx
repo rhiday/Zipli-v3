@@ -1,34 +1,32 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import {
-  LayoutGrid,
-  Plus,
-  Search,
-  ShoppingBag,
-  FileText,
-  BarChart3,
-  Users,
-  TrendingUp,
-  Clock,
-  Calendar,
-} from 'lucide-react';
-import { useDatabase } from '@/store';
-import { useCommonTranslation } from '@/hooks/useTranslations';
+import { Button } from '@/components/ui/button';
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
-import { Button } from '@/components/ui/button';
+import { useCommonTranslation } from '@/hooks/useTranslations';
+import { cn } from '@/lib/utils';
+import { useDatabase } from '@/store';
+import {
+  BarChart3,
+  Calendar,
+  Clock,
+  LayoutGrid,
+  Plus,
+  Search,
+  ShoppingBag,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
 export default function BottomNav() {
   const pathname = usePathname();
