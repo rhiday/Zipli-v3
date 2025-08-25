@@ -620,6 +620,7 @@ export const en = {
   requestSubmitted: 'Request Submitted!',
   requestSubmittedDesc: 'Your food request has been submitted successfully',
   requestPeriod: 'Request Period',
+  donationPeriod: 'Donation Period',
   pickupSchedule: 'Pickup Schedule',
   driverInstructions: 'Instructions for driver',
   updateAddressInProfile: 'Update address in my profile',

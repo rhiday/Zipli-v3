@@ -11,6 +11,7 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { Calendar, Clock, Trash2 } from 'lucide-react';
 import { useDonationStore } from '@/store/donation';
+import { format } from 'date-fns';
 
 interface RecurringSchedule {
   id: string;
@@ -60,10 +61,18 @@ export default function RecurringSchedulePage() {
   const [showTimeSelector, setShowTimeSelector] = useState(false);
   const [editingTime, setEditingTime] = useState<'start' | 'end' | null>(null);
 
+  // Date fields
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   useEffect(() => {
     const storedDonation = sessionStorage.getItem('pendingDonation');
     if (storedDonation) {
-      setDonationData(JSON.parse(storedDonation));
+      const data = JSON.parse(storedDonation);
+      setDonationData(data);
+      // Initialize dates if they exist
+      if (data.startDate) setStartDate(data.startDate);
+      if (data.endDate) setEndDate(data.endDate);
     }
   }, []);
 
@@ -100,7 +109,9 @@ export default function RecurringSchedulePage() {
   };
 
   const canAddSchedule = selectedDays.length > 0;
-  const canContinue = schedules.length > 0 || canAddSchedule;
+  const hasValidDates =
+    startDate && endDate && new Date(startDate) <= new Date(endDate);
+  const canContinue = hasValidDates && (schedules.length > 0 || canAddSchedule);
 
   const handleContinue = () => {
     // If there's a pending schedule, add it
@@ -123,6 +134,8 @@ export default function RecurringSchedulePage() {
     const donationWithSchedule = {
       ...donationData,
       recurringSchedules: finalSchedules,
+      startDate: startDate,
+      endDate: endDate,
     };
 
     sessionStorage.setItem(
@@ -161,6 +174,48 @@ export default function RecurringSchedulePage() {
       className="bg-white"
     >
       <main className="contents">
+        {/* Donation Period */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">
+            {t('donationPeriod') || 'Donation Period'}
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                {t('startDate')}
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                min={format(new Date(), 'yyyy-MM-dd')}
+                className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between hover:border-[#024209] focus:border-[#024209] focus:ring-2 focus:ring-[#024209]/20 focus:outline-none transition-colors duration-200 text-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                {t('endDate')}
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                min={startDate || format(new Date(), 'yyyy-MM-dd')}
+                className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between hover:border-[#024209] focus:border-[#024209] focus:ring-2 focus:ring-[#024209]/20 focus:outline-none transition-colors duration-200 text-lg"
+              />
+            </div>
+          </div>
+          {startDate && endDate && (
+            <div className="p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+              <div className="text-sm font-semibold text-[#024209]">
+                {t('donationPeriod') || 'Donation Period'}:{' '}
+                {format(new Date(startDate), 'dd.MM.yyyy')} -{' '}
+                {format(new Date(endDate), 'dd.MM.yyyy')}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Existing Schedules */}
         {schedules.length > 0 && (
           <div className="space-y-3">

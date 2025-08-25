@@ -620,6 +620,7 @@ export const fi = {
   requestSubmitted: 'Pyyntö lähetetty!',
   requestSubmittedDesc: 'Ruokapyyntösi on lähetetty onnistuneesti',
   requestPeriod: 'Pyynnön jakso',
+  donationPeriod: 'Lahjoitusjakso',
   pickupSchedule: 'Noutotaulu',
   driverInstructions: 'Ohjeita kuljettajalle',
   updateAddressInProfile: 'Päivitä osoite profiiliini',
