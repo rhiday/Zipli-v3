@@ -217,6 +217,25 @@ export default function RequestSchedulePage() {
                 </div>
               </div>
             ))}
+
+            {/* Add Another Slot Button */}
+            <button
+              type="button"
+              onClick={() => {
+                // Reset form to add another slot
+                setSelectedDays([]);
+                setStartTime('09:00');
+                setEndTime('14:00');
+                // Scroll to the schedule form
+                const formSection = document.querySelector(
+                  '[data-schedule-form]'
+                );
+                formSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-interactive font-semibold text-base underline underline-offset-4"
+            >
+              Add another slot
+            </button>
           </div>
         )}
 
@@ -343,7 +362,7 @@ export default function RequestSchedulePage() {
         </div>
 
         {/* Add Schedule Form */}
-        <div className="space-y-6">
+        <div className="space-y-6" data-schedule-form>
           <h2 className="text-xl font-semibold">
             {schedules.length > 0
               ? 'Add another schedule'

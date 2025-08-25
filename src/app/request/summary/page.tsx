@@ -164,7 +164,7 @@ export default function RequestSummaryPage() {
           pickupSlots.length > 0 && formattedSlots[0]?.end_time
             ? formattedSlots[0].end_time
             : '17:00',
-        pickup_slots: formattedSlots, // Save all pickup slots
+        // Note: requests table uses individual pickup time fields, not pickup_slots array
         status: 'active' as const,
         is_recurring: !!recurringSchedule,
       };
