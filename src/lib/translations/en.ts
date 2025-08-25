@@ -22,7 +22,6 @@ export const en = {
   donations: 'Listings',
   donation: 'Listing',
   request: 'Request',
-  add: 'Add',
   impact: 'Impact',
   noActiveItems: "You don't have any active donations or requests",
   showMore: 'Show more',

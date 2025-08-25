@@ -22,7 +22,6 @@ export const fi = {
   donations: 'Ilmoitukset',
   donation: 'Ilmoitus',
   request: 'Pyyntö',
-  add: 'Lisää',
   impact: 'Vaikuttavuus',
   noActiveItems: 'Sinulla ei ole aktiivisia ilmoituksia tai pyyntöjä',
 
