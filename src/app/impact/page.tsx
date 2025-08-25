@@ -163,7 +163,7 @@ function ImpactPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-screen pb-20">
+      <div className="min-h-dvh pb-20">
         <div className="bg-base p-4 pt-6">
           <div className="h-7 w-32 bg-gray-200 rounded-md animate-pulse"></div>
         </div>
@@ -173,7 +173,7 @@ function ImpactPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       <main className="bg-base p-4 space-y-6 pt-6">
         {/* Header with same pattern as dashboard */}
         <section>

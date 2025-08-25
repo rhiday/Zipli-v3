@@ -135,7 +135,7 @@ export default function RequestDetailPage({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream">
+      <div className="flex min-h-dvh items-center justify-center bg-cream">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
@@ -143,7 +143,7 @@ export default function RequestDetailPage({
 
   if (error || !request) {
     return (
-      <div className="min-h-screen bg-cream flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto">
+      <div className="min-h-dvh bg-cream flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto">
         <XIcon className="mb-4 h-12 w-12 text-negative" />
         <h1 className="text-titleMd font-display text-primary">
           Request Not Found
@@ -169,7 +169,8 @@ export default function RequestDetailPage({
   const requesterUser = users.find((u) => u.id === request.user_id);
   const requesterName =
     requesterUser?.full_name ||
-    requesterUser?.organization_name  || 'Anonymous_requester';
+    requesterUser?.organization_name ||
+    'Anonymous_requester';
 
   const statusClass = (() => {
     switch (request.status) {
@@ -185,13 +186,13 @@ export default function RequestDetailPage({
   })();
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       {/* Header with Image and Back Arrow */}
       <div className="relative h-60 w-full">
         <Button
           onClick={() => router.back()}
           className="absolute top-12 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
-title="Default"
+          title="Default"
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -293,7 +294,7 @@ title="Default"
                 ) : (
                   <XIcon className="h-5 w-5" />
                 )}
-                {t('cancel')  || 'Cancel_request'}
+                {t('cancel') || 'Cancel_request'}
               </Button>
               <Button
                 variant="primary"
@@ -324,7 +325,7 @@ title="Default"
                   window.location.href = `mailto:${email}?subject=Re: Food Request - ${requestInfo.requestName}`;
                 }}
               >
-                {t('contactRequester')  || 'ContactRequester'}
+                {t('contactRequester') || 'ContactRequester'}
               </Button>
             </div>
           )}

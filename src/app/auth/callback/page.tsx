@@ -71,7 +71,7 @@ export default function AuthCallback() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
         <h1 className="text-titleSm font-display text-primary">Processing</h1>
         <p className="mt-2 text-body text-primary-75">

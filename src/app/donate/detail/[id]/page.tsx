@@ -112,7 +112,7 @@ export default function DonationDetailPage({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream">
+      <div className="flex min-h-dvh items-center justify-center bg-cream">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
@@ -120,7 +120,7 @@ export default function DonationDetailPage({
 
   if (error || !donation || !donation.food_item) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center text-center">
+      <div className="flex min-h-dvh flex-col items-center justify-center text-center">
         <h2 className="text-2xl font-bold mb-2">
           {error ? 'Error' : 'Donation Not Found'}
         </h2>
@@ -137,7 +137,7 @@ export default function DonationDetailPage({
   const donorName = donorDisplayName || 'Generous Donor';
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       {/* Header with Image and Back Arrow */}
       <div className="relative h-60 w-full">
         <Button
@@ -158,7 +158,7 @@ export default function DonationDetailPage({
           <div className="h-full w-full bg-gray-200 flex items-center justify-center">
             <Image
               src="/images/placeholder.svg"
-              alt = 'NoImage'
+              alt="NoImage"
               width={160}
               height={160}
             />
@@ -222,7 +222,8 @@ export default function DonationDetailPage({
                 <DialogHeader>
                   <DialogTitle>Are you sure?</DialogTitle>
                   <DialogDescription>
-                    This will permanently remove the listing from public view. This action cannot be undone.
+                    This will permanently remove the listing from public view.
+                    This action cannot be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

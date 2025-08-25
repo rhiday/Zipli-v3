@@ -60,7 +60,7 @@ function ConfirmPageContent() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">
@@ -142,7 +142,7 @@ export default function ConfirmPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+        <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
           <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>

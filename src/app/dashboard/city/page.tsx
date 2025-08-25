@@ -59,7 +59,7 @@ const monthlyData = [
 
 const partnerData = [
   { name: 'Sodexo Helsinki Airport', donations: 45, category: 'Corporate' },
-  { name: "Alice's Restaurant", donations: 32, category: "Restaurant" },
+  { name: "Alice's Restaurant", donations: 32, category: 'Restaurant' },
   { name: 'School District #3', donations: 28, category: 'Education' },
   { name: 'Kesko Citymarket', donations: 22, category: 'Retail' },
   { name: 'Red Cross Helsinki', donations: 41, category: 'NGO' },
@@ -87,7 +87,9 @@ export default function CityDashboardPage(): React.ReactElement {
   return <div>Redirecting...</div>;
 }
 
-function _DisabledCityDashboardPage(): React.ReactElement {
+// Note: keep this component unused to avoid hook rule violations.
+// If you need it, export with a proper name and use it as a React component.
+function DisabledCityDashboardPage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized, getAllDonations, getAllRequests } =
     useDatabase();
@@ -100,7 +102,18 @@ function _DisabledCityDashboardPage(): React.ReactElement {
   const [loading, setLoading] = useState(true);
 
   const allMonths = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   const currentDate = new Date();
@@ -180,7 +193,7 @@ function _DisabledCityDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-screen pb-20">
+      <div className="min-h-dvh pb-20">
         <Header title="Loading..." />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -212,7 +225,7 @@ function _DisabledCityDashboardPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       <Header title="Helsinki Food Terminal" />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -329,14 +342,14 @@ function _DisabledCityDashboardPage(): React.ReactElement {
                     dataKey="donations"
                     stroke="#22c55e"
                     strokeWidth={2}
-                    name = 'Donations'
+                    name="Donations"
                   />
                   <Line
                     type="monotone"
                     dataKey="recipients"
                     stroke="#3b82f6"
                     strokeWidth={2}
-                    name = 'Recipients'
+                    name="Recipients"
                   />
                 </LineChart>
               </ResponsiveContainer>

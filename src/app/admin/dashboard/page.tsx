@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
 /**
  * Admin Dashboard Page
  * Provides overview and management of the entire application
  */
-import React from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default function AdminDashboardPage(): React.ReactElement {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-dvh bg-gray-50 p-6">
       <div className="mx-auto max-w-6xl">
         <h1 className="mb-6 text-2xl font-bold text-gray-800">
           Admin Dashboard
@@ -25,7 +25,7 @@ export default function AdminDashboardPage(): React.ReactElement {
               Manage user accounts and roles.
             </p>
             <Button
-              onClick={() => router.push("/admin/users")}
+              onClick={() => router.push('/admin/users')}
               className="w-full bg-green-700 hover:bg-green-600"
             >
               Manage Users
@@ -40,7 +40,7 @@ export default function AdminDashboardPage(): React.ReactElement {
               View and manage all food donations.
             </p>
             <Button
-              onClick={() => router.push("/admin/donations")}
+              onClick={() => router.push('/admin/donations')}
               className="w-full bg-green-700 hover:bg-green-600"
             >
               Manage Donations
@@ -55,7 +55,7 @@ export default function AdminDashboardPage(): React.ReactElement {
               View and manage all food requests.
             </p>
             <Button
-              onClick={() => router.push("/admin/requests")}
+              onClick={() => router.push('/admin/requests')}
               className="w-full bg-green-700 hover:bg-green-600"
             >
               Manage Requests

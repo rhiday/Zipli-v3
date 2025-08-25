@@ -178,7 +178,7 @@ export default function RequestSummaryPage() {
   // Show loading if no request data
   if (!requestData.description) {
     return (
-      <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
+      <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">No request data found</p>
         <Button onClick={() => router.push('/request/select-type')}>
           Start New Request

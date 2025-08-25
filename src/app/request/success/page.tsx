@@ -8,7 +8,7 @@ import { useCommonTranslation } from '@/hooks/useTranslations';
 export default function RequestSuccessPage() {
   const { t } = useCommonTranslation();
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-white">
+    <div className="flex flex-col items-center justify-center min-h-dvh px-4 bg-white">
       <div className="mt-12 mb-8">
         <svg
           width="164"

@@ -194,7 +194,7 @@ This documentation is being loaded. Please check back soon.`;
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-dvh bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
         <div className="px-4 sm:px-6 lg:px-8">

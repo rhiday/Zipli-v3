@@ -118,7 +118,7 @@ function DonorDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-screen pb-20">
+      <div className="min-h-dvh pb-20">
         <Header title={'Loading'} />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -165,7 +165,7 @@ function DonorDashboardPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">

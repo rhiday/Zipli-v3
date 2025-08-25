@@ -53,7 +53,8 @@ const FOOD_TYPE_OPTIONS = [
   'Prepared meals',
   'Fresh produce',
   'Cold packaged foods',
-  'Bakery and Pastry', 'Other',
+  'Bakery and Pastry',
+  'Other',
 ];
 
 export default function AllItemsPage(): React.ReactElement {
@@ -97,7 +98,7 @@ export default function AllItemsPage(): React.ReactElement {
         .single();
       if (profileData) {
         setUserName(
-          profileData.organization_name || profileData.full_name  || 'User'
+          profileData.organization_name || profileData.full_name || 'User'
         );
       }
 
@@ -231,14 +232,14 @@ export default function AllItemsPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-base">
+      <div className="flex min-h-dvh items-center justify-center bg-base">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-base pb-20">
+    <div className="min-h-dvh bg-base pb-20">
       <Header
         title={`All ${filters.type === 'donations' ? 'donations' : 'requests'} by ${userName}`}
       />

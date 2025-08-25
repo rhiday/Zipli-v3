@@ -88,7 +88,7 @@ export default function DonationSummaryPage() {
         ) {
           const { addDonationItem } = useDonationStore.getState();
           addDonationItem({
-            name: donationData.description  || 'Recurring_donation',
+            name: donationData.description || 'Recurring_donation',
             quantity: donationData.quantity?.toString() || '1',
             allergens: donationData.allergens || [],
             description: donationData.description || null,
@@ -282,7 +282,7 @@ export default function DonationSummaryPage() {
   // Show loading if no donation data
   if (donationItems.length === 0) {
     return (
-      <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
+      <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">{t('noDonationItemsFound')}</p>
         <Button onClick={() => router.push('/donate/new')}>
           Start New Donation
