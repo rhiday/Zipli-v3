@@ -140,9 +140,6 @@ export default function RequestSummaryPage() {
         user_id: currentUser.id,
         description: requestData.description,
         people_count: requestData.quantity || 1,
-        allergens: requestData.allergens || [],
-        start_date: sessionData.startDate || null,
-        end_date: sessionData.endDate || null,
         pickup_date:
           pickupSlots.length > 0 && formattedSlots[0]?.date
             ? formattedSlots[0].date
@@ -155,7 +152,6 @@ export default function RequestSummaryPage() {
           pickupSlots.length > 0 && formattedSlots[0]?.end_time
             ? formattedSlots[0].end_time
             : '17:00',
-        pickup_slots: formattedSlots, // Save all pickup slots
         status: 'active' as const,
         is_recurring: !!recurringSchedule,
       };
