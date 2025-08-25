@@ -111,6 +111,29 @@ export default function BottomNav() {
   function renderNavItem(item: (typeof navItems)[0], index: number) {
     const isActive = pathname === item.href && !item.isCentral;
     if (item.isCentral) {
+      // For donors, go directly to manual donation flow without modal
+      if (currentUser?.role === 'food_donor') {
+        return (
+          <button
+            key={item.label}
+            className={cn(
+              'group inline-flex flex-col items-center justify-center text-center w-full',
+              '-mt-8'
+            )}
+            aria-label={item.label}
+            onClick={() => router.push('/donate/manual')}
+          >
+            <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-lime text-primary shadow-md group-hover:bg-lime/90">
+              <item.icon className="h-7 w-7" aria-hidden="true" />
+            </div>
+            <span className={cn('text-caption font-medium text-primary')}>
+              {item.label}
+            </span>
+          </button>
+        );
+      }
+
+      // For non-donors, keep the existing modal behavior
       return (
         <Drawer key={item.label}>
           <DrawerTrigger asChild>
