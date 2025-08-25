@@ -131,7 +131,7 @@ export default function BottomNav() {
     const isActive = pathname === item.href && !item.isCentral;
     if (item.isCentral) {
       return (
-        <Drawer key={item.label}>
+        <Drawer key={item.label} shouldScaleBackground={false}>
           <DrawerTrigger asChild>
             <button
               className={cn(
@@ -148,7 +148,7 @@ export default function BottomNav() {
               </span>
             </button>
           </DrawerTrigger>
-          <DrawerContent className="bg-base z-[9999]">
+          <DrawerContent className="bg-base">
             <DrawerHeader className="text-center">
               <DrawerTitle className="text-lg font-semibold text-primary">
                 {t('components.bottomNav.createDonation')}?
