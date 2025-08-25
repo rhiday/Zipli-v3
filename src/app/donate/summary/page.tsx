@@ -336,7 +336,7 @@ export default function DonationSummaryPage() {
           <ItemPreview
             key={index}
             name={item.name}
-            quantity={item.quantity}
+            quantity={`${item.quantity} ${item.unit || 'kg'}`}
             imageUrl={item.imageUrl}
             allergens={item.allergens}
             onEdit={() => handleEditItem(item.id)}

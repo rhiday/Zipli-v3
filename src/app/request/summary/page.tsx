@@ -75,7 +75,7 @@ export default function RequestSummaryPage() {
       return;
     }
 
-    if (!requestData.description || !requestData.quantity) {
+    if (!requestData.description || !requestData.people_count) {
       toast({
         title: 'Request details required',
         description: 'Please complete your food request details',
@@ -264,7 +264,7 @@ export default function RequestSummaryPage() {
               {requestData.description || 'Food Request'}
             </div>
             <div className="text-sm text-gray-600">
-              {t('portions')}: {requestData.quantity || '—'}
+              {t('portions')}: {requestData.people_count || '—'}
             </div>
             <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap">
               {t('allergiesIntolerancesDiets')}:{' '}

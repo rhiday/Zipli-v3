@@ -42,7 +42,9 @@ export default function RecurringRequestForm() {
   } = useForm<RecurringFormInputs>({
     defaultValues: {
       description: requestData.description || '',
-      quantity: requestData.quantity ? requestData.quantity.toString() : '',
+      quantity: requestData.people_count
+        ? requestData.people_count.toString()
+        : '',
     },
   });
 
@@ -84,7 +86,7 @@ export default function RecurringRequestForm() {
       setRequestData({
         request_type: 'recurring',
         description: data.description,
-        quantity: Number(data.quantity),
+        people_count: Number(data.quantity),
         allergens: selectedAllergens,
       });
 
@@ -92,7 +94,7 @@ export default function RecurringRequestForm() {
       const requestData = {
         request_type: 'recurring',
         description: data.description,
-        quantity: Number(data.quantity),
+        people_count: Number(data.quantity),
         allergens: selectedAllergens,
       };
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
