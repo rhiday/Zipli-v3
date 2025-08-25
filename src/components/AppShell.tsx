@@ -44,7 +44,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
           <div className="relative mx-auto flex h-screen w-full max-w-lg flex-col bg-base shadow-lg">
             {/* Main content container */}
             <main className="flex-grow overflow-y-auto">{children}</main>
-            {/* BottomNav is now part of this container and positioned absolutely */}
+            {/* BottomNav is positioned absolutely within this container */}
             {!hideBottomNav && <BottomNav />}
           </div>
         </div>
