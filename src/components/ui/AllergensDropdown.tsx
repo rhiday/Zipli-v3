@@ -4,7 +4,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from './Input';
 import { Chip } from './Chip';
 import { useCommonTranslation } from '@/hooks/useTranslations';
-import { ALLERGEN_TRANSLATION_KEYS } from '@/constants/allergens';
+import {
+  ALLERGEN_TRANSLATION_KEYS,
+  getAllergenKeyword,
+} from '@/constants/allergens';
 
 interface AllergensDropdownProps {
   label: string;
@@ -37,6 +40,12 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   const getTranslatedLabel = (value: string): string => {
     const option = translatedOptions.find((opt) => opt.key === value);
     return option?.label || value;
+  };
+
+  // Helper to get compact keyword for chips
+  const getCompactLabel = (value: string): string => {
+    const fullLabel = getTranslatedLabel(value);
+    return getAllergenKeyword(fullLabel);
   };
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -105,7 +114,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
               {value.map((v) => (
                 <div key={v} className="flex-shrink-0">
                   <Chip
-                    label={getTranslatedLabel(v)}
+                    label={getCompactLabel(v)}
                     selected
                     onRemove={() => handleToggle(v)}
                   />

@@ -80,3 +80,44 @@ export const LEGACY_ALLERGENS = [
   'Kosher',
   'Low-lactose',
 ];
+
+/**
+ * Extracts the key allergen term from full text to create compact chips
+ * Examples:
+ * "Does not contain molluscs" -> "Molluscs"
+ * "Does not contain sulphur dioxide / sulphites >10 mg/kg or litre" -> "Sulphur dioxide"
+ */
+export function getAllergenKeyword(allergenText: string): string {
+  // Handle common patterns
+  const patterns = [
+    // "Does not contain X" pattern
+    {
+      regex: /does not contain (.+?)(?:$|\s*\/|\s*>)/i,
+      transform: (match: string) => match,
+    },
+    // "X-free" pattern
+    { regex: /^(.+?)-free$/i, transform: (match: string) => match },
+    // "Low-X" pattern
+    { regex: /^low-(.+)$/i, transform: (match: string) => `Low ${match}` },
+  ];
+
+  for (const pattern of patterns) {
+    const match = allergenText.match(pattern.regex);
+    if (match && match[1]) {
+      let keyword = match[1].trim();
+
+      // Handle special cases
+      if (keyword === 'other nuts') keyword = 'nuts';
+      if (keyword === 'sesame seeds') keyword = 'sesame';
+      if (keyword === 'sulphur dioxide') keyword = 'sulphites';
+
+      // Capitalize first letter
+      return pattern.transform(
+        keyword.charAt(0).toUpperCase() + keyword.slice(1)
+      );
+    }
+  }
+
+  // Fallback for patterns that don't match (like "Gluten-free", "Vegan", etc.)
+  return allergenText;
+}
