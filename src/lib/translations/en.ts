@@ -18,11 +18,13 @@ export const en = {
   goodToSeeYou: "Hello! Let's turn food waste into impact.",
 
   // Impact metrics
-  totalFoodDonated: 'Food Rescued',
-  donations: 'Donations',
-  costSavings: 'Cost Saved',
-  co2Avoided: 'CO₂ Prevented',
-  portionsOffered: 'Portions Offered',
+  totalFoodDonated: 'Total weight of food in your latest food listing',
+  donations: 'Listings',
+  showMore: 'Show more',
+  showLess: 'Show less',
+  costSavings: 'Saved in production & disposal costs (average)',
+  co2Avoided: "Trees' worth of CO₂ saved",
+  portionsOffered: 'People got a proper meal (500g/portion)',
   savedInFoodDisposalCosts: 'Saved in Food Disposal Costs',
   emissionReduction: 'Emission Reduction',
 
@@ -90,8 +92,9 @@ export const en = {
   fulfilledRequests: 'Fulfilled Requests',
   exportImpactReport: 'Export Impact Report',
   requestHistoryAndImpactData: 'Request history and impact data',
-  exportToPdf: 'Export to PDF',
-  environmentalAndSocialImpactData: 'Environmental and social impact data',
+  exportToPdf: 'Check out more impact data',
+  environmentalAndSocialImpactData:
+    'Data on your financial, social and environmental impact helps with reporting, communicating and operation planning.',
   editFoodItem: 'Edit Food Item',
   addFoodItem: 'Add Food Item',
   changesSaved: 'Changes Saved',

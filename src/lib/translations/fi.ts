@@ -18,11 +18,13 @@ export const fi = {
   goodToSeeYou: 'Moi! Tehdään yhdessä hävikistä hyvikkiä.',
 
   // Impact metrics
-  totalFoodDonated: 'Ruokaa Pelastettu',
-  donations: 'Lahjoitukset',
-  costSavings: 'Säästöt',
-  co2Avoided: 'CO₂ Vältetty',
-  portionsOffered: 'Annosta Tarjottu',
+  totalFoodDonated: 'Viimeisimmän ilmoituksesi yhteenlaskettu kilomäärä',
+  donations: 'Ilmoitukset',
+  showMore: 'Näytä lisää',
+  showLess: 'Näytä vähemmän',
+  costSavings: 'Säästetty tuotanto- ja jätekustannuksissa (keskiarvo)',
+  co2Avoided: 'Puun verran hiilidioksidipäästöjä vältetty',
+  portionsOffered: 'Ihmistä sai kunnon aterian (500g/annos)',
   savedInFoodDisposalCosts: 'Säästetty Hävittämiskustannuksissa',
   emissionReduction: 'Päästövähennys',
 
@@ -90,9 +92,9 @@ export const fi = {
   fulfilledRequests: 'Täytetyt pyynnöt',
   exportImpactReport: 'Vie vaikutusraportti',
   requestHistoryAndImpactData: 'Pyyntöhistoria ja vaikutustiedot',
-  exportToPdf: 'Vie PDF:ksi',
+  exportToPdf: 'Täältä näet lisää vaikuttavuusdataa',
   environmentalAndSocialImpactData:
-    'Ympäristö- ja sosiaalisen vaikutuksen tiedot',
+    'Keräämme vaikuttavuusdataa auttaa raportoimaan, viestimään ja suunnittelemaan toimintaa entistä paremmin.',
   editFoodItem: 'Muokkaa ruoka-ainetta',
   addFoodItem: 'Lisää ruoka-aine',
   changesSaved: 'Muutokset tallennettu',

@@ -43,7 +43,7 @@ export default function BottomNav() {
     switch (role) {
       case 'food_donor':
         return [
-          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
+          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
           { href: '#', label: 'Add', icon: Plus, isCentral: true },
           { href: '/impact', label: 'Impact', icon: TrendingUp },
         ];
@@ -51,7 +51,7 @@ export default function BottomNav() {
         return [
           {
             href: '/receiver/dashboard',
-            label: 'Dashboard',
+            label: t('dashboard'),
             icon: LayoutGrid,
           },
           { href: '#', label: 'Request', icon: Plus, isCentral: true },
@@ -59,7 +59,7 @@ export default function BottomNav() {
         ];
       case 'city':
         return [
-          { href: '/city/dashboard', label: 'Dashboard', icon: LayoutGrid },
+          { href: '/city/dashboard', label: t('dashboard'), icon: LayoutGrid },
           { href: '/city', label: 'Analytics', icon: BarChart3 },
           { href: '/feed', label: 'Overview', icon: Users },
         ];
