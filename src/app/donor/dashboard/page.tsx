@@ -23,7 +23,7 @@ export default function DonorDashboard() {
 
         <section className="grid gap-4">
           <Link href="/donate/new">
-            <div className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+            <div className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50">
               <div className="flex items-center gap-3">
                 <PlusIcon className="w-6 h-6 text-earth" />
                 <div>
@@ -39,7 +39,7 @@ export default function DonorDashboard() {
           </Link>
 
           <Link href="/donate/all-offers">
-            <div className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+            <div className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50">
               <div className="flex items-center gap-3">
                 <PackageIcon className="w-6 h-6 text-earth" />
                 <div>

@@ -35,11 +35,12 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Prevent flickering on iOS - apply only to elements that need it */
+  /* DISABLED: Causing font rendering issues on mobile Safari
   .gpu-accelerated {
     -webkit-transform: translateZ(0);
     -webkit-backface-visibility: hidden;
   }
+  */
 
   /* Smooth scrolling for mobile */
   .smooth-scroll {
