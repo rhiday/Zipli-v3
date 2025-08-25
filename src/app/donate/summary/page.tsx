@@ -438,13 +438,44 @@ export default function DonationSummaryPage() {
               </button>
             </div>
           ))
+        ) : // One-time pickup slots - display all slots
+        pickupSlots.length > 0 ? (
+          pickupSlots.map((slot, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
+            >
+              <span className="font-semibold text-interactive">
+                {slot.date
+                  ? `${formatSlotDate(slot.date)}, ${slot.startTime} - ${slot.endTime}`
+                  : t('dateNotSet')}
+              </span>
+              <button
+                onClick={() => router.push('/donate/pickup-slot')}
+                className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+                title="Edit pickup time"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                    fill="#024209"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))
         ) : (
-          // One-time pickup slot or old format
           <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
             <span className="font-semibold text-interactive">
-              {pickupSlots.length > 0 && pickupSlots[0].date
-                ? `${formatSlotDate(pickupSlots[0].date)}, ${pickupSlots[0].startTime} - ${pickupSlots[0].endTime}`
-                : t('dateNotSet')}
+              {t('dateNotSet')}
             </span>
             <button
               onClick={() => router.push('/donate/pickup-slot')}
