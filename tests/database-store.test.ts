@@ -174,7 +174,7 @@ describe('Database Store Tests', () => {
       const newFoodItem = {
         name: 'New Food Item',
         description: 'A new test item',
-        allergens: JSON.stringify(['None']),
+        allergens: JSON.stringify(['Not specified']),
         image_url: '/test.jpg',
         quantity: 1,
         unit: 'piece',

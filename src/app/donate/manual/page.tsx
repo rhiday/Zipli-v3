@@ -215,10 +215,10 @@ function ManualDonationPageInner() {
       tempeh: ['Soybeans'],
 
       // Vegan options
-      vegan: ['None'],
-      plant: ['None'],
-      vegetable: ['None'],
-      fruit: ['None'],
+      vegan: ['Not specified'],
+      plant: ['Not specified'],
+      vegetable: ['Not specified'],
+      fruit: ['Not specified'],
       salad: name.includes('nut') ? ['Tree nuts'] : [],
     };
 
@@ -427,7 +427,7 @@ function ManualDonationPageInner() {
       <AllergensDropdown
         label={t('allergiesIntolerancesDiets')}
         options={[
-          'None',
+          'Not specified',
           'Milk',
           'Eggs',
           'Fish',

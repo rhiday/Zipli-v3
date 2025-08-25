@@ -161,7 +161,7 @@ export default function OneTimeRequestForm() {
         <AllergensDropdown
           label={t('allergiesIntolerancesDiets')}
           options={[
-            'None',
+            'Not specified',
             'Milk',
             'Eggs',
             'Fish',

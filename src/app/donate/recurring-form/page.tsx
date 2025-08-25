@@ -140,7 +140,7 @@ export default function RecurringDonationForm() {
         <AllergensDropdown
           label="Allergens & dietary information"
           options={[
-            'None',
+            'Not specified',
             'Milk',
             'Eggs',
             'Fish',

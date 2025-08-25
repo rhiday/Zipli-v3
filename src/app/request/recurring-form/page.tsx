@@ -162,7 +162,7 @@ export default function RecurringRequestForm() {
         <AllergensDropdown
           label={t('allergiesIntolerancesDiets')}
           options={[
-            'None',
+            'Not specified',
             'Milk',
             'Eggs',
             'Fish',
