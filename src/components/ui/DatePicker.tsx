@@ -1,175 +1,222 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon } from 'lucide-react';
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  addMonths,
+  subMonths,
+  isAfter,
+  isBefore,
+} from 'date-fns';
+import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, isValid, isAfter, addDays } from 'date-fns';
-import { sanitizeDateString } from '@/lib/date-time-validation';
 
 interface DatePickerProps {
-  label?: string;
-  date?: Date;
-  onDateChange?: (date: Date | undefined) => void;
-  disabled?: boolean;
-  error?: string;
+  value?: string;
+  onChange: (date: string) => void;
+  min?: string;
+  max?: string;
+  placeholder?: string;
   className?: string;
-  placeholder?: string; // e.g. "DD/MM/YYYY"
-  dateFormat?: string; // e.g. 'dd/MM/yyyy'
-  disablePastDates?: boolean;
-  minDate?: Date;
-  maxDate?: Date;
-  validateOnChange?: boolean;
-  maxFutureDays?: number;
-  onValidationError?: (error: string) => void;
+  label?: string;
 }
 
-export const DatePicker: React.FC<DatePickerProps> = ({
+export function DatePicker({
+  value,
+  onChange,
+  min,
+  max,
+  placeholder = 'DD/MM/YYYY',
+  className,
   label,
-  date,
-  onDateChange,
-  disabled = false,
-  error,
-  className = '',
-  placeholder = 'dd.mm.yyyy',
-  dateFormat = 'dd/MM/yyyy',
-  disablePastDates = true,
-  minDate,
-  maxDate,
-  validateOnChange = true,
-  maxFutureDays = 365,
-  onValidationError,
-}) => {
+}: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const validateDate = (selectedDate: Date | undefined): string | null => {
-    if (!selectedDate) return null;
+  const selectedDate = value ? new Date(value) : null;
+  const minDate = min ? new Date(min) : null;
+  const maxDate = max ? new Date(max) : null;
 
-    if (!isValid(selectedDate)) {
-      return 'Invalid date selected';
-    }
-
-    const now = new Date();
-
-    if (
-      disablePastDates &&
-      !isAfter(selectedDate, now) &&
-      selectedDate.toDateString() !== now.toDateString()
-    ) {
-      return 'Date must be today or in the future';
-    }
-
-    if (
-      minDate &&
-      !isAfter(selectedDate, minDate) &&
-      selectedDate.toDateString() !== minDate.toDateString()
-    ) {
-      return `Date must be on or after ${format(minDate, dateFormat)}`;
-    }
-
-    if (maxDate && isAfter(selectedDate, maxDate)) {
-      return `Date must be on or before ${format(maxDate, dateFormat)}`;
-    }
-
-    const maxFutureDate = addDays(now, maxFutureDays);
-    if (isAfter(selectedDate, maxFutureDate)) {
-      return `Date must be within ${maxFutureDays} days`;
-    }
-
-    return null;
-  };
-
-  const handleDateSelect = (selectedDate: Date | undefined) => {
-    if (validateOnChange && selectedDate) {
-      const validationError = validateDate(selectedDate);
-      if (validationError) {
-        onValidationError?.(validationError);
-        return;
+  // Close on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
       }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
-    onDateChange?.(selectedDate);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleDateSelect = (date: Date) => {
+    onChange(format(date, 'yyyy-MM-dd'));
     setIsOpen(false);
   };
 
-  const getDisabledDates = () => {
-    const disabled: any = {};
+  const handlePrevMonth = () => {
+    setCurrentMonth(subMonths(currentMonth, 1));
+  };
 
-    if (disablePastDates) {
-      disabled.before = new Date();
+  const handleNextMonth = () => {
+    setCurrentMonth(addMonths(currentMonth, 1));
+  };
+
+  const getDaysInMonth = () => {
+    const start = startOfMonth(currentMonth);
+    const end = endOfMonth(currentMonth);
+    const days = eachDayOfInterval({ start, end });
+
+    // Add padding days from previous month
+    const startDayOfWeek = start.getDay();
+    const prevMonthDays = [];
+    for (let i = startDayOfWeek - 1; i >= 0; i--) {
+      const date = new Date(start);
+      date.setDate(date.getDate() - (i + 1));
+      prevMonthDays.push(date);
     }
 
-    if (minDate) {
-      disabled.before = minDate;
-    }
+    return [...prevMonthDays, ...days];
+  };
 
-    if (maxDate) {
-      disabled.after = maxDate;
-    } else {
-      // Default max date based on maxFutureDays
-      const maxFutureDate = addDays(new Date(), maxFutureDays);
-      disabled.after = maxFutureDate;
-    }
+  const isDateDisabled = (date: Date) => {
+    if (minDate && isBefore(date, minDate)) return true;
+    if (maxDate && isAfter(date, maxDate)) return true;
+    return false;
+  };
 
-    return disabled;
+  const formatDisplayValue = () => {
+    if (selectedDate) {
+      return format(selectedDate, 'dd.MM.yyyy');
+    }
+    return '';
   };
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className="relative" ref={containerRef}>
       {label && (
-        <Label className="text-sm font-medium text-gray-700 block">
-          {label}
-        </Label>
+        <label className="block text-label font-semibold mb-3">{label}</label>
       )}
 
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="secondary"
-            disabled={disabled}
-            className={cn(
-              'rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base h-12',
-              !date && 'text-muted-foreground',
-              error && 'border-red-500'
-            )}
-          >
-            {date ? (
-              <span className="text-black">{format(date, dateFormat)}</span>
-            ) : (
-              <span className="text-gray-400">{placeholder}</span>
-            )}
-            <div className="pointer-events-none">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
-                <CalendarIcon className="h-4 w-4 text-gray-400" />
-              </div>
-            </div>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          className="w-auto p-0 bg-white border-gray-200"
-          align="start"
-        >
-          <Calendar
-            mode="single"
-            weekStartsOn={1}
-            selected={date}
-            onSelect={handleDateSelect}
-            disabled={getDisabledDates()}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
+      {/* Input Field */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          'w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between',
+          'hover:border-[#024209] focus:border-[#024209] focus:ring-2 focus:ring-[#024209]/20 focus:outline-none',
+          'transition-colors duration-200',
+          className
+        )}
+      >
+        <span className={cn('text-lg', !selectedDate && 'text-gray-400')}>
+          {formatDisplayValue() || placeholder}
+        </span>
+        <Calendar className="w-5 h-5 text-gray-400" />
+      </button>
 
-      {error && <div className="text-sm text-red-600">{error}</div>}
+      {/* Calendar Popover */}
+      {isOpen && (
+        <div className="absolute z-[9999] mt-2 w-full bg-white rounded-[12px] shadow-lg border border-[#D9DBD5] p-4">
+          {/* Month Navigation */}
+          <div className="flex items-center justify-between mb-4">
+            <button
+              type="button"
+              onClick={handlePrevMonth}
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <div className="text-lg font-semibold">
+              {format(currentMonth, 'MMMM yyyy')}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Weekday Headers */}
+          <div className="grid grid-cols-7 gap-1 mb-2">
+            {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day) => (
+              <div
+                key={day}
+                className="text-center text-sm font-medium text-gray-600 py-1"
+              >
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar Days */}
+          <div className="grid grid-cols-7 gap-1">
+            {getDaysInMonth().map((date, index) => {
+              const isCurrentMonth = isSameMonth(date, currentMonth);
+              const isSelected = selectedDate && isSameDay(date, selectedDate);
+              const isDisabled = isDateDisabled(date);
+              const isToday = isSameDay(date, new Date());
+
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() =>
+                    !isDisabled && isCurrentMonth && handleDateSelect(date)
+                  }
+                  disabled={isDisabled || !isCurrentMonth}
+                  className={cn(
+                    'h-10 rounded-lg text-sm transition-all duration-200',
+                    isCurrentMonth ? 'text-gray-900' : 'text-gray-300',
+                    !isDisabled && isCurrentMonth && 'hover:bg-[#F5F9EF]',
+                    isSelected && 'bg-[#024209] text-white hover:bg-[#024209]',
+                    isToday && !isSelected && 'border border-[#024209]',
+                    isDisabled && 'text-gray-300 cursor-not-allowed'
+                  )}
+                >
+                  {date.getDate()}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex justify-between mt-4 pt-4 border-t border-[#D9DBD5]">
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDateSelect(new Date())}
+              className="text-[#024209] hover:text-[#024209]/80 text-sm font-medium"
+            >
+              Today
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-DatePicker.displayName = 'DatePicker';
+}
