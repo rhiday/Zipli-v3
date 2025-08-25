@@ -48,6 +48,10 @@ export default function DonationSummaryPage() {
     useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
+  const [donationPeriod, setDonationPeriod] = useState<{
+    startDate?: Date;
+    endDate?: Date;
+  } | null>(null);
   const [isLoadingRecurringData, setIsLoadingRecurringData] = useState(true);
 
   const formatSlotDate = (date: Date | string | undefined) => {
@@ -78,6 +82,24 @@ export default function DonationSummaryPage() {
     const storedDonation = sessionStorage.getItem('pendingDonation');
     if (storedDonation) {
       const donationData = JSON.parse(storedDonation);
+
+      // Extract donation period from schedules or direct properties
+      if (donationData.schedules && donationData.schedules.length > 0) {
+        const firstSchedule = donationData.schedules[0];
+        if (firstSchedule.startDate && firstSchedule.endDate) {
+          setDonationPeriod({
+            startDate: new Date(firstSchedule.startDate),
+            endDate: new Date(firstSchedule.endDate),
+          });
+        }
+      } else if (donationData.startDate && donationData.endDate) {
+        // Fallback to direct properties on donation data
+        setDonationPeriod({
+          startDate: new Date(donationData.startDate),
+          endDate: new Date(donationData.endDate),
+        });
+      }
+
       if (donationData.recurringSchedules || donationData.schedule) {
         setRecurringSchedule(
           donationData.recurringSchedules || donationData.schedule
@@ -357,6 +379,32 @@ export default function DonationSummaryPage() {
           />
         ))}
       </div>
+
+      {/* Donation Period */}
+      {donationPeriod && donationPeriod.startDate && donationPeriod.endDate && (
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center justify-between p-4 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+            <span className="font-semibold text-interactive">
+              Donation Period: {format(donationPeriod.startDate, 'dd.MM.yyyy')}{' '}
+              - {format(donationPeriod.endDate, 'dd.MM.yyyy')}
+            </span>
+            <button
+              onClick={() => router.push('/donate/schedule')}
+              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+              title="Edit donation period"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                  fill="#024209"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Pickup schedule */}
       <div className="space-y-4">

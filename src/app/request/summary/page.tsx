@@ -21,6 +21,10 @@ export default function RequestSummaryPage() {
   const { requestData, pickupSlots, clearRequest } = useRequestStore();
   const { currentUser, addRequest } = useDatabase();
   const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
+  const [requestPeriod, setRequestPeriod] = useState<{
+    startDate?: Date;
+    endDate?: Date;
+  } | null>(null);
 
   const [address, setAddress] = useState('');
   const [instructions, setInstructions] = useState('');
@@ -55,6 +59,14 @@ export default function RequestSummaryPage() {
       const sessionRequestData = JSON.parse(storedRequest);
       if (sessionRequestData.recurringSchedules) {
         setRecurringSchedule(sessionRequestData.recurringSchedules);
+      }
+
+      // Extract request period dates
+      if (sessionRequestData.startDate && sessionRequestData.endDate) {
+        setRequestPeriod({
+          startDate: new Date(sessionRequestData.startDate),
+          endDate: new Date(sessionRequestData.endDate),
+        });
       }
     }
 
@@ -313,6 +325,32 @@ export default function RequestSummaryPage() {
           </button>
         </div>
       </div>
+
+      {/* Request Period */}
+      {requestPeriod && requestPeriod.startDate && requestPeriod.endDate && (
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center justify-between p-4 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+            <span className="font-semibold text-interactive">
+              Request Period: {format(requestPeriod.startDate, 'dd.MM.yyyy')} -{' '}
+              {format(requestPeriod.endDate, 'dd.MM.yyyy')}
+            </span>
+            <button
+              onClick={() => router.push('/request/schedule')}
+              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+              title="Edit request period"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                  fill="#024209"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Pickup Schedule Section */}
       <div className="space-y-4">
