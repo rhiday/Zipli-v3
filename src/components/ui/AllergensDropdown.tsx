@@ -99,6 +99,9 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           disabled={disabled}
           className="cursor-pointer"
           onClick={handleInputClick}
+          autoComplete="off"
+          name="allergens-selector"
+          data-form-type="other"
         />
         {value.length > 0 && (
           <>
