@@ -1,10 +1,12 @@
 /**
- * Enhanced i18n system with contextual organization for Lokalise
- * Automatically syncs with Lokalise and provides page/section context
+ * Simple i18n system using static translation files
+ * All translations load from static en.ts and fi.ts files
+ * Lokalise is only for content management, not runtime loading
  */
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getTranslations } from './translations';
 
 export type Language = 'en' | 'fi';
 
@@ -101,7 +103,7 @@ const useLanguageStore = create<LanguageState>()(
   persist(
     (set, get) => ({
       language: 'en' as Language,
-      translations: {},
+      translations: { en: {}, fi: {} } as Record<Language, any>,
       setLanguage: (language: Language) => set({ language }),
       setTranslations: (translations: Record<Language, any>) =>
         set({ translations }),
@@ -125,32 +127,15 @@ export const useTranslation = (namespace?: string) => {
     key: TranslationKey | string,
     params?: Record<string, string>
   ): string => {
-    let translationKey = key;
+    // Get static translations
+    const staticTranslations = getTranslations(language);
 
-    // Add namespace prefix if provided and key doesn't already have it
-    if (namespace && !key.includes('.')) {
-      translationKey = `${namespace}.${key}`;
-    }
+    // Try to get translation from static files
+    const translation = (staticTranslations as any)[key];
+    if (translation) return translation;
 
-    const currentTranslations = translations[language] || {};
-    let value =
-      getNestedValue(currentTranslations, translationKey) || translationKey;
-
-    // Replace parameters if provided
-    if (params) {
-      Object.entries(params).forEach(([param, replacement]) => {
-        value = value.replace(`{{${param}}}`, replacement);
-      });
-    }
-
-    // Log missing translations in development
-    if (process.env.NODE_ENV === 'development' && value === translationKey) {
-      console.warn(
-        `Missing translation: ${translationKey} for language: ${language}`
-      );
-    }
-
-    return value;
+    // Fallback to key if no translation found
+    return key;
   };
 
   const changeLanguage = (newLanguage: Language) => {
@@ -192,49 +177,23 @@ export const useAllergenSelectorTranslation = () =>
   useTranslation('components.allergenSelector');
 
 // Common translations helper
-export const useCommonTranslation = () => useTranslation('common');
+export const useCommonTranslation = () => {
+  const { language } = useLanguageStore();
 
-// Load translations from API or static files
+  return {
+    t: (key: string) => {
+      const staticTranslations = getTranslations(language);
+      return (staticTranslations as any)[key] || key;
+    },
+    language,
+  };
+};
+
+// No need to load translations - they're imported statically
 export const loadTranslations = async () => {
-  const { setTranslations } = useLanguageStore.getState();
-
-  try {
-    // Try to load from Lokalise API first
-    const response = await fetch('/api/translations');
-    if (response.ok) {
-      const translations = await response.json();
-      console.log('📥 Loaded translations from Lokalise API');
-      setTranslations(translations);
-      return;
-    }
-  } catch (error) {
-    console.warn(
-      'Could not load translations from Lokalise API, falling back to static files'
-    );
-  }
-
-  // Fallback to static files
-  try {
-    const [enResponse, fiResponse] = await Promise.all([
-      fetch('/locales/en/translations.json'),
-      fetch('/locales/fi/translations.json'),
-    ]);
-
-    if (enResponse.ok && fiResponse.ok) {
-      const [enTranslations, fiTranslations] = await Promise.all([
-        enResponse.json(),
-        fiResponse.json(),
-      ]);
-
-      console.log('📁 Loaded translations from static files');
-      setTranslations({
-        en: enTranslations,
-        fi: fiTranslations,
-      });
-    }
-  } catch (error) {
-    console.error('Failed to load translations:', error);
-  }
+  // Static translations are already loaded via imports
+  // This function exists for compatibility but does nothing
+  console.log('📁 Using static translations from en.ts and fi.ts files');
 };
 
 export default useTranslation;

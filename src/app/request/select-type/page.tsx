@@ -2,20 +2,20 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Clock, Calendar, ArrowRight } from 'lucide-react';
 
 export default function RequestTypeSelection() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   return (
     <PageContainer
       header={
         <SecondaryNavbar
-title="Default"
+          title={t('selectRequestType')}
           backHref="/receiver/dashboard"
           onBackClick={() => router.back()}
         />
@@ -26,7 +26,7 @@ title="Default"
       <div className="space-y-6">
         <div className="text-center mb-8">
           <h2 className="text-titleSm text-primary mb-2">
-            What type of request do you want to create?
+            {t('selectRequestType')}?
           </h2>
           <p className="text-body text-secondary">
             Choose the type that best fits your needs
@@ -46,7 +46,7 @@ title="Default"
                 </div>
                 <div className="flex-1">
                   <h3 className="text-bodyLg font-semibold text-primary mb-1">
-                    One-time Request
+                    {t('oneTimeRequest')}
                   </h3>
                   <p className="text-body text-secondary">
                     Create a single request for immediate food needs
@@ -69,7 +69,7 @@ title="Default"
                 </div>
                 <div className="flex-1">
                   <h3 className="text-bodyLg font-semibold text-primary mb-1">
-                    Recurring Request
+                    {t('recurringRequest')}
                   </h3>
                   <p className="text-body text-secondary">
                     Set up a repeating schedule for ongoing food needs

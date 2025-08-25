@@ -27,6 +27,6 @@ const Steps = React.forwardRef<HTMLDivElement, StepsProps>(
   }
 );
 
-Steps.displayName = t('common.steps');
+Steps.displayName = 'Steps';
 
 export { Steps }; 

@@ -96,9 +96,9 @@ export async function GET(request: Request) {
       }
     );
   } catch (error) {
-    console.error(t('common.qr_token_generation_error'), error);
+    console.error('QR token generation error:', error);
     return new NextResponse(
-      JSON.stringify({ error: t('common.internal_server_error') }),
+      JSON.stringify({ error: 'Internal server error' }),
       {
         status: 500,
         headers: {

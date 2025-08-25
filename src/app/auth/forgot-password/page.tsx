@@ -5,15 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const resetPassword = useDatabase(state => state.resetPassword);
-  const { t } = useLanguage();
+  const resetPassword = useDatabase((state) => state.resetPassword);
+  const { t } = useCommonTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,26 +23,28 @@ export default function ForgotPasswordPage() {
 
     try {
       const response = await resetPassword(email);
-      
+
       if (response.error) {
         setError(response.error);
       } else {
         setMessage(t('resetPasswordDesc'));
       }
     } catch (err) {
-      setError(t(t('pages.auth.networkerror')));
+      setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
-          <h1 className="text-titleSm font-display text-primary">{t('resetPassword')}</h1>
+          <h1 className="text-titleSm font-display text-primary">
+            {t('resetPassword')}
+          </h1>
           <p className="mt-2 text-body text-primary-75">
-title="Default"
+            Enter your email to receive a password reset link
           </p>
         </div>
 
@@ -60,8 +62,11 @@ title="Default"
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-label font-medium text-primary mb-1">
-title="Default"
+            <label
+              htmlFor="email"
+              className="block text-label font-medium text-primary mb-1"
+            >
+              Email
             </label>
             <Input
               id="email"
@@ -71,7 +76,7 @@ title="Default"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder = "EmailAddress"
+              placeholder="EmailAddress"
             />
           </div>
 
@@ -99,4 +104,4 @@ title="Default"
       </div>
     </div>
   );
-} 
+}

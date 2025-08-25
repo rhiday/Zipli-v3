@@ -19,9 +19,9 @@ import {
 } from "@/components/ui/dialog";
 
 const navItems = [
-  { href: '/donate', label: t('common.navigation.dashboard'), icon: LayoutGrid },
-  { href: '/feed', label: t('common.explore'), icon: Search },
-  { href: '#', label: t('common.actions.add'), icon: Plus, isCentral: true },
+  { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
+  { href: '/feed', label: 'Explore', icon: Search },
+  { href: '#', label: 'Add', icon: Plus, isCentral: true },
 ];
 
 export default function DesktopGlobalNavbar() {

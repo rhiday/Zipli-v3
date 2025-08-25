@@ -3,12 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { NextSteps } from '@/components/ui/NextSteps';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 export default function RequestSuccessPage() {
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-white">
+    <div className="flex flex-col items-center justify-center min-h-dvh px-4 bg-white">
       <div className="mt-12 mb-8">
         <svg
           width="164"
@@ -25,15 +25,15 @@ export default function RequestSuccessPage() {
         </svg>
       </div>
       <h1 className="text-3xl font-bold mb-4 text-center">
-title="Default"
+        {t('requestSubmitted')}
       </h1>
       <p className="text-center text-base text-black mb-6 max-w-xs">
-title="Default"
+        {t('requestSubmittedDesc')}
       </p>
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
-          heading = 'NextSteps'
+          heading={t('nextSteps')}
           steps={[
             {
               title: t('requestSubmitted'),
@@ -52,7 +52,7 @@ title="Default"
       </div>
       <Link href="/receiver/dashboard">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-title="Default"
+          {t('backToDashboard')}
         </button>
       </Link>
     </div>

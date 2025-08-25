@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,11 +12,11 @@ function QRLoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
-  const login = useDatabase(state => state.login);
+  const login = useDatabase((state) => state.login);
 
   const handleQRLogin = async () => {
     if (!token) {
-      setError(t('pages.auth.invalid_qr_login_token'));
+      setError('Invalid QR login token');
       return;
     }
 
@@ -28,7 +28,7 @@ function QRLoginPageContent() {
       // In a real app, you'd validate the token and get the associated user
       const mockEmail = 'admin@zipli.test'; // Default to admin for QR login
       const response = await login(mockEmail, 'password');
-      
+
       if (response.error) {
         setError(response.error);
         setLoading(false);
@@ -60,9 +60,11 @@ function QRLoginPageContent() {
 
   if (!token) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+      <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
         <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
-          <h1 className="text-titleSm font-display text-negative">Invalid QR Code</h1>
+          <h1 className="text-titleSm font-display text-negative">
+            Invalid QR Code
+          </h1>
           <p className="text-body text-primary-75">
             This QR login link is invalid or has expired.
           </p>
@@ -77,11 +79,12 @@ function QRLoginPageContent() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
         <h1 className="text-titleSm font-display text-primary">QR Login</h1>
         <p className="text-body text-primary-75">
-          You're about to log in via QR code. Click the button below to complete the login.
+          You're about to log in via QR code. Click the button below to complete
+          the login.
         </p>
 
         {error && (
@@ -114,14 +117,16 @@ function QRLoginPageContent() {
 
 export default function QRLoginPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
-        <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="text-body text-primary-75">Loading...</p>
+    <Suspense
+      fallback={
+        <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
+          <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="text-body text-primary-75">Loading...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <QRLoginPageContent />
     </Suspense>
   );

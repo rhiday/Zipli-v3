@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Header } from './Header';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
+// Removed unused import
 import './page.css';
 
 type User = {
@@ -15,9 +15,9 @@ export const Page: React.FC = () => {
     <article>
       <Header
         user={user}
-        onLogin={() => setUser({ name: t('common.jane_doe') })}
+        onLogin={() => setUser({ name: 'Jane Doe' })}
         onLogout={() => setUser(undefined)}
-        onCreateAccount={() => setUser({ name: t('common.jane_doe') })}
+        onCreateAccount={() => setUser({ name: 'Jane Doe' })}
       />
 
       <section className="storybook-page">

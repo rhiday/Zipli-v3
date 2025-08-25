@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
-import { RecurringRequest } from '@/types/request.types';
+import { useRequestStore } from '@/store/request';
 
 type RecurringFormInputs = {
   description: string;
@@ -21,15 +21,25 @@ type RecurringFormInputs = {
 
 export default function RecurringRequestForm() {
   const router = useRouter();
-  const { t } = useLanguage();
-  const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
+  const { t } = useCommonTranslation();
+  const { setRequestData, requestData } = useRequestStore();
+  const [selectedAllergens, setSelectedAllergens] = useState<string[]>(
+    requestData.allergens || []
+  );
+  const [allergensInteracted, setAllergensInteracted] = useState(false);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
-  } = useForm<RecurringFormInputs>();
+  } = useForm<RecurringFormInputs>({
+    defaultValues: {
+      description: requestData.description || '',
+      quantity: requestData.quantity ? requestData.quantity.toString() : '',
+    },
+  });
 
   const watchedFields = watch();
 
@@ -40,25 +50,35 @@ export default function RecurringRequestForm() {
     selectedAllergens.length > 0;
 
   const onSubmit = async (data: RecurringFormInputs) => {
+    setAttemptedSubmit(true);
+
+    // Check if form is valid before proceeding
+    if (!isFormValid) {
+      return;
+    }
+
     try {
+      // Update the store with form data
+      setRequestData({
+        request_type: 'recurring',
+        description: data.description,
+        quantity: Number(data.quantity),
+        allergens: selectedAllergens,
+      });
+
+      // Store in session storage for backward compatibility
       const requestData = {
         request_type: 'recurring',
         description: data.description,
         quantity: Number(data.quantity),
         allergens: selectedAllergens,
       };
-
-      // Log the structured data for testing
-      console.log('Recurring Request Data:', requestData);
-      console.log('Ready for Supabase:', JSON.stringify(requestData, null, 2));
-
-      // Store in session storage for now (will be replaced with Supabase)
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
       // Navigate to schedule page (following donor flow pattern)
       router.push('/request/schedule');
     } catch (error) {
-      console.error(t('pages.requests.failed_to_create_recurring_req'), error);
+      console.error('Failed to create recurring request:', error);
     }
   };
 
@@ -67,7 +87,7 @@ export default function RecurringRequestForm() {
       header={
         <>
           <SecondaryNavbar
-title="Default"
+            title={t('recurringRequest')}
             backHref="/request/select-type"
             onBackClick={() => router.back()}
           />
@@ -85,7 +105,7 @@ title="Default"
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? 'Submitting...' : t('common.actions.continue')}
+            {isSubmitting ? t('continuing') : t('continue')}
           </Button>
         </BottomActionBar>
       }
@@ -96,14 +116,14 @@ title="Default"
         {/* Food Description */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            Describe what type of food you need
+            {t('describeFood')}
           </label>
           <Textarea
             {...register('description', {
               required: 'Please describe the food you need',
             })}
-            placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
-            variant={errors.description ? {t('common.status.error')} : 'default'}
+            placeholder={t('foodDescriptionPlaceholder')}
+            variant={errors.description ? 'error' : 'default'}
             rows={4}
           />
           {errors.description && (
@@ -116,7 +136,7 @@ title="Default"
         {/* Quantity */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            How many people is this for?
+            {t('peopleCount')}?
           </label>
           <Input
             {...register('quantity', {
@@ -127,9 +147,9 @@ title="Default"
                 message: 'Please enter a valid number',
               },
             })}
-title="Default"
+            placeholder={t('enterNumberOfPeople')}
             type="number"
-            variant={errors.quantity ? {t('common.status.error')} : 'default'}
+            variant={errors.quantity ? 'error' : 'default'}
           />
           {errors.quantity && (
             <div className="mt-1 text-[14px] font-manrope text-negative">
@@ -140,18 +160,34 @@ title="Default"
 
         {/* Allergens */}
         <AllergensDropdown
-          label="Allergies, intolerances & diets"
-          options={['Default', t('pages.requests.eggs'), t('pages.requests.fish'), t('pages.requests.shellfish'),
-            'Tree nuts', t('pages.requests.peanuts'), t('pages.requests.wheat'), t('pages.requests.soybeans'), t('pages.requests.vegan'), t('pages.requests.vegetarian'),
-            'Gluten-free', t('pages.requests.halal'), t('pages.requests.kosher'),
+          label={t('allergiesIntolerancesDiets')}
+          options={[
+            'Eggs',
+            'Fish',
+            'Shellfish',
+            'Tree nuts',
+            'Peanuts',
+            'Wheat',
+            'Soybeans',
+            'Vegan',
+            'Vegetarian',
+            'Gluten-free',
+            'Halal',
+            'Kosher',
             'Low-lactose',
           ]}
           value={selectedAllergens}
-          onChange={setSelectedAllergens}
-title="Default"
+          onChange={(allergens) => {
+            setSelectedAllergens(allergens);
+            if (!allergensInteracted) {
+              setAllergensInteracted(true);
+            }
+          }}
+          placeholder={t('selectAllergens')}
           error={
-            !selectedAllergens.length && watchedFields.description
-              ? 'Please select at least one option'
+            !selectedAllergens.length &&
+            (allergensInteracted || attemptedSubmit)
+              ? t('selectAllergens')
               : undefined
           }
         />

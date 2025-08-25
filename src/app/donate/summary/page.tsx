@@ -88,7 +88,7 @@ export default function DonationSummaryPage() {
         ) {
           const { addDonationItem } = useDonationStore.getState();
           addDonationItem({
-            name: donationData.description  || 'Recurring_donation',
+            name: donationData.description || 'Recurring_donation',
             quantity: donationData.quantity?.toString() || '1',
             allergens: donationData.allergens || [],
             description: donationData.description || null,
@@ -117,7 +117,7 @@ export default function DonationSummaryPage() {
     console.log('✏️ Edit mode:', isEditMode, 'ID:', editingDonationId);
 
     if (!address.trim() || !currentUser) {
-      console.error(t('pages.donations._validation_failed_missing_add'));
+      console.error('Validation failed: missing address');
       return;
     }
 
@@ -200,9 +200,9 @@ export default function DonationSummaryPage() {
         console.log('✅ Donation updated successfully');
       } else {
         // Create mode: create new donations
-        console.log(t('pages.donations._processing'), donationItems.length, 'donation items...');
+        console.log('Processing', donationItems.length, 'donation items...');
         for (const item of donationItems) {
-          console.log(t('pages.donations._processing_item'), item.name, 'qty:', item.quantity);
+          console.log('Processing item:', item.name, 'qty:', item.quantity);
 
           // First, find or create the food item in the database
           let foodItemId = '';
@@ -257,7 +257,7 @@ export default function DonationSummaryPage() {
           const result = await addDonation(donationData);
 
           if (result.error) {
-            console.error(t('pages.donations._error_creating_donation'), result.error);
+            console.error('Error creating donation:', result.error);
             // Continue with other donations even if one fails
           } else {
             console.log('✅ Donation created successfully:', result.data?.id);
@@ -282,10 +282,10 @@ export default function DonationSummaryPage() {
   // Show loading if no donation data
   if (donationItems.length === 0) {
     return (
-      <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
+      <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">{t('noDonationItemsFound')}</p>
         <Button onClick={() => router.push('/donate/new')}>
-title="Default"
+          Start New Donation
         </Button>
       </div>
     );
@@ -296,7 +296,7 @@ title="Default"
       header={
         <>
           <SecondaryNavbar
-            title = 'DonationSummary'
+            title="Donation Summary"
             backHref="/donate/pickup-slot"
           />
           <div className="px-4 pt-2">
@@ -322,7 +322,7 @@ title="Default"
       {/* Donation Items Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-2">
-title="Default"
+          Donation Items
         </h2>
         {donationItems.map((item, index) => (
           <ItemPreview
@@ -340,7 +340,7 @@ title="Default"
       {/* Pickup schedule */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {recurringSchedule ? {t('pages.donations.recurring_schedule')} : t('pickupSchedule')}
+          {recurringSchedule ? 'Recurring Schedule' : 'Pickup Schedule'}
         </h2>
         {recurringSchedule && Array.isArray(recurringSchedule) ? (
           // Multiple recurring schedules
@@ -355,8 +355,8 @@ title="Default"
               </span>
               <button
                 onClick={() => router.push('/donate/recurring-schedule')}
-                className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-title="Default"
+                className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+                title="Edit schedule"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path
@@ -379,8 +379,8 @@ title="Default"
             </span>
             <button
               onClick={() => router.push('/donate/pickup-slot')}
-              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-title="Default"
+              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+              title="Edit pickup time"
             >
               <svg
                 width="20"
@@ -404,14 +404,14 @@ title="Default"
       {/* Address & Instructions Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-title="Default"
+          Address & Instructions
         </h2>
         <div>
           <label
             htmlFor="address"
             className="block text-black font-semibold mb-3"
           >
-title="Default"
+            Address
           </label>
           <Textarea
             id="address"
@@ -432,7 +432,7 @@ title="Default"
               htmlFor="update-address-profile"
               className="text-sm text-gray-600"
             >
-title="Default"
+              Save this address to my profile
             </label>
           </div>
         </div>
@@ -441,11 +441,11 @@ title="Default"
             htmlFor="driver-instructions"
             className="block text-black font-semibold mb-3"
           >
-title="Default"
+            Instructions for driver (optional)
           </label>
           <Textarea
             id="driver-instructions"
-            placeholder = "PleaseRingTheDoorbell"
+            placeholder="Please ring the doorbell"
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
@@ -462,7 +462,7 @@ title="Default"
               htmlFor="update-instructions-profile"
               className="text-sm text-gray-600"
             >
-title="Default"
+              Save these instructions to my profile
             </label>
           </div>
         </div>

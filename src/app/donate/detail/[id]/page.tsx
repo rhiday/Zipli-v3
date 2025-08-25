@@ -27,7 +27,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useDatabase, DonationWithFoodItem } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useDonationStore } from '@/store/donation';
 
 export default function DonationDetailPage({
@@ -35,7 +35,7 @@ export default function DonationDetailPage({
 }: {
   params: { id: string };
 }) {
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const currentUser = useDatabase((state) => state.currentUser);
   const router = useRouter();
   const donations = useDatabase((state) => state.donations);
@@ -112,7 +112,7 @@ export default function DonationDetailPage({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream">
+      <div className="flex min-h-dvh items-center justify-center bg-cream">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
@@ -120,12 +120,12 @@ export default function DonationDetailPage({
 
   if (error || !donation || !donation.food_item) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center text-center">
+      <div className="flex min-h-dvh flex-col items-center justify-center text-center">
         <h2 className="text-2xl font-bold mb-2">
-          {error ? t(t('common.status.error')) : t('donationNotFound')}
+          {error ? 'Error' : 'Donation Not Found'}
         </h2>
         <p className="text-muted-foreground">
-          {error || t('couldNotLoadDetails')}
+          {error || 'Could not load donation details'}
         </p>
         <Button onClick={() => router.back()} className="mt-4">
           Go Back
@@ -134,16 +134,15 @@ export default function DonationDetailPage({
     );
   }
 
-  const donorName = donorDisplayName || t('generousDonor');
+  const donorName = donorDisplayName || 'Generous Donor';
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       {/* Header with Image and Back Arrow */}
       <div className="relative h-60 w-full">
         <Button
           onClick={() => router.back()}
           className="absolute top-12 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
-          Go Back
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -159,7 +158,7 @@ export default function DonationDetailPage({
           <div className="h-full w-full bg-gray-200 flex items-center justify-center">
             <Image
               src="/images/placeholder.svg"
-              alt = 'NoImage'
+              alt="NoImage"
               width={160}
               height={160}
             />
@@ -192,7 +191,7 @@ export default function DonationDetailPage({
 
           <div className="mt-4 flex items-start gap-3 text-gray-600">
             <MapPin className="h-5 w-5 flex-shrink-0" />
-            <span className="font-medium">{t('addressNotProvided')}</span>
+            <span className="font-medium">Address not provided</span>
           </div>
 
           {isOwner ? (
@@ -221,9 +220,10 @@ export default function DonationDetailPage({
               </div>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{t('areYouSure')}</DialogTitle>
+                  <DialogTitle>Are you sure?</DialogTitle>
                   <DialogDescription>
-                    This will permanently remove the listing from public view. This action cannot be undone.
+                    This will permanently remove the listing from public view.
+                    This action cannot be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

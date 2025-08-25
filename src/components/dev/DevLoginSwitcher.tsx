@@ -29,7 +29,7 @@ const DevLoginSwitcher: React.FC = React.memo(() => {
         // Force a page refresh to ensure proper state
         window.location.href = '/';
       } catch (error) {
-        console.error(t('common.devloginswitcher_login_error'), error);
+        console.error('DevLoginSwitcher login error:', error);
 
         // Fallback to regular login
         try {

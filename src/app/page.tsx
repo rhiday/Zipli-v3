@@ -39,7 +39,7 @@ export default function HomePage() {
 
   // Show loading spinner while determining redirect
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream">
+    <div className="flex min-h-dvh items-center justify-center bg-cream">
       <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
     </div>
   );

@@ -2,14 +2,12 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
 import fs from 'fs';
 import path from 'path';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 // Load mock users data
 const mockUsersPath = path.join(process.cwd(), 'mockData', 'users.json');
 const mockUsers = JSON.parse(fs.readFileSync(mockUsersPath, 'utf8'));
 
 export async function GET() {
-  const { t } = useCommonTranslation();
 
   // Only run in development
   if (process.env.NODE_ENV !== 'development') {
@@ -23,22 +21,22 @@ export async function GET() {
         email: 'alice@example.com',
         password: 'testpass123',
         role: 'food_donor' as const,
-        full_name: t('common.alice_restaurant'),
+        full_name: 'Alice Restaurant',
         organization_name: 'Alice\'s Restaurant',
       },
       {
         email: 'bob@example.com',
         password: 'testpass123',
         role: 'food_receiver' as const,
-        full_name: t('common.bob_charity'),
+        full_name: 'Bob Charity',
         organization_name: 'Bob\'s Food Bank',
       },
       {
         email: 'helsinki@example.com',
         password: 'testpass123',
         role: 'city' as const,
-        full_name: t('common.helsinki_admin'),
-        organization_name: t('common.helsinki'),
+        full_name: 'Helsinki Admin',
+        organization_name: 'Helsinki',
       },
     ];
 
@@ -77,7 +75,7 @@ export async function GET() {
 
     return NextResponse.json({ message: 'Seed completed successfully' });
   } catch (error) {
-    console.error(t('common.seed_error'), error);
-    return NextResponse.json({ error: t('common.seed_failed') }, { status: 500 });
+    console.error('Seed error:', error);
+    return NextResponse.json({ error: 'Seed failed' }, { status: 500 });
   }
 } 

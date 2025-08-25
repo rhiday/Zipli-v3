@@ -74,6 +74,6 @@ function Calendar({
     />
   );
 }
-Calendar.displayName = t('common.calendar');
+Calendar.displayName = 'Calendar';
 
 export { Calendar };

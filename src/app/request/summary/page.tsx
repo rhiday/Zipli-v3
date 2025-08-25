@@ -1,24 +1,26 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { useRequestStore } from '@/store/request';
-import { useDatabase } from '@/store';
-import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
-import { Progress } from '@/components/ui/progress';
-import { useLanguage } from '@/hooks/useLanguage';
-import { SummaryCard, AllergenChips } from '@/components/ui/SummaryCard';
-import { Textarea } from '@/components/ui/Textarea';
-import { format } from 'date-fns';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { AllergenChips } from '@/components/ui/SummaryCard';
+import { Textarea } from '@/components/ui/Textarea';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useDatabase } from '@/store';
+import type { RequestInsert } from '@/types/supabase';
+import { useRequestStore } from '@/store/request';
+import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function RequestSummaryPage() {
   const router = useRouter();
-  const { t } = useLanguage();
-  const { requestData, clearRequest } = useRequestStore();
+  const { t } = useCommonTranslation();
+  const { requestData, pickupSlots, clearRequest } = useRequestStore();
   const { currentUser, addRequest } = useDatabase();
+  const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
 
   const [address, setAddress] = useState('');
   const [instructions, setInstructions] = useState('');
@@ -27,6 +29,17 @@ export default function RequestSummaryPage() {
     useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const formatSlotDate = (date: Date | string | undefined) => {
+    if (!date) return null;
+    try {
+      const d = date instanceof Date ? date : new Date(date);
+      if (isNaN(d.getTime())) return null;
+      return format(d, 'dd.M.yyyy');
+    } catch {
+      return null;
+    }
+  };
+
   useEffect(() => {
     if (currentUser) {
       if (currentUser.address) setAddress(currentUser.address);
@@ -34,76 +47,104 @@ export default function RequestSummaryPage() {
         setInstructions((currentUser as any).driver_instructions as string);
       }
     }
+
+    // Check for recurring request data in session storage
+    const storedRequest = sessionStorage.getItem('pendingRequest');
+    if (storedRequest) {
+      const sessionRequestData = JSON.parse(storedRequest);
+      if (sessionRequestData.recurringSchedules) {
+        setRecurringSchedule(sessionRequestData.recurringSchedules);
+      }
+    }
   }, [currentUser]);
 
   const handleSubmitRequest = async () => {
+    console.log('🚀 Starting request submission...');
+    console.log('📝 Current user:', currentUser?.full_name);
+    console.log('📦 Request data:', requestData);
+    console.log('📅 Pickup slots:', pickupSlots.length);
+    console.log('🏠 Address:', address.trim());
+
+    if (!address.trim() || !currentUser) {
+      console.error('Validation failed: missing address or user');
+      alert('Please enter your address');
+      return;
+    }
+
+    if (!requestData.description || !requestData.quantity) {
+      alert('Please complete your food request details');
+      return;
+    }
+
+    if (pickupSlots.length === 0 && !recurringSchedule) {
+      alert('Please add at least one pickup slot');
+      return;
+    }
+
+    setIsSaving(true);
+
     try {
-      if (!currentUser) {
-        console.error('User not logged in');
-        alert('You must be logged in to submit a request');
-        return;
-      }
-
-      if (!address.trim()) {
-        alert('Please enter your address');
-        return;
-      }
-
-      if (
-        !requestData.quantity ||
-        !requestData.pickupDate ||
-        !requestData.startDate ||
-        !requestData.endDate
-      ) {
-        alert('Please complete all required fields');
-        return;
-      }
-
-      // Validate date range
-      if (requestData.startDate > requestData.endDate) {
-        alert('Start date must be before end date');
-        return;
-      }
-
-      // Validate pickup date is within range
-      if (
-        requestData.pickupDate < requestData.startDate ||
-        requestData.pickupDate > requestData.endDate
-      ) {
-        alert('Pickup date must be within the request date range');
-        return;
-      }
-
-      setIsSaving(true);
-
-      // Optionally update profile
+      // Update profile data if checkboxes are checked
       const { updateUser } = useDatabase.getState();
-      if (updateAddressInProfile || updateInstructionsInProfile) {
-        const profileUpdates: any = {};
-        if (updateAddressInProfile && address !== currentUser.address)
+
+      if (
+        currentUser &&
+        (updateAddressInProfile || updateInstructionsInProfile)
+      ) {
+        const profileUpdates: Partial<typeof currentUser> = {};
+
+        if (updateAddressInProfile && address !== currentUser.address) {
           profileUpdates.address = address;
+        }
+
         if (
           updateInstructionsInProfile &&
           instructions !== (currentUser as any).driver_instructions
         ) {
-          profileUpdates.driver_instructions = instructions;
+          (profileUpdates as any).driver_instructions = instructions;
         }
+
+        // Only update if there are actual changes
         if (Object.keys(profileUpdates).length > 0) {
-          await updateUser({ ...currentUser, ...profileUpdates });
+          console.log('Updating profile with:', profileUpdates);
+          updateUser({
+            ...currentUser,
+            ...profileUpdates,
+          });
         }
       }
 
-      // Create the request in the database
-      // Note: Only including fields that exist in current database schema
-      const requestPayload = {
+      // Format pickup slots for database
+      const formattedSlots = pickupSlots.map((slot) => ({
+        date:
+          slot.date instanceof Date
+            ? slot.date.toISOString().split('T')[0]
+            : slot.date,
+        start_time: slot.startTime,
+        end_time: slot.endTime,
+      }));
+
+      // Get session data for additional fields
+      const storedRequest = sessionStorage.getItem('pendingRequest');
+      const sessionData = storedRequest ? JSON.parse(storedRequest) : {};
+
+      // Ensure required string fields for type-safe insert
+      const now = new Date();
+      const primarySlot = formattedSlots[0] || null;
+      const fallbackDate = now.toISOString().split('T')[0];
+      const fallbackStart = '09:00';
+      const fallbackEnd = '17:00';
+
+      // Create the request in the database with explicit type
+      const requestPayload: RequestInsert = {
         user_id: currentUser.id,
-        description: `Request for ${requestData.quantity} portions - ${requestData.allergens.join(', ')} | Address: ${address.trim()} | Instructions: ${instructions.trim()  || 'None'} | Period: ${requestData.startDate} to ${requestData.endDate} | Recurrence: ${JSON.stringify(requestData.recurrencePattern)}`,
-        people_count: parseInt(requestData.quantity) || 1,
-        pickup_date: requestData.pickupDate,
-        pickup_start_time: requestData.startTime,
-        pickup_end_time: requestData.endTime,
+        description: requestData.description,
+        people_count: requestData.quantity || 1,
+        pickup_date: (primarySlot?.date as string) || fallbackDate,
+        pickup_start_time: (primarySlot?.start_time as string) || fallbackStart,
+        pickup_end_time: (primarySlot?.end_time as string) || fallbackEnd,
         status: 'active' as const,
-        is_recurring: requestData.recurrencePattern.type !== 'never',
+        is_recurring: !!recurringSchedule,
       };
 
       console.log('Submitting request with payload:', requestPayload);
@@ -111,94 +152,42 @@ export default function RequestSummaryPage() {
       const response = await addRequest(requestPayload);
 
       if (response.error) {
-        console.error(t('pages.requests.error_creating_request'), response.error);
+        console.error('Error creating request:', response.error);
         alert(`Failed to submit request: ${response.error}`);
         return;
       }
 
       if (response.data) {
-        console.log('Request created successfully:', response.data);
-        // Clear the store and navigate to success
+        console.log('✅ Request created successfully:', response.data.id);
+
+        // Clear the request store after confirming
         clearRequest();
         router.push('/request/success');
       } else {
         console.error('No data returned from addRequest');
-        alert(t('pages.requests.failed_to_submit_request_no_da'));
+        alert('Failed to submit request: No data returned');
       }
     } catch (error) {
-      console.error(t('pages.requests.error_submitting_request'), error);
+      console.error('Error submitting request:', error);
       alert(
-        `Failed to submit request: ${error instanceof Error ? error.message : t('pages.requests.unknown_error')}`
+        `Failed to submit request: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     } finally {
       setIsSaving(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
-  };
-
-  const formatRecurrencePattern = () => {
-    const pattern = requestData.recurrencePattern;
-    if (!pattern || pattern.type === 'never') {
-      return t('doesNotRepeat') || 'Does not repeat';
-    }
-
-    if (pattern.type === 'daily') {
-      return t('daily')  || 'Daily';
-    }
-
-    if (pattern.type === 'weekly') {
-      if (!pattern.weeklyDays || pattern.weeklyDays.length === 0) {
-        return t('weekly')  || 'Weekly';
-      }
-
-      const dayNames = [
-        t('sunday'),
-        t('monday'),
-        t('tuesday'),
-        t('wednesday'),
-        t('thursday'),
-        t('friday'),
-        t('saturday'),
-      ];
-
-      const selectedDayNames = pattern.weeklyDays
-        .sort()
-        .map((dayIndex) => dayNames[dayIndex])
-        .join(', ');
-
-      return `${t('weekly')} - ${selectedDayNames}`;
-    }
-
-    if (pattern.type === 'custom' && pattern.customPattern) {
-      const { frequency, unit, endType, endDate, maxOccurrences } =
-        pattern.customPattern;
-
-      let result = `${t('every')} ${frequency} ${
-        frequency === 1
-          ? unit === 'days'
-            ? t('day')
-            : t('week')
-          : unit === 'days'
-            ? t('days')
-            : t('weeks')
-      }`;
-
-      if (endType === 'date' && endDate) {
-        result += `, ${t('until')} ${formatDate(endDate)}`;
-      } else if (endType === 'occurrences' && maxOccurrences) {
-        result += `, ${maxOccurrences} ${t('times')}`;
-      }
-
-      return result;
-    }
-
-    return t('custom')  || 'Custom';
-  };
+  // Show loading if no request data
+  if (!requestData.description) {
+    return (
+      <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
+        <p className="text-gray-600">No request data found</p>
+        <Button onClick={() => router.push('/request/select-type')}>
+          Start New Request
+        </Button>
+      </div>
+    );
+  }
 
   const handleBackClick = () => {
     router.back();
@@ -209,7 +198,7 @@ export default function RequestSummaryPage() {
       header={
         <>
           <SecondaryNavbar
-            title = 'RequestSummary'
+            title={t('requestSummary')}
             backHref="/request/pickup-slot"
             onBackClick={handleBackClick}
           />
@@ -233,15 +222,15 @@ export default function RequestSummaryPage() {
       }
       className="bg-white"
     >
-      {/* Donation items (requested) */}
+      {/* Food Request Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-2">
-title="Default"
+          {t('foodRequested')}
         </h2>
         <div className="flex items-start justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <div className="space-y-1">
             <div className="font-semibold text-[#024209]">
-title="Default"
+              {requestData.description || 'Food Request'}
             </div>
             <div className="text-sm text-gray-600">
               {t('portions')}: {requestData.quantity || '—'}
@@ -252,9 +241,9 @@ title="Default"
             </div>
           </div>
           <button
-            onClick={() => router.push('/request/new')}
+            onClick={() => router.push('/request/select-type')}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-title="Default"
+            aria-label={t('edit')}
           >
             <svg
               width="20"
@@ -274,117 +263,81 @@ title="Default"
         </div>
       </div>
 
-      {/* Request Period */}
+      {/* Pickup Schedule Section */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('requestPeriod')  || 'RequestPeriod'}
+          {recurringSchedule ? 'Recurring Schedule' : 'Pickup Schedule'}
         </h2>
-        <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
-          <span className="font-semibold text-interactive">
-            {requestData.startDate && requestData.endDate
-              ? `${formatDate(requestData.startDate)} - ${formatDate(requestData.endDate)}`
-              : t('dateNotSet')}
-          </span>
-          <button
-            onClick={() => router.push('/request/new')}
-            className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-title="Default"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+        {recurringSchedule && Array.isArray(recurringSchedule) ? (
+          // Multiple recurring schedules
+          recurringSchedule.map((schedule: any, index: number) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
             >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
-                fill="#024209"
-              />
-            </svg>
-          </button>
-        </div>
+              <span className="font-semibold text-interactive">
+                {schedule.days?.join(', ')}, {schedule.startTime} -{' '}
+                {schedule.endTime}
+              </span>
+              <button
+                onClick={() => router.push('/request/schedule')}
+                className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+                title="Edit schedule"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                    fill="#024209"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))
+        ) : (
+          // One-time pickup slot or old format
+          <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+            <span className="font-semibold text-interactive">
+              {pickupSlots.length > 0 && pickupSlots[0].date
+                ? `${formatSlotDate(pickupSlots[0].date)}, ${pickupSlots[0].startTime} - ${pickupSlots[0].endTime}`
+                : t('dateNotSet')}
+            </span>
+            <button
+              onClick={() => router.push('/request/pickup-slot')}
+              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+              title="Edit pickup time"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                  fill="#024209"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Recurrence Pattern */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {t('recurringInterval')  || 'Recurrence'}
-        </h2>
-        <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
-          <span className="font-semibold text-interactive">
-            {formatRecurrencePattern()}
-          </span>
-          <button
-            onClick={() => router.push('/request/new')}
-            className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-title="Default"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
-                fill="#024209"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Pickup schedule */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-title="Default"
-        </h2>
-        <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
-          <span className="font-semibold text-interactive">
-            {requestData.pickupDate
-              ? `${formatDate(requestData.pickupDate)}, ${requestData.startTime} - ${requestData.endTime}`
-              : t('dateNotSet')}
-          </span>
-          <button
-            onClick={() => router.push('/request/pickup-slot')}
-            className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg:black/5"
-title="Default"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
-                fill="#024209"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Delivery details */}
+      {/* Address & Instructions Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-title="Default"
+          Address & Instructions
         </h2>
         <div>
           <label
             htmlFor="address"
             className="block text-black font-semibold mb-3"
           >
-title="Default"
+            {t('address')}
           </label>
           <Textarea
             id="address"
@@ -405,7 +358,7 @@ title="Default"
               htmlFor="update-address-profile"
               className="text-sm text-gray-600"
             >
-title="Default"
+              {t('updateAddressInProfile')}
             </label>
           </div>
         </div>
@@ -414,11 +367,11 @@ title="Default"
             htmlFor="driver-instructions"
             className="block text-black font-semibold mb-3"
           >
-title="Default"
+            {t('driverInstructions')}
           </label>
           <Textarea
             id="driver-instructions"
-            placeholder = "PleaseRingTheDoorbell"
+            placeholder={t('pleaseRingTheDoorbell')}
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
@@ -435,7 +388,7 @@ title="Default"
               htmlFor="update-instructions-profile"
               className="text-sm text-gray-600"
             >
-title="Default"
+              {t('updateInstructionsInProfile')}
             </label>
           </div>
         </div>

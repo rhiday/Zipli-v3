@@ -28,7 +28,7 @@ import {
   DashboardSkeleton,
 } from '@/components/ui/OptimizedSkeleton';
 import { useDonationStore } from '@/store/donation';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { ActionButton } from '@/components/ui/action-button';
 
 type ProfileRow = {
@@ -50,7 +50,7 @@ function DonorDashboardPage(): React.ReactElement {
   const allDonations = useDatabase((state) => state.donations);
   const foodItems = useDatabase((state) => state.foodItems);
   const clearDonation = useDonationStore((state) => state.clearDonation);
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const [dashboardData, setDashboardData] = useState<DonorDashboardData>({
     profile: null,
@@ -107,7 +107,7 @@ function DonorDashboardPage(): React.ReactElement {
     const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text(t('pages.donations.zipli_summary'), 10, 10);
+    doc.text('Zipli Donation Summary', 10, 10);
     doc.setFontSize(12);
     doc.text(`Total food offered: 46kg`, 10, 20);
     doc.text(`Portions offered: 131`, 10, 30);
@@ -118,7 +118,7 @@ function DonorDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-screen pb-20">
+      <div className="min-h-dvh pb-20">
         <Header title={'Loading'} />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -165,7 +165,7 @@ function DonorDashboardPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -173,7 +173,7 @@ function DonorDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-title="Default"
+              {t('yourImpact')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -187,7 +187,7 @@ title="Default"
                   46kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-title="Default"
+                  {t('totalFoodDonated')}
                 </p>
               </div>
             </div>
@@ -202,7 +202,7 @@ title="Default"
                   131
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-title="Default"
+                  {t('portionsOffered')}
                 </p>
               </div>
             </div>
@@ -217,7 +217,7 @@ title="Default"
                   125€
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-title="Default"
+                  {t('costSavings')}
                 </p>
               </div>
             </div>
@@ -232,7 +232,7 @@ title="Default"
                   10t
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-title="Default"
+                  {t('co2Avoided')}
                 </p>
               </div>
             </div>
@@ -249,8 +249,8 @@ title="Default"
           >
             <ActionButton
               href="#"
-              title = 'ExportToPdf'
-              description = 'EnvironmentalAndSocialImpactData'
+              title={t('exportToPdf')}
+              description={t('environmentalAndSocialImpactData')}
               icon={<FileDown />}
             />
           </div>

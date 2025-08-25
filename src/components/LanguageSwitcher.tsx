@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Languages, Check } from 'lucide-react';
 import {
@@ -22,7 +23,8 @@ type Props = {
 };
 
 export default function LanguageSwitcher({ compact = false }: Props) {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useLanguage();
+  const { t } = useCommonTranslation();
 
   if (compact) {
     return (

@@ -33,7 +33,7 @@ const Skeleton: React.FC<SkeletonProps> = React.memo(({
   );
 });
 
-Skeleton.displayName = t('common.skeleton');
+Skeleton.displayName = 'Skeleton';
 
 // Specialized skeleton components for common patterns
 export const SkeletonCard: React.FC<{ className?: string }> = React.memo(({ className }) => (

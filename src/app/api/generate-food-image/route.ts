@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
 import { createClient } from '@supabase/supabase-js';
 import sharp from 'sharp';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 // Initialize clients with environment variables that are set in .env.local
 const supabase = createClient(
@@ -12,14 +11,13 @@ const supabase = createClient(
 const openai = new OpenAI();
 
 export async function POST(request: Request) {
-  const { t } = useCommonTranslation();
 
   try {
     // Make sure we have required environment variables
     if (!process.env.OPENAI_API_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error('Missing required environment variables');
       return NextResponse.json(
-        { error: t('common.server_configuration_error') },
+        { error: 'Server configuration error' },
         { status: 500 }
       );
     }
@@ -49,7 +47,7 @@ export async function POST(request: Request) {
 
     if (!response.data || !response.data[0]?.url) {
       return NextResponse.json(
-        { error: t('common.failed_to_generate_image') },
+        { error: 'Failed to generate image' },
         { status: 500 }
       );
     }
@@ -61,7 +59,7 @@ export async function POST(request: Request) {
     const imageResponse = await fetch(imageUrl);
     if (!imageResponse.ok) {
       return NextResponse.json(
-        { error: t('common.failed_to_download_image') },
+        { error: 'Failed to download image' },
         { status: 500 }
       );
     }
@@ -82,9 +80,9 @@ export async function POST(request: Request) {
       .upload(filePath, compressedBuffer, { contentType: 'image/jpeg', upsert: true });
       
     if (uploadError) {
-      console.error(t('common.upload_error'), uploadError);
+      console.error('Upload error:', uploadError);
       return NextResponse.json(
-        { error: t('common.failed_to_upload_image_to_stor') },
+        { error: 'Failed to upload image to storage' },
         { status: 500 }
       );
     }
@@ -100,7 +98,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: urlData.publicUrl });
     
   } catch (error: any) {
-    console.error(t('common.api_error'), error);
+    console.error('API error:', error);
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }

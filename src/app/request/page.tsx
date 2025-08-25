@@ -4,10 +4,22 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useDatabase } from '@/store';
-import { PlusIcon, SearchIcon, UsersIcon, CalendarIcon, HandshakeIcon } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import {
+  PlusIcon,
+  SearchIcon,
+  UsersIcon,
+  CalendarIcon,
+  HandshakeIcon,
+} from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
-import { useRequestsTranslation } from '@/lib/i18n-enhanced';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 type Request = {
   id: string;
@@ -22,14 +34,16 @@ type Request = {
 };
 
 export default function RequestsPage(): React.ReactElement {
-  const { t } = useRequestsTranslation();
+  const { t } = useCommonTranslation();
 
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'fulfilled' | 'cancelled'>('all');
-  
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | 'active' | 'fulfilled' | 'cancelled'
+  >('all');
+
   const { isInitialized, getAllRequests, users } = useDatabase();
 
   useEffect(() => {
@@ -41,10 +55,12 @@ export default function RequestsPage(): React.ReactElement {
   const fetchRequests = async () => {
     try {
       const allRequests = getAllRequests();
-      
+
       let filteredByStatus = allRequests;
       if (statusFilter !== 'all') {
-        filteredByStatus = allRequests.filter(req => req.status === statusFilter);
+        filteredByStatus = allRequests.filter(
+          (req) => req.status === statusFilter
+        );
       }
 
       setRequests(filteredByStatus);
@@ -55,25 +71,25 @@ export default function RequestsPage(): React.ReactElement {
     }
   };
 
-  const filteredRequests = requests.filter(request =>
+  const filteredRequests = requests.filter((request) =>
     request.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getUserEmail = (userId: string) => {
-    const user = users.find(u => u.id === userId);
+    const user = users.find((u) => u.id === userId);
     return user?.email || 'Unknown user';
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-dvh items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-green-700"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         <div className="space-y-6">
           <div className="flex items-center justify-between">
@@ -100,10 +116,14 @@ export default function RequestsPage(): React.ReactElement {
 
             <Select
               value={statusFilter}
-              onValueChange={(value) => setStatusFilter(value as 'all' | 'active' | 'fulfilled' | 'cancelled')}
+              onValueChange={(value) =>
+                setStatusFilter(
+                  value as 'all' | 'active' | 'fulfilled' | 'cancelled'
+                )
+              }
             >
               <SelectTrigger className="w-full">
-                <SelectValue {t('pages.requests.status')} />
+                <SelectValue placeholder={t('pages.requests.status')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
@@ -129,14 +149,17 @@ export default function RequestsPage(): React.ReactElement {
               >
                 <div className="p-4">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      request.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : request.status === 'fulfilled'
-                        ? 'bg-gray-100 text-gray-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${
+                        request.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : request.status === 'fulfilled'
+                            ? 'bg-gray-100 text-gray-800'
+                            : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {request.status.charAt(0).toUpperCase() +
+                        request.status.slice(1)}
                     </span>
                     <span className="text-sm text-gray-500">
                       {new Date(request.created_at).toLocaleDateString()}
@@ -145,7 +168,8 @@ export default function RequestsPage(): React.ReactElement {
 
                   <h3 className="mb-2 text-md font-semibold text-gray-800 flex items-center">
                     <HandshakeIcon className="mr-2 h-4 w-4 text-blue-600 flex-shrink-0" />
-                    {request.description.substring(0, 50)}{request.description.length > 50 ? '...' : ''}
+                    {request.description.substring(0, 50)}
+                    {request.description.length > 50 ? '...' : ''}
                   </h3>
 
                   <div className="space-y-2 text-sm text-gray-500">
@@ -155,10 +179,16 @@ export default function RequestsPage(): React.ReactElement {
                     </div>
                     <div className="flex items-center">
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      <span>{new Date(request.pickup_date).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(request.pickup_date).toLocaleDateString()}
+                      </span>
                     </div>
-                    <p>🕒 {request.pickup_start_time} - {request.pickup_end_time}</p>
-                    <p className="text-xs">By: {getUserEmail(request.user_id)}</p>
+                    <p>
+                      🕒 {request.pickup_start_time} - {request.pickup_end_time}
+                    </p>
+                    <p className="text-xs">
+                      By: {getUserEmail(request.user_id)}
+                    </p>
                   </div>
                 </div>
               </Link>

@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/useLanguage';
-import { loadTranslations } from '@/lib/i18n-enhanced';
 import {
+  loadTranslations,
   useAuthTranslation,
-  useDonationsTranslation,
   useCommonTranslation,
+  useDonationsTranslation,
 } from '@/lib/i18n-enhanced';
+import { useEffect, useState } from 'react';
 
 export default function TestLokalisePage() {
-  const { language, changeLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const { t: tAuth } = useAuthTranslation();
   const { t: tDonations } = useDonationsTranslation();
   const { t: tCommon } = useCommonTranslation();
@@ -48,7 +48,7 @@ export default function TestLokalisePage() {
   };
 
   return (
-    <div className="min-h-screen bg-base p-8">
+    <div className="min-h-dvh bg-base p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-primary">
           🌐 Lokalise Integration Test
@@ -96,12 +96,12 @@ export default function TestLokalisePage() {
               Current Language: <strong>{language.toUpperCase()}</strong>
             </span>
             <Button
-              onClick={() => changeLanguage(language === 'en' ? 'fi' : 'en')}
+              onClick={() => setLanguage(language === 'en' ? 'fi' : 'en')}
               variant="secondary"
             >
               Switch to {language === 'en' ? 'Finnish' : 'English'}
             </Button>
-            <Button onClick={reloadTranslations} variant="outline">
+            <Button onClick={reloadTranslations} variant="secondary">
               🔄 Reload Translations
             </Button>
           </div>
@@ -157,7 +157,8 @@ export default function TestLokalisePage() {
               <strong>Current Language:</strong> {language}
             </div>
             <div>
-              <strong>Browser Language:</strong> {navigator.language}
+              <strong>Browser Language:</strong>{' '}
+              {typeof window !== 'undefined' ? navigator.language : 'N/A (SSR)'}
             </div>
             <div>
               <strong>Translations Status:</strong>{' '}

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React from "react";
-import QRLoginGenerator from "@/components/auth/QRLoginGenerator";
-import { useDatabase } from "@/store";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import React from 'react';
+import QRLoginGenerator from '@/components/auth/QRLoginGenerator';
+import { useDatabase } from '@/store';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function AdminQRLoginPage() {
-  const currentUser = useDatabase(state => state.currentUser);
-  const isInitialized = useDatabase(state => state.isInitialized);
+  const currentUser = useDatabase((state) => state.currentUser);
+  const isInitialized = useDatabase((state) => state.isInitialized);
   const router = useRouter();
 
   const isLoading = !isInitialized;
@@ -18,11 +18,12 @@ export default function AdminQRLoginPage() {
   const isAuthorized =
     !isLoading &&
     currentUser &&
-    (currentUser.email?.includes("city@zipli") || currentUser.email?.includes("admin@zipli"));
+    (currentUser.email?.includes('city@zipli') ||
+      currentUser.email?.includes('admin@zipli'));
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+      <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-earth border-r-transparent" />
       </div>
     );
@@ -30,7 +31,7 @@ export default function AdminQRLoginPage() {
 
   if (!isAuthorized) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+      <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
         <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
           <h1 className="text-titleSm font-display text-negative">
             Access Denied
@@ -47,7 +48,7 @@ export default function AdminQRLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-cream p-4">
+    <div className="flex min-h-dvh flex-col bg-cream p-4">
       <div className="mx-auto w-full max-w-5xl">
         <div className="mb-8">
           <h1 className="text-titleLg font-display text-primary">

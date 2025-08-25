@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function LoginPage() {
@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const login = useDatabase((state) => state.login);
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,17 +64,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-cream p-4">
+    <div className="relative flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="flex justify-end mb-4">
           <LanguageSwitcher />
         </div>
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">
-title="Default"
+            {t('welcomeBack')}
           </h1>
           <p className="mt-2 text-body text-primary-75">
-title="Default"
+            {t('signInToAccount')}
           </p>
         </div>
 
@@ -90,7 +90,7 @@ title="Default"
               htmlFor="email"
               className="block text-label font-medium text-primary mb-1"
             >
-title="Default"
+              {t('emailAddress')}
             </label>
             <Input
               id="email"
@@ -108,7 +108,7 @@ title="Default"
               htmlFor="password"
               className="block text-label font-medium text-primary mb-1"
             >
-title="Default"
+              {t('password')}
             </label>
             <Input
               id="password"
@@ -135,7 +135,7 @@ title="Default"
                 htmlFor="remember-me"
                 className="ml-2 block text-body text-primary"
               >
-title="Default"
+                {t('rememberMe')}
               </label>
             </div>
 
@@ -144,7 +144,7 @@ title="Default"
                 href="/auth/forgot-password"
                 className="font-medium text-earth hover:text-primary"
               >
-title="Default"
+                {t('forgotPassword')}
               </Link>
             </div>
           </div>
@@ -168,7 +168,7 @@ title="Default"
             href="/auth/register"
             className="font-medium text-earth hover:text-primary"
           >
-title="Default"
+            {t('signUp')}
           </Link>
         </div>
       </div>

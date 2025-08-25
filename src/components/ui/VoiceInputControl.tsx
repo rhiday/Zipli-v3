@@ -145,7 +145,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = React.memo(({
           const data = await processResponse.json();
           onProcessComplete(data);
         } catch (error: any) {
-          logger.error(t('components.voiceInput.error_during_voice_processing_'), error);
+          logger.error('Error during voice processing', error);
           setServerError(error?.message || 'An error occurred. Please try again.');
           setIsTranscribing(false);
           setIsProcessingDetails(false);
@@ -155,7 +155,7 @@ export const VoiceInputControl: React.FC<VoiceInputControlProps> = React.memo(({
       mediaRecorderRef.current.start();
       setIsRecording(true);
     } catch (error) {
-      logger.error(t('components.voiceInput.error_starting_recording'), error);
+      logger.error('Error starting recording', error);
       setServerError(
         'Could not start recording. Please ensure microphone permissions are granted.'
       );

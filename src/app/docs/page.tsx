@@ -25,86 +25,86 @@ import {
 const docStructure = {
   'getting-started': {
     icon: Rocket,
-    title: t('common.getting_started'),
+    title: 'Getting Started',
     items: [
-      { path: '01-getting-started/index.md', title: t('common.overview') },
-      { path: '01-getting-started/quick-start.md', title: t('common.quick_start') },
-      { path: '01-getting-started/installation.md', title: t('common.installation') },
+      { path: '01-getting-started/index.md', title: 'Overview' },
+      { path: '01-getting-started/quick-start.md', title: 'Quick Start' },
+      { path: '01-getting-started/installation.md', title: 'Installation' },
       {
         path: '01-getting-started/environment-setup.md',
-        title: t('common.environment_setup'),
+        title: 'Environment Setup',
       },
       {
         path: '01-getting-started/first-deployment.md',
-        title: t('common.first_deployment'),
+        title: 'First Deployment',
       },
     ],
   },
   architecture: {
     icon: Database,
-    title: t('common.architecture'),
+    title: 'Architecture',
     items: [
-      { path: '02-architecture/index.md', title: t('common.overview') },
-      { path: '02-architecture/system-design.md', title: t('common.system_design') },
-      { path: '02-architecture/database-schema.md', title: t('common.database_schema') },
+      { path: '02-architecture/index.md', title: 'Overview' },
+      { path: '02-architecture/system-design.md', title: 'System Design' },
+      { path: '02-architecture/database-schema.md', title: 'Database Schema' },
       {
         path: '02-architecture/component-architecture.md',
-        title: t('common.component_architecture'),
+        title: 'Component Architecture',
       },
       {
         path: '02-architecture/performance-optimizations.md',
-        title: t('common.performance'),
+        title: 'Performance',
       },
     ],
   },
   development: {
     icon: Code,
-    title: t('common.development'),
+    title: 'Development',
     items: [
-      { path: '03-development/index.md', title: t('common.overview') },
+      { path: '03-development/index.md', title: 'Overview' },
       {
         path: '03-development/component-patterns.md',
-        title: t('common.component_patterns'),
+        title: 'Component Patterns',
       },
       {
         path: '03-development/store-integration.md',
-        title: t('common.store_integration'),
+        title: 'Store Integration',
       },
-      { path: '03-development/testing-guide.md', title: t('common.testing') },
-      { path: '03-development/code-standards.md', title: t('common.code_standards') },
+      { path: '03-development/testing-guide.md', title: 'Testing' },
+      { path: '03-development/code-standards.md', title: 'Code Standards' },
     ],
   },
   deployment: {
     icon: Settings,
-    title: t('common.deployment'),
+    title: 'Deployment',
     items: [
-      { path: '04-deployment/index.md', title: t('common.overview') },
-      { path: '04-deployment/vercel-setup.md', title: t('common.vercel_setup') },
-      { path: '04-deployment/supabase-config.md', title: t('common.supabase_config') },
-      { path: '04-deployment/monitoring.md', title: t('common.monitoring') },
-      { path: '04-deployment/troubleshooting.md', title: t('common.troubleshooting') },
+      { path: '04-deployment/index.md', title: 'Overview' },
+      { path: '04-deployment/vercel-setup.md', title: 'Vercel Setup' },
+      { path: '04-deployment/supabase-config.md', title: 'Supabase Config' },
+      { path: '04-deployment/monitoring.md', title: 'Monitoring' },
+      { path: '04-deployment/troubleshooting.md', title: 'Troubleshooting' },
     ],
   },
   'api-reference': {
     icon: FileText,
     title: 'API Reference',
     items: [
-      { path: '05-api-reference/index.md', title: t('common.overview') },
+      { path: '05-api-reference/index.md', title: 'Overview' },
       { path: '05-api-reference/rest-endpoints.md', title: 'REST Endpoints' },
-      { path: '05-api-reference/database-types.md', title: t('common.database_types') },
-      { path: '05-api-reference/store-methods.md', title: t('common.store_methods') },
+      { path: '05-api-reference/database-types.md', title: 'Database Types' },
+      { path: '05-api-reference/store-methods.md', title: 'Store Methods' },
     ],
   },
   decisions: {
     icon: Shield,
-    title: t('common.decisions'),
+    title: 'Decisions',
     items: [
-      { path: '06-decisions/index.md', title: t('common.overview') },
-      { path: '06-decisions/performance-fixes.md', title: t('common.performance_fixes') },
-      { path: '06-decisions/why-supabase.md', title: t('common.why_supabase') },
+      { path: '06-decisions/index.md', title: 'Overview' },
+      { path: '06-decisions/performance-fixes.md', title: 'Performance Fixes' },
+      { path: '06-decisions/why-supabase.md', title: 'Why Supabase' },
       {
         path: '06-decisions/architecture-choices.md',
-        title: t('common.architecture_choices'),
+        title: 'Architecture Choices',
       },
     ],
   },
@@ -194,7 +194,7 @@ This documentation is being loaded. Please check back soon.`;
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-dvh bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
         <div className="px-4 sm:px-6 lg:px-8">

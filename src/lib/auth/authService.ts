@@ -52,21 +52,21 @@ class AuthService {
       }
 
       if (!authData.user) {
-        return { data: null, error: t('common.failed_to_create_user') };
+        return { data: null, error: 'Failed to create user' };
       }
 
       // Get the created profile (created by database trigger)
       const profile = await this.getProfile(authData.user.id);
       
       if (!profile) {
-        return { data: null, error: t('common.failed_to_create_user_profile') };
+        return { data: null, error: 'Failed to create user profile' };
       }
 
       return { data: profile, error: null };
     } catch (error) {
       return { 
         data: null, 
-        error: error instanceof Error ? error.message : t('common.unknown_error_occurred') 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
       };
     }
   }
@@ -86,7 +86,7 @@ class AuthService {
       }
 
       if (!authData.user) {
-        return { data: null, error: t('common.failed_to_sign_in') };
+        return { data: null, error: 'Failed to sign in' };
       }
 
       // Get the user's profile
@@ -100,7 +100,7 @@ class AuthService {
     } catch (error) {
       return { 
         data: null, 
-        error: error instanceof Error ? error.message : t('common.unknown_error_occurred') 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
       };
     }
   }
@@ -114,7 +114,7 @@ class AuthService {
       return { error: error?.message || null };
     } catch (error) {
       return { 
-        error: error instanceof Error ? error.message : t('common.unknown_error_occurred') 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
       };
     }
   }
@@ -132,7 +132,7 @@ class AuthService {
 
       return await this.getProfile(user.id);
     } catch (error) {
-      console.error(t('common.error_getting_current_user'), error);
+      console.error('Error getting current user', error);
       return null;
     }
   }
@@ -149,13 +149,13 @@ class AuthService {
         .single();
 
       if (error) {
-        console.error(t('common.error_fetching_profile'), error);
+        console.error('Error fetching profile', error);
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error(t('common.error_getting_profile'), error);
+      console.error('Error getting profile', error);
       return null;
     }
   }
@@ -180,7 +180,7 @@ class AuthService {
     } catch (error) {
       return { 
         data: null, 
-        error: error instanceof Error ? error.message : t('common.unknown_error_occurred') 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
       };
     }
   }
@@ -197,7 +197,7 @@ class AuthService {
       return { error: error?.message || null };
     } catch (error) {
       return { 
-        error: error instanceof Error ? error.message : t('common.unknown_error_occurred') 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
       };
     }
   }
@@ -214,7 +214,7 @@ class AuthService {
       return { error: error?.message || null };
     } catch (error) {
       return { 
-        error: error instanceof Error ? error.message : t('common.unknown_error_occurred') 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
       };
     }
   }
@@ -235,7 +235,7 @@ class AuthService {
       }
 
       if (!authData.user) {
-        return { data: null, error: t('common.failed_to_verify_otp') };
+        return { data: null, error: 'Failed to verify OTP' };
       }
 
       const profile = await this.getProfile(authData.user.id);
@@ -248,7 +248,7 @@ class AuthService {
     } catch (error) {
       return { 
         data: null, 
-        error: error instanceof Error ? error.message : t('common.unknown_error_occurred') 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
       };
     }
   }
@@ -289,7 +289,7 @@ class AuthService {
       const { data: { session } } = await supabase.auth.getSession();
       return session;
     } catch (error) {
-      console.error(t('common.error_getting_session'), error);
+      console.error('Error getting session', error);
       return null;
     }
   }
@@ -314,7 +314,7 @@ class AuthService {
     } catch (error) {
       return { 
         data: null, 
-        error: error instanceof Error ? error.message : t('common.unknown_error_occurred') 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
       };
     }
   }

@@ -42,11 +42,13 @@ interface Request {
   user_id: string;
   description: string;
   people_count: number;
+  allergens: string[];
   start_date: string;
   end_date: string;
   pickup_date: string;
   pickup_start_time: string;
   pickup_end_time: string;
+  pickup_slots?: any[]; // Array of pickup slots for multiple slots
   is_recurring: boolean;
   status: 'active' | 'fulfilled' | 'cancelled';
   created_at: string;
@@ -123,6 +125,7 @@ const mockRequests: Omit<Request, 'id'>[] = [
     user_id: 'user-2', // receiver user
     description: 'Need food for 20 people at homeless shelter',
     people_count: 20,
+    allergens: ['Vegetarian', 'Gluten-free'],
     start_date: '2024-01-15',
     end_date: '2024-01-25',
     pickup_date: '2024-01-20',
@@ -137,6 +140,7 @@ const mockRequests: Omit<Request, 'id'>[] = [
     user_id: 'user-3', // another receiver
     description: 'Weekly food collection for community kitchen',
     people_count: 50,
+    allergens: ['Halal'],
     start_date: '2024-01-20',
     end_date: '2024-01-30',
     pickup_date: '2024-01-25',
@@ -225,12 +229,12 @@ export const useDatabase = create<DatabaseState>()(
 
         const user = get().users.find((u) => u.email === email);
         if (!user) {
-          return { data: null, error: t('common.invalid_email_or_password') };
+          return { data: null, error: 'Invalid email or password' };
         }
 
         // Verify password matches the one stored in mock data
         if ((user as any).password !== password) {
-          return { data: null, error: t('common.invalid_email_or_password') };
+          return { data: null, error: 'Invalid email or password' };
         }
 
         set({ currentUser: user });
@@ -294,7 +298,7 @@ export const useDatabase = create<DatabaseState>()(
 
         const user = get().users.find((u) => u.email === email);
         if (!user) {
-          return { data: null, error: t('common.invalid_verification_code') };
+          return { data: null, error: 'Invalid verification code' };
         }
 
         // For mock purposes, accept any 6-digit code
@@ -303,7 +307,7 @@ export const useDatabase = create<DatabaseState>()(
           return { data: { user }, error: null };
         }
 
-        return { data: null, error: t('common.invalid_verification_code') };
+        return { data: null, error: 'Invalid verification code' };
       },
 
       setCurrentUser: (email) => {
@@ -368,8 +372,6 @@ export const useDatabase = create<DatabaseState>()(
 
         // Helper to generate a random date within the last 7 days
         function randomRecentISO() {
-  const { t } = useCommonTranslation();
-
           const now = new Date();
           const daysAgo = Math.floor(Math.random() * 7);
           const hoursAgo = Math.floor(Math.random() * 24);

@@ -80,9 +80,9 @@ export async function GET() {
 
     return NextResponse.json(
       {
-        status: t('common.status.error'),
+        status: 'error',
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : t('common.health_check_failed'),
+        error: error instanceof Error ? error.message : 'Health check failed',
         duration: Math.round(performance.now() - startTime),
       },
       { status: 503 }

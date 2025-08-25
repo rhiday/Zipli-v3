@@ -14,7 +14,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 interface HeaderProps {
   title?: string;
@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     getAllRequests,
   } = useDatabase();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   // Get activity items - show both donations and requests for all users
   const activityItems = React.useMemo(() => {
@@ -154,7 +154,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             <div className="flex items-center gap-2 mb-3">
               <span className="w-3 h-3 bg-[#18E170] rounded-full"></span>
               <span className="text-white font-semibold text-base">
-title="Default"
+                {t('activity')}
               </span>
             </div>
             <ul className="flex flex-col">
@@ -168,8 +168,8 @@ title="Default"
                   <div>
                     <span className="text-sm font-semibold text-white">
                       {item.type === 'donation'
-                        ? t('donationLabel')
-                        : t('common.request')}
+                        ? 'Donation'
+                        : 'Request'}
                     </span>
                     <span className="text-white/90 text-sm ml-1">
                       ·{' '}
@@ -188,7 +188,7 @@ title="Default"
                       )
                     }
                   >
-title="Default"
+                    {t('details')}
                   </button>
                 </li>
               ))}

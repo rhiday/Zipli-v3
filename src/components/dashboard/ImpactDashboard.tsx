@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Info, ChevronDown } from 'lucide-react';
 import ExportCard from './ExportCard';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface ImpactDashboardProps {
   totalWeight?: number;
@@ -19,7 +19,7 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
     savedCosts = 125,
     emissionReduction = 89,
   }) => {
-    const [selectedMonth, setSelectedMonth] = useState(t('common.february'));
+    const [selectedMonth, setSelectedMonth] = useState('February');
 
     // Memoized month selector handler
     const handleMonthSelect = useCallback(() => {
@@ -59,7 +59,7 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
         },
         {
           id: 2,
-          name: t('common.stadin_safka'),
+          name: 'Stadin Safka',
           info: '500g · Beef stew',
           avatar: { type: 'placeholder', color: 'gray' },
         },

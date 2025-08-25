@@ -26,9 +26,9 @@ interface RecurrenceSelectorProps {
 
 const RECURRENCE_OPTIONS = [
   { key: 'never', label: 'Does not repeat' },
-  { key: 'daily', label: t('common.daily') },
-  { key: 'weekly', label: t('common.weekly') },
-  { key: 'custom', label: t('common.custom') },
+  { key: 'daily', label: 'Daily' },
+  { key: 'weekly', label: 'Weekly' },
+  { key: 'custom', label: 'Custom' },
 ] as const;
 
 export const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({

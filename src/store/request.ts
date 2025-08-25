@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 interface RecurrencePattern {
   type: 'never' | 'daily' | 'weekly' | 'custom';
@@ -14,31 +13,58 @@ interface RecurrencePattern {
   };
 }
 
-interface RequestFormData {
-  recurringInterval: string; // Keep for backward compatibility
-  recurrencePattern: RecurrencePattern;
-  quantity: string;
-  allergens: string[];
-  startDate: string;
-  endDate: string;
-  pickupDate: string;
+interface PickupSlot {
+  id: string;
+  date: Date | undefined;
   startTime: string;
   endTime: string;
 }
 
+interface RequestFormData {
+  request_type: 'one-time' | 'recurring';
+  description: string;
+  quantity: number;
+  allergens: string[];
+  recurringInterval: string; // Keep for backward compatibility
+  recurrencePattern: RecurrencePattern;
+  startDate: string;
+  endDate: string;
+  pickupDate: string; // Keep for backward compatibility
+  startTime: string; // Keep for backward compatibility
+  endTime: string; // Keep for backward compatibility
+}
+
 interface RequestState {
   requestData: RequestFormData;
+  pickupSlots: PickupSlot[];
+  address: string;
+  driverInstructions: string;
+  isEditMode: boolean;
+  editingRequestId: string | null;
+
   setRequestData: (data: Partial<RequestFormData>) => void;
+  setAddress: (address: string) => void;
+  setDriverInstructions: (instructions: string) => void;
+  setEditMode: (isEdit: boolean, requestId?: string) => void;
+
+  // Actions for pickup slots
+  addPickupSlot: (slot: Omit<PickupSlot, 'id'>) => void;
+  updatePickupSlot: (slot: PickupSlot) => void;
+  deletePickupSlot: (id: string) => void;
+  setPickupSlots: (slots: PickupSlot[]) => void;
+
   clearRequest: () => void;
 }
 
 const initialRequestData: RequestFormData = {
+  request_type: 'one-time',
+  description: '',
+  quantity: 1,
+  allergens: [],
   recurringInterval: '',
   recurrencePattern: {
     type: 'never',
   },
-  quantity: '',
-  allergens: ['Vegan', 'Low-lactose'],
   startDate: '',
   endDate: '',
   pickupDate: '',
@@ -46,18 +72,55 @@ const initialRequestData: RequestFormData = {
   endTime: '14:00',
 };
 
+const initialState = {
+  requestData: initialRequestData,
+  pickupSlots: [],
+  address: '',
+  driverInstructions: '',
+  isEditMode: false,
+  editingRequestId: null,
+};
+
 export const useRequestStore = create<RequestState>()(
   persist(
-    (set) => ({
-      requestData: initialRequestData,
+    (set, get) => ({
+      ...initialState,
+
       setRequestData: (data) =>
         set((state) => ({
           requestData: { ...state.requestData, ...data },
         })),
-      clearRequest: () =>
-        set({
-          requestData: initialRequestData,
-        }),
+
+      setAddress: (address) => set({ address }),
+      setDriverInstructions: (instructions) =>
+        set({ driverInstructions: instructions }),
+      setEditMode: (isEdit, requestId) =>
+        set({ isEditMode: isEdit, editingRequestId: requestId || null }),
+
+      // Pickup slot actions
+      addPickupSlot: (slot) =>
+        set((state) => ({
+          pickupSlots: [
+            ...state.pickupSlots,
+            { ...slot, id: Date.now().toString() },
+          ],
+        })),
+
+      updatePickupSlot: (slot) =>
+        set((state) => ({
+          pickupSlots: state.pickupSlots.map((s) =>
+            s.id === slot.id ? slot : s
+          ),
+        })),
+
+      deletePickupSlot: (id) =>
+        set((state) => ({
+          pickupSlots: state.pickupSlots.filter((slot) => slot.id !== id),
+        })),
+
+      setPickupSlots: (slots) => set({ pickupSlots: slots }),
+
+      clearRequest: () => set(initialState),
     }),
     {
       name: 'zipli-request-store',

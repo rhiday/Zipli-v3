@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { translations, Language, TranslationKey } from '@/lib/translations';
+
+export type Language = 'en' | 'fi';
 
 interface LanguageState {
   language: Language;
@@ -21,14 +22,16 @@ const useLanguageStore = create<LanguageState>()(
 
 export const useLanguage = () => {
   const { language, setLanguage } = useLanguageStore();
-  
-  const t = (key: TranslationKey): string => {
-    return translations[language][key] || key;
+
+  // Temporary fallback t function for pages not yet updated
+  const t = (key: string) => {
+    // Just return the key as fallback - actual translations are in the new system
+    return key;
   };
 
   return {
     language,
     setLanguage,
-    t,
+    t, // Temporary compatibility
   };
 };

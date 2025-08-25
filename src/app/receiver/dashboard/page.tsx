@@ -25,7 +25,7 @@ import {
   SkeletonDashboardStat,
   SkeletonRecipient,
 } from '@/components/ui/Skeleton';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { ActionButton } from '@/components/ui/action-button';
 
 type ProfileRow = {
@@ -42,7 +42,7 @@ type ReceiverDashboardData = {
 export default function ReceiverDashboardPage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized, getAllRequests } = useDatabase();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   const [dashboardData, setDashboardData] = useState<ReceiverDashboardData>({
     profile: null,
@@ -85,7 +85,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
   const handleExportPDF = useCallback(() => {
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text(t('common.zipli_request_summary'), 10, 10);
+    doc.text('Zipli Request Summary', 10, 10);
     doc.setFontSize(12);
     doc.text(`Total food requested: 85kg`, 10, 20);
     doc.text(`People served: 250`, 10, 30);
@@ -121,8 +121,8 @@ export default function ReceiverDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-screen pb-20">
-        <Header title = 'Loading') />
+      <div className="min-h-dvh pb-20">
+        <Header title="Loading..." />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
           <section>
@@ -168,7 +168,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -176,7 +176,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-title="Default"
+              {t('yourImpact')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -189,7 +189,9 @@ title="Default"
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.totalPeople}
                 </span>
-                <p className="text-sm text-primary-75 mt-1">People Served</p>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('peopleServed')}
+                </p>
               </div>
             </div>
             {/* Food Requested */}
@@ -201,7 +203,9 @@ title="Default"
                 <span className="text-2xl font-semibold text-green-800">
                   {stats.estimatedKg}kg
                 </span>
-                <p className="text-sm text-primary-75 mt-1">Food Requested</p>
+                <p className="text-sm text-primary-75 mt-1">
+                  {t('foodRequested')}
+                </p>
               </div>
             </div>
             {/* Active Requests */}
@@ -214,7 +218,7 @@ title="Default"
                   {stats.activeRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-title="Default"
+                  {t('activeRequests')}
                 </p>
               </div>
             </div>
@@ -228,7 +232,7 @@ title="Default"
                   {stats.fulfilledRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  Fulfilled Requests
+                  {t('fulfilledRequests')}
                 </p>
               </div>
             </div>
@@ -245,8 +249,8 @@ title="Default"
           >
             <ActionButton
               href="#"
-title="Default"
-              description="Request history and impact data"
+              title={t('exportImpactReport')}
+              description={t('requestHistoryAndImpactData')}
               icon={<FileDown />}
             />
           </div>
@@ -255,7 +259,7 @@ title="Default"
         {/* Who's helped you section - Hidden for now */}
         {/* <section>
           <h2 className="text-lg font-semibold text-primary mb-3">
-title="Default"
+            Who's Helped You
           </h2>
 
           <div className="space-y-4">

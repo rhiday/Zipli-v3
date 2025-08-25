@@ -1,9 +1,9 @@
 'use client';
 import { AuthProvider } from '@/components/auth/AuthProvider';
+import { useDatabase } from '@/store';
+import { usePathname } from 'next/navigation';
 import React, { useEffect } from 'react';
 import BottomNav from './BottomNav';
-import { usePathname } from 'next/navigation';
-import { useDatabase } from '@/store';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -37,11 +37,11 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
         </>
       ) : isDocsRoute ? (
         /* Full-width layout for documentation pages */
-        <div className="min-h-screen bg-gray-50">{children}</div>
+        <div className="min-h-dvh bg-gray-50">{children}</div>
       ) : (
         /* Layout: A mobile-like container centered on all screen sizes */
-        <div className="min-h-screen bg-cream">
-          <div className="relative mx-auto flex h-screen w-full max-w-lg flex-col bg-base shadow-lg">
+        <div className="min-h-dvh bg-cream">
+          <div className="relative mx-auto flex h-dvh w-full max-w-lg flex-col bg-base shadow-lg">
             {/* Main content container */}
             <main className="flex-grow overflow-y-auto">{children}</main>
             {/* BottomNav is now part of this container and positioned absolutely */}

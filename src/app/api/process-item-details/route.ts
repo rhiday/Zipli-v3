@@ -3,7 +3,6 @@ import OpenAI from 'openai';
 import { logger } from '../../../../lib/logger';
 import { validateRequestBody, checkRateLimit, getClientIP, sanitizeString } from '@/lib/validation';
 import { z } from 'zod';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -14,7 +13,7 @@ const FOOD_TYPE_OPTIONS = [
   'Prepared meals',
   'Fresh produce',
   'Cold packaged foods',
-  'Bakery and Pastry', t('common.other'),
+  'Bakery and Pastry', 'Other',
 ];
 
 // Validation schema for request body
@@ -23,7 +22,6 @@ const processItemSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const { t } = useCommonTranslation();
 
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
@@ -94,10 +92,10 @@ export async function POST(req: NextRequest) {
     }
 
   } catch (error: any) {
-    console.error(t('common.error_processing_item_details'), error);
+    console.error('Error processing item details:', error);
     if (error instanceof OpenAI.APIError) {
       return NextResponse.json({ error: error.message, type: error.type }, { status: error.status || 500 });
     }
-    return NextResponse.json({ error: t('common.failed_to_process_item_details'), details: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process item details', details: error.message }, { status: 500 });
   }
 } 

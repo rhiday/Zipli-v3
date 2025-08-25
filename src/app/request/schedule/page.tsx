@@ -5,139 +5,138 @@ import { useRouter } from 'next/navigation';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { TimeSlotSelector } from '@/components/ui/TimeSlotSelector';
-import { WeeklyDaySelector } from '@/components/ui/WeeklyDaySelector';
-import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon, ClockIcon } from 'lucide-react';
-import { format, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Calendar, Clock, Trash2 } from 'lucide-react';
+import { useRequestStore } from '@/store/request';
+import { Input } from '@/components/ui/Input';
+import { format } from 'date-fns';
 
-interface RequestSchedule {
+interface RecurringSchedule {
   id: string;
-  type: 'daily' | 'weekly' | 'custom';
-  startDate?: Date;
-  endDate?: Date;
+  days: string[];
   startTime: string;
   endTime: string;
-  weeklyDays?: number[];
-  customDates?: Array<{
-    date: Date;
-    startTime: string;
-    endTime: string;
-  }>;
 }
+
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const FULL_WEEKDAYS = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
+const TIME_OPTIONS = [
+  '06:00',
+  '07:00',
+  '08:00',
+  '09:00',
+  '10:00',
+  '11:00',
+  '12:00',
+  '13:00',
+  '14:00',
+  '15:00',
+  '16:00',
+  '17:00',
+  '18:00',
+  '19:00',
+  '20:00',
+];
 
 export default function RequestSchedulePage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const [requestData, setRequestData] = useState<any>(null);
-  const [scheduleType, setScheduleType] = useState<
-    'daily' | 'weekly' | 'custom'
-  >('daily');
-  const [schedules, setSchedules] = useState<RequestSchedule[]>([]);
-  const [showAddForm, setShowAddForm] = useState(true);
 
-  // Current schedule form state
-  const [currentSchedule, setCurrentSchedule] = useState<
-    Omit<RequestSchedule, 'id'> & { id: string | 'new' }
-  >({
-    id: 'new',
-    type: 'daily',
-    startTime: '09:00',
-    endTime: '14:00',
-    weeklyDays: [1], // Default to Monday
-  });
+  const [schedules, setSchedules] = useState<RecurringSchedule[]>([]);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [startTime, setStartTime] = useState('09:00');
+  const [endTime, setEndTime] = useState('14:00');
+  const [showTimeSelector, setShowTimeSelector] = useState(false);
+  const [editingTime, setEditingTime] = useState<'start' | 'end' | null>(null);
+
+  // Date fields
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
-    // Get request data from session storage
     const storedRequest = sessionStorage.getItem('pendingRequest');
     if (storedRequest) {
-      setRequestData(JSON.parse(storedRequest));
+      const data = JSON.parse(storedRequest);
+      setRequestData(data);
+      // Initialize dates if they exist
+      if (data.startDate) setStartDate(data.startDate);
+      if (data.endDate) setEndDate(data.endDate);
     }
   }, []);
 
-  const handleScheduleTypeChange = (type: 'daily' | 'weekly' | 'custom') => {
-    setScheduleType(type);
-    setCurrentSchedule((prev) => ({
-      ...prev,
-      type,
-      weeklyDays: type === 'weekly' ? [1] : undefined,
-    }));
+  const toggleDay = (day: string) => {
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
   };
 
-  const handleScheduleChange = (field: keyof RequestSchedule, value: any) => {
-    setCurrentSchedule((prev) => ({ ...prev, [field]: value }));
-  };
+  const addSchedule = () => {
+    if (selectedDays.length === 0) return;
 
-  const handleAddSchedule = () => {
-    if (!isScheduleValid()) return;
-
-    const newSchedule: RequestSchedule = {
-      ...currentSchedule,
+    const newSchedule: RecurringSchedule = {
       id: Date.now().toString(),
-    } as RequestSchedule;
+      days: selectedDays,
+      startTime,
+      endTime,
+    };
 
-    setSchedules((prev) => [...prev, newSchedule]);
-
+    setSchedules([...schedules, newSchedule]);
     // Reset form
-    setCurrentSchedule({
-      id: 'new',
-      type: scheduleType,
-      startTime: '09:00',
-      endTime: '14:00',
-      weeklyDays: scheduleType === 'weekly' ? [1] : undefined,
-    });
+    setSelectedDays([]);
+    setStartTime('09:00');
+    setEndTime('14:00');
   };
 
-  const handleDeleteSchedule = (id: string) => {
-    setSchedules((prev) => prev.filter((s) => s.id !== id));
+  const removeSchedule = (id: string) => {
+    setSchedules(schedules.filter((s) => s.id !== id));
   };
 
-  const isScheduleValid = () => {
-    if (currentSchedule.type === 'daily') {
-      return (
-        currentSchedule.startDate &&
-        currentSchedule.endDate &&
-        currentSchedule.startTime &&
-        currentSchedule.endTime
-      );
-    }
-    if (currentSchedule.type === 'weekly') {
-      return (
-        currentSchedule.weeklyDays?.length &&
-        currentSchedule.startTime &&
-        currentSchedule.endTime
-      );
-    }
-    if (currentSchedule.type === 'custom') {
-      return currentSchedule.customDates?.length;
-    }
-    return false;
+  const formatScheduleDisplay = (schedule: RecurringSchedule) => {
+    const days = schedule.days.join(', ');
+    return `${days}, ${schedule.startTime} - ${schedule.endTime}`;
   };
+
+  const canAddSchedule = selectedDays.length > 0;
+  const hasValidDates =
+    startDate && endDate && new Date(startDate) <= new Date(endDate);
+  const canContinue = hasValidDates && (schedules.length > 0 || canAddSchedule);
 
   const handleContinue = () => {
-    // Auto-save current schedule if valid
-    if (isScheduleValid() && showAddForm) {
-      handleAddSchedule();
+    // If there's a pending schedule, add it
+    if (canAddSchedule) {
+      addSchedule();
     }
 
-    if (schedules.length === 0 && !isScheduleValid()) return;
+    const finalSchedules =
+      canAddSchedule && schedules.length === 0
+        ? [
+            {
+              id: Date.now().toString(),
+              days: selectedDays,
+              startTime,
+              endTime,
+            },
+          ]
+        : schedules;
 
-    // Store schedule data
     const requestWithSchedule = {
       ...requestData,
-      schedules:
-        schedules.length > 0
-          ? schedules
-          : [{ ...currentSchedule, id: Date.now().toString() }],
+      recurringSchedules: finalSchedules,
+      startDate: startDate,
+      endDate: endDate,
     };
 
     sessionStorage.setItem(
@@ -147,34 +146,12 @@ export default function RequestSchedulePage() {
     router.push('/request/summary');
   };
 
-  const formatScheduleDisplay = (schedule: RequestSchedule) => {
-    switch (schedule.type) {
-      case 'daily':
-        if (schedule.startDate && schedule.endDate) {
-          return `Daily: ${format(schedule.startDate, 'dd/MM')} - ${format(schedule.endDate, 'dd/MM')}, ${schedule.startTime} - ${schedule.endTime}`;
-        }
-        return `Daily: ${schedule.startTime} - ${schedule.endTime}`;
-      case 'weekly':
-        if (schedule.weeklyDays?.length) {
-          const dayNames = ['Sun', t('pages.requests.mon'), t('pages.requests.tue'), t('pages.requests.wed'), t('pages.requests.thu'), t('pages.requests.fri'), t('pages.requests.sat')];
-          const days = schedule.weeklyDays.map((d) => dayNames[d]).join(', ');
-          return `Weekly: ${days}, ${schedule.startTime} - ${schedule.endTime}`;
-        }
-        return `Weekly: ${schedule.startTime} - ${schedule.endTime}`;
-      case 'custom':
-        const count = schedule.customDates?.length || 0;
-        return `Custom: ${count} dates selected`;
-      default:
-        return 'Default';
-    }
-  };
-
   return (
     <PageContainer
       header={
         <>
           <SecondaryNavbar
-title="Default"
+            title={t('recurringRequest')}
             backHref="/request/recurring-form"
             onBackClick={() => router.back()}
           />
@@ -188,7 +165,7 @@ title="Default"
         <BottomActionBar>
           <Button
             onClick={handleContinue}
-            disabled={schedules.length === 0 && !isScheduleValid()}
+            disabled={!canContinue}
             className="w-full"
           >
             Continue
@@ -198,239 +175,199 @@ title="Default"
       className="bg-white"
     >
       <main className="contents">
-        <h2 className="text-xl font-semibold mb-2">Request Schedule</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Set up when you need food delivered
-        </p>
-
-        {/* Schedule Type Selector */}
-        <div className="space-y-4 mb-6">
-          <h3 className="font-semibold text-black">Schedule Type</h3>
-          <div className="grid grid-cols-3 gap-2">
-            {(['daily', 'weekly', 'custom'] as const).map((type) => (
-              <button
-                key={type}
-                onClick={() => handleScheduleTypeChange(type)}
-                className={cn(
-                  'px-4 py-3 rounded-lg border text-sm font-medium transition-colors',
-                  scheduleType === type
-                    ? 'border-[#024209] bg-[#eafcd6] text-[#024209]'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                )}
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Existing Schedules */}
         {schedules.length > 0 && (
-          <div className="space-y-4 mb-6">
-            <h3 className="font-semibold text-black">Configured Schedules</h3>
+          <div className="space-y-3">
+            <h2 className="text-xl font-semibold">Pickup slots</h2>
             {schedules.map((schedule) => (
               <div
                 key={schedule.id}
-                className="flex items-center justify-between p-3 h-[56px] rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
+                className="flex items-center justify-between p-4 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
               >
                 <span className="font-semibold text-interactive">
                   {formatScheduleDisplay(schedule)}
                 </span>
-                <button
-                  onClick={() => handleDeleteSchedule(schedule.id)}
-                  className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#CB0003] text-[#CB0003] hover:bg-black/5"
-title="Default"
-                >
-                  <svg width="14" height="15" viewBox="0 0 14 15" fill="none">
-                    <path
-                      d="M10.7325 4.6664H3.26824V12.9017C3.26824 13.0797 3.40931 13.224 3.58335 13.224H10.4174C10.5914 13.224 10.7325 13.0797 10.7325 12.9017V4.6664ZM12.0241 12.9017C12.0241 13.8094 11.3048 14.5452 10.4174 14.5452H3.58335C2.69602 14.5452 1.97667 13.8094 1.97667 12.9017V4.6664H0.645774C0.289119 4.6664 0 4.37065 0 4.00581C0 3.64097 0.289119 3.34521 0.645774 3.34521H13.3542L13.3709 3.34542C13.7198 3.35446 14 3.64667 14 4.00581C14 4.36495 13.7198 4.65715 13.3709 4.66619L13.3542 4.6664H12.0241V12.9017Z"
-                      fill="#CB0003"
-                    />
-                    <path
-                      d="M9.18653 3.51198V2.59606C9.18653 2.43967 9.03048 2.31287 8.83803 2.31286H5.16197C4.9695 2.31286 4.81345 2.43966 4.81345 2.59606V3.51198L4.81325 3.52575C4.80425 3.8141 4.51376 4.04561 4.15673 4.04561C3.79969 4.04561 3.5092 3.8141 3.5002 3.52575L3.5 3.51198V2.59606C3.5 1.85022 4.24409 1.24561 5.16197 1.24561H8.83803C9.75587 1.24561 10.5 1.85022 10.5 2.59606V3.51198C10.5 3.80669 10.206 4.04561 9.84325 4.04561C9.48055 4.0456 9.18653 3.80669 9.18653 3.51198Z"
-                      fill="#CB0003"
-                    />
-                  </svg>
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white"
+                    title={t('edit')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                        fill="#024209"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => removeSchedule(schedule.id)}
+                    className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#CB0003] bg-white"
+                    title={t('delete')}
+                  >
+                    <Trash2 className="w-4 h-4 text-[#CB0003]" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Schedule Configuration Form */}
-        {showAddForm && (
-          <div className="space-y-6">
-            <h3 className="font-semibold text-black">
-              {schedules.length > 0
-                ? {t('pages.requests.add_another_schedule')}
-                : t('pages.requests.configure_schedule')}
-            </h3>
-
-            {/* Daily Schedule */}
-            {scheduleType === 'daily' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-black font-semibold mb-3">
-                    Start Date
-                  </label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
-                      >
-                        {currentSchedule.startDate ? (
-                          <span className="text-black">
-                            {format(currentSchedule.startDate, 'dd/MM/yyyy')}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">DD/MM/YYYY</span>
-                        )}
-                        <div className="pointer-events-none">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
-                            <CalendarIcon className="h-4 w-4 text-gray-400" />
-                          </div>
-                        </div>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto p-0 bg-white border-gray-200"
-                      align="start"
-                    >
-                      <Calendar
-                        mode="single"
-                        weekStartsOn={1}
-                        selected={currentSchedule.startDate}
-                        onSelect={(date) =>
-                          handleScheduleChange('startDate', date)
-                        }
-                        initialFocus
-                        disabled={(date) => date < new Date()}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <div>
-                  <label className="block text-black font-semibold mb-3">
-                    End Date
-                  </label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
-                      >
-                        {currentSchedule.endDate ? (
-                          <span className="text-black">
-                            {format(currentSchedule.endDate, 'dd/MM/yyyy')}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">DD/MM/YYYY</span>
-                        )}
-                        <div className="pointer-events-none">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
-                            <CalendarIcon className="h-4 w-4 text-gray-400" />
-                          </div>
-                        </div>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto p-0 bg-white border-gray-200"
-                      align="start"
-                    >
-                      <Calendar
-                        mode="single"
-                        weekStartsOn={1}
-                        selected={currentSchedule.endDate}
-                        onSelect={(date) =>
-                          handleScheduleChange('endDate', date)
-                        }
-                        initialFocus
-                        disabled={(date) =>
-                          date < (currentSchedule.startDate || new Date())
-                        }
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <TimeSlotSelector
-                  label = 'Time_range'
-                  startTimeLabel = 'StartTime'
-                  endTimeLabel = 'EndTime'
-                  startTime={currentSchedule.startTime}
-                  endTime={currentSchedule.endTime}
-                  onStartTimeChange={(time) =>
-                    handleScheduleChange('startTime', time)
-                  }
-                  onEndTimeChange={(time) =>
-                    handleScheduleChange('endTime', time)
-                  }
-                />
+        {/* Request Period */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">{t('requestPeriod')}</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                {t('startDate')}
+              </label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                min={format(new Date(), 'yyyy-MM-dd')}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                {t('endDate')}
+              </label>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                min={startDate || format(new Date(), 'yyyy-MM-dd')}
+                className="w-full"
+              />
+            </div>
+          </div>
+          {startDate && endDate && (
+            <div className="p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+              <div className="text-sm font-semibold text-[#024209]">
+                {t('requestPeriod')}:{' '}
+                {format(new Date(startDate), 'dd.MM.yyyy')} -{' '}
+                {format(new Date(endDate), 'dd.MM.yyyy')}
               </div>
-            )}
+            </div>
+          )}
+        </div>
 
-            {/* Weekly Schedule */}
-            {scheduleType === 'weekly' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-black font-semibold mb-3">
-                    Select Days
-                  </label>
-                  <WeeklyDaySelector
-                    selectedDays={currentSchedule.weeklyDays || []}
-                    onChange={(days) =>
-                      handleScheduleChange('weeklyDays', days)
-                    }
-                  />
-                </div>
-                <TimeSlotSelector
-                  label="Time Range for Selected Days"
-                  startTimeLabel = 'StartTime'
-                  endTimeLabel = 'EndTime'
-                  startTime={currentSchedule.startTime}
-                  endTime={currentSchedule.endTime}
-                  onStartTimeChange={(time) =>
-                    handleScheduleChange('startTime', time)
-                  }
-                  onEndTimeChange={(time) =>
-                    handleScheduleChange('endTime', time)
-                  }
-                />
-              </div>
-            )}
+        {/* Add Schedule Form */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">
+            {schedules.length > 0
+              ? 'Add another schedule'
+              : 'Set your schedule'}
+          </h2>
 
-            {/* Custom Schedule */}
-            {scheduleType === 'custom' && (
-              <div className="space-y-4">
-                <p className="text-sm text-gray-600">
-                  Select specific dates and times when you need food
-                </p>
-                {/* This would be implemented with a more complex date/time picker */}
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">
-                    Custom date selection with individual time ranges will be
-                    implemented here
-                  </p>
-                </div>
-              </div>
-            )}
+          {/* Day Selection */}
+          <div>
+            <label className="block text-label font-semibold mb-3">
+              Select days
+            </label>
+            <div className="grid grid-cols-7 gap-2">
+              {WEEKDAYS.map((day, index) => (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => toggleDay(FULL_WEEKDAYS[index])}
+                  className={cn(
+                    'h-12 rounded-lg border text-sm font-medium transition-all',
+                    selectedDays.includes(FULL_WEEKDAYS[index])
+                      ? 'border-[#024209] bg-[#eafcd6] text-[#024209]'
+                      : 'border-[#D9DBD5] bg-white text-gray-700 hover:border-gray-400'
+                  )}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            {/* Add Schedule Button */}
-            <div className="flex justify-center mt-4">
+          {/* Time Selection */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                Start time
+              </label>
               <button
                 type="button"
-                onClick={handleAddSchedule}
-                disabled={!isScheduleValid()}
-                className={cn(
-                  'text-interactive font-semibold text-base underline underline-offset-4 px-2 py-1 rounded transition-colors',
-                  isScheduleValid()
-                    ? 'hover:bg-[#eafcd6] cursor-pointer'
-                    : 'text-gray-400 cursor-not-allowed'
-                )}
+                onClick={() => {
+                  setShowTimeSelector(true);
+                  setEditingTime('start');
+                }}
+                className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between"
               >
-                Add Schedule
+                <span className="text-lg">{startTime}</span>
+                <Clock className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                End time
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowTimeSelector(true);
+                  setEditingTime('end');
+                }}
+                className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between"
+              >
+                <span className="text-lg">{endTime}</span>
+                <Clock className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+          </div>
+
+          {/* Add Button */}
+          {selectedDays.length > 0 && (
+            <button
+              type="button"
+              onClick={addSchedule}
+              className="text-interactive font-semibold text-base underline underline-offset-4"
+            >
+              Add pickup slot
+            </button>
+          )}
+        </div>
+
+        {/* Time Selector Modal */}
+        {showTimeSelector && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-end">
+            <div className="bg-white w-full rounded-t-3xl p-6">
+              <h3 className="text-lg font-semibold mb-4">
+                Select {editingTime === 'start' ? 'start' : 'end'} time
+              </h3>
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {TIME_OPTIONS.map((time) => (
+                  <button
+                    key={time}
+                    onClick={() => {
+                      if (editingTime === 'start') {
+                        setStartTime(time);
+                      } else {
+                        setEndTime(time);
+                      }
+                      setShowTimeSelector(false);
+                      setEditingTime(null);
+                    }}
+                    className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50"
+                  >
+                    {time}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  setShowTimeSelector(false);
+                  setEditingTime(null);
+                }}
+                className="w-full py-3 text-gray-600"
+              >
+                Cancel
               </button>
             </div>
           </div>

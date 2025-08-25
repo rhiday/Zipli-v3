@@ -53,7 +53,8 @@ const FOOD_TYPE_OPTIONS = [
   'Prepared meals',
   'Fresh produce',
   'Cold packaged foods',
-  'Bakery and Pastry', 'Other',
+  'Bakery and Pastry',
+  'Other',
 ];
 
 export default function AllItemsPage(): React.ReactElement {
@@ -61,7 +62,7 @@ export default function AllItemsPage(): React.ReactElement {
   const [items, setItems] = useState<DisplayItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string>(t('pages.donations.user'));
+  const [userName, setUserName] = useState<string>('User');
 
   const [filters, setFilters] = useState({
     type: 'donations',
@@ -97,7 +98,7 @@ export default function AllItemsPage(): React.ReactElement {
         .single();
       if (profileData) {
         setUserName(
-          profileData.organization_name || profileData.full_name  || 'User'
+          profileData.organization_name || profileData.full_name || 'User'
         );
       }
 
@@ -177,7 +178,7 @@ export default function AllItemsPage(): React.ReactElement {
       setItems(fetchedItems);
     } catch (err: any) {
       setError(err.message || 'Failed to load items.');
-      console.error(t('pages.donations.error_fetching_items'), err);
+      console.error('Error fetching items:', err);
     } finally {
       setLoading(false);
     }
@@ -224,21 +225,21 @@ export default function AllItemsPage(): React.ReactElement {
       const date = new Date(donation.pickup_time);
       return `Pickup: ${date.toLocaleDateString()}, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
     } catch (error) {
-      console.error(t('pages.donations.error_formatting_pickup_window'), error);
+      console.error('Error formatting pickup window:', error);
       return 'Pickup time not available';
     }
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-base">
+      <div className="flex min-h-dvh items-center justify-center bg-base">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-base pb-20">
+    <div className="min-h-dvh bg-base pb-20">
       <Header
         title={`All ${filters.type === 'donations' ? 'donations' : 'requests'} by ${userName}`}
       />

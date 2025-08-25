@@ -43,8 +43,8 @@ export const logger = {
     }
   },
   error: (...args: any[]): void => {
-    if (canLog(t('common.status.error'))) {
-      console.error(t('common.error'), ...args);
+    if (canLog('ERROR')) {
+      console.error('Error:', ...args);
     }
   },
   getCurrentLevel: (): LogLevelName => currentLogLevelName,
