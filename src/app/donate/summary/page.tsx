@@ -227,7 +227,7 @@ export default function DonationSummaryPage() {
               image_url: item.imageUrl || null,
               donor_id: currentUser?.id || null,
               food_type: null,
-              quantity: parseFloat(item.quantity) || 1,
+              quantity: item.quantity || 1,
               unit: null,
               user_id: currentUser?.id || null,
             });
