@@ -144,7 +144,7 @@ export default function RequestSummaryPage() {
       const requestPayload = {
         user_id: currentUser.id,
         description: requestData.description,
-        people_count: requestData.quantity || 1,
+        people_count: requestData.people_count || 1,
         allergens: requestData.allergens || [],
         start_date: sessionData.startDate || null,
         end_date: sessionData.endDate || null,

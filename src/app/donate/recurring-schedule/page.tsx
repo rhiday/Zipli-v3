@@ -179,7 +179,7 @@ export default function RecurringSchedulePage() {
           <h2 className="text-xl font-semibold">
             {t('donationPeriod') || 'Donation Period'}
           </h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-label font-semibold mb-3">
                 {t('startDate')}

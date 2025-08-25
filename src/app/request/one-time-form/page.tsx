@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 
 type OneTimeFormInputs = {
   description: string;
-  quantity: string;
+  people_count: string;
 };
 
 export default function OneTimeRequestForm() {
@@ -42,21 +42,23 @@ export default function OneTimeRequestForm() {
   } = useForm<OneTimeFormInputs>({
     defaultValues: {
       description: requestData.description || '',
-      quantity: requestData.quantity ? requestData.quantity.toString() : '',
+      people_count: requestData.people_count
+        ? requestData.people_count.toString()
+        : '',
     },
   });
 
   const watchedFields = watch();
   const isFormValid =
     watchedFields.description?.trim() &&
-    watchedFields.quantity?.trim() &&
-    Number(watchedFields.quantity) > 0 &&
+    watchedFields.people_count?.trim() &&
+    Number(watchedFields.people_count) > 0 &&
     selectedAllergens.length > 0;
 
   // Auto-save form data
   const formData = {
     description: watchedFields.description || '',
-    quantity: watchedFields.quantity || '',
+    people_count: watchedFields.people_count || '',
     allergens: selectedAllergens,
     request_type: 'one-time',
   };
@@ -80,8 +82,8 @@ export default function OneTimeRequestForm() {
     if (!isFormValid) {
       console.log('Form validation failed', {
         description: watchedFields.description?.trim(),
-        quantity: watchedFields.quantity?.trim(),
-        quantityNumber: Number(watchedFields.quantity),
+        people_count: watchedFields.people_count?.trim(),
+        people_countNumber: Number(watchedFields.people_count),
         allergensLength: selectedAllergens.length,
       });
       toast({
@@ -98,7 +100,7 @@ export default function OneTimeRequestForm() {
       setRequestData({
         request_type: 'one-time',
         description: data.description,
-        quantity: Number(data.quantity),
+        people_count: Number(data.people_count),
         allergens: selectedAllergens,
       });
 
@@ -106,7 +108,7 @@ export default function OneTimeRequestForm() {
       const requestData = {
         request_type: 'one-time',
         description: data.description,
-        quantity: Number(data.quantity),
+        people_count: Number(data.people_count),
         allergens: selectedAllergens,
       };
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
@@ -211,9 +213,9 @@ export default function OneTimeRequestForm() {
             {t('peopleCount')}?
           </label>
           <Input
-            {...register('quantity', {
-              required: 'Quantity is required',
-              min: { value: 1, message: 'Quantity must be at least 1' },
+            {...register('people_count', {
+              required: 'People count is required',
+              min: { value: 1, message: 'People count must be at least 1' },
               pattern: {
                 value: /^\d+$/,
                 message: 'Please enter a valid number',
@@ -221,11 +223,11 @@ export default function OneTimeRequestForm() {
             })}
             placeholder={t('enterNumberOfPeople')}
             type="number"
-            variant={errors.quantity ? 'error' : 'default'}
+            variant={errors.people_count ? 'error' : 'default'}
           />
-          {errors.quantity && (
+          {errors.people_count && (
             <div className="mt-1 text-[14px] font-manrope text-negative">
-              {errors.quantity.message}
+              {errors.people_count.message}
             </div>
           )}
         </div>

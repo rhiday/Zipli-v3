@@ -217,7 +217,7 @@ export default function RequestSchedulePage() {
         {/* Request Period */}
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">{t('requestPeriod')}</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-label font-semibold mb-3">
                 {t('startDate')}
