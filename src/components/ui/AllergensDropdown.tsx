@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Input } from './Input';
 import { Chip } from './Chip';
-import { useAllergenSelectorTranslation } from '@/lib/i18n-enhanced';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 interface AllergensDropdownProps {
   label: string;
@@ -26,7 +26,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   disabled,
   placeholder = 'Select...',
 }) => {
-  const { t } = useAllergenSelectorTranslation();
+  const { t } = useCommonTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -93,7 +93,11 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
             >
               {value.map((v) => (
                 <div key={v} className="flex-shrink-0">
-                  <Chip label={v} selected onRemove={() => handleToggle(v)} />
+                  <Chip
+                    label={t(v) || v}
+                    selected
+                    onRemove={() => handleToggle(v)}
+                  />
                 </div>
               ))}
             </div>
@@ -107,16 +111,18 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
             {options.map((option) => (
               <div
                 key={option}
-                className={`flex items-center px-4 py-2 cursor-pointer transition-colors ${value.includes(option) ? 'bg-positive/20' : 'hover:bg-cloud'}`}
+                className={`flex items-center px-3 py-3 cursor-pointer transition-colors ${value.includes(option) ? 'bg-positive/20' : 'hover:bg-cloud'}`}
                 onClick={() => handleToggle(option)}
               >
                 <input
                   type="checkbox"
                   checked={value.includes(option)}
                   readOnly
-                  className="mr-2 accent-positive"
+                  className="mr-3 accent-positive w-4 h-4 shrink-0"
                 />
-                <span className="text-body text-primary">{option}</span>
+                <span className="text-body text-primary">
+                  {t(option) || option}
+                </span>
               </div>
             ))}
           </div>

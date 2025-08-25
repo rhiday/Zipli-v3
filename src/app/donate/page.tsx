@@ -158,8 +158,6 @@ function DonorDashboardPage(): React.ReactElement {
             </div>
           </section>
         </main>
-
-        <BottomNav />
       </div>
     );
   }
