@@ -44,8 +44,8 @@ export default function BottomNav() {
       case 'food_donor':
         return [
           { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
-          { href: '#', label: 'Add', icon: Plus, isCentral: true },
-          { href: '/impact', label: 'Impact', icon: TrendingUp },
+          { href: '#', label: t('add'), icon: Plus, isCentral: true },
+          { href: '/impact', label: t('impact'), icon: TrendingUp },
         ];
       case 'food_receiver':
         return [
@@ -54,8 +54,8 @@ export default function BottomNav() {
             label: t('dashboard'),
             icon: LayoutGrid,
           },
-          { href: '#', label: 'Request', icon: Plus, isCentral: true },
-          { href: '/impact', label: 'Impact', icon: TrendingUp },
+          { href: '#', label: t('request'), icon: Plus, isCentral: true },
+          { href: '/impact', label: t('impact'), icon: TrendingUp },
         ];
       case 'city':
         return [
