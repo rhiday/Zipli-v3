@@ -118,7 +118,7 @@ function DonorDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-screen pb-20">
+      <div className="min-h-dvh pb-20">
         <Header title={'Loading'} />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -158,14 +158,12 @@ function DonorDashboardPage(): React.ReactElement {
             </div>
           </section>
         </main>
-
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-20">
       <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -173,7 +171,7 @@ function DonorDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-              {t('pages.impact.title')}
+              {t('yourImpact')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -187,7 +185,7 @@ function DonorDashboardPage(): React.ReactElement {
                   46kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('pages.impact.totalFoodDonated')}
+                  {t('totalFoodDonated')}
                 </p>
               </div>
             </div>
@@ -202,7 +200,7 @@ function DonorDashboardPage(): React.ReactElement {
                   131
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('pages.impact.portionsOffered')}
+                  {t('portionsOffered')}
                 </p>
               </div>
             </div>
@@ -217,7 +215,7 @@ function DonorDashboardPage(): React.ReactElement {
                   125€
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('pages.impact.costSavings')}
+                  {t('costSavings')}
                 </p>
               </div>
             </div>
@@ -232,7 +230,7 @@ function DonorDashboardPage(): React.ReactElement {
                   10t
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('pages.impact.co2Avoided')}
+                  {t('co2Avoided')}
                 </p>
               </div>
             </div>
@@ -249,8 +247,8 @@ function DonorDashboardPage(): React.ReactElement {
           >
             <ActionButton
               href="#"
-              title={t('pages.dashboard.donor.exportToPdf')}
-              description={t('pages.impact.environmentalAndSocialImpactData')}
+              title={t('exportToPdf')}
+              description={t('environmentalAndSocialImpactData')}
               icon={<FileDown />}
             />
           </div>
