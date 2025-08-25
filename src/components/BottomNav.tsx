@@ -100,8 +100,8 @@ export default function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 z-40 w-full h-[76px] border-t border-primary-10 bg-base shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.1)]">
-      <div className="mx-auto grid grid-cols-3 h-full max-w-lg items-center">
+    <nav className="absolute bottom-0 left-0 right-0 z-50 h-[76px] border-t border-primary-10 bg-base shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.1)]">
+      <div className="grid grid-cols-3 h-full items-center">
         {navItems.map((item, index) => renderNavItem(item, index))}
       </div>
     </nav>
