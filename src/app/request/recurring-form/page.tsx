@@ -1,18 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/Textarea';
-import { Input } from '@/components/ui/Input';
-import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { useCommonTranslation } from '@/hooks/useTranslations';
+import AutoSaveFormWrapper from '@/components/forms/AutoSaveFormWrapper';
 import PageContainer from '@/components/layout/PageContainer';
+import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import BottomActionBar from '@/components/ui/BottomActionBar';
-import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/Input';
 import { Progress } from '@/components/ui/progress';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Textarea } from '@/components/ui/Textarea';
+import { toast } from '@/hooks/use-toast';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useRequestStore } from '@/store/request';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 type RecurringFormInputs = {
   description: string;
@@ -29,6 +31,9 @@ export default function RecurringRequestForm() {
   const [allergensInteracted, setAllergensInteracted] = useState(false);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
+  // Check if we're in edit mode (coming from summary with existing data)
+  const isEditMode = Boolean(requestData.description);
+
   const {
     register,
     handleSubmit,
@@ -37,7 +42,9 @@ export default function RecurringRequestForm() {
   } = useForm<RecurringFormInputs>({
     defaultValues: {
       description: requestData.description || '',
-      quantity: requestData.quantity ? requestData.quantity.toString() : '',
+      quantity: requestData.people_count
+        ? requestData.people_count.toString()
+        : '',
     },
   });
 
@@ -50,10 +57,27 @@ export default function RecurringRequestForm() {
     selectedAllergens.length > 0;
 
   const onSubmit = async (data: RecurringFormInputs) => {
+    console.log('Recurring form onSubmit called', {
+      data,
+      isFormValid,
+      selectedAllergens,
+    });
     setAttemptedSubmit(true);
 
     // Check if form is valid before proceeding
     if (!isFormValid) {
+      console.log('Form validation failed', {
+        description: watchedFields.description?.trim(),
+        quantity: watchedFields.quantity?.trim(),
+        quantityNumber: Number(watchedFields.quantity),
+        allergensLength: selectedAllergens.length,
+      });
+      toast({
+        title: 'Please complete all fields',
+        description:
+          'Make sure you have filled in all required information including allergens/dietary restrictions.',
+        variant: 'error',
+      });
       return;
     }
 
@@ -62,7 +86,7 @@ export default function RecurringRequestForm() {
       setRequestData({
         request_type: 'recurring',
         description: data.description,
-        quantity: Number(data.quantity),
+        people_count: Number(data.quantity),
         allergens: selectedAllergens,
       });
 
@@ -70,15 +94,28 @@ export default function RecurringRequestForm() {
       const requestData = {
         request_type: 'recurring',
         description: data.description,
-        quantity: Number(data.quantity),
+        people_count: Number(data.quantity),
         allergens: selectedAllergens,
       };
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
-      // Navigate to schedule page (following donor flow pattern)
-      router.push('/request/schedule');
+      console.log('Request data saved, navigating...', { isEditMode });
+
+      // Navigate based on edit mode
+      if (isEditMode) {
+        // In edit mode, go back to summary
+        router.push('/request/summary');
+      } else {
+        // In create mode, go to schedule page
+        router.push('/request/schedule');
+      }
     } catch (error) {
-      console.error('Failed to create recurring request:', error);
+      console.error('Failed to create recurring request - full error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save your request. Please try again.',
+        variant: 'error',
+      });
     }
   };
 
@@ -99,102 +136,103 @@ export default function RecurringRequestForm() {
       footer={
         <BottomActionBar>
           <Button
-            type="submit"
+            type="button"
             size="cta"
             disabled={!isFormValid || isSubmitting}
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? t('continuing') : t('continue')}
+            {isSubmitting
+              ? isEditMode
+                ? t('saving')
+                : t('continuing')
+              : isEditMode
+                ? t('saveChanges')
+                : t('continue')}
           </Button>
         </BottomActionBar>
       }
       className="bg-white"
       contentClassName="p-4 space-y-6"
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Food Description */}
-        <div>
-          <label className="block text-label font-semibold mb-2">
-            {t('describeFood')}
-          </label>
-          <Textarea
-            {...register('description', {
-              required: 'Please describe the food you need',
-            })}
-            placeholder={t('foodDescriptionPlaceholder')}
-            variant={errors.description ? 'error' : 'default'}
-            rows={4}
-          />
-          {errors.description && (
-            <div className="mt-1 text-[14px] font-manrope text-negative">
-              {errors.description.message}
-            </div>
-          )}
-        </div>
+      <AutoSaveFormWrapper
+        formId="recurring-request-form"
+        formData={{
+          description: watchedFields.description || '',
+          quantity: watchedFields.quantity || '',
+          allergens: selectedAllergens,
+          request_type: 'recurring',
+        }}
+        enabled={true}
+        intervalMs={3000}
+        showStatus={true}
+      >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Food Description */}
+          <div>
+            <label className="block text-label font-semibold mb-2">
+              {t('describeFood')}
+            </label>
+            <Textarea
+              {...register('description', {
+                required: 'Please describe the food you need',
+              })}
+              placeholder={t('foodDescriptionPlaceholder')}
+              variant={errors.description ? 'error' : 'default'}
+              rows={4}
+            />
+            {errors.description && (
+              <div className="mt-1 text-[14px] font-manrope text-negative">
+                {errors.description.message}
+              </div>
+            )}
+          </div>
 
-        {/* Quantity */}
-        <div>
-          <label className="block text-label font-semibold mb-2">
-            {t('peopleCount')}?
-          </label>
-          <Input
-            {...register('quantity', {
-              required: 'Quantity is required',
-              min: { value: 1, message: 'Quantity must be at least 1' },
-              pattern: {
-                value: /^\d+$/,
-                message: 'Please enter a valid number',
-              },
-            })}
-            placeholder={t('enterNumberOfPeople')}
-            type="number"
-            variant={errors.quantity ? 'error' : 'default'}
-          />
-          {errors.quantity && (
-            <div className="mt-1 text-[14px] font-manrope text-negative">
-              {errors.quantity.message}
-            </div>
-          )}
-        </div>
+          {/* Quantity */}
+          <div>
+            <label className="block text-label font-semibold mb-2">
+              {t('peopleCount')}?
+            </label>
+            <Input
+              {...register('quantity', {
+                required: 'Quantity is required',
+                min: { value: 1, message: 'Quantity must be at least 1' },
+                pattern: {
+                  value: /^\d+$/,
+                  message: 'Please enter a valid number',
+                },
+              })}
+              placeholder={t('enterNumberOfPeople')}
+              type="number"
+              variant={errors.quantity ? 'error' : 'default'}
+            />
+            {errors.quantity && (
+              <div className="mt-1 text-[14px] font-manrope text-negative">
+                {errors.quantity.message}
+              </div>
+            )}
+          </div>
 
-        {/* Allergens */}
-        <AllergensDropdown
-          label={t('allergiesIntolerancesDiets')}
-          options={[
-            'Not specified',
-            'Gluten-free',
-            'Lactose-free',
-            'Low-lactose',
-            'Egg-free',
-            'Soy-free',
-            'Does not contain peanuts',
-            'Does not contain other nuts',
-            'Does not contain fish',
-            'Does not contain crustaceans',
-            'Does not contain celery',
-            'Does not contain mustard',
-            'Does not contain sesame seeds',
-            'Does not contain sulphur dioxide / sulphites >10 mg/kg or litre',
-            'Does not contain lupin',
-            'Does not contain molluscs',
-          ]}
-          value={selectedAllergens}
-          onChange={(allergens) => {
-            setSelectedAllergens(allergens);
-            if (!allergensInteracted) {
-              setAllergensInteracted(true);
+          {/* Allergens */}
+          <AllergensDropdown
+            label={t('allergiesIntolerancesDiets')}
+            value={selectedAllergens}
+            onChange={(allergens) => {
+              setSelectedAllergens(allergens);
+              if (!allergensInteracted) {
+                setAllergensInteracted(true);
+              }
+            }}
+            placeholder={t('selectAllergens')}
+            error={
+              !selectedAllergens.length &&
+              (allergensInteracted || attemptedSubmit)
+                ? t('selectAllergens')
+                : undefined
             }
-          }}
-          placeholder={t('selectAllergens')}
-          error={
-            !selectedAllergens.length &&
-            (allergensInteracted || attemptedSubmit)
-              ? t('selectAllergens')
-              : undefined
-          }
-        />
-      </form>
+          />
+        </form>
+      </AutoSaveFormWrapper>
     </PageContainer>
   );
 }

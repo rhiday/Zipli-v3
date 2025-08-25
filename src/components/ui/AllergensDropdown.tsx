@@ -4,10 +4,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from './Input';
 import { Chip } from './Chip';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import {
+  ALLERGEN_TRANSLATION_KEYS,
+  getAllergenKeyword,
+} from '@/constants/allergens';
 
 interface AllergensDropdownProps {
   label: string;
-  options: string[];
   value: string[];
   onChange: (value: string[]) => void;
   error?: string;
@@ -18,7 +21,6 @@ interface AllergensDropdownProps {
 
 export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   label,
-  options,
   value = [],
   onChange,
   error,
@@ -27,6 +29,24 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   placeholder = 'Select...',
 }) => {
   const { t } = useCommonTranslation();
+
+  // Get translated allergen options
+  const translatedOptions = ALLERGEN_TRANSLATION_KEYS.map((item) => ({
+    key: item.fallback, // Use fallback as the key for value consistency
+    label: t(item.key) || item.fallback, // Use translation or fallback
+  }));
+
+  // Helper to get translated label for a value
+  const getTranslatedLabel = (value: string): string => {
+    const option = translatedOptions.find((opt) => opt.key === value);
+    return option?.label || value;
+  };
+
+  // Helper to get compact keyword for chips
+  const getCompactLabel = (value: string): string => {
+    const fullLabel = getTranslatedLabel(value);
+    return getAllergenKeyword(fullLabel);
+  };
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -68,7 +88,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   const hasOverflow = value.length > 3;
 
   return (
-    <div className="w-full relative z-50" ref={containerRef}>
+    <div className="w-full relative z-10" ref={containerRef}>
       <label className="block text-label font-semibold mb-2">{label}</label>
       <div className="relative">
         <Input
@@ -94,7 +114,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
               {value.map((v) => (
                 <div key={v} className="flex-shrink-0">
                   <Chip
-                    label={t(v) || v}
+                    label={getCompactLabel(v)}
                     selected
                     onRemove={() => handleToggle(v)}
                   />
@@ -107,22 +127,20 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           </>
         )}
         {open && (
-          <div className="absolute left-0 right-0 mt-2 bg-base border border-border rounded-md shadow-lg z-[9999]">
-            {options.map((option) => (
+          <div className="absolute left-0 right-0 mt-2 bg-base border border-border rounded-md shadow-lg z-[9999] max-h-60 overflow-y-auto">
+            {translatedOptions.map((option) => (
               <div
-                key={option}
-                className={`flex items-center px-3 py-3 cursor-pointer transition-colors ${value.includes(option) ? 'bg-positive/20' : 'hover:bg-cloud'}`}
-                onClick={() => handleToggle(option)}
+                key={option.key}
+                className={`flex items-center px-4 py-2 cursor-pointer transition-colors ${value.includes(option.key) ? 'bg-positive/20' : 'hover:bg-cloud'}`}
+                onClick={() => handleToggle(option.key)}
               >
                 <input
                   type="checkbox"
-                  checked={value.includes(option)}
+                  checked={value.includes(option.key)}
                   readOnly
-                  className="mr-3 accent-positive w-4 h-4 shrink-0"
+                  className="mr-2 accent-positive"
                 />
-                <span className="text-body text-primary">
-                  {t(option) || option}
-                </span>
+                <span className="text-body text-primary">{option.label}</span>
               </div>
             ))}
           </div>

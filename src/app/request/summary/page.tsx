@@ -1,19 +1,19 @@
 'use client';
 
-import PageContainer from '@/components/layout/PageContainer';
-import BottomActionBar from '@/components/ui/BottomActionBar';
-import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
-import { AllergenChips } from '@/components/ui/SummaryCard';
-import { Textarea } from '@/components/ui/Textarea';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { toast } from '@/hooks/use-toast';
+import { useRequestStore } from '@/store/request';
+import { useDatabase } from '@/store';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { useCommonTranslation } from '@/hooks/useTranslations';
-import { useDatabase } from '@/store';
-import type { RequestInsert } from '@/types/supabase';
-import { useRequestStore } from '@/store/request';
+import { AllergenChips } from '@/components/ui/SummaryCard';
+import { Textarea } from '@/components/ui/Textarea';
 import { format } from 'date-fns';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import PageContainer from '@/components/layout/PageContainer';
+import BottomActionBar from '@/components/ui/BottomActionBar';
 
 export default function RequestSummaryPage() {
   const router = useRouter();
@@ -21,6 +21,10 @@ export default function RequestSummaryPage() {
   const { requestData, pickupSlots, clearRequest } = useRequestStore();
   const { currentUser, addRequest } = useDatabase();
   const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
+  const [requestPeriod, setRequestPeriod] = useState<{
+    startDate?: Date;
+    endDate?: Date;
+  } | null>(null);
 
   const [address, setAddress] = useState('');
   const [instructions, setInstructions] = useState('');
@@ -28,6 +32,7 @@ export default function RequestSummaryPage() {
   const [updateInstructionsInProfile, setUpdateInstructionsInProfile] =
     useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingRecurringData, setIsLoadingRecurringData] = useState(true);
 
   const formatSlotDate = (date: Date | string | undefined) => {
     if (!date) return null;
@@ -55,7 +60,18 @@ export default function RequestSummaryPage() {
       if (sessionRequestData.recurringSchedules) {
         setRecurringSchedule(sessionRequestData.recurringSchedules);
       }
+
+      // Extract request period dates
+      if (sessionRequestData.startDate && sessionRequestData.endDate) {
+        setRequestPeriod({
+          startDate: new Date(sessionRequestData.startDate),
+          endDate: new Date(sessionRequestData.endDate),
+        });
+      }
     }
+
+    // Set loading to false after processing session storage
+    setIsLoadingRecurringData(false);
   }, [currentUser]);
 
   const handleSubmitRequest = async () => {
@@ -67,17 +83,29 @@ export default function RequestSummaryPage() {
 
     if (!address.trim() || !currentUser) {
       console.error('Validation failed: missing address or user');
-      alert('Please enter your address');
+      toast({
+        title: 'Address required',
+        description: 'Please enter your address to continue',
+        variant: 'error',
+      });
       return;
     }
 
-    if (!requestData.description || !requestData.quantity) {
-      alert('Please complete your food request details');
+    if (!requestData.description || !requestData.people_count) {
+      toast({
+        title: 'Request details required',
+        description: 'Please complete your food request details',
+        variant: 'error',
+      });
       return;
     }
 
     if (pickupSlots.length === 0 && !recurringSchedule) {
-      alert('Please add at least one pickup slot');
+      toast({
+        title: 'Pickup slot required',
+        description: 'Please add at least one pickup slot',
+        variant: 'error',
+      });
       return;
     }
 
@@ -128,22 +156,18 @@ export default function RequestSummaryPage() {
       const storedRequest = sessionStorage.getItem('pendingRequest');
       const sessionData = storedRequest ? JSON.parse(storedRequest) : {};
 
-      // Ensure required string fields for type-safe insert
-      const now = new Date();
-      const primarySlot = formattedSlots[0] || null;
-      const fallbackDate = now.toISOString().split('T')[0];
-      const fallbackStart = '09:00';
-      const fallbackEnd = '17:00';
-
-      // Create the request in the database with explicit type
-      const requestPayload: RequestInsert = {
+      // Create the request in the database
+      const requestPayload = {
         user_id: currentUser.id,
         description: requestData.description,
-        people_count: requestData.quantity || 1,
+        people_count: requestData.people_count || 1,
+        allergens: requestData.allergens || [],
+        start_date: sessionData.startDate || null,
+        end_date: sessionData.endDate || null,
         pickup_date:
           pickupSlots.length > 0 && formattedSlots[0]?.date
             ? formattedSlots[0].date
-            : new Date().toISOString().split('T')[0], // Use today's date as fallback
+            : new Date().toISOString().split('T')[0],
         pickup_start_time:
           pickupSlots.length > 0 && formattedSlots[0]?.start_time
             ? formattedSlots[0].start_time
@@ -152,6 +176,7 @@ export default function RequestSummaryPage() {
           pickupSlots.length > 0 && formattedSlots[0]?.end_time
             ? formattedSlots[0].end_time
             : '17:00',
+        // Note: requests table uses individual pickup time fields, not pickup_slots array
         status: 'active' as const,
         is_recurring: !!recurringSchedule,
       };
@@ -162,34 +187,56 @@ export default function RequestSummaryPage() {
 
       if (response.error) {
         console.error('Error creating request:', response.error);
-        alert(`Failed to submit request: ${response.error}`);
+        toast({
+          title: 'Request submission failed',
+          description: `${response.error}`,
+          variant: 'error',
+        });
         return;
       }
 
       if (response.data) {
         console.log('✅ Request created successfully:', response.data.id);
 
-        // Clear the request store after confirming
+        // Clear the request store and session storage after confirming
         clearRequest();
-        router.push('/request/success');
+        sessionStorage.removeItem('pendingRequest');
+
+        // Use replace to prevent back navigation issues
+        router.replace('/request/success');
       } else {
         console.error('No data returned from addRequest');
-        alert('Failed to submit request: No data returned');
+        toast({
+          title: 'Request submission failed',
+          description: 'No data returned from server',
+          variant: 'error',
+        });
       }
     } catch (error) {
       console.error('Error submitting request:', error);
-      alert(
-        `Failed to submit request: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      toast({
+        title: 'Request submission error',
+        description: `${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: 'error',
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Show loading if no request data
-  if (!requestData.description) {
+  // Show loading while processing recurring request data
+  if (isLoadingRecurringData) {
     return (
-      <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
+      <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show error if no request data after loading
+  if (!requestData.description && !recurringSchedule) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">No request data found</p>
         <Button onClick={() => router.push('/request/select-type')}>
           Start New Request
@@ -242,7 +289,7 @@ export default function RequestSummaryPage() {
               {requestData.description || 'Food Request'}
             </div>
             <div className="text-sm text-gray-600">
-              {t('portions')}: {requestData.quantity || '—'}
+              {t('portions')}: {requestData.people_count || '—'}
             </div>
             <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap">
               {t('allergiesIntolerancesDiets')}:{' '}
@@ -250,7 +297,14 @@ export default function RequestSummaryPage() {
             </div>
           </div>
           <button
-            onClick={() => router.push('/request/select-type')}
+            onClick={() => {
+              // Navigate directly to the appropriate edit form based on request type
+              if (recurringSchedule) {
+                router.push('/request/recurring-form');
+              } else {
+                router.push('/request/one-time-form');
+              }
+            }}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
             aria-label={t('edit')}
           >
@@ -271,6 +325,32 @@ export default function RequestSummaryPage() {
           </button>
         </div>
       </div>
+
+      {/* Request Period */}
+      {requestPeriod && requestPeriod.startDate && requestPeriod.endDate && (
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center justify-between p-4 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+            <span className="font-semibold text-interactive">
+              Request Period: {format(requestPeriod.startDate, 'dd.MM.yyyy')} -{' '}
+              {format(requestPeriod.endDate, 'dd.MM.yyyy')}
+            </span>
+            <button
+              onClick={() => router.push('/request/schedule')}
+              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+              title="Edit request period"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                  fill="#024209"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Pickup Schedule Section */}
       <div className="space-y-4">
@@ -304,17 +384,48 @@ export default function RequestSummaryPage() {
               </button>
             </div>
           ))
+        ) : // One-time pickup slots - display all slots
+        pickupSlots.length > 0 ? (
+          pickupSlots.map((slot, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
+            >
+              <span className="font-semibold text-interactive">
+                {slot.date
+                  ? `${formatSlotDate(slot.date)}, ${slot.startTime} - ${slot.endTime}`
+                  : t('dateNotSet')}
+              </span>
+              <button
+                onClick={() => router.push('/request/pickup-slot')}
+                className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+                title="Edit pickup time"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                    fill="#024209"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))
         ) : (
-          // One-time pickup slot or old format
           <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
             <span className="font-semibold text-interactive">
-              {pickupSlots.length > 0 && pickupSlots[0].date
-                ? `${formatSlotDate(pickupSlots[0].date)}, ${pickupSlots[0].startTime} - ${pickupSlots[0].endTime}`
-                : t('dateNotSet')}
+              {t('dateNotSet')}
             </span>
             <button
               onClick={() => router.push('/request/pickup-slot')}
-              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+              className="flex items-center justify-between w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
               title="Edit pickup time"
             >
               <svg

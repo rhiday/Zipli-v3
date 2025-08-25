@@ -4,10 +4,13 @@ import { persist } from 'zustand/middleware';
 interface DonationItem {
   id: string;
   name: string;
-  quantity: string;
+  quantity: number;
+  unit: string;
   description: string | null;
   allergens: string[];
   imageUrl?: string;
+  category?: string;
+  expiresAt?: string; // ISO string
 }
 
 interface PickupSlot {
@@ -22,12 +25,22 @@ interface DonationState {
   pickupSlots: PickupSlot[];
   address: string;
   driverInstructions: string;
+  startDate: string;
+  endDate: string;
+  latitude?: number;
+  longitude?: number;
+  postalCode?: string;
+  timezone: string;
   isEditMode: boolean;
   editingDonationId: string | null;
   setDonationItems: (items: DonationItem[]) => void;
   setPickupSlots: (slots: PickupSlot[]) => void;
   setAddress: (address: string) => void;
   setDriverInstructions: (instructions: string) => void;
+  setStartDate: (date: string) => void;
+  setEndDate: (date: string) => void;
+  setLocation: (lat: number, lng: number, postal?: string) => void;
+  setTimezone: (timezone: string) => void;
   setEditMode: (isEdit: boolean, donationId?: string) => void;
 
   // Actions for donation items
@@ -49,6 +62,12 @@ const initialState = {
   pickupSlots: [],
   address: '',
   driverInstructions: '',
+  startDate: '',
+  endDate: '',
+  latitude: undefined,
+  longitude: undefined,
+  postalCode: undefined,
+  timezone: 'UTC',
   isEditMode: false,
   editingDonationId: null,
 };
@@ -62,6 +81,11 @@ export const useDonationStore = create<DonationState>()(
       setAddress: (address) => set({ address }),
       setDriverInstructions: (instructions) =>
         set({ driverInstructions: instructions }),
+      setStartDate: (date) => set({ startDate: date }),
+      setEndDate: (date) => set({ endDate: date }),
+      setLocation: (lat, lng, postal) =>
+        set({ latitude: lat, longitude: lng, postalCode: postal }),
+      setTimezone: (timezone) => set({ timezone }),
       setEditMode: (isEdit, donationId) =>
         set({ isEditMode: isEdit, editingDonationId: donationId || null }),
 

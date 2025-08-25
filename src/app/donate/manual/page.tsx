@@ -25,6 +25,9 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { Textarea } from '@/components/ui/Textarea';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useAutoSave } from '@/lib/auto-save';
+import AutoSaveFormWrapper from '@/components/forms/AutoSaveFormWrapper';
+import { toast } from '@/hooks/use-toast';
 
 interface DonationItem {
   id: string;
@@ -161,8 +164,8 @@ function ManualDonationPageInner() {
         : String(existingFood.allergens)
             .split(',')
             .map((a) => a.trim());
-      // Filter out 'Not specified' if other allergens are present
-      return allergens.filter((a) => a.toLowerCase() !== 'not specified');
+      // Filter out None if other allergens are present
+      return allergens.filter((a) => a.toLowerCase() !== 'none');
     }
 
     // Smart pattern matching for common food types
@@ -214,11 +217,11 @@ function ManualDonationPageInner() {
       miso: ['Soybeans'],
       tempeh: ['Soybeans'],
 
-      // Vegan options - don't auto-suggest any allergens
-      vegan: [],
-      plant: [],
-      vegetable: [],
-      fruit: [],
+      // Vegan options
+      vegan: ['None'],
+      plant: ['None'],
+      vegetable: ['None'],
+      fruit: ['None'],
       salad: name.includes('nut') ? ['Tree nuts'] : [],
     };
 
@@ -254,8 +257,9 @@ function ManualDonationPageInner() {
         const suggestedAllergens = suggestAllergensForFood(value);
         if (suggestedAllergens.length > 0) {
           updated.allergens = suggestedAllergens;
+        } else {
+          updated.allergens = ['None']; // Default to None if no suggestions
         }
-        // Don't automatically add 'None' - let user select it from dropdown
       } else if (field === 'name' && !value.trim()) {
         updated.allergens = []; // Clear allergens if name is cleared
       }
@@ -291,8 +295,12 @@ function ManualDonationPageInner() {
         });
 
         await updateDonation(currentItem.id, {
-          quantity: parseFloat(currentItem.quantity) || 0,
+          quantity: Number(currentItem.quantity) || 0,
         });
+
+        // Clear auto-saved data on successful save
+        clear();
+        clearItemsList();
 
         // In edit mode, continue to pickup slots instead of showing success dialog
         if (storeEditMode) {
@@ -306,13 +314,15 @@ function ManualDonationPageInner() {
           // This part uses the old zustand store, which you might want to refactor later
           addDonationItem({
             ...currentItem,
-            quantity: `${currentItem.quantity} kg`,
+            quantity: Number(currentItem.quantity),
+            unit: 'kg',
           });
         } else {
           updateDonationItem({
             ...currentItem,
             id: currentItem.id,
-            quantity: `${currentItem.quantity} kg`,
+            quantity: Number(currentItem.quantity),
+            unit: 'kg',
           });
         }
         setShowAddAnotherForm(false);
@@ -325,6 +335,7 @@ function ManualDonationPageInner() {
           imageUrl: undefined,
         });
         setHasAttemptedSave(false);
+        clear(); // Clear auto-saved data after adding item
       }
     } catch (error) {
       console.error('Failed to save changes:', error);
@@ -354,7 +365,7 @@ function ManualDonationPageInner() {
       setCurrentItem({
         ...itemToEdit,
         description: itemToEdit.description ?? '',
-        quantity: itemToEdit.quantity.replace(' kg', ''),
+        quantity: itemToEdit.quantity.toString(),
       });
       setShowAddAnotherForm(true);
     }
@@ -391,6 +402,22 @@ function ManualDonationPageInner() {
     currentItem.quantity.trim() !== '' &&
     currentItem.allergens.length > 0;
 
+  // Auto-save current item data
+  const { hasUnsaved, restore, clear } = useAutoSave({
+    key: `donation-item-${currentItem.id}`,
+    data: currentItem,
+    enabled: showAddAnotherForm,
+    intervalMs: 2000, // Save every 2 seconds when form is visible
+  });
+
+  // Auto-save donation items list
+  const { clear: clearItemsList } = useAutoSave({
+    key: 'donation-items-list',
+    data: donationItems,
+    enabled: true,
+    intervalMs: 5000, // Save items list every 5 seconds
+  });
+
   const formContent = (
     <div className="flex flex-col gap-4">
       <div>
@@ -426,24 +453,6 @@ function ManualDonationPageInner() {
 
       <AllergensDropdown
         label={t('allergiesIntolerancesDiets')}
-        options={[
-          'Not specified',
-          'Gluten-free',
-          'Lactose-free',
-          'Low-lactose',
-          'Egg-free',
-          'Soy-free',
-          'Does not contain peanuts',
-          'Does not contain other nuts',
-          'Does not contain fish',
-          'Does not contain crustaceans',
-          'Does not contain celery',
-          'Does not contain mustard',
-          'Does not contain sesame seeds',
-          'Does not contain sulphur dioxide / sulphites >10 mg/kg or litre',
-          'Does not contain lupin',
-          'Does not contain molluscs',
-        ]}
         value={currentItem.allergens}
         onChange={(allergens) =>
           handleCurrentItemChange('allergens', allergens)
@@ -527,7 +536,7 @@ function ManualDonationPageInner() {
               <ItemPreview
                 key={item.id}
                 name={item.name}
-                quantity={item.quantity}
+                quantity={`${item.quantity} ${item.unit || 'kg'}`}
                 description={item.description || undefined}
                 imageUrl={item.imageUrl}
                 allergens={item.allergens}
@@ -548,13 +557,39 @@ function ManualDonationPageInner() {
             </div>
           </div>
         ) : (
-          <div>
-            <Progress
-              value={(donationItems.length + 1) * 50}
-              className="mb-4"
-            />
-            {formContent}
-          </div>
+          <AutoSaveFormWrapper
+            formId={`donation-form-${currentItem.id}`}
+            formData={currentItem}
+            enabled={showAddAnotherForm}
+            intervalMs={2000}
+            onRestore={(data) => {
+              setCurrentItem((prev) => ({ ...prev, ...data }));
+              toast({
+                title: 'Form data restored',
+                description: 'Your previous work has been recovered',
+                variant: 'success',
+              });
+            }}
+            onClear={() => {
+              setCurrentItem({
+                id: 'new',
+                name: '',
+                quantity: '',
+                allergens: [],
+                description: null,
+                imageUrl: undefined,
+              });
+            }}
+            showStatus={true}
+          >
+            <div>
+              <Progress
+                value={(donationItems.length + 1) * 50}
+                className="mb-4"
+              />
+              {formContent}
+            </div>
+          </AutoSaveFormWrapper>
         )}
       </PageContainer>
 

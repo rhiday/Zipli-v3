@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store';
 import { useLanguage } from '@/hooks/useLanguage';
+import { toast } from '@/hooks/use-toast';
 import { SummaryCard } from '@/components/ui/SummaryCard';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -47,6 +48,11 @@ export default function DonationSummaryPage() {
     useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
+  const [donationPeriod, setDonationPeriod] = useState<{
+    startDate?: Date;
+    endDate?: Date;
+  } | null>(null);
+  const [isLoadingRecurringData, setIsLoadingRecurringData] = useState(true);
 
   const formatSlotDate = (date: Date | string | undefined) => {
     if (!date) return null;
@@ -76,6 +82,24 @@ export default function DonationSummaryPage() {
     const storedDonation = sessionStorage.getItem('pendingDonation');
     if (storedDonation) {
       const donationData = JSON.parse(storedDonation);
+
+      // Extract donation period from schedules or direct properties
+      if (donationData.schedules && donationData.schedules.length > 0) {
+        const firstSchedule = donationData.schedules[0];
+        if (firstSchedule.startDate && firstSchedule.endDate) {
+          setDonationPeriod({
+            startDate: new Date(firstSchedule.startDate),
+            endDate: new Date(firstSchedule.endDate),
+          });
+        }
+      } else if (donationData.startDate && donationData.endDate) {
+        // Fallback to direct properties on donation data
+        setDonationPeriod({
+          startDate: new Date(donationData.startDate),
+          endDate: new Date(donationData.endDate),
+        });
+      }
+
       if (donationData.recurringSchedules || donationData.schedule) {
         setRecurringSchedule(
           donationData.recurringSchedules || donationData.schedule
@@ -89,13 +113,17 @@ export default function DonationSummaryPage() {
           const { addDonationItem } = useDonationStore.getState();
           addDonationItem({
             name: donationData.description || 'Recurring_donation',
-            quantity: donationData.quantity?.toString() || '1',
+            quantity: Number(donationData.quantity) || 1,
+            unit: 'kg',
             allergens: donationData.allergens || [],
             description: donationData.description || null,
           });
         }
       }
     }
+
+    // Set loading to false after processing session storage
+    setIsLoadingRecurringData(false);
   }, [isInitialized, currentUser, donationItems.length]);
 
   const handleEditItem = (itemId: string) => {
@@ -192,7 +220,7 @@ export default function DonationSummaryPage() {
 
         // Update the donation
         await updateDonation(editingDonationId, {
-          quantity: parseInt(item.quantity) || 1,
+          quantity: item.quantity || 1,
           pickup_slots: formattedSlots,
           instructions_for_driver: instructions || null,
         });
@@ -225,7 +253,7 @@ export default function DonationSummaryPage() {
               image_url: item.imageUrl || null,
               donor_id: currentUser?.id || null,
               food_type: null,
-              quantity: parseFloat(item.quantity) || 1,
+              quantity: item.quantity || 1,
               unit: null,
               user_id: currentUser?.id || null,
             });
@@ -246,7 +274,7 @@ export default function DonationSummaryPage() {
           const donationData = {
             food_item_id: foodItemId,
             donor_id: currentUser.id,
-            quantity: parseInt(item.quantity) || 1,
+            quantity: item.quantity || 1,
             status: 'available' as const,
             pickup_slots: formattedSlots,
             pickup_time: null,
@@ -265,33 +293,43 @@ export default function DonationSummaryPage() {
         }
       }
 
-      // Clear the donation store after confirming
+      // Clear the donation store and session storage after confirming
       const clearDonation = useDonationStore.getState().clearDonation;
       clearDonation();
+      sessionStorage.removeItem('pendingDonation');
 
-      router.push('/donate/thank-you');
+      // Use replace to prevent back navigation issues
+      router.replace('/donate/thank-you');
     } catch (error) {
       console.error(`Error ${action} donations:`, error);
       // Show error message to user
-      alert(`There was an error ${action} your donation. Please try again.`);
+      toast({
+        title: `Error ${action} donation`,
+        description: `There was an error ${action} your donation. Please try again.`,
+        variant: 'error',
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Redirect if no donation data instead of showing error
-  useEffect(() => {
-    if (isInitialized && donationItems.length === 0 && !recurringSchedule) {
-      // Redirect to donate page if there are no items
-      router.push('/donate');
-    }
-  }, [isInitialized, donationItems.length, recurringSchedule, router]);
-
-  // Show loading while checking donation data
-  if (!isInitialized || (donationItems.length === 0 && !recurringSchedule)) {
+  // Show loading while processing recurring donation data
+  if (isLoadingRecurringData) {
     return (
-      <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center">
-        <div className="animate-pulse text-gray-500">Loading...</div>
+      <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show error if no donation data after loading
+  if (donationItems.length === 0 && !recurringSchedule) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
+        <p className="text-gray-600">{t('noDonationItemsFound')}</p>
+        <Button onClick={() => router.push('/donate/new')}>
+          Start New Donation
+        </Button>
       </div>
     );
   }
@@ -333,7 +371,7 @@ export default function DonationSummaryPage() {
           <ItemPreview
             key={index}
             name={item.name}
-            quantity={item.quantity}
+            quantity={`${item.quantity} ${item.unit || 'kg'}`}
             imageUrl={item.imageUrl}
             allergens={item.allergens}
             onEdit={() => handleEditItem(item.id)}
@@ -341,6 +379,32 @@ export default function DonationSummaryPage() {
           />
         ))}
       </div>
+
+      {/* Donation Period */}
+      {donationPeriod && donationPeriod.startDate && donationPeriod.endDate && (
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center justify-between p-4 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+            <span className="font-semibold text-interactive">
+              Donation Period: {format(donationPeriod.startDate, 'dd.MM.yyyy')}{' '}
+              - {format(donationPeriod.endDate, 'dd.MM.yyyy')}
+            </span>
+            <button
+              onClick={() => router.push('/donate/schedule')}
+              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+              title="Edit donation period"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                  fill="#024209"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Pickup schedule */}
       <div className="space-y-4">
@@ -374,13 +438,44 @@ export default function DonationSummaryPage() {
               </button>
             </div>
           ))
+        ) : // One-time pickup slots - display all slots
+        pickupSlots.length > 0 ? (
+          pickupSlots.map((slot, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
+            >
+              <span className="font-semibold text-interactive">
+                {slot.date
+                  ? `${formatSlotDate(slot.date)}, ${slot.startTime} - ${slot.endTime}`
+                  : t('dateNotSet')}
+              </span>
+              <button
+                onClick={() => router.push('/donate/pickup-slot')}
+                className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+                title="Edit pickup time"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                    fill="#024209"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))
         ) : (
-          // One-time pickup slot or old format
           <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
             <span className="font-semibold text-interactive">
-              {pickupSlots.length > 0 && pickupSlots[0].date
-                ? `${formatSlotDate(pickupSlots[0].date)}, ${pickupSlots[0].startTime} - ${pickupSlots[0].endTime}`
-                : t('dateNotSet')}
+              {t('dateNotSet')}
             </span>
             <button
               onClick={() => router.push('/donate/pickup-slot')}
@@ -472,6 +567,17 @@ export default function DonationSummaryPage() {
           </div>
         </div>
       </div>
+
+      {/* Bottom action bar with Continue button */}
+      <BottomActionBar>
+        <Button
+          onClick={handleConfirmDonation}
+          disabled={isSaving}
+          className="w-full bg-lime text-primary hover:bg-positive-hover"
+        >
+          {isSaving ? 'Saving...' : t('continue') || 'Continue'}
+        </Button>
+      </BottomActionBar>
     </PageContainer>
   );
 }

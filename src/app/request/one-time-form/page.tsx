@@ -1,22 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/Textarea';
-import { Input } from '@/components/ui/Input';
-import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
-import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
+import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import BottomActionBar from '@/components/ui/BottomActionBar';
-import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/Input';
 import { Progress } from '@/components/ui/progress';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { Textarea } from '@/components/ui/Textarea';
+import { toast } from '@/hooks/use-toast';
+import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useAutoSave } from '@/lib/auto-save';
 import { useRequestStore } from '@/store/request';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 type OneTimeFormInputs = {
   description: string;
-  quantity: string;
+  people_count: string;
 };
 
 export default function OneTimeRequestForm() {
@@ -29,6 +31,9 @@ export default function OneTimeRequestForm() {
   const [allergensInteracted, setAllergensInteracted] = useState(false);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
+  // Check if we're in edit mode (coming from summary with existing data)
+  const isEditMode = Boolean(requestData.description);
+
   const {
     register,
     handleSubmit,
@@ -37,22 +42,56 @@ export default function OneTimeRequestForm() {
   } = useForm<OneTimeFormInputs>({
     defaultValues: {
       description: requestData.description || '',
-      quantity: requestData.quantity ? requestData.quantity.toString() : '',
+      people_count: requestData.people_count
+        ? requestData.people_count.toString()
+        : '',
     },
   });
 
   const watchedFields = watch();
   const isFormValid =
     watchedFields.description?.trim() &&
-    watchedFields.quantity?.trim() &&
-    Number(watchedFields.quantity) > 0 &&
+    watchedFields.people_count?.trim() &&
+    Number(watchedFields.people_count) > 0 &&
     selectedAllergens.length > 0;
 
+  // Auto-save form data
+  const formData = {
+    description: watchedFields.description || '',
+    people_count: watchedFields.people_count || '',
+    allergens: selectedAllergens,
+    request_type: 'one-time',
+  };
+
+  const { hasUnsaved, restore, clear } = useAutoSave({
+    key: 'one-time-request-form',
+    data: formData,
+    enabled: true,
+    intervalMs: 3000, // Save every 3 seconds
+  });
+
   const onSubmit = async (data: OneTimeFormInputs) => {
+    console.log('One-time form onSubmit called', {
+      data,
+      isFormValid,
+      selectedAllergens,
+    });
     setAttemptedSubmit(true);
 
     // Check if form is valid before proceeding
     if (!isFormValid) {
+      console.log('Form validation failed', {
+        description: watchedFields.description?.trim(),
+        people_count: watchedFields.people_count?.trim(),
+        people_countNumber: Number(watchedFields.people_count),
+        allergensLength: selectedAllergens.length,
+      });
+      toast({
+        title: 'Please complete all fields',
+        description:
+          'Make sure you have filled in all required information including allergens/dietary restrictions.',
+        variant: 'error',
+      });
       return;
     }
 
@@ -61,7 +100,7 @@ export default function OneTimeRequestForm() {
       setRequestData({
         request_type: 'one-time',
         description: data.description,
-        quantity: Number(data.quantity),
+        people_count: Number(data.people_count),
         allergens: selectedAllergens,
       });
 
@@ -69,17 +108,47 @@ export default function OneTimeRequestForm() {
       const requestData = {
         request_type: 'one-time',
         description: data.description,
-        quantity: Number(data.quantity),
+        people_count: Number(data.people_count),
         allergens: selectedAllergens,
       };
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
-      // Navigate to pickup slot selection (following donor flow pattern)
-      router.push('/request/pickup-slot');
+      // Clear auto-saved data on successful submission
+      clear();
+
+      console.log('Request data saved, navigating...', { isEditMode });
+
+      // Navigate based on edit mode
+      if (isEditMode) {
+        // In edit mode, go back to summary
+        router.push('/request/summary');
+      } else {
+        // In create mode, go to pickup slot selection
+        router.push('/request/pickup-slot');
+      }
     } catch (error) {
-      console.error('Failed to create request:', error);
+      console.error('Failed to create request - full error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save your request. Please try again.',
+        variant: 'error',
+      });
     }
   };
+
+  // Restore saved data on component mount
+  useEffect(() => {
+    const savedData = restore();
+    if (savedData && savedData.description) {
+      // Restore form values
+      if (savedData.description !== watchedFields.description) {
+        // setValue from react-hook-form could be used here
+      }
+      if (savedData.allergens && savedData.allergens.length > 0) {
+        setSelectedAllergens(savedData.allergens);
+      }
+    }
+  }, []);
 
   return (
     <PageContainer
@@ -98,13 +167,19 @@ export default function OneTimeRequestForm() {
       footer={
         <BottomActionBar>
           <Button
-            type="submit"
+            type="button"
             size="cta"
             disabled={!isFormValid || isSubmitting}
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? t('continuing') : t('continue')}
+            {isSubmitting
+              ? isEditMode
+                ? t('saving')
+                : t('continuing')
+              : isEditMode
+                ? t('saveChanges')
+                : t('continue')}
           </Button>
         </BottomActionBar>
       }
@@ -138,9 +213,9 @@ export default function OneTimeRequestForm() {
             {t('peopleCount')}?
           </label>
           <Input
-            {...register('quantity', {
-              required: 'Quantity is required',
-              min: { value: 1, message: 'Quantity must be at least 1' },
+            {...register('people_count', {
+              required: 'People count is required',
+              min: { value: 1, message: 'People count must be at least 1' },
               pattern: {
                 value: /^\d+$/,
                 message: 'Please enter a valid number',
@@ -148,11 +223,11 @@ export default function OneTimeRequestForm() {
             })}
             placeholder={t('enterNumberOfPeople')}
             type="number"
-            variant={errors.quantity ? 'error' : 'default'}
+            variant={errors.people_count ? 'error' : 'default'}
           />
-          {errors.quantity && (
+          {errors.people_count && (
             <div className="mt-1 text-[14px] font-manrope text-negative">
-              {errors.quantity.message}
+              {errors.people_count.message}
             </div>
           )}
         </div>
@@ -160,24 +235,6 @@ export default function OneTimeRequestForm() {
         {/* Allergens */}
         <AllergensDropdown
           label={t('allergiesIntolerancesDiets')}
-          options={[
-            'Not specified',
-            'Gluten-free',
-            'Lactose-free',
-            'Low-lactose',
-            'Egg-free',
-            'Soy-free',
-            'Does not contain peanuts',
-            'Does not contain other nuts',
-            'Does not contain fish',
-            'Does not contain crustaceans',
-            'Does not contain celery',
-            'Does not contain mustard',
-            'Does not contain sesame seeds',
-            'Does not contain sulphur dioxide / sulphites >10 mg/kg or litre',
-            'Does not contain lupin',
-            'Does not contain molluscs',
-          ]}
           value={selectedAllergens}
           onChange={(allergens) => {
             setSelectedAllergens(allergens);

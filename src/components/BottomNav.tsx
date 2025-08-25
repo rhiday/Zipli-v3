@@ -210,7 +210,7 @@ export default function BottomNav() {
                       <BarChart3 className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          title="Default"
+                          {t('analytics')}
                         </p>
                         <p className="text-xs text-secondary">
                           {t('overview')}.
@@ -263,7 +263,7 @@ export default function BottomNav() {
             <DrawerFooter className="pt-2">
               <DrawerClose asChild>
                 <Button variant="ghost" size="sm">
-                  title="Default"
+                  {t('cancel')}
                 </Button>
               </DrawerClose>
             </DrawerFooter>

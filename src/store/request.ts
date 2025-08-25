@@ -23,8 +23,9 @@ interface PickupSlot {
 interface RequestFormData {
   request_type: 'one-time' | 'recurring';
   description: string;
-  quantity: number;
+  people_count: number; // Changed from quantity to match database
   allergens: string[];
+  dietary_preferences: string[];
   recurringInterval: string; // Keep for backward compatibility
   recurrencePattern: RecurrencePattern;
   startDate: string;
@@ -32,6 +33,7 @@ interface RequestFormData {
   pickupDate: string; // Keep for backward compatibility
   startTime: string; // Keep for backward compatibility
   endTime: string; // Keep for backward compatibility
+  delivery_preference: 'pickup' | 'delivery' | 'either';
 }
 
 interface RequestState {
@@ -39,12 +41,18 @@ interface RequestState {
   pickupSlots: PickupSlot[];
   address: string;
   driverInstructions: string;
+  latitude?: number;
+  longitude?: number;
+  postalCode?: string;
+  timezone: string;
   isEditMode: boolean;
   editingRequestId: string | null;
 
   setRequestData: (data: Partial<RequestFormData>) => void;
   setAddress: (address: string) => void;
   setDriverInstructions: (instructions: string) => void;
+  setLocation: (lat: number, lng: number, postal?: string) => void;
+  setTimezone: (timezone: string) => void;
   setEditMode: (isEdit: boolean, requestId?: string) => void;
 
   // Actions for pickup slots
@@ -59,8 +67,9 @@ interface RequestState {
 const initialRequestData: RequestFormData = {
   request_type: 'one-time',
   description: '',
-  quantity: 1,
+  people_count: 1,
   allergens: [],
+  dietary_preferences: [],
   recurringInterval: '',
   recurrencePattern: {
     type: 'never',
@@ -70,6 +79,7 @@ const initialRequestData: RequestFormData = {
   pickupDate: '',
   startTime: '09:00',
   endTime: '14:00',
+  delivery_preference: 'pickup',
 };
 
 const initialState = {
@@ -77,6 +87,10 @@ const initialState = {
   pickupSlots: [],
   address: '',
   driverInstructions: '',
+  latitude: undefined,
+  longitude: undefined,
+  postalCode: undefined,
+  timezone: 'UTC',
   isEditMode: false,
   editingRequestId: null,
 };
@@ -94,6 +108,9 @@ export const useRequestStore = create<RequestState>()(
       setAddress: (address) => set({ address }),
       setDriverInstructions: (instructions) =>
         set({ driverInstructions: instructions }),
+      setLocation: (lat, lng, postal) =>
+        set({ latitude: lat, longitude: lng, postalCode: postal }),
+      setTimezone: (timezone) => set({ timezone }),
       setEditMode: (isEdit, requestId) =>
         set({ isEditMode: isEdit, editingRequestId: requestId || null }),
 
