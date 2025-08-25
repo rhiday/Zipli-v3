@@ -194,7 +194,7 @@ export default function DonationSummaryPage() {
 
         // Update the donation
         await updateDonation(editingDonationId, {
-          quantity: parseInt(item.quantity) || 1,
+          quantity: item.quantity || 1,
           pickup_slots: formattedSlots,
           instructions_for_driver: instructions || null,
         });
