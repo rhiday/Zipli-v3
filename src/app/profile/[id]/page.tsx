@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -14,23 +14,33 @@ export default function DonorProfilePage() {
   const { users, getDonationsByDonor } = useDatabase();
 
   const donorId = params?.id as string;
-  const donor = users.find(u => u.id === donorId);
-  const donorName = donor?.full_name || donor?.organization_name || t('generousDonor');
+  const donor = users.find((u) => u.id === donorId);
+  const donorName =
+    donor?.full_name || donor?.organization_name || t('generousDonor');
 
-  const donations = useMemo(() => getDonationsByDonor(donorId), [getDonationsByDonor, donorId]);
+  const donations = useMemo(
+    () => getDonationsByDonor(donorId),
+    [getDonationsByDonor, donorId]
+  );
 
   return (
     <div className="flex flex-col h-dvh bg-white">
-      <SecondaryNavbar title={donorName} backHref="/feed" onBackClick={() => router.back()} />
+      <SecondaryNavbar
+        title={donorName}
+        backHref="#"
+        onBackClick={() => router.back()}
+      />
 
       <main className="flex-grow overflow-y-auto p-4 space-y-6">
         <div>
-          <h2 className="text-lg font-semibold text-primary">{t('donations')}</h2>
+          <h2 className="text-lg font-semibold text-primary">
+            {t('donations')}
+          </h2>
           {donations.length === 0 ? (
             <p className="text-secondary mt-2">{t('noDonationsFound')}</p>
           ) : (
             <div className="grid grid-cols-2 gap-3">
-              {donations.map(d => (
+              {donations.map((d) => (
                 <DonationCard key={d.id} donation={d} />
               ))}
             </div>
@@ -40,5 +50,3 @@ export default function DonorProfilePage() {
     </div>
   );
 }
-
-
