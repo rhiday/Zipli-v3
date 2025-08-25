@@ -567,6 +567,13 @@ export default function DonationSummaryPage() {
           </div>
         </div>
       </div>
+
+      {/* Bottom action bar with Continue button */}
+      <BottomActionBar
+        primaryLabel={t('continue') || 'Continue'}
+        onPrimaryClick={handleConfirmDonation}
+        isLoading={isSaving}
+      />
     </PageContainer>
   );
 }
