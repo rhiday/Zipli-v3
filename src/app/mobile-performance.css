@@ -71,7 +71,7 @@ img {
   a,
   [role='button'],
   [role='link'],
-  input,
+  input:not([type='checkbox']):not([type='radio']),
   textarea,
   select {
     min-height: 44px;
@@ -106,10 +106,10 @@ img {
   z-index: 10;
 }
 
-/* Performance hints for cards and list items */
-.rounded-2xl,
-.rounded-xl,
-.rounded-lg {
+/* Performance hints for cards and list items - only when animating */
+.rounded-2xl.animate,
+.rounded-xl.animate,
+.rounded-lg.animate {
   transform: translateZ(0);
   will-change: auto;
 }

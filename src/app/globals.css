@@ -35,8 +35,8 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Prevent flickering on iOS */
-  * {
+  /* Prevent flickering on iOS - apply only to elements that need it */
+  .gpu-accelerated {
     -webkit-transform: translateZ(0);
     -webkit-backface-visibility: hidden;
   }
