@@ -165,7 +165,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                 >
                   <div>
                     <span className="text-sm font-semibold text-white">
-                      {item.type === 'donation' ? 'Donation' : 'Request'}
+                      {item.type === 'donation' ? t('donation') : t('request')}
                     </span>
                     <span className="text-white/90 text-sm ml-1">
                       ·{' '}

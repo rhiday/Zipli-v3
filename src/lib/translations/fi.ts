@@ -21,6 +21,7 @@ export const fi = {
   totalFoodDonated: 'Viimeisimmän ilmoituksesi yhteenlaskettu kilomäärä',
   donations: 'Ilmoitukset',
   donation: 'Ilmoitus',
+  request: 'Pyyntö',
   noActiveItems: 'Sinulla ei ole aktiivisia ilmoituksia tai pyyntöjä',
 
   // Allergen options

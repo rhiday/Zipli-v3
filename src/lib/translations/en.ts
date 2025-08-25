@@ -21,6 +21,7 @@ export const en = {
   totalFoodDonated: 'Total weight of food in your latest food listing',
   donations: 'Listings',
   donation: 'Listing',
+  request: 'Request',
   noActiveItems: "You don't have any active donations or requests",
   showMore: 'Show more',
   showLess: 'Show less',
