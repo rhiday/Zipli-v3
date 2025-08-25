@@ -33,34 +33,41 @@ export default function RequestSuccessPage() {
         </svg>
       </div>
       <h1 className="text-3xl font-bold mb-4 text-center">
-        {t('requestSubmitted')}
+        {t('requestSubmitted') || 'Request Submitted!'}
       </h1>
       <p className="text-center text-base text-black mb-6 max-w-xs">
-        {t('requestSubmittedDesc')}
+        {t('requestSubmittedDesc') ||
+          'Your food request has been submitted successfully'}
       </p>
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
-          heading={t('nextSteps')}
+          heading={t('nextSteps') || 'Next Steps'}
           steps={[
             {
-              title: t('requestSubmitted'),
-              description: t('requestAddedToSystem'),
+              title: t('requestSubmitted') || 'Request Submitted',
+              description:
+                t('requestAddedToSystem') ||
+                'Your request has been added to our system',
             },
             {
-              title: t('matchingInProgress'),
-              description: t('lookingForMatches'),
+              title: t('matchingInProgress') || 'Matching in Progress',
+              description:
+                t('lookingForMatches') ||
+                'We are looking for matches for your request',
             },
             {
-              title: t('getNotified'),
-              description: t('receiveNotificationWhenMatch'),
+              title: t('getNotified') || 'Get Notified',
+              description:
+                t('receiveNotificationWhenMatch') ||
+                'You will receive a notification when we find a match',
             },
           ]}
         />
       </div>
       <Link href="/receiver/dashboard">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-          {t('backToDashboard')}
+          {t('backToDashboard') || 'Back to Dashboard'}
         </button>
       </Link>
     </div>

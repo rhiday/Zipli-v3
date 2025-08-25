@@ -46,19 +46,20 @@ export default function DonationThankYouPage() {
       <p className="text-center text-base text-black mb-6 max-w-xs">
         {isEditMode
           ? 'Your donation has been successfully updated.'
-          : t('pages.donate.thankYou.subtitle')}
+          : t('pages.donate.thankYou.subtitle') ||
+            'Your donation has been added to our system.'}
       </p>
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
-          heading="NextSteps"
+          heading={t('nextSteps') || 'Next Steps'}
           steps={
             isEditMode
               ? [
                   {
                     title:
                       t('pages.donate.thankYou.donationUpdated') ||
-                      'Donation_updated',
+                      'Donation updated',
                     description:
                       t('pages.donate.thankYou.changesHaveBeenSaved') ||
                       'Your changes have been saved successfully.',
@@ -66,30 +67,42 @@ export default function DonationThankYouPage() {
                   {
                     title:
                       t('pages.donate.thankYou.matchingInProgress') ||
-                      'Matching_continues',
-                    description: t('pages.donate.thankYou.lookingForMatches'),
+                      'Matching continues',
+                    description:
+                      t('pages.donate.thankYou.lookingForMatches') ||
+                      'We are looking for matches for your donation',
                   },
                   {
-                    title: t('pages.donate.thankYou.getNotified'),
-                    description: t(
-                      'pages.donate.thankYou.receiveNotificationWhenMatch'
-                    ),
+                    title:
+                      t('pages.donate.thankYou.getNotified') || 'Get notified',
+                    description:
+                      t('pages.donate.thankYou.receiveNotificationWhenMatch') ||
+                      'You will receive a notification when we find a match',
                   },
                 ]
               : [
                   {
-                    title: t('pages.donate.thankYou.requestSubmitted'),
-                    description: t('pages.donate.thankYou.subtitle'),
+                    title:
+                      t('pages.donate.thankYou.requestSubmitted') ||
+                      'Request Submitted',
+                    description:
+                      t('pages.donate.thankYou.subtitle') ||
+                      'Your donation has been added to our system.',
                   },
                   {
-                    title: t('pages.donate.thankYou.matchingInProgress'),
-                    description: t('pages.donate.thankYou.lookingForMatches'),
+                    title:
+                      t('pages.donate.thankYou.matchingInProgress') ||
+                      'Matching in progress',
+                    description:
+                      t('pages.donate.thankYou.lookingForMatches') ||
+                      'We are looking for matches for your donation',
                   },
                   {
-                    title: t('pages.donate.thankYou.getNotified'),
-                    description: t(
-                      'pages.donate.thankYou.receiveNotificationWhenMatch'
-                    ),
+                    title:
+                      t('pages.donate.thankYou.getNotified') || 'Get notified',
+                    description:
+                      t('pages.donate.thankYou.receiveNotificationWhenMatch') ||
+                      'You will receive a notification when we find a match',
                   },
                 ]
           }
@@ -97,7 +110,8 @@ export default function DonationThankYouPage() {
       </div>
       <Link href="/donor/dashboard">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-          {t('pages.donate.thankYou.goBackToDashboard')}
+          {t('pages.donate.thankYou.goBackToDashboard') ||
+            'Go back to dashboard'}
         </button>
       </Link>
     </div>
