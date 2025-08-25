@@ -20,6 +20,7 @@ export const en = {
   // Impact metrics
   totalFoodDonated: 'Total weight of food in your latest food listing',
   donations: 'Listings',
+  donation: 'Listing',
   showMore: 'Show more',
   showLess: 'Show less',
   costSavings: 'Saved in production & disposal costs (average)',
@@ -85,7 +86,8 @@ export const en = {
   somethingWentWrong: 'Something went wrong',
 
   // Dashboard specific
-  yourImpact: 'Your Impact',
+  yourImpact:
+    'Your actions are making a difference! This is the impact of your latest activity:',
   peopleServed: 'People Served',
   foodRequested: 'Food Requested',
   activeRequests: 'Active Requests',

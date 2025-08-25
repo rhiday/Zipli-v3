@@ -20,6 +20,7 @@ export const fi = {
   // Impact metrics
   totalFoodDonated: 'Viimeisimmän ilmoituksesi yhteenlaskettu kilomäärä',
   donations: 'Ilmoitukset',
+  donation: 'Ilmoitus',
   showMore: 'Näytä lisää',
   showLess: 'Näytä vähemmän',
   costSavings: 'Säästetty tuotanto- ja jätekustannuksissa (keskiarvo)',
@@ -85,7 +86,8 @@ export const fi = {
   somethingWentWrong: 'Jotakin meni vikaan',
 
   // Dashboard specific
-  yourImpact: 'Vaikutuksesi',
+  yourImpact:
+    'Teollasi on aitoa merkitystä! Tässä viimeisimmän toimintasi vaikuttavuus:',
   peopleServed: 'Palveltuja ihmisiä',
   foodRequested: 'Pyydetty ruoka',
   activeRequests: 'Aktiiviset pyynnöt',
@@ -138,7 +140,7 @@ export const fi = {
   active: 'Aktiivinen',
   completed: 'Valmis',
   view: 'Näytä',
-  details: 'Tiedot',
+  details: 'Lisätiedot',
   englishLabel: 'English',
   finnishLabel: 'Suomi',
   createListing: 'Luo ilmoitus',
