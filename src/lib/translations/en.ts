@@ -390,6 +390,11 @@ export const en = {
       analytics: 'Analytics',
       donate: 'Donate',
       foodItem: 'Food Item',
+      recurringDonationDescription:
+        'Set up a repeating schedule for ongoing donations.',
+      oneTimeRequestDescription: 'Create a single request for immediate needs.',
+      recurringRequestDescription:
+        'Set up a repeating schedule for ongoing needs.',
     },
     pickupScheduler: {
       pickupSchedule: 'Pickup schedule',

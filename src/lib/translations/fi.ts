@@ -389,6 +389,12 @@ export const fi = {
       analytics: 'Analytiikka',
       donate: 'Lahjoita',
       foodItem: 'Ruoka-aine',
+      recurringDonationDescription:
+        'Luo toistuva aikataulu jatkuville lahjoituksille.',
+      oneTimeRequestDescription:
+        'Luo yksittäinen pyyntö välittömiin tarpeisiin.',
+      recurringRequestDescription:
+        'Luo toistuva aikataulu jatkuville tarpeille.',
     },
     pickupScheduler: {
       pickupSchedule: 'Noutaikataulu',
