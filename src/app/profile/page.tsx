@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import Skeleton from '@/components/ui/Skeleton';
 
 export default function ProfilePage(): React.ReactElement {
   const router = useRouter();
@@ -105,8 +106,45 @@ export default function ProfilePage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
+      <div className="min-h-screen bg-cream p-4">
+        <div className="mx-auto max-w-lg">
+          <div className="flex items-center justify-between mb-6">
+            <Skeleton className="h-8 w-32" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+
+          <div className="space-y-6">
+            {/* Profile form skeleton */}
+            <div className="space-y-4 bg-white rounded-lg p-6">
+              <Skeleton className="h-4 w-16 mb-2" />
+              <Skeleton className="h-10 w-full" />
+
+              <Skeleton className="h-4 w-12 mb-2" />
+              <Skeleton className="h-10 w-full" />
+
+              <Skeleton className="h-4 w-8 mb-2" />
+              <Skeleton className="h-10 w-full" />
+
+              <Skeleton className="h-4 w-20 mb-2" />
+              <Skeleton className="h-10 w-full" />
+
+              <Skeleton className="h-4 w-14 mb-2" />
+              <Skeleton className="h-10 w-full" />
+
+              <Skeleton className="h-4 w-18 mb-2" />
+              <Skeleton className="h-10 w-full" />
+
+              <Skeleton className="h-4 w-24 mb-2" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+
+            {/* Action buttons skeleton */}
+            <div className="flex space-x-4">
+              <Skeleton className="h-10 w-20" />
+              <Skeleton className="h-10 w-24" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

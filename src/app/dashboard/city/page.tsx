@@ -59,7 +59,7 @@ const monthlyData = [
 
 const partnerData = [
   { name: 'Sodexo Helsinki Airport', donations: 45, category: 'Corporate' },
-  { name: "Alice's Restaurant", donations: 32, category: "Restaurant" },
+  { name: "Alice's Restaurant", donations: 32, category: 'Restaurant' },
   { name: 'School District #3', donations: 28, category: 'Education' },
   { name: 'Kesko Citymarket', donations: 22, category: 'Retail' },
   { name: 'Red Cross Helsinki', donations: 41, category: 'NGO' },
@@ -78,16 +78,10 @@ type CityDashboardData = {
 };
 
 export default function CityDashboardPage(): React.ReactElement {
-  // City dashboard disabled for now - redirect to main dashboard
-  const router = useRouter();
-  React.useEffect(() => {
-    router.push('/donate');
-  }, [router]);
-
-  return <div>Redirecting...</div>;
+  return <DisabledCityDashboardPage />;
 }
 
-function _DisabledCityDashboardPage(): React.ReactElement {
+function DisabledCityDashboardPage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized, getAllDonations, getAllRequests } =
     useDatabase();
@@ -100,7 +94,18 @@ function _DisabledCityDashboardPage(): React.ReactElement {
   const [loading, setLoading] = useState(true);
 
   const allMonths = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   const currentDate = new Date();
@@ -329,14 +334,14 @@ function _DisabledCityDashboardPage(): React.ReactElement {
                     dataKey="donations"
                     stroke="#22c55e"
                     strokeWidth={2}
-                    name = 'Donations'
+                    name="Donations"
                   />
                   <Line
                     type="monotone"
                     dataKey="recipients"
                     stroke="#3b82f6"
                     strokeWidth={2}
-                    name = 'Recipients'
+                    name="Recipients"
                   />
                 </LineChart>
               </ResponsiveContainer>

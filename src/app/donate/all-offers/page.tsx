@@ -7,19 +7,10 @@ import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Header from '@/components/layout/Header';
-import {
-  ChevronLeft,
-  FilterXIcon,
-  PackageIcon,
-  HandshakeIcon,
-  SlidersHorizontalIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from 'lucide-react';
+import { ChevronLeft, PackageIcon, HandshakeIcon } from 'lucide-react';
 import { Database, Json } from '@/lib/supabase/types';
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/label';
 import FilterBar from '@/components/ui/FilterBar';
+import { ListSkeleton } from '@/components/ui/OptimizedSkeleton';
 
 type FoodItemDetails = {
   name: string;
@@ -53,7 +44,8 @@ const FOOD_TYPE_OPTIONS = [
   'Prepared meals',
   'Fresh produce',
   'Cold packaged foods',
-  'Bakery and Pastry', 'Other',
+  'Bakery and Pastry',
+  'Other',
 ];
 
 export default function AllItemsPage(): React.ReactElement {
@@ -97,7 +89,7 @@ export default function AllItemsPage(): React.ReactElement {
         .single();
       if (profileData) {
         setUserName(
-          profileData.organization_name || profileData.full_name  || 'User'
+          profileData.organization_name || profileData.full_name || 'User'
         );
       }
 
@@ -231,8 +223,22 @@ export default function AllItemsPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-base">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
+      <div className="min-h-screen bg-base pb-20">
+        <Header title="Loading..." />
+        <main className="relative z-20 -mt-6 rounded-t-3xl md:rounded-t-none bg-base py-6 px-4 md:px-8 space-y-6">
+          {/* Filter skeleton */}
+          <div className="space-y-4">
+            <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
+          {/* Content skeleton */}
+          <ListSkeleton count={6} />
+        </main>
       </div>
     );
   }
