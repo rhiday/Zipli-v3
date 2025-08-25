@@ -165,7 +165,7 @@ class ServiceWorkerManager {
   }
 
   isSupported(): boolean {
-    return 'serviceWorker' in navigator;
+    return typeof window !== 'undefined' && 'serviceWorker' in navigator;
   }
 
   async isInstalled(): Promise<boolean> {

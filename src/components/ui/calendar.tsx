@@ -29,7 +29,7 @@ function Calendar({
         nav: 'space-x-1 flex items-center',
         nav_button: cn(
           'inline-flex items-center justify-center rounded-md text-sm font-medium',
-          'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100'
+          'h-7 w-7 bg-transparent p-0 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors'
         ),
         nav_button_previous: 'absolute left-1',
         nav_button_next: 'absolute right-1',
@@ -64,10 +64,16 @@ function Calendar({
       }}
       components={{
         IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn('h-4 w-4', className)} {...props} />
+          <ChevronLeft
+            className={cn('h-4 w-4 text-current', className)}
+            {...props}
+          />
         ),
         IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn('h-4 w-4', className)} {...props} />
+          <ChevronRight
+            className={cn('h-4 w-4 text-current', className)}
+            {...props}
+          />
         ),
       }}
       {...props}

@@ -28,6 +28,7 @@ export default function RequestSummaryPage() {
   const [updateInstructionsInProfile, setUpdateInstructionsInProfile] =
     useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingRecurringData, setIsLoadingRecurringData] = useState(true);
 
   const formatSlotDate = (date: Date | string | undefined) => {
     if (!date) return null;
@@ -56,6 +57,9 @@ export default function RequestSummaryPage() {
         setRecurringSchedule(sessionRequestData.recurringSchedules);
       }
     }
+
+    // Set loading to false after processing session storage
+    setIsLoadingRecurringData(false);
   }, [currentUser]);
 
   const handleSubmitRequest = async () => {
@@ -208,8 +212,17 @@ export default function RequestSummaryPage() {
     }
   };
 
-  // Show loading if no request data
-  if (!requestData.description) {
+  // Show loading while processing recurring request data
+  if (isLoadingRecurringData) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show error if no request data after loading
+  if (!requestData.description && !recurringSchedule) {
     return (
       <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">No request data found</p>

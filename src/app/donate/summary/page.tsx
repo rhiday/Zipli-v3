@@ -48,6 +48,7 @@ export default function DonationSummaryPage() {
     useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
+  const [isLoadingRecurringData, setIsLoadingRecurringData] = useState(true);
 
   const formatSlotDate = (date: Date | string | undefined) => {
     if (!date) return null;
@@ -98,6 +99,9 @@ export default function DonationSummaryPage() {
         }
       }
     }
+
+    // Set loading to false after processing session storage
+    setIsLoadingRecurringData(false);
   }, [isInitialized, currentUser, donationItems.length]);
 
   const handleEditItem = (itemId: string) => {
@@ -287,8 +291,17 @@ export default function DonationSummaryPage() {
     }
   };
 
-  // Show loading if no donation data
-  if (donationItems.length === 0) {
+  // Show loading while processing recurring donation data
+  if (isLoadingRecurringData) {
+    return (
+      <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show error if no donation data after loading
+  if (donationItems.length === 0 && !recurringSchedule) {
     return (
       <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">{t('noDonationItemsFound')}</p>

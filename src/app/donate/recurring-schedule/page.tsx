@@ -9,9 +9,14 @@ import { cn } from '@/lib/utils';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
-import { Calendar, Clock, Trash2 } from 'lucide-react';
+import { Clock, Trash2, Calendar as CalendarIcon } from 'lucide-react';
 import { useDonationStore } from '@/store/donation';
-import { DatePicker } from '@/components/ui/DatePicker';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 
 interface RecurringSchedule {
@@ -160,7 +165,7 @@ export default function RecurringSchedulePage() {
           </div>
         </>
       }
-      contentClassName="p-4 space-y-6"
+      contentClassName="p-4 space-y-8"
       footer={
         <BottomActionBar>
           <Button
@@ -176,32 +181,124 @@ export default function RecurringSchedulePage() {
     >
       <main className="contents">
         {/* Donation Period */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <h2 className="text-xl font-semibold">
             {t('donationPeriod') || 'Donation Period'}
           </h2>
-          <div className="space-y-4">
-            <DatePicker
-              label={t('startDate')}
-              value={startDate}
-              onChange={setStartDate}
-              min={format(new Date(), 'yyyy-MM-dd')}
-              placeholder="DD/MM/YYYY"
-            />
-            <DatePicker
-              label={t('endDate')}
-              value={endDate}
-              onChange={setEndDate}
-              min={startDate || format(new Date(), 'yyyy-MM-dd')}
-              placeholder="DD/MM/YYYY"
-            />
+          <div className="space-y-5">
+            {/* Start Date */}
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                {t('startDate')}
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
+                  >
+                    {startDate ? (
+                      <span className="text-black">
+                        {format(new Date(startDate), 'dd/MM/yyyy')}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">DD/MM/YYYY</span>
+                    )}
+                    <div className="pointer-events-none">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
+                        <CalendarIcon className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-0 bg-white border-gray-200"
+                  align="start"
+                >
+                  <Calendar
+                    mode="single"
+                    weekStartsOn={1}
+                    selected={startDate ? new Date(startDate) : undefined}
+                    onSelect={(date) =>
+                      setStartDate(date ? format(date, 'yyyy-MM-dd') : '')
+                    }
+                    initialFocus
+                    disabled={(date) =>
+                      date < new Date(new Date().setDate(new Date().getDate()))
+                    }
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* End Date */}
+            <div>
+              <label className="block text-label font-semibold mb-3">
+                {t('endDate')}
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    className="rounded-[12px] border-[#D9DBD5] bg-white px-4 py-3 w-full justify-between items-center font-normal text-base"
+                  >
+                    {endDate ? (
+                      <span className="text-black">
+                        {format(new Date(endDate), 'dd/MM/yyyy')}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">DD/MM/YYYY</span>
+                    )}
+                    <div className="pointer-events-none">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
+                        <CalendarIcon className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-0 bg-white border-gray-200"
+                  align="start"
+                >
+                  <Calendar
+                    mode="single"
+                    weekStartsOn={1}
+                    selected={endDate ? new Date(endDate) : undefined}
+                    onSelect={(date) =>
+                      setEndDate(date ? format(date, 'yyyy-MM-dd') : '')
+                    }
+                    initialFocus
+                    disabled={(date) => {
+                      const today = new Date();
+                      const minDate = startDate ? new Date(startDate) : today;
+                      return date < minDate;
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
           {startDate && endDate && (
-            <div className="p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
-              <div className="text-sm font-semibold text-[#024209]">
+            <div className="flex items-center justify-between p-4 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+              <span className="font-semibold text-interactive">
                 {t('donationPeriod') || 'Donation Period'}:{' '}
                 {format(new Date(startDate), 'dd.MM.yyyy')} -{' '}
                 {format(new Date(endDate), 'dd.MM.yyyy')}
+              </span>
+              <div className="flex gap-2">
+                <button
+                  className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white"
+                  title="Edit donation period"
+                >
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                      fill="#024209"
+                    />
+                  </svg>
+                </button>
               </div>
             </div>
           )}
@@ -247,7 +344,7 @@ export default function RecurringSchedulePage() {
         )}
 
         {/* Add Schedule Form */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <h2 className="text-xl font-semibold">
             {schedules.length > 0
               ? 'Add another schedule'
@@ -255,7 +352,7 @@ export default function RecurringSchedulePage() {
           </h2>
 
           {/* Day Selection */}
-          <div>
+          <div className="space-y-1">
             <label className="block text-label font-semibold mb-3">
               Select days
             </label>
