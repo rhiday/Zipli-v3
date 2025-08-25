@@ -113,6 +113,29 @@ export default function BottomNav() {
   function renderNavItem(item: (typeof navItems)[0], index: number) {
     const isActive = pathname === item.href && !item.isCentral;
     if (item.isCentral) {
+      // For donors, navigate directly to /donate/manual (no modal)
+      if (currentUser?.role === 'food_donor') {
+        return (
+          <button
+            key={item.label}
+            onClick={() => router.push('/donate/manual')}
+            className={cn(
+              'group inline-flex flex-col items-center justify-center text-center w-full',
+              '-mt-8'
+            )}
+            aria-label={item.label}
+          >
+            <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-lime text-primary shadow-md group-hover:bg-lime/90">
+              <item.icon className="h-7 w-7" aria-hidden="true" />
+            </div>
+            <span className={cn('text-caption font-medium text-primary')}>
+              {item.label}
+            </span>
+          </button>
+        );
+      }
+
+      // For other roles, show the modal
       return (
         <Drawer key={item.label}>
           <DrawerTrigger asChild>
@@ -189,7 +212,7 @@ export default function BottomNav() {
                       <BarChart3 className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-title="Default"
+                          title="Default"
                         </p>
                         <p className="text-xs text-secondary">
                           {t('overview')}.
@@ -242,7 +265,7 @@ title="Default"
             <DrawerFooter className="pt-2">
               <DrawerClose asChild>
                 <Button variant="ghost" size="sm">
-title="Default"
+                  title="Default"
                 </Button>
               </DrawerClose>
             </DrawerFooter>
