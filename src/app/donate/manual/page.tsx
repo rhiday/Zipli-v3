@@ -161,8 +161,8 @@ function ManualDonationPageInner() {
         : String(existingFood.allergens)
             .split(',')
             .map((a) => a.trim());
-      // Filter out None if other allergens are present
-      return allergens.filter((a) => a.toLowerCase() !== 'none');
+      // Filter out 'Not specified' if other allergens are present
+      return allergens.filter((a) => a.toLowerCase() !== 'not specified');
     }
 
     // Smart pattern matching for common food types
@@ -214,11 +214,11 @@ function ManualDonationPageInner() {
       miso: ['Soybeans'],
       tempeh: ['Soybeans'],
 
-      // Vegan options
-      vegan: ['Not specified'],
-      plant: ['Not specified'],
-      vegetable: ['Not specified'],
-      fruit: ['Not specified'],
+      // Vegan options - don't auto-suggest any allergens
+      vegan: [],
+      plant: [],
+      vegetable: [],
+      fruit: [],
       salad: name.includes('nut') ? ['Tree nuts'] : [],
     };
 
