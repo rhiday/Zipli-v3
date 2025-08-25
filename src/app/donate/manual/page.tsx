@@ -436,6 +436,12 @@ function ManualDonationPageInner() {
           'Peanuts',
           'Wheat',
           'Soybeans',
+          'Vegan',
+          'Vegetarian',
+          'Gluten-free',
+          'Halal',
+          'Kosher',
+          'Low-lactose',
         ]}
         value={currentItem.allergens}
         onChange={(allergens) =>
