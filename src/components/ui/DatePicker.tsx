@@ -131,36 +131,36 @@ export function DatePicker({
 
       {/* Calendar Popover */}
       {isOpen && (
-        <div className="absolute z-[9999] mt-2 w-full bg-white rounded-[12px] shadow-lg border border-[#D9DBD5] p-4">
+        <div className="absolute z-[9999] mt-2 w-full min-w-[320px] bg-white rounded-[12px] shadow-lg border border-[#D9DBD5] p-6">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-6">
             <button
               type="button"
               onClick={handlePrevMonth}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
 
-            <div className="text-lg font-semibold">
+            <div className="text-lg font-semibold text-gray-900">
               {format(currentMonth, 'MMMM yyyy')}
             </div>
 
             <button
               type="button"
               onClick={handleNextMonth}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
           {/* Weekday Headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
+          <div className="grid grid-cols-7 gap-0 mb-3">
             {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day) => (
               <div
                 key={day}
-                className="text-center text-sm font-medium text-gray-600 py-1"
+                className="text-center text-sm font-medium text-gray-500 py-2 h-10 flex items-center justify-center"
               >
                 {day}
               </div>
@@ -168,7 +168,7 @@ export function DatePicker({
           </div>
 
           {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-0">
             {getDaysInMonth().map((date, index) => {
               const isCurrentMonth = isSameMonth(date, currentMonth);
               const isSelected = selectedDate && isSameDay(date, selectedDate);
@@ -184,11 +184,11 @@ export function DatePicker({
                   }
                   disabled={isDisabled || !isCurrentMonth}
                   className={cn(
-                    'h-10 rounded-lg text-sm transition-all duration-200',
+                    'h-10 text-sm transition-all duration-200 flex items-center justify-center rounded-md',
                     isCurrentMonth ? 'text-gray-900' : 'text-gray-300',
                     !isDisabled && isCurrentMonth && 'hover:bg-[#F5F9EF]',
                     isSelected && 'bg-[#024209] text-white hover:bg-[#024209]',
-                    isToday && !isSelected && 'border border-[#024209]',
+                    isToday && !isSelected && 'font-semibold text-[#024209]',
                     isDisabled && 'text-gray-300 cursor-not-allowed'
                   )}
                 >
@@ -199,10 +199,13 @@ export function DatePicker({
           </div>
 
           {/* Quick Actions */}
-          <div className="flex justify-between mt-4 pt-4 border-t border-[#D9DBD5]">
+          <div className="flex justify-between mt-6 pt-4 border-t border-[#D9DBD5]">
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                onChange('');
+                setIsOpen(false);
+              }}
               className="text-gray-600 hover:text-gray-800 text-sm font-medium"
             >
               Clear
