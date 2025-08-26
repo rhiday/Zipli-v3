@@ -45,25 +45,46 @@ export default function BottomNav() {
     switch (role) {
       case 'food_donor':
         return [
-          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
-          { href: '#', label: 'Add', icon: Plus, isCentral: true },
-          { href: '/impact', label: 'Impact', icon: TrendingUp },
+          {
+            href: '/donate',
+            label: t('common.navigation.dashboard'),
+            icon: LayoutGrid,
+          },
+          {
+            href: '#',
+            label: t('common.actions.add'),
+            icon: Plus,
+            isCentral: true,
+          },
+          {
+            href: '/impact',
+            label: t('common.navigation.impact'),
+            icon: TrendingUp,
+          },
         ];
       case 'food_receiver':
         return [
           {
             href: '/receiver/dashboard',
-            label: 'Dashboard',
+            label: t('common.navigation.dashboard'),
             icon: LayoutGrid,
           },
-          { href: '#', label: 'Request', icon: Plus, isCentral: true },
-          { href: '/impact', label: 'Impact', icon: TrendingUp },
+          { href: '#', label: t('request'), icon: Plus, isCentral: true },
+          {
+            href: '/impact',
+            label: t('common.navigation.impact'),
+            icon: TrendingUp,
+          },
         ];
       case 'city':
         return [
-          { href: '/city/dashboard', label: 'Dashboard', icon: LayoutGrid },
-          { href: '/city', label: 'Analytics', icon: BarChart3 },
-          { href: '/feed', label: 'Overview', icon: Users },
+          {
+            href: '/city/dashboard',
+            label: t('common.navigation.dashboard'),
+            icon: LayoutGrid,
+          },
+          { href: '/city', label: t('analytics'), icon: BarChart3 },
+          { href: '/feed', label: t('overview'), icon: Users },
         ];
       case 'terminals':
         return [
