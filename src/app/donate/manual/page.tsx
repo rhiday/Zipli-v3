@@ -610,3 +610,4 @@ function ManualDonationPage() {
 }
 
 export default ManualDonationPage;
+export { ManualDonationPageInner };

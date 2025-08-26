@@ -95,7 +95,7 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(
     const { id, food_item } = donation;
 
     return (
-      <Link href={`/donate/detail/${id}`} className="block group">
+      <Link href={`/donate/manage/${id}`} className="block group">
         <div
           className={cn(
             'overflow-hidden rounded-2xl bg-white transition-all duration-200 ease-in-out group-hover:-translate-y-1 p-2',
