@@ -5,7 +5,6 @@
 export const dynamic = 'force-dynamic';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -771,11 +770,12 @@ export function ManualDonationForm() {
             <p className="text-sm text-gray-700 leading-relaxed">Seulin sähä</p>
 
             <div className="flex items-start space-x-3">
-              <Checkbox
+              <input
+                type="checkbox"
                 id="pickup-confirm"
                 checked={pickupConfirmChecked}
-                onCheckedChange={setPickupConfirmChecked}
-                className="mt-0.5"
+                onChange={(e) => setPickupConfirmChecked(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border border-gray-300"
               />
               <label
                 htmlFor="pickup-confirm"
