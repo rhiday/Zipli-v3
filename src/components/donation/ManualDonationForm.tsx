@@ -30,6 +30,7 @@ import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useAutoSave } from '@/lib/auto-save';
 import AutoSaveFormWrapper from '@/components/forms/AutoSaveFormWrapper';
 import { toast } from '@/hooks/use-toast';
+import { PickupInfoSection } from '@/components/donation/PickupInfoSection';
 
 interface DonationItem {
   id: string;
@@ -76,7 +77,18 @@ export function ManualDonationForm() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
 
+  // State for pickup info display
+  const [donationDetails, setDonationDetails] = useState<{
+    status: string;
+    claimed_at: string | null;
+    picked_up_at: string | null;
+    receiver_id: string | null;
+    pickup_slots: any[] | null;
+    instructions_for_driver: string | null;
+  } | null>(null);
+
   const hasItems = donationItems.length > 0;
+  const isManagementMode = pathname?.includes('/donate/manage/');
 
   useEffect(() => {
     // Determine if this is management mode (from /donate/manage/xxx) vs direct edit mode
@@ -106,6 +118,18 @@ export function ManualDonationForm() {
             : String(currentAllergens).split(','),
           description: food_item.description,
           imageUrl: food_item.image_url || undefined,
+        });
+
+        // Store donation details for pickup info display
+        setDonationDetails({
+          status: foundDonation.status,
+          claimed_at: foundDonation.claimed_at,
+          picked_up_at: foundDonation.picked_up_at,
+          receiver_id: foundDonation.receiver_id,
+          pickup_slots: foundDonation.pickup_slots
+            ? JSON.parse(foundDonation.pickup_slots as string)
+            : null,
+          instructions_for_driver: foundDonation.instructions_for_driver,
         });
 
         // Only auto-open form for direct edit mode, not management mode
@@ -139,6 +163,19 @@ export function ManualDonationForm() {
           description: food_item.description,
           imageUrl: food_item.image_url || undefined,
         });
+
+        // Store donation details for pickup info display
+        setDonationDetails({
+          status: foundDonation.status,
+          claimed_at: foundDonation.claimed_at,
+          picked_up_at: foundDonation.picked_up_at,
+          receiver_id: foundDonation.receiver_id,
+          pickup_slots: foundDonation.pickup_slots
+            ? JSON.parse(foundDonation.pickup_slots as string)
+            : null,
+          instructions_for_driver: foundDonation.instructions_for_driver,
+        });
+
         setShowAddAnotherForm(true);
       }
     }
@@ -404,6 +441,46 @@ export function ManualDonationForm() {
     currentItem.quantity.trim() !== '' &&
     currentItem.allergens.length > 0;
 
+  // Handle pickup confirmation
+  const handleConfirmPickup = async () => {
+    if (!editingDonationId) return;
+
+    try {
+      setIsSaving(true);
+      // Update donation status to picked_up
+      await updateDonation(editingDonationId, {
+        status: 'picked_up',
+        picked_up_at: new Date().toISOString(),
+      });
+
+      // Update local state
+      setDonationDetails((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: 'picked_up',
+              picked_up_at: new Date().toISOString(),
+            }
+          : null
+      );
+
+      toast({
+        title: t('pickupConfirmed'),
+        description: t('donationMarkedAsPickedUp'),
+        variant: 'success',
+      });
+    } catch (error) {
+      console.error('Failed to confirm pickup:', error);
+      toast({
+        title: t('error'),
+        description: t('failedToConfirmPickup'),
+        variant: 'error',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // Auto-save current item data
   const { hasUnsaved, restore, clear } = useAutoSave({
     key: `donation-item-${currentItem.id}`,
@@ -512,9 +589,23 @@ export function ManualDonationForm() {
           hasItems && !showAddAnotherForm ? (
             <BottomActionBar>
               <div className="flex justify-end">
-                <Button onClick={() => router.push('/donate/pickup-slot')}>
-                  {t('continue')}
-                </Button>
+                {isManagementMode && donationDetails?.status === 'claimed' ? (
+                  <Button onClick={handleConfirmPickup} disabled={isSaving}>
+                    {isSaving ? t('savingEllipsis') : t('confirmPickup')}
+                  </Button>
+                ) : isManagementMode &&
+                  donationDetails?.status === 'picked_up' ? (
+                  <Button
+                    onClick={() => router.push('/donate')}
+                    variant="secondary"
+                  >
+                    {t('backToDashboard')}
+                  </Button>
+                ) : (
+                  <Button onClick={() => router.push('/donate/pickup-slot')}>
+                    {t('continue')}
+                  </Button>
+                )}
               </div>
             </BottomActionBar>
           ) : (
@@ -565,6 +656,25 @@ export function ManualDonationForm() {
                 </span>
               </button>
             </div>
+
+            {/* Pickup Information Section - Only show in management mode */}
+            {isManagementMode && donationDetails && (
+              <PickupInfoSection
+                status={donationDetails.status as any}
+                claimedAt={donationDetails.claimed_at}
+                pickedUpAt={donationDetails.picked_up_at}
+                receiverId={donationDetails.receiver_id}
+                pickupSlots={donationDetails.pickup_slots}
+                instructionsForDriver={donationDetails.instructions_for_driver}
+                onConfirmPickup={
+                  donationDetails.status === 'claimed'
+                    ? handleConfirmPickup
+                    : undefined
+                }
+                // TODO: Add receiver info lookup when needed
+                receiverInfo={undefined}
+              />
+            )}
           </div>
         )}
 
