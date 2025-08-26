@@ -249,6 +249,17 @@ function ImpactPage(): React.ReactElement {
   return (
     <div className="min-h-screen pb-20">
       <main className="bg-base p-4 space-y-6 pt-6">
+        {/* Back button */}
+        <div className="flex items-center mb-4">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        </div>
+
         {/* Header with same pattern as dashboard */}
         <section>
           <div className="flex justify-between items-start gap-4 mb-4">

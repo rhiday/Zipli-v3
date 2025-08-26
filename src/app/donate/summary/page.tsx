@@ -341,8 +341,8 @@ export default function DonationSummaryPage() {
     );
   }
 
-  // Show error if no donation data after loading
-  if (donationItems.length === 0 && !recurringSchedule) {
+  // Show error if no donation data after loading (but not while saving)
+  if (donationItems.length === 0 && !recurringSchedule && !isSaving) {
     console.warn(
       'No donation items found on summary page - likely direct navigation or cleared state'
     );
