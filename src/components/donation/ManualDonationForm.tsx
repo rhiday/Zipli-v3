@@ -20,7 +20,7 @@ import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { useDatabase } from '@/store';
 import { useDonationStore } from '@/store/donation';
 import { PlusIcon } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import PageContainer from '@/components/layout/PageContainer';
@@ -43,6 +43,7 @@ interface DonationItem {
 export function ManualDonationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const {
     donationItems,
     addDonationItem,
@@ -78,6 +79,9 @@ export function ManualDonationForm() {
   const hasItems = donationItems.length > 0;
 
   useEffect(() => {
+    // Determine if this is management mode (from /donate/manage/xxx) vs direct edit mode
+    const isManagementMode = pathname?.includes('/donate/manage/');
+
     // Handle edit mode from store
     if (storeEditMode && editingDonationId && currentUser) {
       setIsEditMode(true);
@@ -103,7 +107,11 @@ export function ManualDonationForm() {
           description: food_item.description,
           imageUrl: food_item.image_url || undefined,
         });
-        setShowAddAnotherForm(true);
+
+        // Only auto-open form for direct edit mode, not management mode
+        if (!isManagementMode) {
+          setShowAddAnotherForm(true);
+        }
       }
     }
 
@@ -136,6 +144,7 @@ export function ManualDonationForm() {
     }
   }, [
     searchParams,
+    pathname,
     currentUser,
     donations,
     foodItems,

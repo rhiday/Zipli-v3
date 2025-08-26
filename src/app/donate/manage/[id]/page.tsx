@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { useDatabase } from '@/store';
@@ -64,8 +65,13 @@ export default function DonationManagePage() {
     // Clear existing donation store state
     clearDonation();
 
-    // Set up edit mode for this specific donation
+    // Set edit mode but don't trigger auto-form opening
+    // We'll handle this differently in ManualDonationForm
     setEditMode(true, donationId);
+
+    // Clear any existing items first
+    const { clearDonation: clearStore } = useDonationStore.getState();
+    clearStore();
 
     // Populate the donation store with this donation's items
     // Parse allergens from database format (handle various formats)
