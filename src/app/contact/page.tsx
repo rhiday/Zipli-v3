@@ -54,10 +54,10 @@ export default function ContactPage() {
                     {t('pages.contact.email')}
                   </h3>
                   <a
-                    href="mailto:nina@nowastefutures.com"
+                    href="mailto:ninja@nowastefutures.com"
                     className="text-green-600 hover:text-green-700 font-medium"
                   >
-                    nina@nowastefutures.com
+                    ninja@nowastefutures.com
                   </a>
                 </div>
               </div>
