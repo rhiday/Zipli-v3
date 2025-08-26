@@ -186,7 +186,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                     onClick={() =>
                       router.push(
                         item.type === 'donation'
-                          ? `/donate/detail/${item.id}`
+                          ? `/donate/manage/${item.id}`
                           : `/request/${item.id}`
                       )
                     }
