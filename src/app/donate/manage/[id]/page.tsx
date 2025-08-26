@@ -3,7 +3,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { useDatabase } from '@/store';
 import { useDonationStore } from '@/store/donation';
-import { ManualDonationPageInner } from '../../manual/page';
+import { ManualDonationForm } from '@/components/donation/ManualDonationForm';
 
 /**
  * Donation Management Route
@@ -137,7 +137,7 @@ export default function DonationManagePage() {
   // Render the donation list management component
   return (
     <Suspense fallback={<div>Loading donation management...</div>}>
-      <ManualDonationPageInner />
+      <ManualDonationForm />
     </Suspense>
   );
 }
