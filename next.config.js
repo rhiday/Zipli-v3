@@ -11,6 +11,15 @@ const nextConfig = {
   // Optimize for production
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
+    optimizeCss: true,
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
 
   // Simplified webpack config for faster builds
@@ -18,6 +27,14 @@ const nextConfig = {
     // Basic optimization without complex splitting
     if (!config.resolve) config.resolve = {};
     if (!config.resolve.alias) config.resolve.alias = {};
+
+    // Optimize for faster builds
+    config.cache = {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [__filename],
+      },
+    };
 
     return config;
   },
