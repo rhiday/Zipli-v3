@@ -28,7 +28,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
 }) => {
   const pathname = usePathname();
   const flowRegex =
-    /^\/(donate|request)\/(new|manual|pickup-slot|summary|thank-you|success|detail|one-time-form|recurring-form|select-type|[^/]+\/handover-confirm)/;
+    /^\/(donate|request)\/(new|manual|manage|pickup-slot|summary|thank-you|success|detail|one-time-form|recurring-form|select-type|[^/]+\/handover-confirm)/;
   const isBottomNavVisible = !flowRegex.test(pathname || '');
 
   return (

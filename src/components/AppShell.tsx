@@ -24,7 +24,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   // Hides bottom nav on all pages within the donation and request creation flows, and profile page.
   const flowRegex =
-    /^\/(donate|request)\/(new|manual|pickup-slot|summary|thank-you|success|detail|[^/]+\/handover-confirm)/;
+    /^\/(donate|request)\/(new|manual|manage|pickup-slot|summary|thank-you|success|detail|[^/]+\/handover-confirm)/;
   const hideBottomNav = flowRegex.test(pathname) || pathname === '/profile';
 
   return (
