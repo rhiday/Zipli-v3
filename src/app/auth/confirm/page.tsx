@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from '@/hooks/use-toast';
 import { useDatabase } from '@/store';
 
 function ConfirmPageContent() {
@@ -47,10 +48,10 @@ function ConfirmPageContent() {
             router.push('/receiver/dashboard');
             break;
           case 'city':
-            router.push('/dashboard');
+            router.push('/city/dashboard');
             break;
           default:
-            router.push('/dashboard');
+            router.push('/donor/dashboard');
         }
       }
     } catch (err) {
@@ -118,7 +119,11 @@ function ConfirmPageContent() {
             className="font-medium text-earth hover:text-primary"
             onClick={() => {
               // In a real app, you'd resend the verification email
-              alert('Verification code resent (mock)');
+              toast({
+                title: 'Code resent',
+                description: 'Verification code resent to your email',
+                variant: 'success',
+              });
             }}
           >
             Resend code

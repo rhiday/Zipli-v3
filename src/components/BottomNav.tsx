@@ -1,32 +1,34 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import React, { useMemo } from 'react';
+import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import {
+  LayoutGrid,
+  Plus,
+  Search,
+  ShoppingBag,
+  FileText,
+  BarChart3,
+  Users,
+  TrendingUp,
+  Clock,
+  Calendar,
+} from 'lucide-react';
+import { useDatabase } from '@/store';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
-import { useCommonTranslation } from '@/hooks/useTranslations';
-import { cn } from '@/lib/utils';
-import { useDatabase } from '@/store';
-import {
-  BarChart3,
-  Calendar,
-  Clock,
-  LayoutGrid,
-  Plus,
-  Search,
-  ShoppingBag,
-  TrendingUp,
-  Users,
-} from 'lucide-react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { Button } from '@/components/ui/button';
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -43,40 +45,78 @@ export default function BottomNav() {
     switch (role) {
       case 'food_donor':
         return [
-          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
-          { href: '#', label: t('add'), icon: Plus, isCentral: true },
-          { href: '/impact', label: t('impact'), icon: TrendingUp },
+          {
+            href: '/donate',
+            label: t('common.navigation.dashboard'),
+            icon: LayoutGrid,
+          },
+          {
+            href: '#',
+            label: t('common.actions.add'),
+            icon: Plus,
+            isCentral: true,
+          },
+          {
+            href: '/impact',
+            label: t('common.navigation.impact'),
+            icon: TrendingUp,
+          },
         ];
       case 'food_receiver':
         return [
           {
             href: '/receiver/dashboard',
-            label: t('dashboard'),
+            label: t('common.navigation.dashboard'),
             icon: LayoutGrid,
           },
           { href: '#', label: t('request'), icon: Plus, isCentral: true },
-          { href: '/impact', label: t('impact'), icon: TrendingUp },
+          {
+            href: '/impact',
+            label: t('common.navigation.impact'),
+            icon: TrendingUp,
+          },
         ];
       case 'city':
         return [
-          { href: '/city/dashboard', label: t('dashboard'), icon: LayoutGrid },
-          { href: '/city', label: 'Analytics', icon: BarChart3 },
-          { href: '/feed', label: 'Overview', icon: Users },
+          {
+            href: '/city/dashboard',
+            label: t('common.navigation.dashboard'),
+            icon: LayoutGrid,
+          },
+          { href: '/city', label: t('analytics'), icon: BarChart3 },
+          { href: '/feed', label: t('overview'), icon: Users },
         ];
       case 'terminals':
         return [
           {
             href: '/terminal/dashboard',
-            label: t('dashboard'),
+            label: t('common.navigation.dashboard'),
             icon: LayoutGrid,
           },
-          { href: '/feed', label: t('overview'), icon: Users },
+          {
+            href: '/feed',
+            label: t('components.bottomNav.overview'),
+            icon: Users,
+          },
         ];
       default:
         return [
-          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
-          { href: '#', label: t('add'), icon: Plus, isCentral: true },
-          { href: '/feed', label: t('explore'), icon: Search },
+          {
+            href: '/donate',
+            label: t('common.navigation.dashboard'),
+            icon: LayoutGrid,
+          },
+          {
+            href: '#',
+            label: t('common.actions.add'),
+            icon: Plus,
+            isCentral: true,
+          },
+          {
+            href: '/feed',
+            label: t('components.bottomNav.explore'),
+            icon: Search,
+          },
         ];
     }
   }, [currentUser, t]);
@@ -135,7 +175,7 @@ export default function BottomNav() {
 
       // For other roles, show the modal
       return (
-        <Drawer key={item.label}>
+        <Drawer key={item.label} shouldScaleBackground={false}>
           <DrawerTrigger asChild>
             <button
               className={cn(
@@ -155,7 +195,7 @@ export default function BottomNav() {
           <DrawerContent className="bg-base">
             <DrawerHeader className="text-center">
               <DrawerTitle className="text-lg font-semibold text-primary">
-                {t('createDonation')}?
+                {t('components.bottomNav.createDonation')}?
               </DrawerTitle>
             </DrawerHeader>
             <div className="grid gap-3 p-4">
@@ -171,10 +211,12 @@ export default function BottomNav() {
                       <Clock className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          One-time Request
+                          {t('oneTimeRequest') || 'One-time Request'}
                         </p>
                         <p className="text-xs text-secondary">
-                          Create a single request for immediate needs .
+                          {t(
+                            'components.bottomNav.oneTimeRequestDescription'
+                          ) || 'Create a single request for immediate needs.'}
                         </p>
                       </div>
                     </Button>
@@ -189,10 +231,12 @@ export default function BottomNav() {
                       <Calendar className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          Recurring Request
+                          {t('recurringRequest') || 'Recurring Request'}
                         </p>
                         <p className="text-xs text-secondary">
-                          Set up a repeating schedule for ongoing needs .
+                          {t(
+                            'components.bottomNav.recurringRequestDescription'
+                          ) || 'Set up a repeating schedule for ongoing needs.'}
                         </p>
                       </div>
                     </Button>
@@ -210,10 +254,10 @@ export default function BottomNav() {
                       <BarChart3 className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          {t('analytics')}
+                          {t('components.bottomNav.analytics')}
                         </p>
                         <p className="text-xs text-secondary">
-                          {t('overview')}.
+                          {t('components.bottomNav.overview')}.
                         </p>
                       </div>
                     </Button>
@@ -231,10 +275,11 @@ export default function BottomNav() {
                       <ShoppingBag className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          {t('donate')} {t('foodItem')}
+                          {t('components.bottomNav.donate')}{' '}
+                          {t('components.bottomNav.foodItem')}
                         </p>
                         <p className="text-xs text-secondary">
-                          {t('createDonation')}.
+                          {t('components.bottomNav.createDonation')}.
                         </p>
                       </div>
                     </Button>
@@ -249,10 +294,13 @@ export default function BottomNav() {
                       <Calendar className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          Recurring Donation
+                          {t('recurringDonation') || 'Recurring Donation'}
                         </p>
                         <p className="text-xs text-secondary">
-                          Set up a repeating schedule for ongoing donations.
+                          {t(
+                            'components.bottomNav.recurringDonationDescription'
+                          ) ||
+                            'Set up a repeating schedule for ongoing donations.'}
                         </p>
                       </div>
                     </Button>
@@ -263,7 +311,7 @@ export default function BottomNav() {
             <DrawerFooter className="pt-2">
               <DrawerClose asChild>
                 <Button variant="ghost" size="sm">
-                  {t('cancel')}
+                  {t('common.actions.close')}
                 </Button>
               </DrawerClose>
             </DrawerFooter>

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useTranslations } from '@/hooks/useTranslations';
 import { toast } from '@/hooks/use-toast';
 import { SummaryCard } from '@/components/ui/SummaryCard';
 import PageContainer from '@/components/layout/PageContainer';
@@ -17,7 +17,7 @@ import BottomActionBar from '@/components/ui/BottomActionBar';
 
 export default function DonationSummaryPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useTranslations();
 
   // Get data from donation store
   const pickupSlots = useDonationStore((state) => state.pickupSlots);
@@ -54,6 +54,9 @@ export default function DonationSummaryPage() {
   } | null>(null);
   const [isLoadingRecurringData, setIsLoadingRecurringData] = useState(true);
 
+  // Add state to track if persist store has been rehydrated
+  const [isStoreRehydrated, setIsStoreRehydrated] = useState(false);
+
   const formatSlotDate = (date: Date | string | undefined) => {
     if (!date) return null;
     try {
@@ -65,8 +68,24 @@ export default function DonationSummaryPage() {
     }
   };
 
+  // Check if store is rehydrated on mount
+  useEffect(() => {
+    // Add a small delay to ensure persist middleware has rehydrated
+    const checkRehydration = () => {
+      setIsStoreRehydrated(true);
+    };
+
+    // Check immediately and also with a small delay for safety
+    checkRehydration();
+    const timeout = setTimeout(checkRehydration, 100);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   // Pre-fill address and instructions from user profile
   useEffect(() => {
+    if (!isStoreRehydrated || !isInitialized) return;
+
     if (isInitialized && currentUser) {
       // Pre-fill address from profile if available
       if (currentUser.address) {
@@ -124,7 +143,7 @@ export default function DonationSummaryPage() {
 
     // Set loading to false after processing session storage
     setIsLoadingRecurringData(false);
-  }, [isInitialized, currentUser, donationItems.length]);
+  }, [isStoreRehydrated, isInitialized, currentUser, donationItems.length]);
 
   const handleEditItem = (itemId: string) => {
     // Navigate back to manual page with edit mode for this item
@@ -313,22 +332,29 @@ export default function DonationSummaryPage() {
     }
   };
 
-  // Show loading while processing recurring donation data
-  if (isLoadingRecurringData) {
+  // Show loading while processing recurring donation data or waiting for store rehydration
+  if (isLoadingRecurringData || !isStoreRehydrated) {
     return (
       <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
-        <p className="text-gray-600">Loading...</p>
+        <p className="text-gray-600">{t('loading')}</p>
       </div>
     );
   }
 
-  // Show error if no donation data after loading
-  if (donationItems.length === 0 && !recurringSchedule) {
+  // Show error if no donation data after loading (but not while saving)
+  if (donationItems.length === 0 && !recurringSchedule && !isSaving) {
+    console.warn(
+      'No donation items found on summary page - likely direct navigation or cleared state'
+    );
+
     return (
       <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
-        <p className="text-gray-600">{t('noDonationItemsFound')}</p>
+        <p className="text-gray-600 text-center">{t('noDonationItemsFound')}</p>
+        <p className="text-sm text-gray-500 text-center">
+          {t('letStartFromBeginning')}
+        </p>
         <Button onClick={() => router.push('/donate/new')}>
-          Start New Donation
+          {t('startNewDonation')}
         </Button>
       </div>
     );
@@ -339,7 +365,7 @@ export default function DonationSummaryPage() {
       header={
         <>
           <SecondaryNavbar
-            title="Donation Summary"
+            title={t('donationSummary')}
             backHref="/donate/pickup-slot"
           />
           <div className="px-4 pt-2">
@@ -365,7 +391,7 @@ export default function DonationSummaryPage() {
       {/* Donation Items Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-2">
-          Donation Items
+          {t('donationItems')}
         </h2>
         {donationItems.map((item, index) => (
           <ItemPreview
@@ -385,13 +411,14 @@ export default function DonationSummaryPage() {
         <div className="space-y-4 mb-6">
           <div className="flex items-center justify-between p-4 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
             <span className="font-semibold text-interactive">
-              Donation Period: {format(donationPeriod.startDate, 'dd.MM.yyyy')}{' '}
-              - {format(donationPeriod.endDate, 'dd.MM.yyyy')}
+              {t('donationPeriod')}:{' '}
+              {format(donationPeriod.startDate, 'dd.MM.yyyy')} -{' '}
+              {format(donationPeriod.endDate, 'dd.MM.yyyy')}
             </span>
             <button
               onClick={() => router.push('/donate/schedule')}
               className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-              title="Edit donation period"
+              title={t('editDonationPeriod')}
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path
@@ -409,7 +436,7 @@ export default function DonationSummaryPage() {
       {/* Pickup schedule */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {recurringSchedule ? 'Recurring Schedule' : 'Pickup Schedule'}
+          {recurringSchedule ? t('recurringSchedule') : t('pickupSchedule')}
         </h2>
         {recurringSchedule && Array.isArray(recurringSchedule) ? (
           // Multiple recurring schedules
@@ -425,7 +452,7 @@ export default function DonationSummaryPage() {
               <button
                 onClick={() => router.push('/donate/recurring-schedule')}
                 className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-                title="Edit schedule"
+                title={t('editSchedule')}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path
@@ -453,7 +480,7 @@ export default function DonationSummaryPage() {
               <button
                 onClick={() => router.push('/donate/pickup-slot')}
                 className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-                title="Edit pickup time"
+                title={t('editPickupTime')}
               >
                 <svg
                   width="20"
@@ -480,7 +507,7 @@ export default function DonationSummaryPage() {
             <button
               onClick={() => router.push('/donate/pickup-slot')}
               className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-              title="Edit pickup time"
+              title={t('editPickupTime')}
             >
               <svg
                 width="20"
@@ -504,14 +531,14 @@ export default function DonationSummaryPage() {
       {/* Address & Instructions Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          Address & Instructions
+          {t('addressAndInstructions')}
         </h2>
         <div>
           <label
             htmlFor="address"
             className="block text-black font-semibold mb-3"
           >
-            Address
+            {t('address')}
           </label>
           <Textarea
             id="address"
@@ -532,7 +559,7 @@ export default function DonationSummaryPage() {
               htmlFor="update-address-profile"
               className="text-sm text-gray-600"
             >
-              Save this address to my profile
+              {t('saveAddressToProfile')}
             </label>
           </div>
         </div>
@@ -541,11 +568,11 @@ export default function DonationSummaryPage() {
             htmlFor="driver-instructions"
             className="block text-black font-semibold mb-3"
           >
-            Instructions for driver (optional)
+            {t('instructionsForDriver')}
           </label>
           <Textarea
             id="driver-instructions"
-            placeholder="Please ring the doorbell"
+            placeholder={t('pleaseRingDoorbell')}
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
@@ -562,22 +589,11 @@ export default function DonationSummaryPage() {
               htmlFor="update-instructions-profile"
               className="text-sm text-gray-600"
             >
-              Save these instructions to my profile
+              {t('saveInstructionsToProfile')}
             </label>
           </div>
         </div>
       </div>
-
-      {/* Bottom action bar with Continue button */}
-      <BottomActionBar>
-        <Button
-          onClick={handleConfirmDonation}
-          disabled={isSaving}
-          className="w-full bg-lime text-primary hover:bg-positive-hover"
-        >
-          {isSaving ? 'Saving...' : t('continue') || 'Continue'}
-        </Button>
-      </BottomActionBar>
     </PageContainer>
   );
 }

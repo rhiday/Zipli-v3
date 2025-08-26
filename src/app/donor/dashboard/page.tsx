@@ -1,78 +1,86 @@
 'use client';
 
-import { useCommonTranslation } from '@/hooks/useTranslations';
+import React from 'react';
+import Header from '@/components/layout/Header';
+import BottomNav from '@/components/BottomNav';
+import { PlusIcon, PackageIcon, Calendar, FileDown } from 'lucide-react';
+import Link from 'next/link';
 
 export default function DonorDashboard() {
-  const { t } = useCommonTranslation();
-
   return (
-    <div className="p-6 space-y-6">
-      {/* Impact Section */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-medium text-gray-900">
-          Teollasi on aitoa merkitystä! Tässä viimeisimmän toimintasi
-          vaikuttavuus:
-        </h2>
+    <div className="min-h-screen pb-20 bg-cream">
+      <Header title="Donor Dashboard" />
 
-        {/* Impact Metrics Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-700 mb-1">46kg</div>
-            <div className="text-sm text-gray-600">
-              viimeisimmän ilmoituksesi yhteenlaskettu kilomäärä
+      <main className="relative z-20 -mt-4 rounded-t-3xl bg-white p-4 space-y-6">
+        <section>
+          <h1 className="text-2xl font-bold mb-2 text-earth">
+            Welcome, Donor!
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Manage your food donations and help reduce waste in your community.
+          </p>
+        </section>
+
+        <section className="grid gap-4">
+          <Link href="/donate/new">
+            <div className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50">
+              <div className="flex items-center gap-3">
+                <PlusIcon className="w-6 h-6 text-earth" />
+                <div>
+                  <h3 className="font-semibold text-earth">
+                    Create New Donation
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    List available food items for pickup
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/donate/all-offers">
+            <div className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50">
+              <div className="flex items-center gap-3">
+                <PackageIcon className="w-6 h-6 text-earth" />
+                <div>
+                  <h3 className="font-semibold text-earth">My Donations</h3>
+                  <p className="text-sm text-gray-600">
+                    Track and manage your active donations
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          <div className="p-4 border border-gray-200 rounded-xl bg-gray-50">
+            <div className="flex items-center gap-3">
+              <Calendar className="w-6 h-6 text-gray-400" />
+              <div>
+                <h3 className="font-semibold text-gray-500">
+                  Pickup Schedules
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Coming soon - manage your pickup times
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-700 mb-1">131</div>
-            <div className="text-sm text-gray-600">
-              ihmistä sai kunnon aterian (500g/annos)
+          <div className="p-4 border border-gray-200 rounded-xl bg-gray-50">
+            <div className="flex items-center gap-3">
+              <FileDown className="w-6 h-6 text-gray-400" />
+              <div>
+                <h3 className="font-semibold text-gray-500">Impact Reports</h3>
+                <p className="text-sm text-gray-500">
+                  Coming soon - download your donation impact
+                </p>
+              </div>
             </div>
           </div>
+        </section>
+      </main>
 
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-700 mb-1">125€</div>
-            <div className="text-sm text-gray-600">
-              säästetty tuotanto- ja jätekustannuksissa (keskiarvo)
-            </div>
-          </div>
-
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-700 mb-1">10t</div>
-            <div className="text-sm text-gray-600">
-              puun verran hiilidioksidipäästöjä vältetty
-            </div>
-          </div>
-        </div>
-
-        {/* More Impact Data Link */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-          <div>
-            <h3 className="font-medium text-gray-900 mb-1">
-              Täältä näet lisää vaikuttavuusdataa
-            </h3>
-            <p className="text-sm text-gray-600">
-              Keräämme vaikuttavuusdataa auttaa raportoimaan, viestimään ja
-              suunnittelemaan toimintaa entistä paremmin.
-            </p>
-          </div>
-          <div className="ml-4">
-            <svg
-              className="w-5 h-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
+      <BottomNav />
     </div>
   );
 }

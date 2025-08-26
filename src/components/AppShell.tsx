@@ -24,7 +24,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   // Hides bottom nav on all pages within the donation and request creation flows, and profile page.
   const flowRegex =
-    /^\/(donate|request)\/(new|manual|pickup-slot|summary|thank-you|success|detail|[^/]+\/handover-confirm)/;
+    /^\/(donate|request)\/(new|manual|manage|pickup-slot|summary|thank-you|success|detail|[^/]+\/handover-confirm)/;
   const hideBottomNav = flowRegex.test(pathname) || pathname === '/profile';
 
   return (
@@ -44,7 +44,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
           <div className="relative mx-auto flex h-dvh w-full max-w-lg flex-col bg-base shadow-lg">
             {/* Main content container */}
             <main className="flex-grow overflow-y-auto">{children}</main>
-            {/* BottomNav is now part of this container and positioned absolutely */}
+            {/* BottomNav is positioned absolutely within this container */}
             {!hideBottomNav && <BottomNav />}
           </div>
         </div>

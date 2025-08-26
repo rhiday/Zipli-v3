@@ -1,16 +1,46 @@
-/* Mobile Performance Optimizations */
+/* Mobile Performance Optimizations - Minimal transforms only */
 
-/* Use GPU acceleration for transforms */
-.group-hover\:-translate-y-1,
-.transition-all,
-.transition-transform,
-.transition-opacity {
-  will-change: auto;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-perspective: 1000px;
-  perspective: 1000px;
+/* Force disable all transforms and animations on mobile to prevent UI glitches */
+@media (max-width: 768px) {
+  * {
+    transform: none !important;
+    -webkit-transform: none !important;
+    will-change: auto !important;
+    -webkit-backface-visibility: visible !important;
+    backface-visibility: visible !important;
+    -webkit-perspective: none !important;
+    perspective: none !important;
+  }
+
+  /* Disable all transitions and animations on mobile */
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Force disable specific problematic classes */
+  .transition-all,
+  .transition-colors,
+  .transition-transform,
+  .transition,
+  .animate-spin,
+  .animate-pulse,
+  .animate-bounce,
+  .group-hover\:-translate-y-1,
+  .hover\:-translate-y-1,
+  .hover\:shadow-lg,
+  .hover\:bg-black\/5 {
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    box-shadow: inherit !important;
+    background-color: inherit !important;
+  }
 }
+
+/* All GPU acceleration completely removed for stability */
 
 /* Optimize hover effects on mobile */
 @media (hover: none) and (pointer: coarse) {
@@ -19,9 +49,9 @@
     transform: none !important;
   }
 
-  /* Use tap highlights instead */
+  /* Use tap highlights instead - completely removed transforms */
   .group:active .group-hover\:-translate-y-1 {
-    transform: translateY(-2px);
+    background-color: rgba(0, 0, 0, 0.05);
   }
 }
 
@@ -58,12 +88,7 @@ img {
   contain-intrinsic-size: 0 500px;
 }
 
-/* Hardware acceleration for modals and overlays */
-.fixed,
-[role='dialog'],
-[data-radix-collection-item] {
-  transform: translateZ(0);
-}
+/* Hardware acceleration completely removed */
 
 /* Optimize touch targets for mobile */
 @media (max-width: 768px) {
@@ -71,7 +96,7 @@ img {
   a,
   [role='button'],
   [role='link'],
-  input,
+  input:not([type='checkbox']):not([type='radio']),
   textarea,
   select {
     min-height: 44px;
@@ -84,12 +109,42 @@ img {
   }
 }
 
-/* Reduce paint areas for frequently updated elements */
-.animate-pulse,
-.animate-spin,
-.animate-bounce {
-  will-change: transform;
-  contain: layout style paint;
+/* All animations disabled on mobile for stability */
+
+/* Additional mobile-specific overrides for UI stability */
+@media (max-width: 768px) {
+  /* Force disable all hover states that could cause glitches */
+  *:hover {
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Disable all box-shadow transitions */
+  .shadow-sm:hover,
+  .shadow:hover,
+  .shadow-md:hover,
+  .shadow-lg:hover {
+    box-shadow: inherit !important;
+  }
+
+  /* Override any remaining transition classes */
+  [class*='transition'] {
+    transition: none !important;
+  }
+
+  /* Override any remaining animation classes */
+  [class*='animate'] {
+    animation: none !important;
+  }
+
+  /* Override any remaining transform classes */
+  [class*='transform'],
+  [class*='translate'],
+  [class*='rotate'],
+  [class*='scale'] {
+    transform: none !important;
+  }
 }
 
 /* Optimize font loading */
@@ -106,13 +161,7 @@ img {
   z-index: 10;
 }
 
-/* Performance hints for cards and list items */
-.rounded-2xl,
-.rounded-xl,
-.rounded-lg {
-  transform: translateZ(0);
-  will-change: auto;
-}
+/* Transform hints completely removed */
 
 /* Optimize shadow rendering on mobile */
 @media (max-width: 768px) {

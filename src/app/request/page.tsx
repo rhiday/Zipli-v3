@@ -20,6 +20,9 @@ import {
 } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { RequestCardSkeleton } from '@/components/ui/OptimizedSkeleton';
+import Header from '@/components/layout/Header';
+import BottomNav from '@/components/BottomNav';
 
 type Request = {
   id: string;
@@ -82,14 +85,38 @@ export default function RequestsPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-green-700"></div>
+      <div className="min-h-screen pb-20 bg-cream">
+        <Header title="Loading Requests..." />
+        <main className="relative z-20 -mt-4 rounded-t-3xl bg-white p-4 space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-10 w-24 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+
+          {/* Filter skeleton */}
+          <div className="space-y-4">
+            <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="flex space-x-4">
+              <div className="h-10 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="h-10 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
+
+          {/* Request cards skeleton */}
+          <div className="space-y-4">
+            {Array.from({ length: 4 }, (_, i) => (
+              <RequestCardSkeleton key={i} />
+            ))}
+          </div>
+        </main>
+        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh pb-20">
+    <div className="min-h-screen pb-20">
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
         <div className="space-y-6">
           <div className="flex items-center justify-between">

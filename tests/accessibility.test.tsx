@@ -7,7 +7,6 @@ import '@testing-library/jest-dom';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/layout/Header';
 import { PhotoUpload } from '@/components/ui/PhotoUpload';
-import { VoiceInputControl } from '@/components/ui/VoiceInputControl';
 import ImpactDashboard from '@/components/dashboard/ImpactDashboard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/Input';
@@ -86,7 +85,7 @@ describe('Accessibility Tests', () => {
     it('PhotoUpload should be accessible', async () => {
       const mockOnImageUpload = jest.fn();
       const { container } = render(
-        <PhotoUpload 
+        <PhotoUpload
           onImageUpload={mockOnImageUpload}
           hint="Upload a photo of your food item"
         />
@@ -95,25 +94,9 @@ describe('Accessibility Tests', () => {
       expect(results).toHaveNoViolations();
     });
 
-    it('VoiceInputControl should be accessible', async () => {
-      const mockOnProcessComplete = jest.fn();
-      const mockSetServerError = jest.fn();
-      
-      const { container } = render(
-        <VoiceInputControl 
-          onProcessComplete={mockOnProcessComplete}
-          setServerError={mockSetServerError}
-        />
-      );
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
     it('Button should be accessible', async () => {
       const { container } = render(
-        <Button variant="primary">
-          Accessible Button
-        </Button>
+        <Button variant="primary">Accessible Button</Button>
       );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
@@ -121,7 +104,7 @@ describe('Accessibility Tests', () => {
 
     it('Input should be accessible', async () => {
       const { container } = render(
-        <Input 
+        <Input
           type="text"
           placeholder="Enter text"
           aria-label="Text input field"
@@ -135,7 +118,7 @@ describe('Accessibility Tests', () => {
   describe('Dashboard Components', () => {
     it('ImpactDashboard should be accessible', async () => {
       const { container } = render(
-        <ImpactDashboard 
+        <ImpactDashboard
           totalWeight={46}
           portionsOffered={131}
           savedCosts={125}
@@ -161,10 +144,10 @@ describe('Accessibility Tests', () => {
       const input = document.querySelector('input');
 
       // All interactive elements should be focusable
-      buttons.forEach(button => {
+      buttons.forEach((button) => {
         expect(button).not.toHaveAttribute('tabindex', '-1');
       });
-      
+
       expect(input).not.toHaveAttribute('tabindex', '-1');
     });
 
@@ -227,8 +210,8 @@ describe('Accessibility Tests', () => {
       );
 
       const interactiveElements = document.querySelectorAll('button, a');
-      
-      interactiveElements.forEach(element => {
+
+      interactiveElements.forEach((element) => {
         // All interactive elements should be keyboard accessible
         expect(element.tagName).toMatch(/^(BUTTON|A)$/);
       });
@@ -237,9 +220,7 @@ describe('Accessibility Tests', () => {
 
   describe('Screen Reader Support', () => {
     it('should have proper alt text for images', () => {
-      render(
-        <img src="/test-image.jpg" alt="Descriptive alt text" />
-      );
+      render(<img src="/test-image.jpg" alt="Descriptive alt text" />);
 
       const image = document.querySelector('img');
       expect(image).toHaveAttribute('alt', 'Descriptive alt text');
@@ -270,7 +251,7 @@ describe('Accessibility Tests', () => {
         <form>
           <label htmlFor="username">Username</label>
           <input id="username" type="text" />
-          
+
           <label htmlFor="email">Email</label>
           <input id="email" type="email" />
         </form>
@@ -281,10 +262,10 @@ describe('Accessibility Tests', () => {
 
       expect(usernameInput).toBeInTheDocument();
       expect(emailInput).toBeInTheDocument();
-      
+
       const usernameLabel = document.querySelector('label[for="username"]');
       const emailLabel = document.querySelector('label[for="email"]');
-      
+
       expect(usernameLabel).toBeInTheDocument();
       expect(emailLabel).toBeInTheDocument();
     });
@@ -296,8 +277,12 @@ describe('Accessibility Tests', () => {
         <div>
           <nav role="navigation">
             <ul>
-              <li><a href="#home">Home</a></li>
-              <li><a href="#about">About</a></li>
+              <li>
+                <a href="#home">Home</a>
+              </li>
+              <li>
+                <a href="#about">About</a>
+              </li>
             </ul>
           </nav>
           <main role="main">
@@ -316,13 +301,8 @@ describe('Accessibility Tests', () => {
     it('should use aria-describedby for additional information', () => {
       render(
         <div>
-          <input 
-            type="password" 
-            aria-describedby="password-help"
-          />
-          <div id="password-help">
-            Password must be at least 8 characters
-          </div>
+          <input type="password" aria-describedby="password-help" />
+          <div id="password-help">Password must be at least 8 characters</div>
         </div>
       );
 

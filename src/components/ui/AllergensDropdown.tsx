@@ -71,10 +71,24 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   }, [open]);
 
   const handleToggle = (option: string) => {
-    if (value.includes(option)) {
-      onChange(value.filter((v) => v !== option));
+    // Handle "Not specified" as mutually exclusive
+    if (option === t('notSpecified')) {
+      if (value.includes(option)) {
+        // If "Not specified" is currently selected, remove it
+        onChange(value.filter((v) => v !== option));
+      } else {
+        // If selecting "Not specified", clear all others and select only this
+        onChange([option]);
+      }
     } else {
-      onChange([...value, option]);
+      // For other options, remove "Not specified" if it exists, then toggle normally
+      let newValue = value.filter((v) => v !== t('notSpecified'));
+
+      if (newValue.includes(option)) {
+        onChange(newValue.filter((v) => v !== option));
+      } else {
+        onChange([...newValue, option]);
+      }
     }
   };
 
@@ -99,12 +113,16 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           disabled={disabled}
           className="cursor-pointer"
           onClick={handleInputClick}
+          autoComplete="off"
+          name="allergens-selector"
+          data-form-type="other"
         />
         {value.length > 0 && (
           <>
             <div
-              className="absolute left-3 right-12 top-1/2 -translate-y-1/2 flex gap-2 overflow-x-auto overflow-y-hidden pointer-events-auto scrollbar-hide"
+              className="absolute left-3 right-12 top-1/2 flex gap-2 overflow-x-auto overflow-y-hidden pointer-events-auto scrollbar-hide"
               style={{
+                transform: 'translateY(-50%)',
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
                 WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
@@ -122,7 +140,10 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
               ))}
             </div>
             {hasOverflow && (
-              <div className="absolute right-12 top-1/2 -translate-y-1/2 w-6 h-8 bg-gradient-to-l from-base to-transparent pointer-events-none" />
+              <div
+                className="absolute right-12 top-1/2 w-6 h-8 bg-gradient-to-l from-base to-transparent pointer-events-none"
+                style={{ transform: 'translateY(-50%)' }}
+              />
             )}
           </>
         )}

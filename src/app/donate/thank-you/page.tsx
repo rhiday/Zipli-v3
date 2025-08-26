@@ -17,6 +17,8 @@ export default function DonationThankYouPage() {
     if (isEditMode) {
       setEditMode(false);
     }
+    // Clear any session storage data
+    sessionStorage.removeItem('pendingDonation');
   }, [isEditMode, setEditMode]);
 
   return (
@@ -38,56 +40,83 @@ export default function DonationThankYouPage() {
       </div>
       <h1 className="text-3xl font-bold mb-4 text-center">
         {isEditMode
-          ? t('changesSaved') || 'Donation Updated!'
-          : t('donationCreated') || 'Thank you!'}
+          ? t('pages.donations.thankYou.donationUpdated') || 'Donation Updated!'
+          : t('pages.donations.thankYou.title') || 'Thank you!'}
       </h1>
       <p className="text-center text-base text-black mb-6 max-w-xs">
         {isEditMode
-          ? t('changesSaved') || 'Your donation has been successfully updated.'
-          : t('thisIsWhomYouveHelped')}
+          ? t('pages.donations.thankYou.donationUpdatedMessage')
+          : t('pages.donations.thankYou.subtitle')}
       </p>
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
-          heading="NextSteps"
+          heading={t('nextSteps') || 'Next Steps'}
           steps={
             isEditMode
               ? [
                   {
-                    title: t('changesSaved') || 'Donation_updated',
+                    title:
+                      t('pages.donations.thankYou.donationUpdated') ||
+                      'Donation updated',
                     description:
-                      t('changesSaved') ||
+                      t('pages.donations.thankYou.changesHaveBeenSaved') ||
                       'Your changes have been saved successfully.',
                   },
                   {
-                    title: t('matchingInProgress') || 'Matching_continues',
-                    description: t('lookingForMatches'),
+                    title:
+                      t('pages.donations.thankYou.matchingInProgress') ||
+                      'Matching continues',
+                    description:
+                      t('pages.donations.thankYou.lookingForMatches') ||
+                      'We are looking for matches for your donation',
                   },
                   {
-                    title: t('getNotified'),
-                    description: t('receiveNotificationWhenMatch'),
+                    title:
+                      t('pages.donations.thankYou.getNotified') ||
+                      'Get notified',
+                    description:
+                      t(
+                        'pages.donations.thankYou.receiveNotificationWhenMatch'
+                      ) ||
+                      'You will receive a notification when we find a match',
                   },
                 ]
               : [
                   {
-                    title: t('requestSubmitted'),
-                    description: t('requestAddedToSystem'),
+                    title:
+                      t('pages.donations.thankYou.requestSubmitted') ||
+                      'Donation Submitted',
+                    description:
+                      t('pages.donations.thankYou.subtitle') ||
+                      'Your donation has been added to our system.',
                   },
                   {
-                    title: t('matchingInProgress'),
-                    description: t('lookingForMatches'),
+                    title:
+                      t('pages.donations.thankYou.matchingInProgress') ||
+                      'Matching in progress',
+                    description:
+                      t('pages.donations.thankYou.lookingForMatches') ||
+                      'We are looking for matches for your donation',
                   },
                   {
-                    title: t('getNotified'),
-                    description: t('receiveNotificationWhenMatch'),
+                    title:
+                      t('pages.donations.thankYou.getNotified') ||
+                      'Get notified',
+                    description:
+                      t(
+                        'pages.donations.thankYou.receiveNotificationWhenMatch'
+                      ) ||
+                      'You will receive a notification when we find a match',
                   },
                 ]
           }
         />
       </div>
-      <Link href="/donate">
+      <Link href="/donor/dashboard">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-          title="Default"
+          {t('pages.donations.thankYou.goBackToDashboard') ||
+            'Go back to dashboard'}
         </button>
       </Link>
     </div>

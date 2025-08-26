@@ -74,8 +74,14 @@ function DonorDashboardPage(): React.ReactElement {
       return () => clearTimeout(timer);
     }
 
-    // Clear any draft donations when user navigates to dashboard
-    clearDonation();
+    // Only clear draft donations if user is not in the middle of a donation flow
+    // Check if user has active donation items or is in edit mode
+    const { donationItems, isEditMode } = useDonationStore.getState();
+    const hasActiveDonation = donationItems.length > 0 || isEditMode;
+
+    if (!hasActiveDonation) {
+      clearDonation();
+    }
 
     const profile: ProfileRow = {
       id: currentUser.id,
@@ -171,7 +177,7 @@ function DonorDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-              {t('yourImpact')}
+              {t('pages.impact.subtitle')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -185,7 +191,7 @@ function DonorDashboardPage(): React.ReactElement {
                   46kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('totalFoodDonated')}
+                  {t('pages.impact.totalWeight')}
                 </p>
               </div>
             </div>
@@ -200,7 +206,7 @@ function DonorDashboardPage(): React.ReactElement {
                   131
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('portionsOffered')}
+                  {t('pages.impact.portionsOffered')}
                 </p>
               </div>
             </div>
@@ -215,7 +221,7 @@ function DonorDashboardPage(): React.ReactElement {
                   125€
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('costSavings')}
+                  {t('pages.impact.savedInDisposalCosts')}
                 </p>
               </div>
             </div>
@@ -230,7 +236,7 @@ function DonorDashboardPage(): React.ReactElement {
                   10t
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('co2Avoided')}
+                  {t('pages.impact.co2AvoidedDesc')}
                 </p>
               </div>
             </div>
@@ -257,7 +263,7 @@ function DonorDashboardPage(): React.ReactElement {
         {/* This is whom you've helped section - Hidden for now */}
         {/* <section>
           <h2 className="text-lg font-semibold text-primary mb-3">
-title="Default"
+            {t('peopleYouHelped')}
           </h2>
 
           <div className="space-y-4">

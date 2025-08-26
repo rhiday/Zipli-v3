@@ -24,13 +24,13 @@ function ResetPasswordPageContent() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError(t('passwordsDoNotMatch'));
+      setError(t('pages.auth.resetPassword.passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError(t('passwordTooShort'));
+      setError(t('pages.auth.resetPassword.passwordTooShort'));
       setLoading(false);
       return;
     }
@@ -45,22 +45,24 @@ function ResetPasswordPageContent() {
       }
 
       // Success - redirect to login
-      router.push('/auth/login?message=Password updated successfully');
+      router.push(
+        '/auth/login?message=' + t('pages.auth.resetPassword.passwordUpdated')
+      );
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError(t('pages.auth.login.networkError'));
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">
-            {t('resetPassword')}
+            {t('pages.auth.resetPassword.title')}
           </h1>
           <p className="mt-2 text-body text-primary-75">
-            Enter your new password
+            {t('pages.auth.forgotPassword.subtitle')}
           </p>
         </div>
 
@@ -76,7 +78,7 @@ function ResetPasswordPageContent() {
               htmlFor="password"
               className="block text-label font-medium text-primary mb-1"
             >
-              New Password
+              {t('pages.auth.resetPassword.newPassword')}
             </label>
             <Input
               id="password"
@@ -95,7 +97,7 @@ function ResetPasswordPageContent() {
               htmlFor="confirmPassword"
               className="block text-label font-medium text-primary mb-1"
             >
-              Confirm Password
+              {t('pages.auth.resetPassword.confirmNewPassword')}
             </label>
             <Input
               id="confirmPassword"
@@ -117,7 +119,9 @@ function ResetPasswordPageContent() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? t('updatingPassword') : t('updatePassword')}
+              {loading
+                ? t('pages.auth.resetPassword.updatingPassword')
+                : t('pages.auth.resetPassword.updatePassword')}
             </Button>
           </div>
         </form>
@@ -127,7 +131,7 @@ function ResetPasswordPageContent() {
             href="/auth/login"
             className="font-medium text-earth hover:text-primary"
           >
-            ← {t('backToLogin')}
+            ← {t('pages.auth.forgotPassword.backToLogin')}
           </Link>
         </div>
       </div>
@@ -139,7 +143,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
           <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>

@@ -1,0 +1,160 @@
+/* Mobile Keyboard Management Styles */
+
+/* CSS Variables for keyboard height */
+:root {
+  --keyboard-height: 0px;
+}
+
+/* Keyboard-aware container */
+.keyboard-aware {
+  transition: height 0.3s ease-in-out;
+}
+
+/* When keyboard is open */
+.keyboard-open .keyboard-aware {
+  height: calc(100vh - var(--keyboard-height));
+}
+
+/* Form containers that need keyboard adjustment */
+.keyboard-aware-form {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: min-height 0.3s ease-in-out;
+}
+
+.keyboard-open .keyboard-aware-form {
+  min-height: calc(100vh - var(--keyboard-height));
+}
+
+/* Bottom fixed elements (like navigation) */
+.keyboard-aware-bottom {
+  bottom: 0;
+  transition: bottom 0.3s ease-in-out;
+}
+
+.keyboard-open .keyboard-aware-bottom {
+  bottom: var(--keyboard-height);
+}
+
+/* Scrollable content when keyboard is open */
+.keyboard-scrollable {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.keyboard-open .keyboard-scrollable {
+  max-height: calc(100vh - var(--keyboard-height));
+}
+
+/* Prevent zoom on input focus (iOS) */
+input[type='text'],
+input[type='email'],
+input[type='tel'],
+input[type='password'],
+input[type='number'],
+input[type='search'],
+input[type='url'],
+select,
+textarea {
+  font-size: 16px !important;
+  font-size: max(16px, 1rem) !important;
+}
+
+/* Mobile keyboard input styling */
+@media screen and (max-width: 768px) {
+  /* Ensure inputs don't get hidden behind keyboard */
+  .form-input {
+    margin-bottom: 1rem;
+    scroll-margin-bottom: 100px;
+  }
+
+  /* When keyboard is open, give more space to focused elements */
+  .keyboard-open .form-input:focus-within {
+    scroll-margin-bottom: 150px;
+  }
+
+  /* Button positioning when keyboard is open */
+  .keyboard-open .form-submit-button {
+    position: sticky;
+    bottom: 10px;
+    z-index: 1000;
+  }
+
+  /* Safe area for keyboard */
+  .keyboard-safe-area {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .keyboard-open .keyboard-safe-area {
+    padding-bottom: calc(var(--keyboard-height) + env(safe-area-inset-bottom));
+  }
+}
+
+/* Animation for smooth transitions */
+.keyboard-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* iOS specific fixes */
+@supports (-webkit-appearance: none) {
+  .keyboard-open body {
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* Android specific fixes */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  .keyboard-open .viewport-height {
+    height: calc(100vh - var(--keyboard-height));
+  }
+}
+
+/* Focus ring that's visible even with keyboard */
+.keyboard-aware input:focus,
+.keyboard-aware textarea:focus,
+.keyboard-aware select:focus {
+  outline: 2px solid #024209;
+  outline-offset: 2px;
+  border-color: #024209;
+}
+
+/* Prevent horizontal scrolling when keyboard is open */
+.keyboard-open {
+  overflow-x: hidden;
+}
+
+/* Keyboard indicator (optional visual feedback) */
+.keyboard-indicator {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--keyboard-height);
+  background: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+  z-index: 999;
+  transition: height 0.3s ease;
+}
+
+.keyboard-indicator.hidden {
+  height: 0;
+}
+
+/* Utility classes for common patterns */
+.full-height-minus-keyboard {
+  height: 100vh;
+}
+
+.keyboard-open .full-height-minus-keyboard {
+  height: calc(100vh - var(--keyboard-height));
+}
+
+.min-full-height-minus-keyboard {
+  min-height: 100vh;
+}
+
+.keyboard-open .min-full-height-minus-keyboard {
+  min-height: calc(100vh - var(--keyboard-height));
+}

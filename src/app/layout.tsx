@@ -6,6 +6,8 @@ import { Manrope, Space_Grotesk } from 'next/font/google'; // Import fonts
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
 import DevSwitcherOverlay from '@/components/dev/DevSwitcherOverlay';
 import LangSetter from '@/components/LangSetter';
+import { Toaster } from '@/components/ui/toaster';
+import { EdgeCaseProvider } from '@/components/EdgeCaseProvider';
 import Script from 'next/script';
 
 // Configure fonts
@@ -31,6 +33,12 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'Zipli',
   },
+  other: {
+    // Cache-busting for CSS and JS resources
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0',
+  },
 };
 
 export const viewport = {
@@ -51,12 +59,23 @@ export default function RootLayout({
   // We keep html lang reactive via a data-attr on body for simplicity
   return (
     <html className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+      <head>
+        <meta
+          httpEquiv="Cache-Control"
+          content="no-cache, no-store, must-revalidate"
+        />
+        <meta httpEquiv="Pragma" content="no-cache" />
+        <meta httpEquiv="Expires" content="0" />
+      </head>
       <body>
         <LangSetter />
-        <ErrorBoundary>
-          <AppShell>{children}</AppShell>
-          {isDev && <DevSwitcherOverlay />}
-        </ErrorBoundary>
+        <EdgeCaseProvider>
+          <ErrorBoundary>
+            <AppShell>{children}</AppShell>
+            <Toaster />
+            {isDev && <DevSwitcherOverlay />}
+          </ErrorBoundary>
+        </EdgeCaseProvider>
         {/* Performance monitoring in development */}
         {isDev && (
           <Script

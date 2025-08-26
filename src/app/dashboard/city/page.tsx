@@ -1,28 +1,48 @@
 'use client';
 
-import BottomNav from '@/components/BottomNav';
-import Header from '@/components/layout/Header';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import BottomNav from '@/components/BottomNav';
+import {
+  ChevronDown,
+  TrendingUp,
+  Building2,
+  Users,
+  Leaf,
+  Euro,
+  MapPin,
+  Calendar,
+} from 'lucide-react';
+import Header from '@/components/layout/Header';
+import Link from 'next/link';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useCommonTranslation } from '@/hooks/useTranslations';
-import { useDatabase } from '@/store';
 import { jsPDF } from 'jspdf';
-import { Building2, ChevronDown, Euro, Leaf, TrendingUp } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useDatabase } from '@/store';
 import {
-  CartesianGrid,
-  Line,
+  SkeletonDashboardStat,
+  SkeletonRecipient,
+} from '@/components/ui/Skeleton';
+import { useCommonTranslation } from '@/hooks/useTranslations';
+import {
   LineChart,
-  ResponsiveContainer,
-  Tooltip,
+  Line,
   XAxis,
   YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
 
 // Enhanced mock data with more realistic values
@@ -58,17 +78,9 @@ type CityDashboardData = {
 };
 
 export default function CityDashboardPage(): React.ReactElement {
-  // City dashboard disabled for now - redirect to main dashboard
-  const router = useRouter();
-  React.useEffect(() => {
-    router.push('/donate');
-  }, [router]);
-
-  return <div>Redirecting...</div>;
+  return <DisabledCityDashboardPage />;
 }
 
-// Note: keep this component unused to avoid hook rule violations.
-// If you need it, export with a proper name and use it as a React component.
 function DisabledCityDashboardPage(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized, getAllDonations, getAllRequests } =
@@ -173,7 +185,7 @@ function DisabledCityDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-dvh pb-20">
+      <div className="min-h-screen pb-20">
         <Header title="Loading..." />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -205,7 +217,7 @@ function DisabledCityDashboardPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-dvh pb-20">
+    <div className="min-h-screen pb-20">
       <Header title="Helsinki Food Terminal" />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">

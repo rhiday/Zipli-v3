@@ -18,6 +18,7 @@ interface AutoSaveFormWrapperProps {
   onClear?: () => void;
   showStatus?: boolean;
   className?: string;
+  preventRestore?: boolean; // Prevent showing restore prompt for fresh forms
 }
 
 export const AutoSaveFormWrapper: React.FC<AutoSaveFormWrapperProps> = ({
@@ -31,6 +32,7 @@ export const AutoSaveFormWrapper: React.FC<AutoSaveFormWrapperProps> = ({
   onClear,
   showStatus = true,
   className = '',
+  preventRestore = false,
 }) => {
   const [hasRestoredData, setHasRestoredData] = useState(false);
   const [showRestorePrompt, setShowRestorePrompt] = useState(false);
@@ -45,7 +47,7 @@ export const AutoSaveFormWrapper: React.FC<AutoSaveFormWrapperProps> = ({
 
   // Check for saved data on mount
   useEffect(() => {
-    if (!hasRestoredData) {
+    if (!hasRestoredData && !preventRestore) {
       const savedData = restore();
       if (savedData && Object.keys(savedData).length > 0) {
         // Check if saved data is different from current data
@@ -60,8 +62,12 @@ export const AutoSaveFormWrapper: React.FC<AutoSaveFormWrapperProps> = ({
         }
       }
       setHasRestoredData(true);
+    } else if (preventRestore) {
+      // If preventRestore is true, clear any saved data and don't show restore prompt
+      clear();
+      setHasRestoredData(true);
     }
-  }, [hasRestoredData, restore]);
+  }, [hasRestoredData, restore, preventRestore, clear]);
 
   const handleRestore = () => {
     const savedData = restore();

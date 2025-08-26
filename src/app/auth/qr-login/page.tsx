@@ -46,10 +46,10 @@ function QRLoginPageContent() {
             router.push('/feed');
             break;
           case 'city':
-            router.push('/dashboard');
+            router.push('/city/dashboard');
             break;
           default:
-            router.push('/dashboard');
+            router.push('/donor/dashboard');
         }
       }
     } catch (err) {
@@ -60,7 +60,7 @@ function QRLoginPageContent() {
 
   if (!token) {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
         <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
           <h1 className="text-titleSm font-display text-negative">
             Invalid QR Code
@@ -79,7 +79,7 @@ function QRLoginPageContent() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
         <h1 className="text-titleSm font-display text-primary">QR Login</h1>
         <p className="text-body text-primary-75">
@@ -119,7 +119,7 @@ export default function QRLoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-cream p-4">
           <div className="w-full max-w-md space-y-6 rounded-lg bg-base p-8 shadow-lg text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
             <p className="text-body text-primary-75">Loading...</p>

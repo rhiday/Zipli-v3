@@ -121,7 +121,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-dvh pb-20">
+      <div className="min-h-screen pb-20">
         <Header title="Loading..." />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -168,7 +168,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-dvh pb-20">
+    <div className="min-h-screen pb-20">
       <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -176,7 +176,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-primary">
-              {t('yourImpact')}
+              {t('pages.impact.title')}
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -190,7 +190,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.totalPeople}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('peopleServed')}
+                  {t('pages.impact.peopleHelped')}
                 </p>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.estimatedKg}kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('foodRequested')}
+                  {t('pages.impact.totalFoodDonated')}
                 </p>
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.activeRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('activeRequests')}
+                  {t('pages.dashboard.receiver.activeRequests')}
                 </p>
               </div>
             </div>
@@ -232,7 +232,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.fulfilledRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('fulfilledRequests')}
+                  {t('pages.impact.completedDonations')}
                 </p>
               </div>
             </div>
@@ -249,8 +249,8 @@ export default function ReceiverDashboardPage(): React.ReactElement {
           >
             <ActionButton
               href="#"
-              title={t('exportImpactReport')}
-              description={t('requestHistoryAndImpactData')}
+              title={t('pages.dashboard.donor.exportToPdf')}
+              description={t('pages.impact.detailedAnalytics')}
               icon={<FileDown />}
             />
           </div>

@@ -7,6 +7,8 @@ import { Select } from '@/components/ui/Select';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
+import { useCommonTranslation } from '@/hooks/useTranslations';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -23,6 +25,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const register = useDatabase((state) => state.register);
+  const { t } = useCommonTranslation();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -30,54 +33,32 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('🎯 RegisterPage - Form submitted with data:', formData);
-
     setLoading(true);
     setError(null);
 
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
-      console.error('🎯 RegisterPage - Password mismatch');
-      setError('Passwords do not match');
+      setError(t('pages.auth.register.passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
-      console.error('🎯 RegisterPage - Password too short');
-      setError('Password must be at least 6 characters long');
+      setError(t('pages.auth.register.passwordTooShort'));
       setLoading(false);
       return;
     }
 
     try {
-      const registrationData = {
+      const response = await register(formData.email, formData.password, {
         full_name: formData.fullName,
         role: formData.role,
         organization_name: formData.organizationName,
         contact_number: formData.contactNumber,
         address: formData.address,
-      };
-
-      console.log('🎯 RegisterPage - Calling register with:', {
-        email: formData.email,
-        userData: registrationData,
-      });
-
-      const response = await register(
-        formData.email,
-        formData.password,
-        registrationData
-      );
-
-      console.log('🎯 RegisterPage - Registration response:', {
-        hasData: !!response.data,
-        error: response.error,
-        data: response.data,
       });
 
       if (response.error) {
-        console.error('🎯 RegisterPage - Registration error:', response.error);
         setError(response.error);
         setLoading(false);
         return;
@@ -86,11 +67,6 @@ export default function RegisterPage() {
       // Registration successful - redirect to appropriate dashboard
       if (response.data) {
         const user = response.data;
-        console.log(
-          '🎯 RegisterPage - Success! Redirecting user with role:',
-          user.role
-        );
-
         switch (user.role) {
           case 'food_donor':
             router.push('/donate');
@@ -99,28 +75,33 @@ export default function RegisterPage() {
             router.push('/receiver/dashboard');
             break;
           case 'city':
-            router.push('/dashboard');
+            router.push('/city/dashboard');
             break;
           default:
-            router.push('/dashboard');
+            router.push('/donor/dashboard');
         }
       }
     } catch (err) {
-      console.error('🎯 RegisterPage - Caught exception:', err);
-      setError('An error occurred during registration. Please try again.');
+      setError(t('pages.auth.login.networkError'));
       setLoading(false);
     }
   };
 
   return (
-    <div className="relative flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-cream p-4">
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
+        <div className="flex justify-end mb-4">
+          <LanguageSwitcher />
+        </div>
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">
-            Create your account
+            {t('pages.auth.register.title')}
           </h1>
           <p className="mt-2 text-body text-primary-75">
-            Join Zipli to start sharing food
+            {t('pages.auth.register.subtitle')}
+          </p>
+          <p className="mt-1 text-body text-primary-50">
+            {t('pages.auth.register.itOnlyTakes')}
           </p>
         </div>
 
@@ -136,7 +117,7 @@ export default function RegisterPage() {
               htmlFor="email"
               className="block text-label font-medium text-primary mb-1"
             >
-              Email address *
+              {t('pages.auth.register.email')} *
             </label>
             <Input
               id="email"
@@ -154,7 +135,7 @@ export default function RegisterPage() {
               htmlFor="fullName"
               className="block text-label font-medium text-primary mb-1"
             >
-              Full name *
+              {t('pages.auth.register.fullName')} *
             </label>
             <Input
               id="fullName"
@@ -171,16 +152,24 @@ export default function RegisterPage() {
               htmlFor="role"
               className="block text-label font-medium text-primary mb-1"
             >
-              I am a *
+              {t('pages.auth.register.iAmA')} *
             </label>
             <Select
               value={formData.role}
               onValueChange={(value) => handleInputChange('role', value)}
             >
-              <option value="food_donor">Food Donor</option>
-              <option value="food_receiver">Food Receiver</option>
-              <option value="city">City Official</option>
-              <option value="terminals">Terminal Operator</option>
+              <option value="food_donor">
+                {t('pages.auth.register.foodDonor')}
+              </option>
+              <option value="food_receiver">
+                {t('pages.auth.register.foodReceiver')}
+              </option>
+              <option value="city">
+                {t('pages.auth.register.cityOfficial')}
+              </option>
+              <option value="terminals">
+                {t('pages.auth.register.terminalOperator')}
+              </option>
             </Select>
           </div>
 
@@ -189,7 +178,7 @@ export default function RegisterPage() {
               htmlFor="organizationName"
               className="block text-label font-medium text-primary mb-1"
             >
-              Organization name
+              {t('pages.auth.register.organizationName')}
             </label>
             <Input
               id="organizationName"
@@ -207,7 +196,7 @@ export default function RegisterPage() {
               htmlFor="contactNumber"
               className="block text-label font-medium text-primary mb-1"
             >
-              Contact number
+              {t('pages.auth.register.contactNumber')}
             </label>
             <Input
               id="contactNumber"
@@ -225,7 +214,7 @@ export default function RegisterPage() {
               htmlFor="address"
               className="block text-label font-medium text-primary mb-1"
             >
-              Address
+              {t('pages.auth.register.address')}
             </label>
             <Input
               id="address"
@@ -241,7 +230,7 @@ export default function RegisterPage() {
               htmlFor="password"
               className="block text-label font-medium text-primary mb-1"
             >
-              Password *
+              {t('pages.auth.register.password')} *
             </label>
             <Input
               id="password"
@@ -259,7 +248,7 @@ export default function RegisterPage() {
               htmlFor="confirmPassword"
               className="block text-label font-medium text-primary mb-1"
             >
-              Confirm password *
+              {t('pages.auth.register.confirmPassword')} *
             </label>
             <Input
               id="confirmPassword"
@@ -282,18 +271,22 @@ export default function RegisterPage() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading
+                ? t('pages.auth.register.creatingAccount')
+                : t('pages.auth.register.createAccount')}
             </Button>
           </div>
         </form>
 
         <div className="text-center text-body">
-          <span className="text-inactive">Already have an account?</span>{' '}
+          <span className="text-inactive">
+            {t('pages.auth.register.alreadyHaveAccount')}
+          </span>{' '}
           <Link
             href="/auth/login"
             className="font-medium text-earth hover:text-primary"
           >
-            Sign in
+            {t('pages.auth.register.signIn')}
           </Link>
         </div>
       </div>
