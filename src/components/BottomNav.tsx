@@ -17,6 +17,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useDatabase } from '@/store';
+import { useDonationStore } from '@/store/donation';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import {
   Drawer,
@@ -34,7 +35,22 @@ export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser } = useDatabase();
+  const { clearDonation } = useDonationStore();
   const { t } = useCommonTranslation();
+
+  const handleFreshDonation = () => {
+    // Clear all donation state to ensure fresh donation
+    clearDonation();
+    // Navigate to manual donation page
+    router.push('/donate/manual');
+  };
+
+  const handleFreshRecurringDonation = () => {
+    // Clear all donation state to ensure fresh recurring donation
+    clearDonation();
+    // Navigate to recurring donation page
+    router.push('/donate/recurring-form');
+  };
 
   // Define navigation items based on user role
   const navItems = useMemo(() => {
@@ -156,7 +172,7 @@ export default function BottomNav() {
         return (
           <button
             key={item.label}
-            onClick={() => router.push('/donate/manual')}
+            onClick={handleFreshDonation}
             className={cn(
               'group inline-flex flex-col items-center justify-center text-center w-full',
               '-mt-8'
@@ -270,7 +286,7 @@ export default function BottomNav() {
                       variant="secondary"
                       size="lg"
                       className="w-full justify-start py-5 text-left"
-                      onClick={() => router.push('/donate/manual')}
+                      onClick={handleFreshDonation}
                     >
                       <ShoppingBag className="mr-3 h-5 w-5 text-primary" />
                       <div>
@@ -289,7 +305,7 @@ export default function BottomNav() {
                       variant="secondary"
                       size="lg"
                       className="w-full justify-start py-5 text-left"
-                      onClick={() => router.push('/donate/recurring-form')}
+                      onClick={handleFreshRecurringDonation}
                     >
                       <Calendar className="mr-3 h-5 w-5 text-primary" />
                       <div>
