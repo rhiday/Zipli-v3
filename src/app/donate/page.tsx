@@ -74,8 +74,14 @@ function DonorDashboardPage(): React.ReactElement {
       return () => clearTimeout(timer);
     }
 
-    // Clear any draft donations when user navigates to dashboard
-    clearDonation();
+    // Only clear draft donations if user is not in the middle of a donation flow
+    // Check if user has active donation items or is in edit mode
+    const { donationItems, isEditMode } = useDonationStore.getState();
+    const hasActiveDonation = donationItems.length > 0 || isEditMode;
+
+    if (!hasActiveDonation) {
+      clearDonation();
+    }
 
     const profile: ProfileRow = {
       id: currentUser.id,

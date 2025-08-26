@@ -54,6 +54,9 @@ export default function DonationSummaryPage() {
   } | null>(null);
   const [isLoadingRecurringData, setIsLoadingRecurringData] = useState(true);
 
+  // Add state to track if persist store has been rehydrated
+  const [isStoreRehydrated, setIsStoreRehydrated] = useState(false);
+
   const formatSlotDate = (date: Date | string | undefined) => {
     if (!date) return null;
     try {
@@ -65,8 +68,24 @@ export default function DonationSummaryPage() {
     }
   };
 
+  // Check if store is rehydrated on mount
+  useEffect(() => {
+    // Add a small delay to ensure persist middleware has rehydrated
+    const checkRehydration = () => {
+      setIsStoreRehydrated(true);
+    };
+
+    // Check immediately and also with a small delay for safety
+    checkRehydration();
+    const timeout = setTimeout(checkRehydration, 100);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   // Pre-fill address and instructions from user profile
   useEffect(() => {
+    if (!isStoreRehydrated || !isInitialized) return;
+
     if (isInitialized && currentUser) {
       // Pre-fill address from profile if available
       if (currentUser.address) {
@@ -124,7 +143,7 @@ export default function DonationSummaryPage() {
 
     // Set loading to false after processing session storage
     setIsLoadingRecurringData(false);
-  }, [isInitialized, currentUser, donationItems.length]);
+  }, [isStoreRehydrated, isInitialized, currentUser, donationItems.length]);
 
   const handleEditItem = (itemId: string) => {
     // Navigate back to manual page with edit mode for this item
@@ -313,8 +332,8 @@ export default function DonationSummaryPage() {
     }
   };
 
-  // Show loading while processing recurring donation data
-  if (isLoadingRecurringData) {
+  // Show loading while processing recurring donation data or waiting for store rehydration
+  if (isLoadingRecurringData || !isStoreRehydrated) {
     return (
       <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">Loading...</p>
@@ -324,9 +343,18 @@ export default function DonationSummaryPage() {
 
   // Show error if no donation data after loading
   if (donationItems.length === 0 && !recurringSchedule) {
+    console.warn(
+      'No donation items found on summary page - likely direct navigation or cleared state'
+    );
+
     return (
       <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto items-center justify-center gap-4">
-        <p className="text-gray-600">{t('noDonationItemsFound')}</p>
+        <p className="text-gray-600 text-center">
+          {t('noDonationItemsFound') || 'No donation items found'}
+        </p>
+        <p className="text-sm text-gray-500 text-center">
+          Let's start your donation from the beginning
+        </p>
         <Button onClick={() => router.push('/donate/new')}>
           Start New Donation
         </Button>
