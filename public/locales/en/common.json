@@ -614,5 +614,6 @@
   "afternoon": "Afternoon",
   "evening": "Evening",
   "saving": "Saving...",
-  "submitting": "Submitting..."
+  "submitting": "Submitting...",
+  "addPickupSlotButton": "Add pickup slot"
 }
