@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface PhotoUploadProps {
   isMobile?: boolean;
@@ -14,6 +15,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
   onImageUpload,
   uploadedImage,
 }) => {
+  const { t } = useTranslations();
   const [hovered, setHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -219,9 +221,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
                       </svg>
                     </div>
                     <div className="font-manrope text-[#021d13] text-[14px] text-center opacity-70 w-[146px]">
-                      {isMobile
-                        ? 'Tap to take photo or choose file'
-                        : 'Drag & drop or click to choose files'}
+                      {isMobile ? t('tapToTakePhoto') : t('dragAndDrop')}
                     </div>
                     {hint && (
                       <div className="mt-2 flex items-center gap-2 text-[#021d13] text-xs font-manrope opacity-60">
@@ -262,8 +262,8 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
           </div>
         </div>
         <div className="w-full flex flex-row items-center justify-between text-[#021d13] text-[14px] font-manrope opacity-70">
-          <div>Supported formats: JPG, PNG, WebP</div>
-          <div>Max: 5MB</div>
+          <div>{t('supportedFormats')}</div>
+          <div>{t('maxFileSize')}</div>
         </div>
       </div>
     </div>
