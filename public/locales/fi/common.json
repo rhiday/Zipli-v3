@@ -562,5 +562,14 @@
   "whenDoYouNeed": "Milloin tarvitset",
   "yesRemove": "Kyllä, poista",
   "yourActiveDonations": "Aktiiviset ilmoituksesi",
-  "yourImpact": "Teoillasi on aitoa merkitystä! \\nTässä viimeisimmän toimintasi vaikuttavuus:"
+  "yourImpact": "Teoillasi on aitoa merkitystä! \\nTässä viimeisimmän toimintasi vaikuttavuus:",
+  "pages.contact.title": "Ota yhteyttä",
+  "pages.contact.subtitle": "Ota yhteyttä tiimiin",
+  "pages.contact.getInTouch": "Ota yhteyttä",
+  "pages.contact.coFounderCEO": "Perustaja, toimitusjohtaja",
+  "pages.contact.email": "Sähköposti",
+  "pages.contact.aboutUs": "Tietoa meistä",
+  "pages.contact.aboutDescription1": "Zipli on vallankumouksellinen ruokahävikin vähentämisalusta, joka yhdistää ruoan lahjoittajat niihin, jotka tarvitsevat sitä. Missiomme on luoda kestävä ruokaekosysteemi, jossa ylijäämäruoka löytää tiensä ihmisille, jotka voivat hyötyä siitä.",
+  "pages.contact.aboutDescription2": "Perustimme yrityksen visiolla eliminoida ruokahävikki ja samalla vastata nälkään. Käytämme teknologiaa tehdäksemme ruoan jakamisesta yksinkertaista, tehokasta ja vaikuttavaa. Jokainen alustamme kautta pelastettu ateria edustaa askelta kohti kestävämpää tulevaisuutta.",
+  "pages.contact.aboutDescription3": "Liity mukaan missioomme muuttaa ruokahävikki merkitykselliseksi vaikutukseksi. Yhdessä voimme rakentaa yhteisöjä, joissa mikään ruoka ei mene hukkaan ja kaikilla on pääsy ravitseviin aterioihin."
 }

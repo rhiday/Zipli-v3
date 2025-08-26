@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/Avatar';
-import { Languages, MessageSquare } from 'lucide-react';
+import { Languages, Phone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { Database } from '@/lib/supabase/types';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -36,8 +36,9 @@ export default function MobileDashboardHeader({
               variant="ghost"
               size="sm"
               className="h-10 w-10 p-0 rounded-full border border-white/50 bg-white/10 hover:bg-white/20 text-white"
+              onClick={() => router.push('/contact')}
             >
-              <MessageSquare className="h-5 w-5" />
+              <Phone className="h-5 w-5" />
             </Button>
             <button
               onClick={() => router.push('/profile')}

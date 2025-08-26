@@ -565,5 +565,14 @@
   "whenDoYouNeed": "When do you need",
   "yesRemove": "Yes, remove",
   "yourActiveDonations": "Your active listings",
-  "yourImpact": "Your actions are making a difference! \\nThis is the impact of your latest activity:"
+  "yourImpact": "Your actions are making a difference! \\nThis is the impact of your latest activity:",
+  "pages.contact.title": "Contact Us",
+  "pages.contact.subtitle": "Get in touch with our team",
+  "pages.contact.getInTouch": "Get in Touch",
+  "pages.contact.coFounderCEO": "Co-founder, CEO",
+  "pages.contact.email": "Email",
+  "pages.contact.aboutUs": "About Us",
+  "pages.contact.aboutDescription1": "Zipli is a revolutionary food waste reduction platform that connects food donors with those in need. Our mission is to create a sustainable food ecosystem where surplus food finds its way to people who can benefit from it.",
+  "pages.contact.aboutDescription2": "Founded with the vision of eliminating food waste while addressing hunger, we leverage technology to make food sharing simple, efficient, and impactful. Every meal saved through our platform represents a step towards a more sustainable future.",
+  "pages.contact.aboutDescription3": "Join us in our mission to turn food waste into meaningful impact. Together, we can build communities where no food goes to waste and everyone has access to nutritious meals."
 }

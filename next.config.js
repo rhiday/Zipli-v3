@@ -11,7 +11,6 @@ const nextConfig = {
   // Optimize for production
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
-    optimizeCss: true,
     turbo: {
       rules: {
         '*.svg': {
