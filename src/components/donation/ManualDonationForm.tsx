@@ -616,41 +616,33 @@ export function ManualDonationForm() {
         footer={
           hasItems && !showAddAnotherForm ? (
             <BottomActionBar>
-              <div className="flex justify-between items-center w-full">
-                {/* Always show Confirm pickup button on the left */}
-                <Button
-                  onClick={handleShowPickupConfirmDialog}
-                  disabled={isSaving}
-                  variant="secondary"
-                  className="bg-lime text-primary hover:bg-lime/90"
-                >
-                  {isSaving ? t('savingEllipsis') : t('confirmPickup')}
-                </Button>
+              {isManagementMode ? (
+                // Management mode: Show both Confirm Pickup (left) and navigation button (right)
+                <div className="flex justify-between items-center w-full">
+                  <Button
+                    onClick={handleShowPickupConfirmDialog}
+                    disabled={isSaving}
+                    variant="secondary"
+                    className="bg-lime text-primary hover:bg-lime/90"
+                  >
+                    {isSaving ? t('savingEllipsis') : t('confirmPickup')}
+                  </Button>
 
-                {/* Right side buttons */}
-                <div className="flex justify-end">
-                  {isManagementMode &&
-                  donationDetails?.status === 'picked_up' ? (
-                    <Button
-                      onClick={() => router.push('/donate')}
-                      variant="secondary"
-                    >
-                      {t('backToDashboard')}
-                    </Button>
-                  ) : !isManagementMode ? (
-                    <Button onClick={() => router.push('/donate/pickup-slot')}>
-                      {t('continue')}
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => router.push('/donate')}
-                      variant="secondary"
-                    >
-                      {t('backToDashboard')}
-                    </Button>
-                  )}
+                  <Button
+                    onClick={() => router.push('/donate')}
+                    variant="secondary"
+                  >
+                    {t('backToDashboard')}
+                  </Button>
                 </div>
-              </div>
+              ) : (
+                // Creation mode: Only show Continue button (right aligned)
+                <div className="flex justify-end">
+                  <Button onClick={() => router.push('/donate/pickup-slot')}>
+                    {t('continue')}
+                  </Button>
+                </div>
+              )}
             </BottomActionBar>
           ) : (
             <BottomActionBar>
