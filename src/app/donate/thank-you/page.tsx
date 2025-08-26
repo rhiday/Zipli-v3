@@ -45,9 +45,8 @@ export default function DonationThankYouPage() {
       </h1>
       <p className="text-center text-base text-black mb-6 max-w-xs">
         {isEditMode
-          ? 'Your donation has been successfully updated.'
-          : t('pages.donations.thankYou.subtitle') ||
-            'Your donation has been added to our system.'}
+          ? t('pages.donations.thankYou.donationUpdatedMessage')
+          : t('pages.donations.thankYou.subtitle')}
       </p>
 
       <div className="w-full max-w-md mb-8">

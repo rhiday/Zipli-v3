@@ -594,17 +594,6 @@ export default function DonationSummaryPage() {
           </div>
         </div>
       </div>
-
-      {/* Bottom action bar with Continue button */}
-      <BottomActionBar>
-        <Button
-          onClick={handleConfirmDonation}
-          disabled={isSaving}
-          className="w-full bg-lime text-primary hover:bg-positive-hover"
-        >
-          {isSaving ? t('continuing') : t('continue')}
-        </Button>
-      </BottomActionBar>
     </PageContainer>
   );
 }

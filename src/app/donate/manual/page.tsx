@@ -556,8 +556,8 @@ function ManualDonationPageInner() {
             onRestore={(data) => {
               setCurrentItem((prev) => ({ ...prev, ...data }));
               toast({
-                title: 'Form data restored',
-                description: 'Your previous work has been recovered',
+                title: t('formDataRestored'),
+                description: t('yourPreviousWorkRecovered'),
                 variant: 'success',
               });
             }}

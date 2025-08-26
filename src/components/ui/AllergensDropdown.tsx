@@ -72,7 +72,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
 
   const handleToggle = (option: string) => {
     // Handle "Not specified" as mutually exclusive
-    if (option === 'Not specified') {
+    if (option === t('notSpecified')) {
       if (value.includes(option)) {
         // If "Not specified" is currently selected, remove it
         onChange(value.filter((v) => v !== option));
@@ -82,7 +82,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
       }
     } else {
       // For other options, remove "Not specified" if it exists, then toggle normally
-      let newValue = value.filter((v) => v !== 'Not specified');
+      let newValue = value.filter((v) => v !== t('notSpecified'));
 
       if (newValue.includes(option)) {
         onChange(newValue.filter((v) => v !== option));

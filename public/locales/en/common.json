@@ -637,5 +637,9 @@
   "pages.donations.thankYou.getNotified": "Get notified",
   "pages.donations.thankYou.receiveNotificationWhenMatch": "You will receive a notification when we find a match",
   "pages.donations.thankYou.requestSubmitted": "Donation Submitted",
-  "pages.donations.thankYou.goBackToDashboard": "Go back to dashboard"
+  "pages.donations.thankYou.goBackToDashboard": "Go back to dashboard",
+  "pages.donations.thankYou.donationUpdatedMessage": "Your donation has been successfully updated.",
+  "peopleYouHelped": "People you've helped",
+  "formDataRestored": "Form data restored",
+  "yourPreviousWorkRecovered": "Your previous work has been recovered"
 }

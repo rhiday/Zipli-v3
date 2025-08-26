@@ -263,7 +263,7 @@ function DonorDashboardPage(): React.ReactElement {
         {/* This is whom you've helped section - Hidden for now */}
         {/* <section>
           <h2 className="text-lg font-semibold text-primary mb-3">
-title="Default"
+            {t('peopleYouHelped')}
           </h2>
 
           <div className="space-y-4">

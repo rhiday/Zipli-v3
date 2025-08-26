@@ -634,5 +634,9 @@
   "pages.donations.thankYou.getNotified": "Saat ilmoituksen",
   "pages.donations.thankYou.receiveNotificationWhenMatch": "Saat ilmoituksen, kun löydämme vastaavuuden",
   "pages.donations.thankYou.requestSubmitted": "Lahjoitus lähetetty",
-  "pages.donations.thankYou.goBackToDashboard": "Palaa kojetauluun"
+  "pages.donations.thankYou.goBackToDashboard": "Palaa kojetauluun",
+  "pages.donations.thankYou.donationUpdatedMessage": "Lahjoituksesi on päivitetty onnistuneesti.",
+  "peopleYouHelped": "Ihmiset, joita olet auttanut",
+  "formDataRestored": "Lomakkeen tiedot palautettu",
+  "yourPreviousWorkRecovered": "Aiempi työsi on palautettu"
 }

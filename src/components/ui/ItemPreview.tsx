@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { EditIcon } from './icons/EditIcon';
 import { DeleteIcon } from './icons/DeleteIcon';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface ItemPreviewProps {
   name: string;
@@ -15,6 +15,7 @@ interface ItemPreviewProps {
 
 export const ItemPreview: React.FC<ItemPreviewProps> = React.memo(
   ({ name, quantity, description, imageUrl, allergens, onEdit, onDelete }) => {
+    const { t } = useTranslations();
     const [imageError, setImageError] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -66,7 +67,7 @@ export const ItemPreview: React.FC<ItemPreviewProps> = React.memo(
           </p>
           {allergens && allergens.length > 0 && (
             <p className="text-sm text-gray-500 truncate">
-              Allergens: {allergens.join(', ')}
+              {t('allergens')}: {allergens.join(', ')}
             </p>
           )}
         </div>
@@ -75,7 +76,7 @@ export const ItemPreview: React.FC<ItemPreviewProps> = React.memo(
             <button
               onClick={onEdit}
               className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#021d13] text-[#021d13] hover:bg-black/5"
-              title="Edit"
+              title={t('edit')}
             >
               <svg
                 width="20"
@@ -97,7 +98,7 @@ export const ItemPreview: React.FC<ItemPreviewProps> = React.memo(
             <button
               onClick={onDelete}
               className="flex items-center justify-center rounded-full w-[42px] h-[32px] transition-colors bg-white border border-[#CB0003] text-[#CB0003] hover:bg-black/5"
-              title="Delete"
+              title={t('delete')}
             >
               <svg
                 width="14"
