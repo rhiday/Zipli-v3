@@ -120,8 +120,9 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
         {value.length > 0 && (
           <>
             <div
-              className="absolute left-3 right-12 top-1/2 -translate-y-1/2 flex gap-2 overflow-x-auto overflow-y-hidden pointer-events-auto scrollbar-hide"
+              className="absolute left-3 right-12 top-1/2 flex gap-2 overflow-x-auto overflow-y-hidden pointer-events-auto scrollbar-hide"
               style={{
+                transform: 'translateY(-50%)',
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
                 WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
@@ -139,7 +140,10 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
               ))}
             </div>
             {hasOverflow && (
-              <div className="absolute right-12 top-1/2 -translate-y-1/2 w-6 h-8 bg-gradient-to-l from-base to-transparent pointer-events-none" />
+              <div
+                className="absolute right-12 top-1/2 w-6 h-8 bg-gradient-to-l from-base to-transparent pointer-events-none"
+                style={{ transform: 'translateY(-50%)' }}
+              />
             )}
           </>
         )}

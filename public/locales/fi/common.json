@@ -571,5 +571,21 @@
   "pages.contact.aboutUs": "Tietoa meistä",
   "pages.contact.aboutDescription1": "Zipli on vallankumouksellinen ruokahävikin vähentämisalusta, joka yhdistää ruoan lahjoittajat niihin, jotka tarvitsevat sitä. Missiomme on luoda kestävä ruokaekosysteemi, jossa ylijäämäruoka löytää tiensä ihmisille, jotka voivat hyötyä siitä.",
   "pages.contact.aboutDescription2": "Perustimme yrityksen visiolla eliminoida ruokahävikki ja samalla vastata nälkään. Käytämme teknologiaa tehdäksemme ruoan jakamisesta yksinkertaista, tehokasta ja vaikuttavaa. Jokainen alustamme kautta pelastettu ateria edustaa askelta kohti kestävämpää tulevaisuutta.",
-  "pages.contact.aboutDescription3": "Liity mukaan missioomme muuttaa ruokahävikki merkitykselliseksi vaikutukseksi. Yhdessä voimme rakentaa yhteisöjä, joissa mikään ruoka ei mene hukkaan ja kaikilla on pääsy ravitseviin aterioihin."
+  "pages.contact.aboutDescription3": "Liity mukaan missioomme muuttaa ruokahävikki merkitykselliseksi vaikutukseksi. Yhdessä voimme rakentaa yhteisöjä, joissa mikään ruoka ei mene hukkaan ja kaikilla on pääsy ravitseviin aterioihin.",
+  "allergens.glutenFree": "Gluteeniton",
+  "allergens.lactoseFree": "Laktoositon",
+  "allergens.lowLactose": "Vähälaktoosinen",
+  "allergens.eggFree": "Munaton",
+  "allergens.soyFree": "Soijaton",
+  "allergens.doesNotContainPeanuts": "Ei sisällä maapähkinöitä",
+  "allergens.doesNotContainOtherNuts": "Ei sisällä muita pähkinöitä",
+  "allergens.doesNotContainFish": "Ei sisällä kalaa",
+  "allergens.doesNotContainCrustaceans": "Ei sisällä äyriäisiä",
+  "allergens.doesNotContainCelery": "Ei sisällä selleriä",
+  "allergens.doesNotContainMustard": "Ei sisällä sinappia",
+  "allergens.doesNotContainSesameSeeds": "Ei sisällä seesaminsiemeniä",
+  "allergens.doesNotContainSulphurDioxide": "Ei sisällä rikkidioksidia / sulfiitteja >10 mg/kg tai litra",
+  "allergens.doesNotContainLupin": "Ei sisällä lupiinia",
+  "allergens.doesNotContainMolluscs": "Ei sisällä nilviäisiä",
+  "notSpecified": "Ei määritelty"
 }

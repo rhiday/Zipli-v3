@@ -574,5 +574,21 @@
   "pages.contact.aboutUs": "About Us",
   "pages.contact.aboutDescription1": "Zipli is a revolutionary food waste reduction platform that connects food donors with those in need. Our mission is to create a sustainable food ecosystem where surplus food finds its way to people who can benefit from it.",
   "pages.contact.aboutDescription2": "Founded with the vision of eliminating food waste while addressing hunger, we leverage technology to make food sharing simple, efficient, and impactful. Every meal saved through our platform represents a step towards a more sustainable future.",
-  "pages.contact.aboutDescription3": "Join us in our mission to turn food waste into meaningful impact. Together, we can build communities where no food goes to waste and everyone has access to nutritious meals."
+  "pages.contact.aboutDescription3": "Join us in our mission to turn food waste into meaningful impact. Together, we can build communities where no food goes to waste and everyone has access to nutritious meals.",
+  "allergens.glutenFree": "Gluten-free",
+  "allergens.lactoseFree": "Lactose-free",
+  "allergens.lowLactose": "Low-lactose",
+  "allergens.eggFree": "Egg-free",
+  "allergens.soyFree": "Soy-free",
+  "allergens.doesNotContainPeanuts": "Does not contain peanuts",
+  "allergens.doesNotContainOtherNuts": "Does not contain other nuts",
+  "allergens.doesNotContainFish": "Does not contain fish",
+  "allergens.doesNotContainCrustaceans": "Does not contain crustaceans",
+  "allergens.doesNotContainCelery": "Does not contain celery",
+  "allergens.doesNotContainMustard": "Does not contain mustard",
+  "allergens.doesNotContainSesameSeeds": "Does not contain sesame seeds",
+  "allergens.doesNotContainSulphurDioxide": "Does not contain sulphur dioxide / sulphites >10 mg/kg or litre",
+  "allergens.doesNotContainLupin": "Does not contain lupin",
+  "allergens.doesNotContainMolluscs": "Does not contain molluscs",
+  "notSpecified": "Not specified"
 }

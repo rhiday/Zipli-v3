@@ -86,39 +86,44 @@ export const LEGACY_ALLERGENS = [
  * Extracts the key allergen term from full text to create compact chips
  * Examples:
  * "Does not contain molluscs" -> "Molluscs"
- * "Does not contain sulphur dioxide / sulphites >10 mg/kg or litre" -> "Sulphur dioxide"
+ * "Does not contain sulphur dioxide / sulphites >10 mg/kg or litre" -> "Sulphites"
+ * "Lactose-free" -> "Lactose-free"
+ * "Low-lactose" -> "Low-lactose"
  */
 export function getAllergenKeyword(allergenText: string): string {
+  // Clean any JSON-like formatting that might be accidentally included
+  let cleanText = allergenText.replace(/^\["|"$|\]$/g, '').trim();
+
   // Handle common patterns
   const patterns = [
     // "Does not contain X" pattern
     {
       regex: /does not contain (.+?)(?:$|\s*\/|\s*>)/i,
-      transform: (match: string) => match,
+      transform: (match: string) => {
+        // Handle special cases
+        if (match === 'other nuts') return 'Nuts';
+        if (match === 'sesame seeds') return 'Sesame';
+        if (match === 'sulphur dioxide') return 'Sulphites';
+        return match.charAt(0).toUpperCase() + match.slice(1);
+      },
     },
-    // "X-free" pattern
-    { regex: /^(.+?)-free$/i, transform: (match: string) => match },
-    // "Low-X" pattern
-    { regex: /^low-(.+)$/i, transform: (match: string) => `Low ${match}` },
+    // "X-free" pattern - keep as is
+    {
+      regex: /^(.+?)-free$/i,
+      transform: (match: string) =>
+        `${match.charAt(0).toUpperCase() + match.slice(1)}-free`,
+    },
+    // "Low-X" pattern - keep as is
+    { regex: /^low-(.+)$/i, transform: (match: string) => `Low-${match}` },
   ];
 
   for (const pattern of patterns) {
-    const match = allergenText.match(pattern.regex);
+    const match = cleanText.match(pattern.regex);
     if (match && match[1]) {
-      let keyword = match[1].trim();
-
-      // Handle special cases
-      if (keyword === 'other nuts') keyword = 'nuts';
-      if (keyword === 'sesame seeds') keyword = 'sesame';
-      if (keyword === 'sulphur dioxide') keyword = 'sulphites';
-
-      // Capitalize first letter
-      return pattern.transform(
-        keyword.charAt(0).toUpperCase() + keyword.slice(1)
-      );
+      return pattern.transform(match[1].trim());
     }
   }
 
   // Fallback for patterns that don't match (like "Gluten-free", "Vegan", etc.)
-  return allergenText;
+  return cleanText.charAt(0).toUpperCase() + cleanText.slice(1);
 }
