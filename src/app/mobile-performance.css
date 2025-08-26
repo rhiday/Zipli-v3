@@ -24,14 +24,19 @@
   .transition-all,
   .transition-colors,
   .transition-transform,
+  .transition,
   .animate-spin,
   .animate-pulse,
   .animate-bounce,
   .group-hover\:-translate-y-1,
-  .hover\:-translate-y-1 {
+  .hover\:-translate-y-1,
+  .hover\:shadow-lg,
+  .hover\:bg-black\/5 {
     transform: none !important;
     transition: none !important;
     animation: none !important;
+    box-shadow: inherit !important;
+    background-color: inherit !important;
   }
 }
 
@@ -44,9 +49,9 @@
     transform: none !important;
   }
 
-  /* Use tap highlights instead */
+  /* Use tap highlights instead - completely removed transforms */
   .group:active .group-hover\:-translate-y-1 {
-    transform: translateY(-2px);
+    background-color: rgba(0, 0, 0, 0.05);
   }
 }
 
@@ -105,6 +110,42 @@ img {
 }
 
 /* All animations disabled on mobile for stability */
+
+/* Additional mobile-specific overrides for UI stability */
+@media (max-width: 768px) {
+  /* Force disable all hover states that could cause glitches */
+  *:hover {
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Disable all box-shadow transitions */
+  .shadow-sm:hover,
+  .shadow:hover,
+  .shadow-md:hover,
+  .shadow-lg:hover {
+    box-shadow: inherit !important;
+  }
+
+  /* Override any remaining transition classes */
+  [class*='transition'] {
+    transition: none !important;
+  }
+
+  /* Override any remaining animation classes */
+  [class*='animate'] {
+    animation: none !important;
+  }
+
+  /* Override any remaining transform classes */
+  [class*='transform'],
+  [class*='translate'],
+  [class*='rotate'],
+  [class*='scale'] {
+    transform: none !important;
+  }
+}
 
 /* Optimize font loading */
 .font-sans,

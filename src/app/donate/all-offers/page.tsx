@@ -333,7 +333,7 @@ export default function AllItemsPage(): React.ReactElement {
                 <Link
                   key={item.id}
                   href={detailLink}
-                  className="block transform rounded-xl border border-border bg-base p-4 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
+                  className="block rounded-xl border border-border bg-base p-4 shadow-sm"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="text-md font-semibold text-primary line-clamp-2 flex items-center">
