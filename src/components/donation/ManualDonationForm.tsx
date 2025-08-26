@@ -76,6 +76,7 @@ export function ManualDonationForm() {
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
+  const [forceNewForm, setForceNewForm] = useState(false);
 
   // State for pickup info display
   const [donationDetails, setDonationDetails] = useState<{
@@ -188,6 +189,16 @@ export function ManualDonationForm() {
     storeEditMode,
     editingDonationId,
   ]);
+
+  // Reset forceNewForm flag after the form is initialized
+  useEffect(() => {
+    if (forceNewForm && showAddAnotherForm) {
+      const timer = setTimeout(() => {
+        setForceNewForm(false);
+      }, 100); // Small delay to ensure the form wrapper is initialized
+      return () => clearTimeout(timer);
+    }
+  }, [forceNewForm, showAddAnotherForm]);
 
   // Smart allergen suggestions based on food name
   const suggestAllergensForFood = (foodName: string): string[] => {
@@ -395,6 +406,13 @@ export function ManualDonationForm() {
       imageUrl: undefined,
     });
     setHasAttemptedSave(false);
+
+    // Clear any auto-saved data for fresh start
+    clear();
+
+    // Force a completely new form (no restore prompts)
+    setForceNewForm(true);
+
     setShowAddAnotherForm(true);
   };
 
@@ -685,6 +703,7 @@ export function ManualDonationForm() {
             formData={currentItem}
             enabled={showAddAnotherForm}
             intervalMs={2000}
+            preventRestore={forceNewForm}
             onRestore={(data) => {
               setCurrentItem((prev) => ({ ...prev, ...data }));
               toast({
@@ -702,6 +721,7 @@ export function ManualDonationForm() {
                 description: null,
                 imageUrl: undefined,
               });
+              setForceNewForm(false); // Reset after clearing
             }}
           >
             <div className="flex flex-col gap-4">{formContent}</div>
