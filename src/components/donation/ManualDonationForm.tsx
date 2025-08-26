@@ -786,7 +786,7 @@ export function ManualDonationForm() {
         open={showPickupConfirmDialog}
         onOpenChange={setShowPickupConfirmDialog}
       >
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-full max-w-full sm:rounded-none">
           <DialogHeader className="text-left">
             <DialogTitle className="text-lg font-semibold text-gray-900">
               Confirm pickup
@@ -827,7 +827,7 @@ export function ManualDonationForm() {
         open={showRemoveListingDialog}
         onOpenChange={setShowRemoveListingDialog}
       >
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-full max-w-full sm:rounded-none">
           <DialogHeader className="text-left">
             <DialogTitle className="text-lg font-semibold text-gray-900">
               {t('removeListing')}
@@ -859,7 +859,7 @@ export function ManualDonationForm() {
       </Dialog>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent>
+        <DialogContent className="w-full max-w-full sm:rounded-none">
           <DialogHeader>
             <DialogTitle>{t('changesSaved')}</DialogTitle>
           </DialogHeader>
