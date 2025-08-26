@@ -79,6 +79,7 @@ export function ManualDonationForm() {
   const [forceNewForm, setForceNewForm] = useState(false);
   const [showPickupConfirmDialog, setShowPickupConfirmDialog] = useState(false);
   const [pickupConfirmChecked, setPickupConfirmChecked] = useState(false);
+  const [showRemoveListingDialog, setShowRemoveListingDialog] = useState(false);
 
   // State for pickup info display
   const [donationDetails, setDonationDetails] = useState<{
@@ -467,6 +468,39 @@ export function ManualDonationForm() {
     setPickupConfirmChecked(false); // Reset checkbox
   };
 
+  // Handle remove listing
+  const handleRemoveListing = async () => {
+    if (!editingDonationId) return;
+
+    try {
+      setIsSaving(true);
+      setShowRemoveListingDialog(false);
+
+      // Update donation status to cancelled/removed
+      await updateDonation(editingDonationId, {
+        status: 'cancelled',
+      });
+
+      toast({
+        title: t('listingRemoved'),
+        description: t('listingRemovedSuccess'),
+        variant: 'success',
+      });
+
+      // Navigate back to dashboard
+      router.push('/donate');
+    } catch (error) {
+      console.error('Failed to remove listing:', error);
+      toast({
+        title: t('error'),
+        description: t('failedToRemoveListing'),
+        variant: 'error',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // Handle actual pickup confirmation
   const handleConfirmPickup = async () => {
     if (!editingDonationId) return;
@@ -617,22 +651,22 @@ export function ManualDonationForm() {
           hasItems && !showAddAnotherForm ? (
             <BottomActionBar>
               {isManagementMode ? (
-                // Management mode: Show both Confirm Pickup (left) and navigation button (right)
+                // Management mode: Remove listing (left) and Confirm Pickup (right)
                 <div className="flex justify-between items-center w-full">
                   <Button
-                    onClick={handleShowPickupConfirmDialog}
+                    onClick={() => setShowRemoveListingDialog(true)}
                     disabled={isSaving}
-                    variant="secondary"
-                    className="bg-lime text-primary hover:bg-lime/90"
+                    variant="destructive"
                   >
-                    {isSaving ? t('savingEllipsis') : t('confirmPickup')}
+                    {t('removeListing')}
                   </Button>
 
                   <Button
-                    onClick={() => router.push('/donate')}
-                    variant="secondary"
+                    onClick={handleShowPickupConfirmDialog}
+                    disabled={isSaving}
+                    variant="primary"
                   >
-                    {t('backToDashboard')}
+                    {isSaving ? t('savingEllipsis') : t('confirmPickup')}
                   </Button>
                 </div>
               ) : (
@@ -759,8 +793,6 @@ export function ManualDonationForm() {
             </DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-4">
-            <p className="text-sm text-gray-700 leading-relaxed">Seulin sähä</p>
-
             <div className="flex items-start space-x-3">
               <input
                 type="checkbox"
@@ -773,8 +805,7 @@ export function ManualDonationForm() {
                 htmlFor="pickup-confirm"
                 className="text-sm text-gray-700 leading-relaxed cursor-pointer"
               >
-                I confirm that this has item(s) have been kept over 60°C and
-                control under it's before pick up.
+                {t('temperatureConfirmationText')}
               </label>
             </div>
           </div>
@@ -782,9 +813,46 @@ export function ManualDonationForm() {
             <Button
               onClick={handleConfirmPickup}
               disabled={!pickupConfirmChecked || isSaving}
-              className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 disabled:bg-gray-200 disabled:text-gray-400"
+              variant={pickupConfirmChecked ? 'primary' : 'secondary'}
+              className="w-full"
             >
-              {isSaving ? 'Confirming...' : 'Confirm'}
+              {isSaving ? t('confirmingEllipsis') : t('confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Listing Confirmation Dialog */}
+      <Dialog
+        open={showRemoveListingDialog}
+        onOpenChange={setShowRemoveListingDialog}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-lg font-semibold text-gray-900">
+              {t('removeListing')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-700 leading-relaxed">
+              {t('removeListingConfirmation')}
+            </p>
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => setShowRemoveListingDialog(false)}
+              className="flex-1"
+            >
+              {t('cancel')}
+            </Button>
+            <Button
+              onClick={handleRemoveListing}
+              disabled={isSaving}
+              variant="destructive"
+              className="flex-1"
+            >
+              {isSaving ? t('removingEllipsis') : t('remove')}
             </Button>
           </DialogFooter>
         </DialogContent>
