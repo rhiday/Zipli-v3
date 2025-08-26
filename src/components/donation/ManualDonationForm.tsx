@@ -5,6 +5,7 @@
 export const dynamic = 'force-dynamic';
 import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -77,6 +78,8 @@ export function ManualDonationForm() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [hasAttemptedSave, setHasAttemptedSave] = useState(false);
   const [forceNewForm, setForceNewForm] = useState(false);
+  const [showPickupConfirmDialog, setShowPickupConfirmDialog] = useState(false);
+  const [pickupConfirmChecked, setPickupConfirmChecked] = useState(false);
 
   // State for pickup info display
   const [donationDetails, setDonationDetails] = useState<{
@@ -459,12 +462,20 @@ export function ManualDonationForm() {
     currentItem.quantity.trim() !== '' &&
     currentItem.allergens.length > 0;
 
-  // Handle pickup confirmation
+  // Handle pickup confirmation dialog
+  const handleShowPickupConfirmDialog = () => {
+    setShowPickupConfirmDialog(true);
+    setPickupConfirmChecked(false); // Reset checkbox
+  };
+
+  // Handle actual pickup confirmation
   const handleConfirmPickup = async () => {
     if (!editingDonationId) return;
 
     try {
       setIsSaving(true);
+      setShowPickupConfirmDialog(false); // Close dialog
+
       // Update donation status to picked_up
       await updateDonation(editingDonationId, {
         status: 'picked_up',
@@ -606,24 +617,40 @@ export function ManualDonationForm() {
         footer={
           hasItems && !showAddAnotherForm ? (
             <BottomActionBar>
-              <div className="flex justify-end">
-                {isManagementMode && donationDetails?.status === 'claimed' ? (
-                  <Button onClick={handleConfirmPickup} disabled={isSaving}>
-                    {isSaving ? t('savingEllipsis') : t('confirmPickup')}
-                  </Button>
-                ) : isManagementMode &&
+              <div className="flex justify-between items-center w-full">
+                {/* Always show Confirm pickup button on the left */}
+                <Button
+                  onClick={handleShowPickupConfirmDialog}
+                  disabled={isSaving}
+                  variant="secondary"
+                  className="bg-lime text-primary hover:bg-lime/90"
+                >
+                  {isSaving ? t('savingEllipsis') : t('confirmPickup')}
+                </Button>
+
+                {/* Right side buttons */}
+                <div className="flex justify-end">
+                  {isManagementMode &&
                   donationDetails?.status === 'picked_up' ? (
-                  <Button
-                    onClick={() => router.push('/donate')}
-                    variant="secondary"
-                  >
-                    {t('backToDashboard')}
-                  </Button>
-                ) : (
-                  <Button onClick={() => router.push('/donate/pickup-slot')}>
-                    {t('continue')}
-                  </Button>
-                )}
+                    <Button
+                      onClick={() => router.push('/donate')}
+                      variant="secondary"
+                    >
+                      {t('backToDashboard')}
+                    </Button>
+                  ) : !isManagementMode ? (
+                    <Button onClick={() => router.push('/donate/pickup-slot')}>
+                      {t('continue')}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => router.push('/donate')}
+                      variant="secondary"
+                    >
+                      {t('backToDashboard')}
+                    </Button>
+                  )}
+                </div>
               </div>
             </BottomActionBar>
           ) : (
@@ -728,6 +755,48 @@ export function ManualDonationForm() {
           </AutoSaveFormWrapper>
         )}
       </PageContainer>
+
+      {/* Pickup Confirmation Dialog */}
+      <Dialog
+        open={showPickupConfirmDialog}
+        onOpenChange={setShowPickupConfirmDialog}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-lg font-semibold text-gray-900">
+              Confirm pickup
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <p className="text-sm text-gray-700 leading-relaxed">Seulin sähä</p>
+
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="pickup-confirm"
+                checked={pickupConfirmChecked}
+                onCheckedChange={setPickupConfirmChecked}
+                className="mt-0.5"
+              />
+              <label
+                htmlFor="pickup-confirm"
+                className="text-sm text-gray-700 leading-relaxed cursor-pointer"
+              >
+                I confirm that this has item(s) have been kept over 60°C and
+                control under it's before pick up.
+              </label>
+            </div>
+          </div>
+          <DialogFooter className="pt-4">
+            <Button
+              onClick={handleConfirmPickup}
+              disabled={!pickupConfirmChecked || isSaving}
+              className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 disabled:bg-gray-200 disabled:text-gray-400"
+            >
+              {isSaving ? 'Confirming...' : 'Confirm'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent>
