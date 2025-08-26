@@ -1,18 +1,23 @@
 // Enhanced translation hook with robust fallback system
-// Replaces the complex i18n system with static imports and error handling
+// Uses JSON translation files from public/locales
 
 import { useLanguage } from './useLanguage';
-import {
-  getTranslations,
-  type TranslationKey,
-  translations,
-} from '@/lib/translations/index';
+import enTranslations from '../../public/locales/en/common.json';
+import fiTranslations from '../../public/locales/fi/common.json';
 
 const MISSING_TRANSLATION_CACHE = new Set<string>();
 
+// Create translations object from JSON files
+const translations = {
+  en: enTranslations,
+  fi: fiTranslations,
+} as const;
+
 export const useTranslations = () => {
   const { language } = useLanguage();
-  const t = getTranslations(language);
+  const t = (key: string) => {
+    return getTranslationWithFallback(key, language, translations);
+  };
 
   return { t, language };
 };
