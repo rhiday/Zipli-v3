@@ -11,7 +11,7 @@ import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { Calendar, Clock, Trash2 } from 'lucide-react';
 import { useRequestStore } from '@/store/request';
-import { Input } from '@/components/ui/Input';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { format } from 'date-fns';
 
 interface RecurringSchedule {
@@ -53,6 +53,7 @@ const TIME_OPTIONS = [
 export default function RequestSchedulePage() {
   const router = useRouter();
   const { t } = useCommonTranslation();
+  const { setRequestData: updateRequestStore } = useRequestStore();
   const [requestData, setRequestData] = useState<any>(null);
 
   const [schedules, setSchedules] = useState<RecurringSchedule[]>([]);
@@ -63,8 +64,8 @@ export default function RequestSchedulePage() {
   const [editingTime, setEditingTime] = useState<'start' | 'end' | null>(null);
 
   // Date fields
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     const storedRequest = sessionStorage.getItem('pendingRequest');
@@ -72,8 +73,8 @@ export default function RequestSchedulePage() {
       const data = JSON.parse(storedRequest);
       setRequestData(data);
       // Initialize dates if they exist
-      if (data.startDate) setStartDate(data.startDate);
-      if (data.endDate) setEndDate(data.endDate);
+      if (data.startDate) setStartDate(new Date(data.startDate));
+      if (data.endDate) setEndDate(new Date(data.endDate));
     }
   }, []);
 
@@ -110,8 +111,7 @@ export default function RequestSchedulePage() {
   };
 
   const canAddSchedule = selectedDays.length > 0;
-  const hasValidDates =
-    startDate && endDate && new Date(startDate) <= new Date(endDate);
+  const hasValidDates = startDate && endDate && startDate <= endDate;
   const canContinue = hasValidDates && (schedules.length > 0 || canAddSchedule);
 
   const handleContinue = () => {
@@ -135,9 +135,15 @@ export default function RequestSchedulePage() {
     const requestWithSchedule = {
       ...requestData,
       recurringSchedules: finalSchedules,
-      startDate: startDate,
-      endDate: endDate,
+      startDate: startDate?.toISOString().split('T')[0],
+      endDate: endDate?.toISOString().split('T')[0],
     };
+
+    // Update the Zustand store as well
+    updateRequestStore({
+      startDate: startDate?.toISOString().split('T')[0] || '',
+      endDate: endDate?.toISOString().split('T')[0] || '',
+    });
 
     sessionStorage.setItem(
       'pendingRequest',
@@ -147,232 +153,242 @@ export default function RequestSchedulePage() {
   };
 
   return (
-    <PageContainer
-      header={
-        <>
-          <SecondaryNavbar
-            title={t('recurringRequest')}
-            backHref="/request/recurring-form"
-            onBackClick={() => router.back()}
-          />
-          <div className="px-4 pt-2">
-            <Progress value={67} className="h-2 w-full" />
-          </div>
-        </>
-      }
-      contentClassName="p-4 space-y-6"
-      footer={
-        <BottomActionBar>
-          <Button
-            onClick={handleContinue}
-            disabled={!canContinue}
-            className="w-full"
-          >
-            Continue
-          </Button>
-        </BottomActionBar>
-      }
-      className="bg-white"
-    >
-      <main className="contents">
-        {/* Existing Schedules */}
-        {schedules.length > 0 && (
-          <div className="space-y-3">
-            <h2 className="text-xl font-semibold">Pickup slots</h2>
-            {schedules.map((schedule) => (
-              <div
-                key={schedule.id}
-                className="flex items-center justify-between p-4 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
-              >
-                <span className="font-semibold text-interactive">
-                  {formatScheduleDisplay(schedule)}
-                </span>
-                <div className="flex gap-2">
-                  <button
-                    className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white"
-                    title={t('edit')}
+    <>
+      <PageContainer
+        header={
+          <>
+            <SecondaryNavbar
+              title={t('recurringRequest')}
+              backHref="/request/recurring-form"
+              onBackClick={() => router.back()}
+            />
+            <div className="px-4 pt-2">
+              <Progress value={67} className="h-2 w-full" />
+            </div>
+          </>
+        }
+        contentClassName="p-4 space-y-6"
+        footer={
+          <BottomActionBar>
+            <Button
+              onClick={handleContinue}
+              disabled={!canContinue}
+              size="cta"
+              className="w-full"
+            >
+              {t('continue')}
+            </Button>
+          </BottomActionBar>
+        }
+        className="bg-white"
+      >
+        <div className="space-y-6">
+          {/* Existing Schedules */}
+          {schedules.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-[#021d13]">
+                Pickup slots
+              </h2>
+              <div className="space-y-3">
+                {schedules.map((schedule) => (
+                  <div
+                    key={schedule.id}
+                    className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5] min-h-[56px]"
                   >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
-                        fill="#024209"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => removeSchedule(schedule.id)}
-                    className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#CB0003] bg-white"
-                    title={t('delete')}
-                  >
-                    <Trash2 className="w-4 h-4 text-[#CB0003]" />
-                  </button>
+                    <span className="font-semibold text-interactive">
+                      {formatScheduleDisplay(schedule)}
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+                        title={t('edit')}
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                            d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                            fill="#024209"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => removeSchedule(schedule.id)}
+                        className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#CB0003] bg-white transition-colors hover:bg-red-50"
+                        title={t('delete')}
+                      >
+                        <Trash2 className="w-4 h-4 text-[#CB0003]" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Request Period */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-[#021d13]">
+              {t('requestPeriod')}
+            </h2>
+            <div className="space-y-3">
+              <DatePicker
+                label={t('startDate')}
+                date={startDate}
+                onDateChange={setStartDate}
+                placeholder="dd.mm.yyyy"
+                dateFormat="dd.MM.yyyy"
+                disablePastDates={true}
+                className="w-full"
+              />
+              <DatePicker
+                label={t('endDate')}
+                date={endDate}
+                onDateChange={setEndDate}
+                placeholder="dd.mm.yyyy"
+                dateFormat="dd.MM.yyyy"
+                disablePastDates={false}
+                minDate={startDate || new Date()}
+                className="w-full"
+              />
+            </div>
+            {startDate && endDate && (
+              <div className="p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5] min-h-[56px] flex items-center">
+                <div className="text-sm font-semibold text-[#024209]">
+                  {t('requestPeriod')}: {format(startDate, 'dd.MM.yyyy')} -{' '}
+                  {format(endDate, 'dd.MM.yyyy')}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Request Period */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">{t('requestPeriod')}</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-label font-semibold mb-3">
-                {t('startDate')}
-              </label>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                min={format(new Date(), 'yyyy-MM-dd')}
-                className="w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-label font-semibold mb-3">
-                {t('endDate')}
-              </label>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                min={startDate || format(new Date(), 'yyyy-MM-dd')}
-                className="w-full"
-              />
-            </div>
-          </div>
-          {startDate && endDate && (
-            <div className="p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
-              <div className="text-sm font-semibold text-[#024209]">
-                {t('requestPeriod')}:{' '}
-                {format(new Date(startDate), 'dd.MM.yyyy')} -{' '}
-                {format(new Date(endDate), 'dd.MM.yyyy')}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Add Schedule Form */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">
-            {schedules.length > 0
-              ? 'Add another schedule'
-              : 'Set your schedule'}
-          </h2>
-
-          {/* Day Selection */}
-          <div>
-            <label className="block text-label font-semibold mb-3">
-              Select days
-            </label>
-            <div className="grid grid-cols-7 gap-2">
-              {WEEKDAYS.map((day, index) => (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => toggleDay(FULL_WEEKDAYS[index])}
-                  className={cn(
-                    'h-12 rounded-lg border text-sm font-medium transition-all',
-                    selectedDays.includes(FULL_WEEKDAYS[index])
-                      ? 'border-[#024209] bg-[#eafcd6] text-[#024209]'
-                      : 'border-[#D9DBD5] bg-white text-gray-700 hover:border-gray-400'
-                  )}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
+            )}
           </div>
 
-          {/* Time Selection */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-label font-semibold mb-3">
-                Start time
-              </label>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowTimeSelector(true);
-                  setEditingTime('start');
-                }}
-                className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between"
-              >
-                <span className="text-lg">{startTime}</span>
-                <Clock className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-            <div>
-              <label className="block text-label font-semibold mb-3">
-                End time
-              </label>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowTimeSelector(true);
-                  setEditingTime('end');
-                }}
-                className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between"
-              >
-                <span className="text-lg">{endTime}</span>
-                <Clock className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-          </div>
+          {/* Add Schedule Form */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-[#021d13]">
+              {schedules.length > 0
+                ? 'Add another schedule'
+                : 'Set your schedule'}
+            </h2>
 
-          {/* Add Button */}
-          {selectedDays.length > 0 && (
-            <button
-              type="button"
-              onClick={addSchedule}
-              className="text-interactive font-semibold text-base underline underline-offset-4"
-            >
-              Add pickup slot
-            </button>
-          )}
-        </div>
-
-        {/* Time Selector Modal */}
-        {showTimeSelector && (
-          <div className="fixed inset-0 z-50 bg-black/50 flex items-end">
-            <div className="bg-white w-full rounded-t-3xl p-6">
-              <h3 className="text-lg font-semibold mb-4">
-                Select {editingTime === 'start' ? 'start' : 'end'} time
-              </h3>
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {TIME_OPTIONS.map((time) => (
+            {/* Day Selection */}
+            <div className="space-y-3">
+              <label className="block text-label font-semibold">
+                Select days
+              </label>
+              <div className="grid grid-cols-7 gap-2">
+                {WEEKDAYS.map((day, index) => (
                   <button
-                    key={time}
-                    onClick={() => {
-                      if (editingTime === 'start') {
-                        setStartTime(time);
-                      } else {
-                        setEndTime(time);
-                      }
-                      setShowTimeSelector(false);
-                      setEditingTime(null);
-                    }}
-                    className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50"
+                    key={day}
+                    type="button"
+                    onClick={() => toggleDay(FULL_WEEKDAYS[index])}
+                    className={cn(
+                      'h-12 rounded-lg border text-sm font-medium transition-all',
+                      selectedDays.includes(FULL_WEEKDAYS[index])
+                        ? 'border-[#024209] bg-[#eafcd6] text-[#024209]'
+                        : 'border-[#D9DBD5] bg-white text-gray-700 hover:border-gray-400'
+                    )}
                   >
-                    {time}
+                    {day}
                   </button>
                 ))}
               </div>
-              <button
-                onClick={() => {
-                  setShowTimeSelector(false);
-                  setEditingTime(null);
-                }}
-                className="w-full py-3 text-gray-600"
-              >
-                Cancel
-              </button>
             </div>
+
+            {/* Time Selection */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <label className="block text-label font-semibold">
+                  Start time
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTimeSelector(true);
+                    setEditingTime('start');
+                  }}
+                  className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between h-12 transition-colors hover:border-gray-400"
+                >
+                  <span className="text-lg">{startTime}</span>
+                  <Clock className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+              <div className="space-y-3">
+                <label className="block text-label font-semibold">
+                  End time
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTimeSelector(true);
+                    setEditingTime('end');
+                  }}
+                  className="w-full px-4 py-4 rounded-[12px] border border-[#D9DBD5] bg-white text-left flex items-center justify-between h-12 transition-colors hover:border-gray-400"
+                >
+                  <span className="text-lg">{endTime}</span>
+                  <Clock className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+            </div>
+
+            {/* Add Button */}
+            {selectedDays.length > 0 && (
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={addSchedule}
+                  className="text-interactive font-semibold text-base underline underline-offset-4 hover:no-underline transition-all"
+                >
+                  Add pickup slot
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </main>
-    </PageContainer>
+        </div>
+      </PageContainer>
+
+      {/* Time Selector Modal - Outside PageContainer for proper overlay */}
+      {showTimeSelector && (
+        <div className="fixed inset-0 z-[9999] bg-black/50 flex items-end">
+          <div className="bg-white w-full rounded-t-3xl p-6 max-w-md mx-auto">
+            <h3 className="text-lg font-semibold mb-4">
+              Select {editingTime === 'start' ? 'start' : 'end'} time
+            </h3>
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              {TIME_OPTIONS.map((time) => (
+                <button
+                  key={time}
+                  onClick={() => {
+                    if (editingTime === 'start') {
+                      setStartTime(time);
+                    } else {
+                      setEndTime(time);
+                    }
+                    setShowTimeSelector(false);
+                    setEditingTime(null);
+                  }}
+                  className="px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors text-center"
+                >
+                  {time}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                setShowTimeSelector(false);
+                setEditingTime(null);
+              }}
+              className="w-full py-3 text-gray-600 text-center font-medium"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
