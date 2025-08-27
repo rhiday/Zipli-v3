@@ -392,7 +392,6 @@ export const fi = {
   noMolluscs: 'Ei sisällä nilviäisiä',
 
   // Request details page
-  quantity: 'Määrä',
   confirmForToday: 'Vahvista tänään',
   orderCompleted: 'Tilaus valmis',
   confirmed: 'Vahvistettu',

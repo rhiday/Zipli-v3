@@ -352,7 +352,6 @@ export const en = {
   noMolluscs: 'Does not contain molluscs',
 
   // Request details page
-  quantity: 'Quantity',
   confirmForToday: 'Confirm for today',
   orderCompleted: 'Order completed',
   confirmed: 'Confirmed',
