@@ -83,7 +83,7 @@ export default function OneTimeRequestForm() {
       // Navigate based on edit mode
       if (isEditMode) {
         // Clear edit mode and return to summary
-        setEditMode(false, null);
+        setEditMode(false, undefined);
         sessionStorage.removeItem('editingRequestId');
         router.push('/request/summary');
       } else {
