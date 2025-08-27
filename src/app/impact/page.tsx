@@ -490,21 +490,6 @@ function ImpactPage(): React.ReactElement {
             </div>
           </div>
         </section>
-
-        {/* Export to PDF - same pattern as dashboard */}
-        <div className="my-4">
-          <a
-            onClick={handleExportPDF}
-            className="text-primary underline font-semibold cursor-pointer"
-            tabIndex={0}
-            role="button"
-          >
-            Export to PDF
-          </a>
-          <span className="block text-sm text-primary-75 mt-1">
-            Download your complete impact report and analytics
-          </span>
-        </div>
       </main>
 
       {/* BottomNav is provided by AppShell; avoid duplicate mount here */}
