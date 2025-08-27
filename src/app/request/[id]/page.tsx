@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import Tag from '@/components/ui/Tag';
 import { Avatar } from '@/components/ui/Avatar';
 import { getInitials } from '@/lib/utils';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 type RequestDetail = {
   id: string;
@@ -120,7 +120,7 @@ export default function RequestDetailPage({
     };
   };
 
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   if (loading) {
     return (
@@ -181,7 +181,7 @@ export default function RequestDetailPage({
         <Button
           onClick={() => router.back()}
           className="absolute top-12 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
-          title="Default"
+          title={t('back')}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -270,25 +270,11 @@ export default function RequestDetailPage({
 
           {/* Action buttons for owner */}
           {isOwner && canTakeAction && (
-            <div className="mt-6 flex items-center gap-3">
-              <Button
-                variant="destructive-outline"
-                size="cta"
-                className="flex-1"
-                onClick={() => handleStatusUpdate('cancelled')}
-                disabled={actionLoading}
-              >
-                {actionLoading ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : (
-                  <XIcon className="h-5 w-5" />
-                )}
-                {t('cancel') || 'Cancel_request'}
-              </Button>
+            <div className="mt-6 flex flex-col gap-3">
               <Button
                 variant="primary"
                 size="cta"
-                className="flex-1"
+                className="w-full"
                 onClick={() => handleStatusUpdate('fulfilled')}
                 disabled={actionLoading}
               >
@@ -298,6 +284,20 @@ export default function RequestDetailPage({
                   <CheckIcon className="h-5 w-5" />
                 )}
                 {t('confirmForToday')}
+              </Button>
+              <Button
+                variant="destructive-outline"
+                size="cta"
+                className="w-full"
+                onClick={() => handleStatusUpdate('cancelled')}
+                disabled={actionLoading}
+              >
+                {actionLoading ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  <XIcon className="h-5 w-5" />
+                )}
+                {t('cancel')}
               </Button>
             </div>
           )}
@@ -314,7 +314,7 @@ export default function RequestDetailPage({
                   window.location.href = `mailto:${email}?subject=Re: Food Request - ${requestInfo.requestName}`;
                 }}
               >
-                {t('contactRequester') || 'ContactRequester'}
+                Contact Requester
               </Button>
             </div>
           )}
@@ -352,7 +352,7 @@ export default function RequestDetailPage({
             variant="secondary"
             size="cta"
             className="w-full"
-            onClick={() => router.push('/dashboard/requests')}
+            onClick={() => router.push('/requests')}
           >
             <ArrowRight className="h-5 w-5" />
             {t('seeAllRequests')}
