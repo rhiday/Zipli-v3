@@ -22,7 +22,13 @@ type OneTimeFormInputs = {
 export default function OneTimeRequestForm() {
   const router = useRouter();
   const { t } = useCommonTranslation();
-  const { setRequestData, requestData } = useRequestStore();
+  const {
+    setRequestData,
+    requestData,
+    isEditMode,
+    editingRequestId,
+    setEditMode,
+  } = useRequestStore();
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>(
     requestData.allergens || []
   );
@@ -74,8 +80,16 @@ export default function OneTimeRequestForm() {
       };
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
-      // Navigate to pickup slot selection (following donor flow pattern)
-      router.push('/request/pickup-slot');
+      // Navigate based on edit mode
+      if (isEditMode) {
+        // Clear edit mode and return to summary
+        setEditMode(false, null);
+        sessionStorage.removeItem('editingRequestId');
+        router.push('/request/summary');
+      } else {
+        // Navigate to pickup slot selection (following donor flow pattern)
+        router.push('/request/pickup-slot');
+      }
     } catch (error) {
       console.error('Failed to create request:', error);
     }
@@ -86,7 +100,7 @@ export default function OneTimeRequestForm() {
       header={
         <>
           <SecondaryNavbar
-            title={t('oneTimeRequest')}
+            title={isEditMode ? 'Edit Request' : t('oneTimeRequest')}
             backHref="/request/select-type"
             onBackClick={() => router.back()}
           />
@@ -104,7 +118,11 @@ export default function OneTimeRequestForm() {
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? t('continuing') : t('continue')}
+            {isSubmitting
+              ? t('continuing')
+              : isEditMode
+                ? 'Update Request'
+                : t('continue')}
           </Button>
         </BottomActionBar>
       }
@@ -135,7 +153,7 @@ export default function OneTimeRequestForm() {
         {/* Quantity */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            {t('peopleCount')}?
+            {t('peopleCount')}
           </label>
           <Input
             {...register('quantity', {

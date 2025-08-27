@@ -3,7 +3,7 @@
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
-import { AllergenChips } from '@/components/ui/SummaryCard';
+import { SummaryCard } from '@/components/ui/SummaryCard';
 import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -18,7 +18,8 @@ import { useEffect, useState } from 'react';
 export default function RequestSummaryPage() {
   const router = useRouter();
   const { t } = useCommonTranslation();
-  const { requestData, pickupSlots, clearRequest } = useRequestStore();
+  const { requestData, pickupSlots, clearRequest, setEditMode } =
+    useRequestStore();
   const { currentUser, addRequest } = useDatabase();
   const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
   const [requestPeriod, setRequestPeriod] = useState<{
@@ -212,6 +213,24 @@ export default function RequestSummaryPage() {
     router.back();
   };
 
+  const handleEditRequest = () => {
+    // Generate a unique request ID for edit mode (since we're in creation flow)
+    const editRequestId = `edit_${Date.now()}`;
+
+    // Set edit mode in the store
+    setEditMode(true, editRequestId);
+
+    // Store the request ID in session storage for persistence across page loads
+    sessionStorage.setItem('editingRequestId', editRequestId);
+
+    // Navigate to the appropriate form based on request type
+    if (requestData.request_type === 'one-time') {
+      router.push('/request/one-time-form');
+    } else {
+      router.push('/request/recurring-form');
+    }
+  };
+
   return (
     <PageContainer
       header={
@@ -252,15 +271,17 @@ export default function RequestSummaryPage() {
               {requestData.description || 'Food Request'}
             </div>
             <div className="text-sm text-gray-600">
-              {t('portions')}: {requestData.quantity || '—'}
+              {t('peopleCount')}: {requestData.quantity || '—'}
             </div>
-            <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap">
-              {t('allergiesIntolerancesDiets')}:{' '}
-              <AllergenChips allergens={requestData.allergens} />
+            <div className="text-sm text-gray-600">
+              {t('requestDetails')}:{' '}
+              {requestData.allergens && requestData.allergens.length > 0
+                ? requestData.allergens.join(', ')
+                : 'None specified'}
             </div>
           </div>
           <button
-            onClick={() => router.push('/request/select-type')}
+            onClick={handleEditRequest}
             className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
             aria-label={t('edit')}
           >
@@ -274,7 +295,7 @@ export default function RequestSummaryPage() {
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
-                d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
                 fill="#024209"
               />
             </svg>
@@ -314,7 +335,7 @@ export default function RequestSummaryPage() {
       {/* Pickup Schedule Section */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {recurringSchedule ? 'Recurring Schedule' : 'Pickup Schedule'}
+          {recurringSchedule ? 'Recurring Schedule' : 'Delivery Schedule'}
         </h2>
         {recurringSchedule && Array.isArray(recurringSchedule) ? (
           // Multiple recurring schedules
@@ -354,7 +375,7 @@ export default function RequestSummaryPage() {
             <button
               onClick={() => router.push('/request/pickup-slot')}
               className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-              title="Edit pickup time"
+              title="Edit delivery time"
             >
               <svg
                 width="20"
@@ -366,7 +387,7 @@ export default function RequestSummaryPage() {
                 <path
                   fillRule="evenodd"
                   clipRule="evenodd"
-                  d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                  d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
                   fill="#024209"
                 />
               </svg>

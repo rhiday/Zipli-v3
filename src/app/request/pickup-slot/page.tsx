@@ -141,7 +141,7 @@ export default function PickupSlotPage() {
       header={
         <>
           <SecondaryNavbar
-            title={t('pickupSchedule')}
+            title={t('deliverySchedule')}
             backHref="/request/new"
             onBackClick={handleBackClick}
           />
@@ -173,9 +173,11 @@ export default function PickupSlotPage() {
     >
       <main className="contents">
         <div>
-          <h2 className="text-xl font-semibold mb-2">{t('pickupSchedule')}</h2>
+          <h2 className="text-xl font-semibold mb-2">
+            {t('deliverySchedule')}
+          </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Add one or more pickup time slots to give donors flexibility.
+            Add one or more delivery time slots to give donors flexibility.
           </p>
         </div>
 
@@ -207,7 +209,7 @@ export default function PickupSlotPage() {
                     <path
                       fillRule="evenodd"
                       clipRule="evenodd"
-                      d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                      d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
                       fill="#024209"
                     />
                   </svg>
@@ -237,20 +239,20 @@ export default function PickupSlotPage() {
               </div>
             </div>
           ))}
-        </div>
 
-        {/* Show "Add pickup slot" button when no slots exist and form is not shown */}
-        {pickupSlots.length === 0 && !showAddForm && (
-          <div className="flex justify-center mt-6">
-            <Button
-              onClick={handleAddTimeSlotClick}
-              variant="secondary"
-              className="text-interactive border-interactive hover:bg-[#eafcd6]"
-            >
-              {t('addPickupSlotButton')}
-            </Button>
-          </div>
-        )}
+          {/* Always show "Add delivery slot" button below compact views */}
+          {!showAddForm && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleAddTimeSlotClick}
+                className="text-interactive font-semibold text-base underline underline-offset-4 hover:no-underline transition-all"
+              >
+                {t('addDeliverySlotButton')}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Add/Edit Slot Form */}
         {showAddForm && (
@@ -258,8 +260,8 @@ export default function PickupSlotPage() {
             {(pickupSlots.length > 0 || currentSlot.id !== 'new') && (
               <h3 className="text-lg font-semibold text-[#021d13] mt-4">
                 {currentSlot.id !== 'new'
-                  ? t('editPickupSlot')
-                  : t('addAnotherPickupSlot')}
+                  ? t('editDeliverySlot')
+                  : t('addAnotherDeliverySlot')}
               </h3>
             )}
 
@@ -425,7 +427,7 @@ export default function PickupSlotPage() {
               >
                 {currentSlot.id !== 'new'
                   ? t('save')
-                  : t('addPickupSlotButton')}
+                  : t('addDeliverySlotButton')}
               </button>
             </div>
           </div>
