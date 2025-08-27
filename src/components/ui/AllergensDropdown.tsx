@@ -68,7 +68,6 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   disabled,
   placeholder = 'Select...',
 }) => {
-  const { t } = useAllergenSelectorTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -106,9 +105,6 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
     }
   };
 
-  // Check if there are more chips to scroll to
-  const hasOverflow = value.length > 3;
-
   return (
     <div className="w-full" ref={containerRef}>
       <label className="block text-label font-semibold mb-2">{label}</label>
@@ -129,6 +125,10 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
               WebkitOverflowScrolling: 'touch',
+              maskImage:
+                'linear-gradient(to right, black 0%, black 85%, transparent 100%)',
+              WebkitMaskImage:
+                'linear-gradient(to right, black 0%, black 85%, transparent 100%)',
             }}
             onClick={(e) => e.stopPropagation()}
           >

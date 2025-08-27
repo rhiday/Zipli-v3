@@ -390,4 +390,13 @@ export const fi = {
   noSulphurDioxide: 'Ei sisällä rikkidioksidia / sulfiitteja (>10 mg/kg)',
   noLupin: 'Ei sisällä lupiinia',
   noMolluscs: 'Ei sisällä nilviäisiä',
+
+  // Request details page
+  quantity: 'Määrä',
+  confirmForToday: 'Vahvista tänään',
+  orderCompleted: 'Tilaus valmis',
+  confirmed: 'Vahvistettu',
+  seeAllRequests: 'Näytä kaikki pyynnöt',
+  showMore: 'Näytä lisää',
+  showLess: 'Näytä vähemmän',
 } as const;

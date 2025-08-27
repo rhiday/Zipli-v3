@@ -5,31 +5,20 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
 import {
-  UsersIcon,
+  Scale,
   CalendarIcon,
   ClockIcon,
   CheckIcon,
   XIcon,
   ArrowLeft,
+  ArrowRight,
   MapPin,
   HandHeart,
-  Edit,
-  Trash2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
 import Tag from '@/components/ui/Tag';
 import { Avatar } from '@/components/ui/Avatar';
 import { getInitials } from '@/lib/utils';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { useLanguage } from '@/hooks/useLanguage';
 
 type RequestDetail = {
@@ -60,12 +49,6 @@ export default function RequestDetailPage({
   const { currentUser, getRequestById, updateRequest, users, isInitialized } =
     useDatabase();
 
-  useEffect(() => {
-    if (isInitialized && params.id) {
-      fetchRequest();
-    }
-  }, [isInitialized, params.id]);
-
   const fetchRequest = async () => {
     setLoading(true);
     setError(null);
@@ -82,6 +65,12 @@ export default function RequestDetailPage({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isInitialized && params.id) {
+      fetchRequest();
+    }
+  }, [isInitialized, params.id]);
 
   const handleStatusUpdate = async (newStatus: 'fulfilled' | 'cancelled') => {
     if (!currentUser || !request) {
@@ -209,9 +198,9 @@ export default function RequestDetailPage({
               `Request for ${request.people_count} people`}
           </h1>
           <div className="mt-2 flex items-center gap-2 text-gray-600">
-            <UsersIcon className="h-5 w-5" />
+            <Scale className="h-5 w-5" />
             <span className="font-medium">
-              For {request.people_count} people
+              {t('quantity')}: {request.people_count} kg
             </span>
           </div>
 
@@ -308,7 +297,7 @@ export default function RequestDetailPage({
                 ) : (
                   <CheckIcon className="h-5 w-5" />
                 )}
-                Mark as Fulfilled
+                {t('confirmForToday')}
               </Button>
             </div>
           )}
@@ -355,6 +344,19 @@ export default function RequestDetailPage({
               </p>
             </div>
           </div>
+        </section>
+
+        {/* See All Requests Button */}
+        <section className="pt-6">
+          <Button
+            variant="secondary"
+            size="cta"
+            className="w-full"
+            onClick={() => router.push('/dashboard/requests')}
+          >
+            <ArrowRight className="h-5 w-5" />
+            {t('seeAllRequests')}
+          </Button>
         </section>
       </main>
     </div>

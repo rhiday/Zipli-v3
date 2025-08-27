@@ -19,7 +19,7 @@ import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 
 export default function ProfilePage(): React.ReactElement {
   const router = useRouter();
-  const { currentUser, isInitialized } = useDatabase();
+  const { currentUser, isInitialized, updateUser } = useDatabase();
   const { t } = useCommonTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -73,12 +73,33 @@ export default function ProfilePage(): React.ReactElement {
     setSaving(true);
     setError(null);
 
-    // In a real app, you'd update the user in the database
-    // For now, we'll just simulate saving
-    setTimeout(() => {
+    try {
+      if (!currentUser) {
+        throw new Error('No user found');
+      }
+
+      // Create updated user object with form data
+      const updatedUser = {
+        ...currentUser,
+        full_name: formData.full_name,
+        organization_name: formData.organization_name,
+        role: formData.role as any,
+        address: formData.address,
+        contact_number: formData.contact_number,
+        driver_instructions: formData.driver_instructions,
+      };
+
+      // Update user in database
+      await updateUser(updatedUser);
+
+      // Success - exit editing mode
       setIsEditing(false);
+    } catch (err: any) {
+      console.error('Profile update error:', err);
+      setError(err.message || 'Failed to update profile. Please try again.');
+    } finally {
       setSaving(false);
-    }, 500);
+    }
   };
 
   const handleLogout = () => {
@@ -297,7 +318,9 @@ export default function ProfilePage(): React.ReactElement {
 
                   <div className="flex gap-3">
                     <Button type="submit" disabled={saving} className="flex-1">
-                      {saving ? 'Saving...' : 'Save Changes'}
+                      {saving
+                        ? t('savingEllipsis') || 'Saving...'
+                        : t('saveChanges')}
                     </Button>
                     <Button
                       type="button"
@@ -305,7 +328,7 @@ export default function ProfilePage(): React.ReactElement {
                       onClick={() => setIsEditing(false)}
                       className="flex-1"
                     >
-                      {t('saveChanges')}
+                      {t('cancelChanges')}
                     </Button>
                   </div>
                 </form>

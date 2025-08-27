@@ -1,14 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
-import {
-  Languages,
-  Phone,
-  UserCircle,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { Phone, UserCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useRouter } from 'next/navigation';
@@ -103,7 +96,6 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const visibleItems = showAll
     ? activityItems
     : activityItems.slice(0, maxVisible);
-  const hiddenCount = activityItems.length - maxVisible;
 
   return (
     <div className="relative w-full bg-green-800 text-white px-4 pt-10 pb-6 shadow-lg overflow-hidden mb-8">
@@ -161,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
               </span>
             </div>
             <ul className="flex flex-col">
-              {visibleItems.map((item, idx) => (
+              {visibleItems.map((item) => (
                 <li
                   key={item.id}
                   className={cn(

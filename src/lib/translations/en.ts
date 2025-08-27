@@ -350,6 +350,15 @@ export const en = {
     'Does not contain sulphur dioxide / sulphites >10 mg/kg or litre',
   noLupin: 'Does not contain lupin',
   noMolluscs: 'Does not contain molluscs',
+
+  // Request details page
+  quantity: 'Quantity',
+  confirmForToday: 'Confirm for today',
+  orderCompleted: 'Order completed',
+  confirmed: 'Confirmed',
+  seeAllRequests: 'See all requests',
+  showMore: 'Show more',
+  showLess: 'Show less',
 } as const;
 
 export type TranslationKey = keyof typeof en;
