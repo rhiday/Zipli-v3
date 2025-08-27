@@ -51,7 +51,7 @@ export default function ProfilePage(): React.ReactElement {
       organization_name: currentUser.organization_name || '',
       address: currentUser.address || '',
       contact_number: currentUser.contact_number || '',
-      driver_instructions: (currentUser as any).driver_instructions || '',
+      driver_instructions: currentUser.driver_instructions || '',
     });
     setLoading(false);
   }, [currentUser, isInitialized, router]);
@@ -78,6 +78,10 @@ export default function ProfilePage(): React.ReactElement {
         throw new Error('No user found');
       }
 
+      console.log('🚀 Starting profile update...');
+      console.log('📝 Current user:', currentUser);
+      console.log('📝 Form data:', formData);
+
       // Create updated user object with form data
       const updatedUser = {
         ...currentUser,
@@ -89,13 +93,22 @@ export default function ProfilePage(): React.ReactElement {
         driver_instructions: formData.driver_instructions,
       };
 
+      console.log('📝 Updated user object:', updatedUser);
+
       // Update user in database
+      console.log('🔄 Calling updateUser...');
       await updateUser(updatedUser);
 
+      console.log('✅ Profile updated successfully');
       // Success - exit editing mode
       setIsEditing(false);
     } catch (err: any) {
-      console.error('Profile update error:', err);
+      console.error('❌ Profile update error:', err);
+      console.error('❌ Error details:', {
+        message: err.message,
+        stack: err.stack,
+        error: err,
+      });
       setError(err.message || 'Failed to update profile. Please try again.');
     } finally {
       setSaving(false);

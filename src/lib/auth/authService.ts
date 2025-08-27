@@ -204,6 +204,11 @@ class AuthService {
     updates: ProfileUpdate
   ): Promise<{ data: Profile | null; error: string | null }> {
     try {
+      console.log('🔄 AuthService.updateProfile - Starting update with:', {
+        userId,
+        updates,
+      });
+
       const { data, error } = await supabase
         .from('profiles')
         .update(updates)
@@ -211,12 +216,34 @@ class AuthService {
         .select()
         .single();
 
+      console.log('🔄 AuthService.updateProfile - Supabase response:', {
+        data,
+        error,
+        hasData: !!data,
+        errorMessage: error?.message,
+        errorDetails: error?.details,
+        errorHint: error?.hint,
+        errorCode: (error as any)?.code,
+      });
+
       if (error) {
+        console.error('❌ AuthService.updateProfile - Database error:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: (error as any)?.code,
+          fullError: error,
+        });
         return { data: null, error: error.message };
       }
 
+      console.log(
+        '✅ AuthService.updateProfile - Success! Updated profile:',
+        data
+      );
       return { data, error: null };
     } catch (error) {
+      console.error('❌ AuthService.updateProfile - Caught exception:', error);
       return {
         data: null,
         error:
