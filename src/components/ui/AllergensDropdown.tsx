@@ -159,7 +159,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
                   type="checkbox"
                   checked={value.includes(option)}
                   readOnly
-                  className="mr-3 accent-positive w-3 h-3 flex-shrink-0"
+                  className="mr-3 accent-positive w-2.5 h-2.5 flex-shrink-0 scale-75 sm:scale-100"
                 />
                 <span className="text-body text-primary leading-tight">
                   {option}

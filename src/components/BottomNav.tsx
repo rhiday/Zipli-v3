@@ -155,7 +155,7 @@ export default function BottomNav() {
           <DrawerContent className="bg-base">
             <DrawerHeader className="text-center">
               <DrawerTitle className="text-lg font-semibold text-primary">
-                {t('createRequest')}?
+                {t('selectRequestType')}
               </DrawerTitle>
             </DrawerHeader>
             <div className="grid gap-3 p-4">
