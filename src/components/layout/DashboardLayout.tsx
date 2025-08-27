@@ -134,7 +134,7 @@ Sidebar.displayName = 'Sidebar';
 const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => (
-  <div className="min-h-dvh bg-base flex">
+  <div className="min-h-[100svh] bg-base flex">
     <Sidebar />
     <main className="flex-1 flex flex-col">{children}</main>
   </div>

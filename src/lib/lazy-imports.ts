@@ -21,11 +21,11 @@ export const loadQRCode = async () => {
   return QRCode.default;
 };
 
-// OpenAI - only loaded when AI features are used
-export const loadOpenAI = async () => {
-  const { OpenAI } = await import('openai');
-  return OpenAI;
-};
+// OpenAI - removed for production
+// export const loadOpenAI = async () => {
+//   const { OpenAI } = await import('openai');
+//   return OpenAI;
+// };
 
 // Syntax Highlighter - only loaded on docs page
 export const loadSyntaxHighlighter = async () => {
