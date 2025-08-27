@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { Checkbox } from '@/components/ui/Checkbox';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('tsanssi@etappiry.net');
@@ -122,22 +123,13 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-border text-primary focus:ring-primary/50"
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-body text-primary"
-              >
-                {t('rememberMe')}
-              </label>
-            </div>
+            <Checkbox
+              id="remember-me"
+              name="remember-me"
+              checked={rememberMe}
+              onChange={setRememberMe}
+              label={t('rememberMe')}
+            />
 
             <div className="text-body">
               <Link

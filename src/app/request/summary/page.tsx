@@ -14,6 +14,7 @@ import { useRequestStore } from '@/store/request';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Checkbox } from '@/components/ui/Checkbox';
 
 export default function RequestSummaryPage() {
   const router = useRouter();
@@ -415,20 +416,13 @@ export default function RequestSummaryPage() {
             onChange={(e) => setAddress(e.target.value)}
             rows={3}
           />
-          <div className="flex items-center gap-2 mt-2">
-            <input
-              type="checkbox"
+          <div className="mt-2">
+            <Checkbox
               id="update-address-profile"
               checked={updateAddressInProfile}
-              onChange={(e) => setUpdateAddressInProfile(e.target.checked)}
-              className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              onChange={setUpdateAddressInProfile}
+              label={t('updateAddressInProfile')}
             />
-            <label
-              htmlFor="update-address-profile"
-              className="text-sm text-gray-600"
-            >
-              {t('updateAddressInProfile')}
-            </label>
           </div>
         </div>
         <div>
@@ -445,20 +439,13 @@ export default function RequestSummaryPage() {
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
           />
-          <div className="flex items-center gap-2 mt-2">
-            <input
-              type="checkbox"
+          <div className="mt-2">
+            <Checkbox
               id="update-instructions-profile"
               checked={updateInstructionsInProfile}
-              onChange={(e) => setUpdateInstructionsInProfile(e.target.checked)}
-              className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              onChange={setUpdateInstructionsInProfile}
+              label={t('updateInstructionsInProfile')}
             />
-            <label
-              htmlFor="update-instructions-profile"
-              className="text-sm text-gray-600"
-            >
-              {t('updateInstructionsInProfile')}
-            </label>
           </div>
         </div>
       </div>

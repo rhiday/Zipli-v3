@@ -13,6 +13,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { SummaryCard } from '@/components/ui/SummaryCard';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
+import { Checkbox } from '@/components/ui/Checkbox';
 
 export default function DonationSummaryPage() {
   const router = useRouter();
@@ -420,20 +421,13 @@ export default function DonationSummaryPage() {
             onChange={(e) => setAddress(e.target.value)}
             rows={3}
           />
-          <div className="flex items-center gap-2 mt-2">
-            <input
-              type="checkbox"
+          <div className="mt-2">
+            <Checkbox
               id="update-address-profile"
               checked={updateAddressInProfile}
-              onChange={(e) => setUpdateAddressInProfile(e.target.checked)}
-              className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              onChange={setUpdateAddressInProfile}
+              label="Save this address to my profile"
             />
-            <label
-              htmlFor="update-address-profile"
-              className="text-sm text-gray-600"
-            >
-              Save this address to my profile
-            </label>
           </div>
         </div>
         <div>
@@ -450,20 +444,13 @@ export default function DonationSummaryPage() {
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
           />
-          <div className="flex items-center gap-2 mt-2">
-            <input
-              type="checkbox"
+          <div className="mt-2">
+            <Checkbox
               id="update-instructions-profile"
               checked={updateInstructionsInProfile}
-              onChange={(e) => setUpdateInstructionsInProfile(e.target.checked)}
-              className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              onChange={setUpdateInstructionsInProfile}
+              label="Save these instructions to my profile"
             />
-            <label
-              htmlFor="update-instructions-profile"
-              className="text-sm text-gray-600"
-            >
-              Save these instructions to my profile
-            </label>
           </div>
         </div>
       </div>
