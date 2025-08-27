@@ -37,11 +37,11 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
         </>
       ) : isDocsRoute ? (
         /* Full-width layout for documentation pages */
-        <div className="min-h-screen bg-gray-50">{children}</div>
+        <div className="min-h-[100svh] bg-gray-50">{children}</div>
       ) : (
         /* Layout: A mobile-like container centered on all screen sizes */
-        <div className="min-h-screen bg-cream">
-          <div className="relative mx-auto flex h-screen w-full max-w-lg flex-col bg-base shadow-lg">
+        <div className="min-h-[100svh] bg-cream">
+          <div className="relative mx-auto flex h-[100svh] w-full max-w-lg flex-col bg-base shadow-lg">
             {/* Main content container */}
             <main className="flex-grow overflow-y-auto">{children}</main>
             {/* BottomNav is positioned absolutely within this container */}

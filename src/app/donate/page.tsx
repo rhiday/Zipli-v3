@@ -4,7 +4,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import BottomNav from '@/components/BottomNav';
 import {
   ArrowRight,
   Info,
@@ -124,7 +123,7 @@ function DonorDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-dvh pb-20">
+      <div className="min-h-[100svh] pb-20">
         <Header title={'Loading'} />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -169,7 +168,7 @@ function DonorDashboardPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-dvh pb-20">
+    <div className="min-h-[100svh] pb-20">
       <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -318,7 +317,7 @@ function DonorDashboardPage(): React.ReactElement {
         </section> */}
       </main>
 
-      <BottomNav />
+      {/* BottomNav is provided by AppShell; avoid duplicate mount here */}
 
       {/* Force-hide any rogue Figma card section if it still exists */}
       <style>{`.rogue-donation-card { display: none !important; }`}</style>

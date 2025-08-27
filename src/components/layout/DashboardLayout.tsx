@@ -4,7 +4,15 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutGrid, Search, ShoppingBag, FileText, BarChart3, Users, LogOut } from 'lucide-react';
+import {
+  LayoutGrid,
+  Search,
+  ShoppingBag,
+  FileText,
+  BarChart3,
+  Users,
+  LogOut,
+} from 'lucide-react';
 import { useDatabase } from '@/store';
 import MobileTabLayout from './MobileTabLayout';
 import { useCommonTranslation } from '@/lib/i18n-enhanced';
@@ -18,7 +26,7 @@ const Sidebar: React.FC = React.memo(() => {
     if (!currentUser) return [];
 
     const role = currentUser.role;
-    
+
     switch (role) {
       case 'food_donor':
         return [
@@ -66,12 +74,13 @@ const Sidebar: React.FC = React.memo(() => {
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
               <span className="text-white font-semibold text-sm">
-                {currentUser.full_name?.charAt(0) || currentUser.email.charAt(0).toUpperCase()}
+                {currentUser.full_name?.charAt(0) ||
+                  currentUser.email.charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
               <p className="font-semibold text-primary text-sm">
-                {currentUser.full_name  || 'User'}
+                {currentUser.full_name || 'User'}
               </p>
               <p className="text-xs text-secondary capitalize">
                 {currentUser.role}
@@ -91,8 +100,8 @@ const Sidebar: React.FC = React.memo(() => {
                     href={item.href}
                     className={cn(
                       'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
-                      isActive 
-                        ? 'bg-lime text-primary font-medium' 
+                      isActive
+                        ? 'bg-lime text-primary font-medium'
                         : 'text-secondary hover:bg-primary-10 hover:text-primary'
                     )}
                   >
@@ -122,13 +131,13 @@ const Sidebar: React.FC = React.memo(() => {
 
 Sidebar.displayName = 'Sidebar';
 
-const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="min-h-screen bg-base flex">
+const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => (
+  <div className="min-h-[100svh] bg-base flex">
     <Sidebar />
-    <main className="flex-1 flex flex-col">
-      {children}
-    </main>
+    <main className="flex-1 flex flex-col">{children}</main>
   </div>
 );
 
-export default DashboardLayout; 
+export default DashboardLayout;

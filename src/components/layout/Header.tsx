@@ -106,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const hiddenCount = activityItems.length - maxVisible;
 
   return (
-    <div className="relative w-full bg-green-800 text-white px-4 pt-10 pb-6 shadow-lg overflow-hidden mb-8">
+    <div className="relative w-full bg-green-800 text-white px-4 pt-10 pb-6 border-b border-black/10 mb-8">
       {/* Top action row: language pill left, actions right */}
       <div className="flex items-center justify-between">
         <LanguageSwitcher compact />

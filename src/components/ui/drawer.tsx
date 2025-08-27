@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useCommonTranslation } from '@/lib/i18n-enhanced';
 
 const Drawer = ({
-  shouldScaleBackground = true,
+  shouldScaleBackground = false,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
   <DrawerPrimitive.Root
