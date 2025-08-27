@@ -16,7 +16,7 @@ export default function ContactPage(): React.ReactElement {
         onBackClick={() => router.back()}
       />
 
-      <div className="flex-grow overflow-y-auto p-4">
+      <div className="flex-grow overflow-y-auto p-4 pb-24">
         <div className="mx-auto max-w-lg space-y-6">
           {/* Company Info */}
           <div className="bg-white rounded-lg shadow-sm p-6">
