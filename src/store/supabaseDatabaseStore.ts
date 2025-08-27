@@ -286,15 +286,27 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       updateUser: async (updatedUser: Profile) => {
         try {
+          console.log('🔄 updateUser called with:', updatedUser);
           const result = await authService.updateProfile(
             updatedUser.id,
             updatedUser
           );
+          console.log('🔄 updateProfile result:', result);
+
+          if (result.error) {
+            console.error('❌ Profile update failed:', result.error);
+            throw new Error(result.error);
+          }
+
           if (result.data) {
+            console.log('✅ Profile updated successfully, updating state');
             set({ currentUser: result.data });
+          } else {
+            throw new Error('No data returned from profile update');
           }
         } catch (error) {
-          console.error('Error updating user', error);
+          console.error('❌ Error in updateUser:', error);
+          throw error; // Re-throw so the UI can handle it
         }
       },
 
