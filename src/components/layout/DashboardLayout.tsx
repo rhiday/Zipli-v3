@@ -15,12 +15,13 @@ import {
 } from 'lucide-react';
 import { useDatabase } from '@/store';
 import MobileTabLayout from './MobileTabLayout';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 // Desktop Sidebar component
 const Sidebar: React.FC = React.memo(() => {
   const pathname = usePathname();
   const { currentUser, logout } = useDatabase();
+  const { t } = useCommonTranslation();
 
   const sidebarItems = React.useMemo(() => {
     if (!currentUser) return [];
@@ -30,39 +31,47 @@ const Sidebar: React.FC = React.memo(() => {
     switch (role) {
       case 'food_donor':
         return [
-          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
-          { href: '/donate/new', label: 'Add Donation', icon: ShoppingBag },
-          { href: '/feed', label: 'Explore', icon: Search },
-          { href: '/profile', label: 'Profile', icon: Users },
+          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
+          { href: '/donate/new', label: t('addDonation'), icon: ShoppingBag },
+          { href: '/feed', label: t('explore'), icon: Search },
+          { href: '/profile', label: t('profile'), icon: Users },
         ];
       case 'food_receiver':
         return [
-          { href: '/receiver/dashboard', label: 'Dashboard', icon: LayoutGrid },
-          { href: '/request/new', label: 'Request Food', icon: FileText },
-          { href: '/feed', label: 'Explore', icon: Search },
-          { href: '/profile', label: 'Profile', icon: Users },
+          {
+            href: '/receiver/dashboard',
+            label: t('dashboard'),
+            icon: LayoutGrid,
+          },
+          { href: '/request/new', label: t('requestFood'), icon: FileText },
+          { href: '/feed', label: t('explore'), icon: Search },
+          { href: '/profile', label: t('profile'), icon: Users },
         ];
       case 'city':
         return [
-          { href: '/city/dashboard', label: 'Dashboard', icon: LayoutGrid },
-          { href: '/city', label: 'Analytics', icon: BarChart3 },
-          { href: '/feed', label: 'Overview', icon: Users },
-          { href: '/profile', label: 'Profile', icon: Users },
+          { href: '/city/dashboard', label: t('dashboard'), icon: LayoutGrid },
+          { href: '/city', label: t('analytics'), icon: BarChart3 },
+          { href: '/feed', label: t('overview'), icon: Users },
+          { href: '/profile', label: t('profile'), icon: Users },
         ];
       case 'terminals':
         return [
-          { href: '/terminal/dashboard', label: 'Terminal', icon: LayoutGrid },
-          { href: '/feed', label: 'Overview', icon: Users },
-          { href: '/profile', label: 'Profile', icon: Users },
+          {
+            href: '/terminal/dashboard',
+            label: t('terminal'),
+            icon: LayoutGrid,
+          },
+          { href: '/feed', label: t('overview'), icon: Users },
+          { href: '/profile', label: t('profile'), icon: Users },
         ];
       default:
         return [
-          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
-          { href: '/feed', label: 'Explore', icon: Search },
-          { href: '/profile', label: 'Profile', icon: Users },
+          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
+          { href: '/feed', label: t('explore'), icon: Search },
+          { href: '/profile', label: t('profile'), icon: Users },
         ];
     }
-  }, [currentUser]);
+  }, [currentUser, t]);
 
   if (!currentUser) return null;
 

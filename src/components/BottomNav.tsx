@@ -43,25 +43,25 @@ export default function BottomNav() {
     switch (role) {
       case 'food_donor':
         return [
-          { href: '/donate', label: 'Dashboard', icon: LayoutGrid },
+          { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
           { href: '#', label: 'Add', icon: Plus, isCentral: true },
-          { href: '/impact', label: 'Impact', icon: TrendingUp },
+          { href: '/impact', label: t('impact'), icon: TrendingUp },
         ];
       case 'food_receiver':
         return [
           {
             href: '/receiver/dashboard',
-            label: 'Dashboard',
+            label: t('dashboard'),
             icon: LayoutGrid,
           },
-          { href: '#', label: 'Request', icon: Plus, isCentral: true },
-          { href: '/impact', label: 'Impact', icon: TrendingUp },
+          { href: '#', label: t('request'), icon: Plus, isCentral: true },
+          { href: '/impact', label: t('impact'), icon: TrendingUp },
         ];
       case 'city':
         return [
-          { href: '/city/dashboard', label: 'Dashboard', icon: LayoutGrid },
-          { href: '/city', label: 'Analytics', icon: BarChart3 },
-          { href: '/feed', label: 'Overview', icon: Users },
+          { href: '/city/dashboard', label: t('dashboard'), icon: LayoutGrid },
+          { href: '/city', label: t('analytics'), icon: BarChart3 },
+          { href: '/feed', label: t('overview'), icon: Users },
         ];
       case 'terminals':
         return [
@@ -155,7 +155,7 @@ export default function BottomNav() {
           <DrawerContent className="bg-base">
             <DrawerHeader className="text-center">
               <DrawerTitle className="text-lg font-semibold text-primary">
-                {t('createDonation')}?
+                {t('createRequest')}?
               </DrawerTitle>
             </DrawerHeader>
             <div className="grid gap-3 p-4">
@@ -166,15 +166,22 @@ export default function BottomNav() {
                       variant="secondary"
                       size="lg"
                       className="w-full justify-start py-5 text-left"
-                      onClick={() => router.push('/request/one-time-form')}
+                      onClick={() => {
+                        // Clear any existing form data for fresh start
+                        if (typeof window !== 'undefined') {
+                          localStorage.removeItem('zipli-request-store');
+                          sessionStorage.removeItem('pendingRequest');
+                        }
+                        router.push('/request/one-time-form');
+                      }}
                     >
                       <Clock className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          One-time Request
+                          {t('oneTimeRequest')}
                         </p>
                         <p className="text-xs text-secondary">
-                          Create a single request for immediate needs .
+                          {t('createSingleRequest')}
                         </p>
                       </div>
                     </Button>
@@ -184,15 +191,22 @@ export default function BottomNav() {
                       variant="secondary"
                       size="lg"
                       className="w-full justify-start py-5 text-left"
-                      onClick={() => router.push('/request/recurring-form')}
+                      onClick={() => {
+                        // Clear any existing form data for fresh start
+                        if (typeof window !== 'undefined') {
+                          localStorage.removeItem('zipli-request-store');
+                          sessionStorage.removeItem('pendingRequest');
+                        }
+                        router.push('/request/recurring-form');
+                      }}
                     >
                       <Calendar className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          Recurring Request
+                          {t('recurringRequest')}
                         </p>
                         <p className="text-xs text-secondary">
-                          Set up a repeating schedule for ongoing needs .
+                          {t('setupRepeatingSchedule')}
                         </p>
                       </div>
                     </Button>
@@ -210,7 +224,7 @@ export default function BottomNav() {
                       <BarChart3 className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          title="Default"
+                          {t('analytics')}
                         </p>
                         <p className="text-xs text-secondary">
                           {t('overview')}.
@@ -263,7 +277,7 @@ export default function BottomNav() {
             <DrawerFooter className="pt-2">
               <DrawerClose asChild>
                 <Button variant="ghost" size="sm">
-                  title="Default"
+                  {t('cancel')}
                 </Button>
               </DrawerClose>
             </DrawerFooter>

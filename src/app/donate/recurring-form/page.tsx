@@ -83,7 +83,7 @@ export default function RecurringDonationForm() {
             onClick={handleSubmit(onSubmit)}
             className="w-full"
           >
-            {isSubmitting ? 'Submitting...' : 'Continue'}
+            {isSubmitting ? t('submitting') : t('continue')}
           </Button>
         </BottomActionBar>
       }
@@ -138,23 +138,24 @@ export default function RecurringDonationForm() {
 
         {/* Allergens */}
         <AllergensDropdown
-          label="Allergens & dietary information"
+          label={t('allergensAndDietaryInfo')}
           options={[
-            'None',
-            'Milk',
-            'Eggs',
-            'Fish',
-            'Shellfish',
-            'Tree nuts',
-            'Peanuts',
-            'Wheat',
-            'Soybeans',
-            'Vegan',
-            'Vegetarian',
-            'Gluten-free',
-            'Halal',
-            'Kosher',
-            'Low-lactose',
+            t('notSpecified'),
+            t('glutenFree'),
+            t('lactoseFree'),
+            t('lowLactose'),
+            t('eggFree'),
+            t('soyFree'),
+            t('noPeanuts'),
+            t('noOtherNuts'),
+            t('noFish'),
+            t('noCrustaceans'),
+            t('noCelery'),
+            t('noMustard'),
+            t('noSesamSeeds'),
+            t('noSulphurDioxide'),
+            t('noLupin'),
+            t('noMolluscs'),
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}

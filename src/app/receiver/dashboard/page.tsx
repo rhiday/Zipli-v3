@@ -190,7 +190,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.totalPeople}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('peopleServed')}
+                  {t('peopleServedDesc')}
                 </p>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.estimatedKg}kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('foodRequested')}
+                  {t('foodRequestedDesc')}
                 </p>
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.activeRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('activeRequests')}
+                  {t('activeRequestsDesc')}
                 </p>
               </div>
             </div>
@@ -232,7 +232,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
                   {stats.fulfilledRequests}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('fulfilledRequests')}
+                  {t('fulfilledRequestsDesc')}
                 </p>
               </div>
             </div>

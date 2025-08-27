@@ -16,6 +16,48 @@ interface AllergensDropdownProps {
   placeholder?: string;
 }
 
+// Function to create short chip labels from full allergen names
+const getShortLabel = (fullLabel: string): string => {
+  const shortcuts: Record<string, string> = {
+    'Not specified': 'Not specified',
+    'Gluten-free': 'Gluten-free',
+    'Lactose-free': 'Lactose-free',
+    'Low-lactose': 'Low-lactose',
+    'Egg-free': 'Egg-free',
+    'Soy-free': 'Soy-free',
+    'Does not contain peanuts': 'Peanuts',
+    'Does not contain other nuts': 'Other nuts',
+    'Does not contain fish': 'Fish',
+    'Does not contain crustaceans': 'Crustaceans',
+    'Does not contain celery': 'Celery',
+    'Does not contain mustard': 'Mustard',
+    'Does not contain sesame seeds': 'Sesame seeds',
+    'Does not contain sulphur dioxide / sulphites >10 mg/kg or litre':
+      'Sulphites',
+    'Does not contain lupin': 'Lupin',
+    'Does not contain molluscs': 'Molluscs',
+    // Finnish versions
+    Määritelty: 'Määritelty',
+    Gluteeniton: 'Gluteeniton',
+    Laktoositon: 'Laktoositon',
+    Vähälaktoosinen: 'Vähälaktoosinen',
+    Munaton: 'Munaton',
+    Soijaton: 'Soijaton',
+    'Ei sisällä maapähkinöitä': 'Maapähkinät',
+    'Ei sisällä muita pähkinöitä': 'Muut pähkinät',
+    'Ei sisällä kalaa': 'Kala',
+    'Ei sisällä äyriäisiä': 'Äyriäiset',
+    'Ei sisällä selleriä': 'Selleri',
+    'Ei sisällä sinappia': 'Sinappi',
+    'Ei sisällä seesaminsiemeniä': 'Seesaminsiemenet',
+    'Ei sisällä rikkidioksidia / sulfiitteja (>10 mg/kg)': 'Sulfiitit',
+    'Ei sisällä lupiinia': 'Lupiini',
+    'Ei sisällä nilviäisiä': 'Nilviäiset',
+  };
+
+  return shortcuts[fullLabel] || fullLabel;
+};
+
 export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   label,
   options,
@@ -24,7 +66,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   error,
   hint,
   disabled,
-  placeholder = "Select...",
+  placeholder = 'Select...',
 }) => {
   const { t } = useAllergenSelectorTranslation();
   const [open, setOpen] = useState(false);
@@ -81,42 +123,47 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           onClick={handleInputClick}
         />
         {value.length > 0 && (
-          <>
-            <div
-              className="absolute left-3 right-12 top-1/2 -translate-y-1/2 flex gap-2 overflow-x-auto overflow-y-hidden pointer-events-auto scrollbar-hide"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-              }}
-              onClick={(e) => e.stopPropagation()} // Prevent input click when scrolling
-            >
-              {value.map((v) => (
-                <div key={v} className="flex-shrink-0">
-                  <Chip label={v} selected onRemove={() => handleToggle(v)} />
-                </div>
-              ))}
-            </div>
-            {hasOverflow && (
-              <div className="absolute right-12 top-1/2 -translate-y-1/2 w-6 h-8 bg-gradient-to-l from-base to-transparent pointer-events-none" />
-            )}
-          </>
+          <div
+            className="absolute left-3 right-12 top-1/2 -translate-y-1/2 flex gap-1.5 overflow-x-auto overflow-y-hidden pointer-events-auto scrollbar-hide max-w-[calc(100%-60px)]"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {value.map((v) => (
+              <div key={v} className="flex-shrink-0">
+                <Chip
+                  label={getShortLabel(v)}
+                  selected
+                  onRemove={() => handleToggle(v)}
+                />
+              </div>
+            ))}
+          </div>
         )}
         {open && (
-          <div className="absolute left-0 right-0 mt-2 bg-base border border-border rounded-md shadow-lg z-20">
+          <div className="absolute left-0 right-0 mt-1 bg-base border border-border rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
             {options.map((option) => (
               <div
                 key={option}
-                className={`flex items-center px-4 py-2 cursor-pointer transition-colors ${value.includes(option) ? 'bg-positive/20' : 'hover:bg-cloud'}`}
+                className={`flex items-center px-3 py-2.5 cursor-pointer transition-colors ${
+                  value.includes(option)
+                    ? 'bg-positive/10 border-l-2 border-positive'
+                    : 'hover:bg-cloud'
+                }`}
                 onClick={() => handleToggle(option)}
               >
                 <input
                   type="checkbox"
                   checked={value.includes(option)}
                   readOnly
-                  className="mr-2 accent-positive"
+                  className="mr-3 accent-positive w-4 h-4"
                 />
-                <span className="text-body text-primary">{option}</span>
+                <span className="text-body text-primary leading-tight">
+                  {option}
+                </span>
               </div>
             ))}
           </div>

@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         return {
           id: d.id,
           quantity: d.quantity,
-          name: foodItem?.name  || 'Unknown_item',
+          name: foodItem?.name || 'Unknown_item',
           created_at: d.created_at || d.pickup_time || new Date().toISOString(),
           type: 'donation' as const,
         };
@@ -167,9 +167,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                 >
                   <div>
                     <span className="text-sm font-semibold text-white">
-                      {item.type === 'donation'
-                        ? 'Donation'
-                        : 'Request'}
+                      {item.type === 'donation' ? t('donation') : t('request')}
                     </span>
                     <span className="text-white/90 text-sm ml-1">
                       ·{' '}

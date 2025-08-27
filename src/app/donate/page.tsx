@@ -119,7 +119,7 @@ function DonorDashboardPage(): React.ReactElement {
   if (loading) {
     return (
       <div className="min-h-[100svh] pb-20">
-        <Header title={'Loading'} />
+        <Header title={t('loading')} />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
           <section>
