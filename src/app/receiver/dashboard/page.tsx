@@ -4,7 +4,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import BottomNav from '@/components/BottomNav';
 import {
   ArrowRight,
   Info,
@@ -161,8 +160,6 @@ export default function ReceiverDashboardPage(): React.ReactElement {
             </div>
           </section>
         </main>
-
-        <BottomNav />
       </div>
     );
   }
@@ -297,8 +294,6 @@ export default function ReceiverDashboardPage(): React.ReactElement {
           </div>
         </section> */}
       </main>
-
-      <BottomNav />
     </div>
   );
 }
