@@ -1,33 +1,31 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import BottomNav from '@/components/BottomNav';
-import {
-  ArrowLeft,
-  Download,
-  ChevronDown,
-  Scale,
-  Utensils,
-  Euro,
-  Leaf,
-  Users,
-  Package,
-  TrendingUp as TrendingIcon,
-  BarChart,
-} from 'lucide-react';
-import Header from '@/components/layout/Header';
-import Image from 'next/image';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useLanguage } from '@/hooks/useLanguage';
+import {
+  generateRealisticMockData,
+  impactCalculator,
+} from '@/lib/impact-calculator';
 import { loadJsPDF } from '@/lib/lazy-imports';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import {
+  ArrowLeft,
+  BarChart,
+  ChevronDown,
+  Euro,
+  Leaf,
+  Scale,
+  TrendingUp as TrendingIcon,
+  Utensils,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 function ImpactPage(): React.ReactElement {
   const router = useRouter();
@@ -66,100 +64,170 @@ function ImpactPage(): React.ReactElement {
 
     const now = new Date();
     let cutoffDate: Date;
+    let periodDays: number;
 
     switch (selectedPeriod) {
       case '30days':
         cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        periodDays = 30;
         break;
       case '90days':
         cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        periodDays = 90;
         break;
       case '365days':
         cutoffDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        periodDays = 365;
         break;
       default:
         cutoffDate = new Date(0); // All time
+        periodDays = 0;
     }
 
+    // Transform database format to impact calculator format
     const userDonations = allDonations
       .filter((d) => d.donor_id === currentUser.id)
       .filter((d) => new Date(d.created_at) >= cutoffDate)
       .map((d) => {
         const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
-        return { ...d, food_item: foodItem! };
+        return {
+          id: d.id,
+          food_item: {
+            name: foodItem?.name || 'Food donation',
+            weight_kg: foodItem?.quantity || 2.5, // Use quantity as weight
+            created_at: d.created_at,
+            category: foodItem?.food_type || 'mixed',
+          },
+          status: d.status as
+            | 'available'
+            | 'requested'
+            | 'picked_up'
+            | 'expired',
+          created_at: d.created_at,
+          picked_up_at: d.pickup_time || undefined,
+          donor_id: d.donor_id,
+        };
       });
+
+    // Use realistic mock data for demo if no real data exists
+    const donationsForCalculation =
+      userDonations.length > 0 ? userDonations : generateRealisticMockData(12);
 
     const userRequests = allRequests
       .filter((r) => r.user_id === currentUser.id)
       .filter((r) => new Date(r.created_at) >= cutoffDate);
 
-    return { userDonations, userRequests };
+    return { userDonations: donationsForCalculation, userRequests, periodDays };
   }, [currentUser, allDonations, allRequests, foodItems, selectedPeriod]);
 
-  // Mock trend data for visualizations
-  const trendData = useMemo(() => {
+  // Calculate realistic impact metrics and trends
+  const { impactStats, trendData, benchmarks } = useMemo(() => {
+    const { userDonations, userRequests, periodDays } = filteredData;
+
+    // Calculate comprehensive impact metrics using real data
+    const metrics = impactCalculator.calculateImpact(userDonations, periodDays);
+
+    // Generate realistic trend data based on actual donations
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    const donationTrend = [
-      { month: 'Jan', donations: 3, weight: 8 },
-      { month: 'Feb', donations: 5, weight: 12 },
-      { month: 'Mar', donations: 4, weight: 10 },
-      { month: 'Apr', donations: 7, weight: 18 },
-      { month: 'May', donations: 6, weight: 15 },
-      { month: 'Jun', donations: 8, weight: 21 },
-    ];
+    const trends = impactCalculator.calculateTrends(userDonations, months);
 
-    const impactTrend = [
-      { month: 'Jan', co2: 2, cost: 20 },
-      { month: 'Feb', co2: 3, cost: 30 },
-      { month: 'Mar', co2: 2.5, cost: 25 },
-      { month: 'Apr', co2: 4, cost: 45 },
-      { month: 'May', co2: 3.5, cost: 37 },
-      { month: 'Jun', co2: 5, cost: 52 },
-    ];
+    // Get benchmark comparisons
+    const benchmarks = impactCalculator.getBenchmarks(metrics);
 
-    return { donationTrend, impactTrend };
-  }, []);
-
-  // Calculate impact statistics using the same pattern as dashboard
-  const impactStats = useMemo(() => {
-    const { userDonations, userRequests } = filteredData;
-
-    // Use the same calculation pattern as the dashboard
-    const totalWeight = 46; // Static for now like dashboard
-    const totalPortions = 131;
-    const costSavings = 125;
-    const co2Reduction = 10;
-    const peopleHelped = Math.floor(totalPortions / 3);
-
-    return {
-      totalWeight,
-      totalPortions,
-      costSavings,
-      co2Reduction,
-      peopleHelped,
-      donationCount: userDonations.length,
+    // Additional stats for compatibility with existing UI
+    const additionalStats = {
       requestCount: userRequests.length,
       activeDonations: userDonations.filter((d) => d.status === 'available')
         .length,
       completedDonations: userDonations.filter((d) => d.status === 'picked_up')
         .length,
     };
+
+    return {
+      impactStats: { ...metrics, ...additionalStats },
+      trendData: {
+        donationTrend: trends.map((t) => ({
+          month: t.period,
+          donations: t.donations,
+          weight: t.weight,
+        })),
+        impactTrend: trends.map((t) => ({
+          month: t.period,
+          co2: t.co2,
+          cost: t.cost,
+        })),
+      },
+      benchmarks,
+    };
   }, [filteredData]);
 
-  // Handle PDF export
+  // Handle PDF export with comprehensive metrics
   const handleExportPDF = useCallback(async () => {
     const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text('Zipli Impact Report', 10, 10);
-    doc.setFontSize(12);
-    doc.text(`Total food donated: ${impactStats.totalWeight}kg`, 10, 20);
-    doc.text(`Portions created: ${impactStats.totalPortions}`, 10, 30);
-    doc.text(`Cost savings: €${impactStats.costSavings}`, 10, 40);
-    doc.text(`CO2 reduced: ${impactStats.co2Reduction}t`, 10, 50);
-    doc.text(`People helped: ${impactStats.peopleHelped}`, 10, 60);
-    doc.save('zipli-impact-report.pdf');
-  }, [impactStats]);
+
+    // Header
+    doc.setFontSize(18);
+    doc.text('Zipli Impact Report', 20, 20);
+    doc.setFontSize(10);
+    doc.text(`Generated on ${new Date().toLocaleDateString()}`, 20, 30);
+    doc.text(
+      `Period: ${periods.find((p) => p.value === selectedPeriod)?.label}`,
+      20,
+      36
+    );
+
+    // Key metrics
+    doc.setFontSize(14);
+    doc.text('Impact Summary', 20, 50);
+    doc.setFontSize(11);
+    doc.text(`Total food donated: ${impactStats.totalWeight}kg`, 25, 60);
+    doc.text(`Portions created: ${impactStats.totalPortions}`, 25, 67);
+    doc.text(`People helped: ${impactStats.peopleHelped}`, 25, 74);
+    doc.text(`Meals provided: ${impactStats.mealsProvided}`, 25, 81);
+
+    // Environmental impact
+    doc.setFontSize(14);
+    doc.text('Environmental Impact', 20, 95);
+    doc.setFontSize(11);
+    doc.text(
+      `CO2 emissions avoided: ${impactStats.co2Avoided}kg (${impactStats.co2AvoidedTons}t)`,
+      25,
+      105
+    );
+    doc.text(
+      `Environmental score: ${impactStats.environmentalScore}/100`,
+      25,
+      112
+    );
+    doc.text(`${benchmarks.co2Equivalent}`, 25, 119);
+
+    // Economic impact
+    doc.setFontSize(14);
+    doc.text('Economic Impact', 20, 133);
+    doc.setFontSize(11);
+    doc.text(`Disposal cost savings: €${impactStats.costSavings}`, 25, 143);
+    doc.text(`Food value saved: €${impactStats.foodValueSaved}`, 25, 150);
+    doc.text(`Total social value: €${impactStats.socialValue}`, 25, 157);
+
+    // Performance metrics
+    doc.setFontSize(14);
+    doc.text('Performance Metrics', 20, 171);
+    doc.setFontSize(11);
+    doc.text(`Success rate: ${impactStats.successRate}%`, 25, 181);
+    doc.text(
+      `Average time to pickup: ${impactStats.averageDaysToPickup} days`,
+      25,
+      188
+    );
+    doc.text(
+      `Waste reduction rate: ${impactStats.wasteReductionRate}%`,
+      25,
+      195
+    );
+
+    doc.save(`zipli-impact-report-${selectedPeriod}.pdf`);
+  }, [impactStats, benchmarks, selectedPeriod, periods]);
 
   if (loading) {
     return (
@@ -167,7 +235,7 @@ function ImpactPage(): React.ReactElement {
         <div className="bg-base p-4 pt-6">
           <div className="h-7 w-32 bg-gray-200 rounded-md animate-pulse"></div>
         </div>
-        <BottomNav />
+        {/* BottomNav is provided by AppShell; avoid duplicate mount here */}
       </div>
     );
   }
@@ -175,6 +243,17 @@ function ImpactPage(): React.ReactElement {
   return (
     <div className="min-h-dvh pb-20">
       <main className="bg-base p-4 space-y-6 pt-6">
+        {/* Back button */}
+        <div className="flex items-center mb-4">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        </div>
+
         {/* Header with same pattern as dashboard */}
         <section>
           <div className="flex justify-between items-start gap-4 mb-4">
@@ -254,72 +333,9 @@ function ImpactPage(): React.ReactElement {
               </div>
               <div>
                 <span className="text-2xl font-semibold text-green-800">
-                  {impactStats.co2Reduction}t
+                  {impactStats.co2AvoidedTons}t
                 </span>
                 <p className="text-sm text-primary-75 mt-1">CO2 Avoided</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Additional Impact Metrics */}
-        <section className="space-y-4">
-          <h3 className="text-lg font-semibold text-primary">
-            Detailed Analytics
-          </h3>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl border border-primary-10 shadow-sm p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-5 h-5 text-blue-600" />
-                <span className="text-xl font-semibold text-blue-800">
-                  {impactStats.peopleHelped}
-                </span>
-              </div>
-              <span className="text-sm text-gray-600">People Helped</span>
-            </div>
-
-            <div className="bg-white rounded-xl border border-primary-10 shadow-sm p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Package className="w-5 h-5 text-purple-600" />
-                <span className="text-xl font-semibold text-purple-800">
-                  {impactStats.donationCount}
-                </span>
-              </div>
-              <span className="text-sm text-gray-600">Total Donations</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl border border-primary-10 shadow-sm p-4">
-            <h4 className="font-semibold text-primary mb-3">
-              Activity Breakdown
-            </h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-600">Active Donations</p>
-                <p className="text-lg font-semibold text-green-700">
-                  {impactStats.activeDonations}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-600">Completed Donations</p>
-                <p className="text-lg font-semibold text-blue-700">
-                  {impactStats.completedDonations}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-600">Total Requests</p>
-                <p className="text-lg font-semibold text-purple-700">
-                  {impactStats.requestCount}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-600">Avg per Donation</p>
-                <p className="text-lg font-semibold text-orange-700">
-                  {impactStats.donationCount > 0
-                    ? `${Math.round((impactStats.totalWeight / impactStats.donationCount) * 10) / 10}kg`
-                    : '0kg'}
-                </p>
               </div>
             </div>
           </div>
@@ -455,76 +471,22 @@ function ImpactPage(): React.ReactElement {
           {/* Quick Stats Cards */}
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-green-800">6</div>
-              <div className="text-xs text-green-600">Months Active</div>
+              <div className="text-lg font-bold text-green-800">
+                {impactStats.successRate}%
+              </div>
+              <div className="text-xs text-green-600">Success Rate</div>
             </div>
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-blue-800">94%</div>
-              <div className="text-xs text-blue-600">Success Rate</div>
+              <div className="text-lg font-bold text-blue-800">
+                {impactStats.averageWeight}kg
+              </div>
+              <div className="text-xs text-blue-600">Avg/Donation</div>
             </div>
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-purple-800">3.2kg</div>
-              <div className="text-xs text-purple-600">Avg/Donation</div>
-            </div>
-          </div>
-        </section>
-
-        {/* Organizations section - same as dashboard */}
-        <section>
-          <h2 className="text-lg font-semibold text-primary mb-3">
-            This is whom you've helped
-          </h2>
-
-          <div className="space-y-4">
-            {/* Recipient 1 - Tsänssi */}
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-full overflow-hidden relative">
-                <Image
-                  src="/images/tsänssi.jpg"
-                  alt="Tsänssi logo"
-                  fill
-                  className="object-contain bg-white"
-                  sizes="64px"
-                />
+              <div className="text-lg font-bold text-purple-800">
+                {impactStats.averageDaysToPickup}d
               </div>
-              <div>
-                <h3 className="text-primary font-medium">Tsänssi</h3>
-                <p className="text-sm text-primary-75">3 kg · Warm food</p>
-              </div>
-            </div>
-
-            {/* Recipient 2 - Red cross */}
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-full overflow-hidden relative">
-                <Image
-                  src="/images/redcross.jpg"
-                  alt="Red Cross logo"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <h3 className="text-primary font-medium">Red cross</h3>
-                <p className="text-sm text-primary-75">
-                  10 kg · Warm food; Cold food
-                </p>
-              </div>
-            </div>
-
-            {/* Recipient 3 - Andreas church */}
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-full overflow-hidden relative">
-                <Image
-                  src="/images/kirkko.jpg"
-                  alt="Andreas church logo"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <h3 className="text-primary font-medium">Andreas church</h3>
-                <p className="text-sm text-primary-75">7 kg · Cold food</p>
-              </div>
+              <div className="text-xs text-purple-600">Avg Pickup Time</div>
             </div>
           </div>
         </section>
@@ -545,7 +507,7 @@ function ImpactPage(): React.ReactElement {
         </div>
       </main>
 
-      <BottomNav />
+      {/* BottomNav is provided by AppShell; avoid duplicate mount here */}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import {
   Languages,
-  MessageSquare,
+  Phone,
   UserCircle,
   ChevronDown,
   ChevronUp,
@@ -111,9 +111,12 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       <div className="flex items-center justify-between">
         <LanguageSwitcher compact />
         <div className="flex items-center gap-2">
-          <button className="w-10 h-10 border border-[#F3F4ED] rounded-full flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-white" />
-          </button>
+          <Link
+            href="/contact"
+            className="w-10 h-10 border border-[#F3F4ED] rounded-full flex items-center justify-center"
+          >
+            <Phone className="w-5 h-5 text-white" />
+          </Link>
           <Link
             href="/profile"
             className="w-10 h-10 border border-[#F3F4ED] rounded-full flex items-center justify-center"

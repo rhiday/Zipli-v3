@@ -292,6 +292,47 @@ export const fi = {
   receiveNotificationWhenMatch:
     'Saat notifikaation, kun löydämme sopivan vastaanottajan ja voimme varmistaa noutoajan.',
 
+  // Impact page specific
+  yourCompleteImpact: 'Kokonaisvaikutuksesi',
+  allTime: 'Koko aika',
+  last30Days: 'Viimeiset 30 päivää',
+  last3Months: 'Viimeiset 3 kuukautta',
+  lastYear: 'Viimeinen vuosi',
+  totalFoodOffered: 'Lahjoitettu ruoka',
+  portionsCreated: 'Luodut annokset',
+  historicalTrends: 'Trendit',
+  donationTrend: 'Lahjoitustrendi',
+  lastSixMonths: '(Viimeiset 6 kuukautta)',
+  environmentalImpactTrend: 'Ympäristövaikutus trendi',
+  co2Reduction: 'CO2 vähennys',
+  successRate: 'Onnistumisprosentti',
+  avgPerDonation: 'Keskiarvo/lahjoitus',
+  avgPickupTime: 'Keskim. noutoaika',
+  downloadCompleteReport: 'Lataa täydellinen vaikutusraportti ja analytiikka',
+  detailedAnalytics: 'Yksityiskohtainen analytiikka',
+  peopleHelped: 'Autettuja ihmisiä',
+  totalDonations: 'Lahjoituksia yhteensä',
+  activityBreakdown: 'Toiminnan erittely',
+  performanceMetrics: 'Suorituskykymittarit',
+  monthsActive: 'Kuukautta aktiivisena',
+  impactSummaryTitle: 'Vaikutusraportti',
+  environmentalImpact: 'Ympäristövaikutus',
+  economicImpact: 'Taloudelliset vaikutukset',
+
+  // Contact page
+  contact: 'Yhteystiedot',
+  getInTouch: 'Ota yhteyttä',
+  phone: 'Puhelin',
+  businessHours: 'Aukioloajat',
+  needHelp: 'Tarvitsetko apua?',
+  emergencySupport: 'Hätätuki',
+  forUrgentFoodSafetyIssues: 'Kiireellisissä ruokaturvallisuusasioissa:',
+  available247: 'Saatavilla 24/7',
+  ourSupportTeam:
+    'Tukitiimimme on täällä auttamassa sinua kaikissa Ziplin käyttöön liittyvissä kysymyksissä.',
+  reducingFoodWaste:
+    'Vähennämme ruokahävikkiä ja rakennamme kestäviä yhteisöjä teknologian avulla.',
+
   // Common words
   available: 'Saatavilla',
   claimed: 'Varattu',
