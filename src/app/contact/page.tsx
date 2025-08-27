@@ -24,8 +24,8 @@ export default function ContactPage(): React.ReactElement {
               Zipli Oy
             </h2>
             <p className="text-gray-600 mb-6">
-              Reducing food waste and building sustainable communities through
-              technology.
+              Helping cities and the food industry cut waste and hit their
+              impact goals.
             </p>
           </div>
 
@@ -39,7 +39,7 @@ export default function ContactPage(): React.ReactElement {
               <Phone className="w-5 h-5 text-primary mt-1" />
               <div>
                 <p className="font-medium text-gray-900">Phone</p>
-                <p className="text-gray-600">+358 40 123 4567</p>
+                <p className="text-gray-600">+358 40 723 2017</p>
               </div>
             </div>
 
@@ -47,7 +47,7 @@ export default function ContactPage(): React.ReactElement {
               <Mail className="w-5 h-5 text-primary mt-1" />
               <div>
                 <p className="font-medium text-gray-900">Email</p>
-                <p className="text-gray-600">info@zipli.fi</p>
+                <p className="text-gray-600">ninja@nowastefutures.com</p>
               </div>
             </div>
 
@@ -86,10 +86,10 @@ export default function ContactPage(): React.ReactElement {
               using Zipli.
             </p>
             <a
-              href="mailto:support@zipli.fi"
+              href="mailto:ninja@nowastefutures.com"
               className="text-primary font-semibold underline underline-offset-4"
             >
-              support@zipli.fi
+              ninja@nowastefutures.com
             </a>
           </div>
 
@@ -99,7 +99,7 @@ export default function ContactPage(): React.ReactElement {
               Emergency Support
             </h3>
             <p className="text-gray-600 mb-2">For urgent food safety issues:</p>
-            <p className="text-xl font-bold text-primary">+358 40 987 6543</p>
+            <p className="text-xl font-bold text-primary">+358 40 723 2017</p>
             <p className="text-sm text-gray-500 mt-1">Available 24/7</p>
           </div>
         </div>
