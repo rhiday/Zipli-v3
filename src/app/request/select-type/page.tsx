@@ -26,7 +26,7 @@ export default function RequestTypeSelection() {
       <div className="space-y-6">
         <div className="text-center mb-8">
           <h2 className="text-titleSm text-primary mb-2">
-            {t('selectRequestType')}?
+            {t('selectRequestType')}
           </h2>
           <p className="text-body text-secondary">
             Choose the type that best fits your needs

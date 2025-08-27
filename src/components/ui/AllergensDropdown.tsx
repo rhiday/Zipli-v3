@@ -130,7 +130,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
               WebkitMaskImage:
                 'linear-gradient(to right, black 0%, black 85%, transparent 100%)',
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleInputClick}
           >
             {value.map((v) => (
               <div key={v} className="flex-shrink-0">
