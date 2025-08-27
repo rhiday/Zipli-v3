@@ -10,7 +10,7 @@ import { useCommonTranslation } from '@/hooks/useTranslations';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('hasan@zipli.test');
+  const [email, setEmail] = useState('tsanssi@etappiry.net');
   const [password, setPassword] = useState('password');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
