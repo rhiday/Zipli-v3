@@ -222,6 +222,8 @@ export const fi = {
   backToDashboard: 'Takaisin kotinäkymään',
   peopleCount: 'Henkilömäärä',
   enterNumberOfPeople: 'Syötä määrä',
+  deliveryDate: 'Toimituksen päivämäärä',
+  deliveryTimeslot: 'Toimituksen aikaväli',
   selectAllergens: 'Valitse allergeenit',
   describeFood: 'Pyynnön kuvaus',
   foodDescriptionPlaceholder: 'Lisää tähän vihjetekstiä.',

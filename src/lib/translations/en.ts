@@ -222,6 +222,8 @@ export const en = {
   backToDashboard: 'Back to Dashboard',
   peopleCount: 'Number of people',
   enterNumberOfPeople: 'Enter quantity',
+  deliveryDate: 'Delivery date',
+  deliveryTimeslot: 'Delivery timeslot',
   selectAllergens: 'Select allergens',
   describeFood: 'Request description',
   foodDescriptionPlaceholder: 'Enter text here.',

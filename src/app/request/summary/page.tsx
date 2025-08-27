@@ -271,7 +271,7 @@ export default function RequestSummaryPage() {
               {requestData.description || 'Food Request'}
             </div>
             <div className="text-sm text-gray-600">
-              {t('peopleCount')}: {requestData.quantity || '—'}
+              {t('quantity')}: {requestData.quantity || '—'} kg
             </div>
             <div className="text-sm text-gray-600">
               {t('requestDetails')}:{' '}

@@ -85,7 +85,7 @@ export default function RequestsPage(): React.ReactElement {
   if (loading) {
     return (
       <PageContainer
-        header={<SecondaryNavbar title="Food Requests" />}
+        header={<SecondaryNavbar title="Food Requests" backHref="#" />}
         className="bg-white"
         contentClassName="flex items-center justify-center min-h-[50vh]"
       >

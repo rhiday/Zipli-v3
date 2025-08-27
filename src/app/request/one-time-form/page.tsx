@@ -153,7 +153,7 @@ export default function OneTimeRequestForm() {
         {/* Quantity */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            {t('peopleCount')}
+            {t('quantity')} (kg)
           </label>
           <Input
             {...register('quantity', {
@@ -164,7 +164,7 @@ export default function OneTimeRequestForm() {
                 message: 'Please enter a valid number',
               },
             })}
-            placeholder={t('enterNumberOfPeople')}
+            placeholder="Enter quantity in kg"
             type="number"
             variant={errors.quantity ? 'error' : 'default'}
           />

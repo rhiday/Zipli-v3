@@ -268,7 +268,7 @@ export default function PickupSlotPage() {
             {/* Date Picker */}
             <div>
               <label className="block text-black font-semibold mb-3">
-                {t('dateLabel')}
+                {t('deliveryDate')}
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -311,11 +311,11 @@ export default function PickupSlotPage() {
             </div>
 
             {/* Time Pickers */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-black font-semibold mb-3">
-                  {t('startTimeLabel')}
-                </label>
+            <div>
+              <label className="block text-black font-semibold mb-3">
+                {t('deliveryTimeslot')}
+              </label>
+              <div className="grid grid-cols-2 gap-4">
                 <Popover
                   open={openPopover === 'start'}
                   onOpenChange={(isOpen) =>
@@ -361,11 +361,6 @@ export default function PickupSlotPage() {
                     </div>
                   </PopoverContent>
                 </Popover>
-              </div>
-              <div>
-                <label className="block text-black font-semibold mb-3">
-                  {t('endTimeLabel')}
-                </label>
                 <Popover
                   open={openPopover === 'end'}
                   onOpenChange={(isOpen) =>

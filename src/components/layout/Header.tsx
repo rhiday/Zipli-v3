@@ -176,7 +176,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                       ·{' '}
                       {item.type === 'donation'
                         ? `${item.quantity} kg, ${item.name}`
-                        : `${item.quantity} people, ${item.name}`}
+                        : `${item.quantity} kg, ${item.name}`}
                     </span>
                   </div>
                   <button
