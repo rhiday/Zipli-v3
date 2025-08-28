@@ -21,6 +21,8 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
   const isDocsRoute = pathname.startsWith('/docs');
+  const isCityDashboard = pathname === '/dashboard/city';
+  const isFullWidthRoute = isDocsRoute || isCityDashboard;
 
   // Hides bottom nav on all pages within the donation and request creation flows, and profile page.
   const flowRegex =
@@ -35,8 +37,8 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
           {/* No shell for auth routes but still need store init */}
           {children}
         </>
-      ) : isDocsRoute ? (
-        /* Full-width layout for documentation pages */
+      ) : isFullWidthRoute ? (
+        /* Full-width layout for documentation and city dashboard pages */
         <div className="min-h-[100svh] bg-gray-50">{children}</div>
       ) : (
         /* Layout: A mobile-like container centered on all screen sizes */
