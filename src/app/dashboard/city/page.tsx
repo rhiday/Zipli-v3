@@ -20,6 +20,9 @@ import {
   CheckCircle,
   Plus,
   FileText,
+  Calendar,
+  MapPin,
+  Clock,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import {
@@ -52,12 +55,13 @@ const content = {
     totalDonations: 'Lahjoitukset yhteensä',
     activeRequests: 'Aktiiviset pyynnöt',
     storageCapacity: 'Varastokapasiteetti',
-    dailyThroughput: 'Päivittäinen läpimeno',
-    hourlyActivity: 'Tuntikohtainen toiminta',
+    dailyVolume: 'Päivän volyymi',
+    monthlyTrends: 'Kuukausittaiset trendit',
     storageByCategory: 'Varasto kategorioittain',
-    distributionByRecipient: 'Jakelu vastaanottajittain',
+    topRecipients: 'Suurimmat vastaanottajat',
     recentActivity: 'Viimeaikainen toiminta',
-    weeklyPerformance: 'Viikkosuoritus',
+    todaysSchedule: 'Päivän aikataulu',
+    logistics: 'Logistiikka ja kuljetukset',
     quickActions: 'Pikatoiminnot',
     systemStatus: 'Järjestelmän tila',
     live: 'Live',
@@ -65,7 +69,6 @@ const content = {
     capacityKg: 'Kapasiteetti (kg)',
     donations: 'Lahjoitukset',
     requests: 'Pyynnöt',
-    wasteReduced: 'Jätteen vähennys (kg)',
     operations: 'Toiminnot',
     allSystemsRunning: 'Kaikki järjestelmät toimivat',
     processingTime: 'Käsittelyaika',
@@ -85,6 +88,28 @@ const content = {
     pending: 'odottaa',
     completed: 'valmis',
     fulfilled: 'täytetty',
+    driver: 'Kuljettaja',
+    vehicle: 'Ajoneuvo',
+    pickup: 'Nouto',
+    delivery: 'Toimitus',
+    containers: 'GN-astiat',
+    schedule: 'Aikataulu',
+    route: 'Reitti',
+    available: 'Vapaa',
+    onRoute: 'Reitillä',
+    returning: 'Palaamassa',
+    january: 'Tammikuu',
+    february: 'Helmikuu',
+    march: 'Maaliskuu',
+    april: 'Huhtikuu',
+    may: 'Toukokuu',
+    june: 'Kesäkuu',
+    july: 'Heinäkuu',
+    august: 'Elokuu',
+    september: 'Syyskuu',
+    october: 'Lokakuu',
+    november: 'Marraskuu',
+    december: 'Joulukuu',
   },
   en: {
     title: 'Stadin Safka Terminal',
@@ -96,12 +121,13 @@ const content = {
     totalDonations: 'Total Donations',
     activeRequests: 'Active Requests',
     storageCapacity: 'Storage Capacity',
-    dailyThroughput: 'Daily Throughput',
-    hourlyActivity: 'Hourly Activity',
+    dailyVolume: 'Daily Volume',
+    monthlyTrends: 'Monthly Trends',
     storageByCategory: 'Storage by Category',
-    distributionByRecipient: 'Distribution by Recipient',
+    topRecipients: 'Top Recipients',
     recentActivity: 'Recent Activity',
-    weeklyPerformance: 'Weekly Performance Overview',
+    todaysSchedule: "Today's Schedule",
+    logistics: 'Logistics & Transportation',
     quickActions: 'Quick Actions',
     systemStatus: 'System Status',
     live: 'Live',
@@ -109,7 +135,6 @@ const content = {
     capacityKg: 'Capacity (kg)',
     donations: 'Donations',
     requests: 'Requests',
-    wasteReduced: 'Waste Reduced (kg)',
     operations: 'Operations',
     allSystemsRunning: 'All systems running',
     processingTime: 'Processing Time',
@@ -129,90 +154,193 @@ const content = {
     pending: 'pending',
     completed: 'completed',
     fulfilled: 'fulfilled',
+    driver: 'Driver',
+    vehicle: 'Vehicle',
+    pickup: 'Pickup',
+    delivery: 'Delivery',
+    containers: 'GN Containers',
+    schedule: 'Schedule',
+    route: 'Route',
+    available: 'Available',
+    onRoute: 'On Route',
+    returning: 'Returning',
+    january: 'January',
+    february: 'February',
+    march: 'March',
+    april: 'April',
+    may: 'May',
+    june: 'June',
+    july: 'July',
+    august: 'August',
+    september: 'September',
+    october: 'October',
+    november: 'November',
+    december: 'December',
   },
 };
 
-// Realistic Helsinki organizations data
-const majorDonors = [
+// Fleet data with drivers and vehicles
+const fleetData = [
   {
-    name: 'Sodexo Vilppulantie',
-    address: 'Vilppulantie 4, 00410 Helsinki',
-    type: 'Corporate Catering',
-    weeklyAverage: '180kg',
+    id: 1,
+    driver: 'Matti Virtanen',
+    vehicle: 'Ford Transit 1',
+    plateNumber: 'ABC-123',
+    status: 'onRoute',
+    currentLocation: 'K-Citymarket Kallio',
+    containers: 8,
+    maxContainers: 12,
   },
   {
-    name: 'Sodexo Helsinki Airport',
-    address: 'Helsinki-Vantaa Airport, Terminal 2',
-    type: 'Airport Catering',
-    weeklyAverage: '220kg',
+    id: 2,
+    driver: 'Jari Korhonen',
+    vehicle: 'Mercedes Sprinter',
+    plateNumber: 'XYZ-456',
+    status: 'available',
+    currentLocation: 'Terminal',
+    containers: 0,
+    maxContainers: 15,
   },
   {
-    name: 'Stockmann Herkku',
-    address: 'Aleksanterinkatu 52, 00100 Helsinki',
-    type: 'Department Store Food',
-    weeklyAverage: '150kg',
-  },
-  {
-    name: 'S-Market Kamppi',
-    address: 'Urho Kekkosen katu 1, 00100 Helsinki',
-    type: 'Supermarket',
-    weeklyAverage: '200kg',
-  },
-  {
-    name: 'K-Citymarket Kallio',
-    address: 'Hämeentie 135, 00560 Helsinki',
-    type: 'Hypermarket',
-    weeklyAverage: '280kg',
-  },
-  {
-    name: 'Fazer Bakery Punavuori',
-    address: 'Iso Roobertinkatu 21, 00120 Helsinki',
-    type: 'Bakery',
-    weeklyAverage: '90kg',
+    id: 3,
+    driver: 'Sanna Nieminen',
+    vehicle: 'Ford Transit 2',
+    plateNumber: 'DEF-789',
+    status: 'returning',
+    currentLocation: 'Pelastusarmeija',
+    containers: 4,
+    maxContainers: 12,
   },
 ];
 
-const majorRecipients = [
+// Today's schedule data
+const getTodaysSchedule = (lang: 'fi' | 'en') => [
   {
-    name: 'Tsänssi',
-    nameEn: 'Tsänssi Community Kitchen',
-    address: 'Hämeentie 135, 00560 Helsinki',
-    servesDaily: '150',
+    time: '08:00',
+    type: 'pickup',
+    location: 'Sodexo Vilppulantie',
+    driver: 'Matti Virtanen',
+    containers: 6,
+    status: 'completed',
+    address: 'Vilppulantie 4',
   },
   {
-    name: 'Helsingin Diakonissalaitos',
-    nameEn: 'Helsinki Deaconess Institute',
-    address: 'Ratakatu 12, 00120 Helsinki',
-    servesDaily: '200',
+    time: '09:30',
+    type: 'delivery',
+    location: 'Tsänssi',
+    driver: 'Matti Virtanen',
+    containers: 4,
+    status: 'completed',
+    address: 'Hämeentie 135',
+  },
+  {
+    time: '10:00',
+    type: 'pickup',
+    location: 'K-Citymarket Kallio',
+    driver: 'Sanna Nieminen',
+    containers: 8,
+    status: 'onRoute',
+    address: 'Hämeentie 135',
+  },
+  {
+    time: '11:30',
+    type: 'delivery',
+    location:
+      lang === 'fi'
+        ? 'Helsingin Diakonissalaitos'
+        : 'Helsinki Deaconess Institute',
+    driver: 'Sanna Nieminen',
+    containers: 5,
+    status: 'pending',
+    address: 'Ratakatu 12',
+  },
+  {
+    time: '13:00',
+    type: 'pickup',
+    location: 'S-Market Kamppi',
+    driver: 'Jari Korhonen',
+    containers: 7,
+    status: 'pending',
+    address: 'Urho Kekkosen katu 1',
+  },
+  {
+    time: '14:30',
+    type: 'delivery',
+    location: 'Pelastusarmeija',
+    driver: 'Jari Korhonen',
+    containers: 6,
+    status: 'pending',
+    address: 'Albertinkatu 23',
+  },
+  {
+    time: '15:30',
+    type: 'pickup',
+    location: 'Fazer Bakery Punavuori',
+    driver: 'Matti Virtanen',
+    containers: 3,
+    status: 'pending',
+    address: 'Iso Roobertinkatu 21',
+  },
+  {
+    time: '16:30',
+    type: 'delivery',
+    location: 'Caritas Helsinki',
+    driver: 'Matti Virtanen',
+    containers: 4,
+    status: 'pending',
+    address: 'Pyhän Henrikin aukio 1',
+  },
+];
+
+// Monthly trends data (last 6 months)
+const getMonthlyTrends = (lang: 'fi' | 'en') => {
+  const months =
+    lang === 'fi'
+      ? ['Maalis', 'Huhti', 'Touko', 'Kesä', 'Heinä', 'Elo']
+      : ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
+
+  return [
+    { month: months[0], donations: 85420, requests: 78350 },
+    { month: months[1], donations: 92180, requests: 86420 },
+    { month: months[2], donations: 98560, requests: 91230 },
+    { month: months[3], donations: 103420, requests: 96850 },
+    { month: months[4], donations: 108690, requests: 102340 },
+    { month: months[5], donations: 112850, requests: 106720 },
+  ];
+};
+
+// Real organizations for pie chart
+const getTopRecipientsData = (lang: 'fi' | 'en') => [
+  {
+    name: 'Tsänssi',
+    value: 2850,
+    percentage: 28,
+    color: '#4CAF50',
+  },
+  {
+    name: lang === 'fi' ? 'Helsingin Diakonissalaitos' : 'Helsinki Deaconess',
+    value: 2340,
+    percentage: 23,
+    color: '#2196F3',
   },
   {
     name: 'Pelastusarmeija',
-    nameEn: 'Salvation Army Helsinki',
-    address: 'Albertinkatu 23, 00180 Helsinki',
-    servesDaily: '180',
+    value: 1890,
+    percentage: 19,
+    color: '#FF9800',
   },
   {
     name: 'Caritas Helsinki',
-    nameEn: 'Caritas Helsinki',
-    address: 'Pyhän Henrikin aukio 1, 00140 Helsinki',
-    servesDaily: '120',
+    value: 1530,
+    percentage: 15,
+    color: '#9C27B0',
   },
-];
-
-// Hourly activity with realistic patterns
-const hourlyActivity = [
-  { hour: '06:00', donations: 45, requests: 32 },
-  { hour: '07:00', donations: 78, requests: 45 },
-  { hour: '08:00', donations: 120, requests: 89 },
-  { hour: '09:00', donations: 156, requests: 134 },
-  { hour: '10:00', donations: 189, requests: 167 },
-  { hour: '11:00', donations: 234, requests: 198 },
-  { hour: '12:00', donations: 267, requests: 223 },
-  { hour: '13:00', donations: 298, requests: 245 },
-  { hour: '14:00', donations: 312, requests: 267 },
-  { hour: '15:00', donations: 289, requests: 234 },
-  { hour: '16:00', donations: 245, requests: 198 },
-  { hour: '17:00', donations: 178, requests: 145 },
+  {
+    name: lang === 'fi' ? 'Muut' : 'Others',
+    value: 1520,
+    percentage: 15,
+    color: '#607D8B',
+  },
 ];
 
 // Storage data with Finnish categories
@@ -241,30 +369,6 @@ const getStorageData = (lang: 'fi' | 'en') => [
     category: lang === 'fi' ? 'Valmisruoka' : 'Prepared',
     amount: 290,
     capacity: 500,
-  },
-];
-
-// Distribution data with Finnish organizations
-const getDistributionData = (lang: 'fi' | 'en') => [
-  {
-    name: lang === 'fi' ? 'Järjestöt' : 'NGOs',
-    value: 55,
-    color: '#4CAF50',
-  },
-  {
-    name: lang === 'fi' ? 'Koulut' : 'Schools',
-    value: 25,
-    color: '#2196F3',
-  },
-  {
-    name: lang === 'fi' ? 'Suora nouto' : 'Direct Pickup',
-    value: 12,
-    color: '#FF9800',
-  },
-  {
-    name: lang === 'fi' ? 'Yhteisökeskukset' : 'Community Centers',
-    value: 8,
-    color: '#9C27B0',
   },
 ];
 
@@ -299,88 +403,6 @@ const getRecentActivities = (lang: 'fi' | 'en') => [
     time: lang === 'fi' ? '12 min sitten' : '12 min ago',
     status: 'processing',
   },
-  {
-    id: 4,
-    type: 'request',
-    organization: 'Pelastusarmeija',
-    amount: '150kg',
-    category: lang === 'fi' ? 'Mitä tahansa' : 'Any category',
-    time: lang === 'fi' ? '18 min sitten' : '18 min ago',
-    status: 'pending',
-  },
-  {
-    id: 5,
-    type: 'donation',
-    organization: 'Alepa Punavuori',
-    amount: '45kg',
-    category: lang === 'fi' ? 'Hedelmiä' : 'Fruits',
-    time: lang === 'fi' ? '25 min sitten' : '25 min ago',
-    status: 'completed',
-  },
-  {
-    id: 6,
-    type: 'request',
-    organization: 'Tsänssi',
-    amount: '95kg',
-    category: lang === 'fi' ? 'Valmisruokaa' : 'Prepared meals',
-    time: lang === 'fi' ? '32 min sitten' : '32 min ago',
-    status: 'fulfilled',
-  },
-  {
-    id: 7,
-    type: 'donation',
-    organization: 'Fazer Bakery Punavuori',
-    amount: '38kg',
-    category: lang === 'fi' ? 'Leipää' : 'Bread',
-    time: lang === 'fi' ? '45 min sitten' : '45 min ago',
-    status: 'completed',
-  },
-];
-
-// Weekly trends with Finnish day names
-const getWeeklyTrends = (lang: 'fi' | 'en') => [
-  {
-    day: lang === 'fi' ? 'Ma' : 'Mon',
-    donations: 420,
-    requests: 380,
-    waste_saved: 245,
-  },
-  {
-    day: lang === 'fi' ? 'Ti' : 'Tue',
-    donations: 465,
-    requests: 425,
-    waste_saved: 278,
-  },
-  {
-    day: lang === 'fi' ? 'Ke' : 'Wed',
-    donations: 510,
-    requests: 475,
-    waste_saved: 312,
-  },
-  {
-    day: lang === 'fi' ? 'To' : 'Thu',
-    donations: 580,
-    requests: 545,
-    waste_saved: 356,
-  },
-  {
-    day: lang === 'fi' ? 'Pe' : 'Fri',
-    donations: 625,
-    requests: 590,
-    waste_saved: 389,
-  },
-  {
-    day: lang === 'fi' ? 'La' : 'Sat',
-    donations: 380,
-    requests: 345,
-    waste_saved: 234,
-  },
-  {
-    day: lang === 'fi' ? 'Su' : 'Sun',
-    donations: 290,
-    requests: 265,
-    waste_saved: 178,
-  },
 ];
 
 export default function CityDashboardPage(): React.ReactElement {
@@ -395,8 +417,8 @@ export default function CityDashboardPage(): React.ReactElement {
     totalRequests: 2856,
     requestsChange: '+8%',
     storageCapacity: 72,
-    dailyThroughput: 4250,
-    throughputChange: '+5%',
+    dailyVolume: 4250,
+    volumeChange: '+5%',
     processingTime: '18 sec',
     fulfillmentRate: 96.8,
   };
@@ -407,8 +429,30 @@ export default function CityDashboardPage(): React.ReactElement {
       pending: { fi: 'odottaa', en: 'pending' },
       completed: { fi: 'valmis', en: 'completed' },
       fulfilled: { fi: 'täytetty', en: 'fulfilled' },
+      onRoute: { fi: 'reitillä', en: 'on route' },
+      available: { fi: 'vapaa', en: 'available' },
+      returning: { fi: 'palaamassa', en: 'returning' },
     };
     return statusMap[status]?.[language] || status;
+  };
+
+  const getTypeIcon = (type: string) => {
+    return type === 'pickup' ? (
+      <ArrowUpIcon className="h-4 w-4 text-blue-600" />
+    ) : (
+      <ArrowDownIcon className="h-4 w-4 text-green-600" />
+    );
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors: { [key: string]: string } = {
+      completed: 'bg-green-100 text-green-800',
+      onRoute: 'bg-blue-100 text-blue-800',
+      pending: 'bg-gray-100 text-gray-800',
+      available: 'bg-green-100 text-green-800',
+      returning: 'bg-yellow-100 text-yellow-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
   return (
@@ -479,6 +523,106 @@ export default function CityDashboardPage(): React.ReactElement {
 
       {/* Main Content */}
       <main className="p-6">
+        {/* Logistics & Today's Schedule - Moved to top */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Fleet Status */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Truck className="h-5 w-5" />
+              {t.logistics}
+            </h2>
+            <div className="space-y-3">
+              {fleetData.map((vehicle) => (
+                <div key={vehicle.id} className="border rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <p className="font-medium text-sm">{vehicle.driver}</p>
+                      <p className="text-xs text-gray-500">
+                        {vehicle.vehicle} • {vehicle.plateNumber}
+                      </p>
+                    </div>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(vehicle.status)}`}
+                    >
+                      {getStatusText(vehicle.status)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-600">
+                    <span>{vehicle.currentLocation}</span>
+                    <span>
+                      {vehicle.containers}/{vehicle.maxContainers}{' '}
+                      {t.containers}
+                    </span>
+                  </div>
+                  <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+                    <div
+                      className="bg-blue-500 h-1.5 rounded-full"
+                      style={{
+                        width: `${(vehicle.containers / vehicle.maxContainers) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Today's Schedule */}
+          <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              {t.todaysSchedule}
+            </h2>
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {getTodaysSchedule(language).map((item, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center gap-4 p-3 rounded-lg border ${
+                    item.status === 'completed'
+                      ? 'bg-gray-50'
+                      : item.status === 'onRoute'
+                        ? 'bg-blue-50 border-blue-200'
+                        : ''
+                  }`}
+                >
+                  <div className="flex flex-col items-center">
+                    <span className="text-sm font-medium">{item.time}</span>
+                    <div
+                      className={`mt-1 p-1 rounded-full ${
+                        item.type === 'pickup' ? 'bg-blue-100' : 'bg-green-100'
+                      }`}
+                    >
+                      {getTypeIcon(item.type)}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-sm">{item.location}</p>
+                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {item.address}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-600">{item.driver}</p>
+                        <p className="text-sm font-medium">
+                          {item.containers} GN
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
+                  >
+                    {getStatusText(item.status)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Key Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow p-6">
@@ -547,19 +691,19 @@ export default function CityDashboardPage(): React.ReactElement {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
-                  {t.dailyThroughput}
+                  {t.dailyVolume}
                 </p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">
-                  {metrics.dailyThroughput}kg
+                  {metrics.dailyVolume}kg
                 </p>
                 <p className="mt-2 flex items-center text-sm text-green-600">
                   <ArrowUpIcon className="h-4 w-4 mr-1" />
-                  {metrics.throughputChange}{' '}
+                  {metrics.volumeChange}{' '}
                   {language === 'fi' ? 'tänään' : 'today'}
                 </p>
               </div>
               <div className="p-3 bg-purple-100 rounded-full">
-                <Truck className="h-6 w-6 text-purple-600" />
+                <Activity className="h-6 w-6 text-purple-600" />
               </div>
             </div>
           </div>
@@ -567,15 +711,15 @@ export default function CityDashboardPage(): React.ReactElement {
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Activity Chart */}
+          {/* Monthly Trends */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              {t.hourlyActivity}
+              {t.monthlyTrends}
             </h2>
             <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={hourlyActivity}>
+              <AreaChart data={getMonthlyTrends(language)}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="hour" />
+                <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
@@ -586,7 +730,7 @@ export default function CityDashboardPage(): React.ReactElement {
                   stroke="#4CAF50"
                   fill="#4CAF50"
                   fillOpacity={0.6}
-                  name={t.donations}
+                  name={`${t.donations} (kg)`}
                 />
                 <Area
                   type="monotone"
@@ -595,7 +739,7 @@ export default function CityDashboardPage(): React.ReactElement {
                   stroke="#2196F3"
                   fill="#2196F3"
                   fillOpacity={0.6}
-                  name={t.requests}
+                  name={`${t.requests} (kg)`}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -620,34 +764,49 @@ export default function CityDashboardPage(): React.ReactElement {
           </div>
         </div>
 
-        {/* Distribution and Activity Feed */}
+        {/* Top Recipients and Activity Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Distribution Pie Chart */}
+          {/* Top Recipients with real names */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              {t.distributionByRecipient}
+              {t.topRecipients}
             </h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={getDistributionData(language)}
+                  data={getTopRecipientsData(language)}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
+                  label={({ name, percentage }) => `${name} ${percentage}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {getDistributionData(language).map((entry, index) => (
+                  {getTopRecipientsData(language).map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+            <div className="mt-4 space-y-2">
+              {getTopRecipientsData(language).map((recipient, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: recipient.color }}
+                    />
+                    <span>{recipient.name}</span>
+                  </div>
+                  <span className="font-medium">{recipient.value}kg</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Recent Activity Feed */}
@@ -712,43 +871,6 @@ export default function CityDashboardPage(): React.ReactElement {
           </div>
         </div>
 
-        {/* Weekly Trends */}
-        <div className="mt-6 bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            {t.weeklyPerformance}
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={getWeeklyTrends(language)}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="donations"
-                stroke="#4CAF50"
-                strokeWidth={2}
-                name={`${t.donations} (kg)`}
-              />
-              <Line
-                type="monotone"
-                dataKey="requests"
-                stroke="#2196F3"
-                strokeWidth={2}
-                name={`${t.requests} (kg)`}
-              />
-              <Line
-                type="monotone"
-                dataKey="waste_saved"
-                stroke="#FF9800"
-                strokeWidth={2}
-                name={t.wasteReduced}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
         {/* Quick Actions */}
         <div className="mt-6 bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -794,7 +916,7 @@ export default function CityDashboardPage(): React.ReactElement {
             </div>
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div className="flex items-center gap-3">
-                <Activity className="h-5 w-5 text-green-600" />
+                <Clock className="h-5 w-5 text-green-600" />
                 <div>
                   <p className="font-medium text-gray-900">
                     {t.processingTime}
@@ -823,68 +945,6 @@ export default function CityDashboardPage(): React.ReactElement {
               <span className="text-sm text-green-600 font-medium">
                 {t.excellent}
               </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Major Donors & Recipients Info (Hidden but available in data) */}
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              {language === 'fi' ? 'Suurimmat lahjoittajat' : 'Major Donors'}
-            </h2>
-            <div className="space-y-3">
-              {majorDonors.slice(0, 5).map((donor, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">{donor.name}</p>
-                    <p className="text-xs text-gray-500">{donor.address}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-green-600">
-                      {donor.weeklyAverage}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {language === 'fi' ? 'viikossa' : 'weekly'}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              {language === 'fi'
-                ? 'Suurimmat vastaanottajat'
-                : 'Major Recipients'}
-            </h2>
-            <div className="space-y-3">
-              {majorRecipients.map((recipient, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {language === 'fi' ? recipient.name : recipient.nameEn}
-                    </p>
-                    <p className="text-xs text-gray-500">{recipient.address}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-blue-600">
-                      {recipient.servesDaily}{' '}
-                      {language === 'fi' ? 'hlö' : 'people'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {language === 'fi' ? 'päivittäin' : 'daily'}
-                    </p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
