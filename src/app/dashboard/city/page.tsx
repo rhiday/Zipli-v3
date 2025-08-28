@@ -58,18 +58,49 @@ type CityDashboardData = {
 };
 
 export default function CityDashboardPage(): React.ReactElement {
-  // City dashboard disabled for now - redirect to main dashboard
   const router = useRouter();
-  React.useEffect(() => {
-    router.push('/donate');
-  }, [router]);
+  const { currentUser, isInitialized, getAllDonations, getAllRequests } =
+    useDatabase();
+  const { t } = useCommonTranslation();
 
-  return <div>Redirecting...</div>;
+  // Check if user has city role, otherwise redirect
+  React.useEffect(() => {
+    if (isInitialized && currentUser) {
+      // Only allow access if user has 'city' role
+      if (currentUser.role !== 'city') {
+        router.push('/donate');
+      }
+    }
+  }, [isInitialized, currentUser, router]);
+
+  // Show loading while checking authentication
+  if (!isInitialized || !currentUser) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <div className="text-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect non-city users
+  if (currentUser.role !== 'city') {
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <div className="text-center">
+          <p>Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is authenticated with city role, render the full dashboard
+  return <CityDashboardContent />;
 }
 
-// Note: keep this component unused to avoid hook rule violations.
-// If you need it, export with a proper name and use it as a React component.
-function DisabledCityDashboardPage(): React.ReactElement {
+// Separate component for the actual dashboard content
+function CityDashboardContent(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized, getAllDonations, getAllRequests } =
     useDatabase();

@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Input } from './Input';
+import React, { useEffect, useRef, useState } from 'react';
 import { Chip } from './Chip';
-import { useAllergenSelectorTranslation } from '@/lib/i18n-enhanced';
+import { Input } from './Input';
 
 interface AllergensDropdownProps {
   label: string;
@@ -37,7 +36,7 @@ const getShortLabel = (fullLabel: string): string => {
     'Does not contain lupin': 'Lupin',
     'Does not contain molluscs': 'Molluscs',
     // Finnish versions
-    Määritelty: 'Määritelty',
+    'Ei Määritelty': 'Ei Määritelty',
     Gluteeniton: 'Gluteeniton',
     Laktoositon: 'Laktoositon',
     Vähälaktoosinen: 'Vähälaktoosinen',

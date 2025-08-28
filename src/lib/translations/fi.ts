@@ -374,7 +374,7 @@ export const fi = {
   decisions: 'Päätökset',
 
   // Allergens options
-  notSpecified: 'Määritelty',
+  notSpecified: 'Ei Määritelty',
   glutenFree: 'Gluteeniton',
   lactoseFree: 'Laktoositon',
   lowLactose: 'Vähälaktoosinen',
