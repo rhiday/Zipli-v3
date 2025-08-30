@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Languages, Check } from 'lucide-react';
@@ -22,9 +22,16 @@ type Props = {
   compact?: boolean;
 };
 
-export default function LanguageSwitcher({ compact = false }: Props) {
+export default React.memo(function LanguageSwitcher({
+  compact = false,
+}: Props) {
   const { language, setLanguage } = useLanguage();
   const { t } = useCommonTranslation();
+
+  const buttonText = useMemo(
+    () => (language === 'fi' ? t('finnishLabel') : t('englishLabel')),
+    [language, t]
+  );
 
   if (compact) {
     return (
@@ -35,15 +42,21 @@ export default function LanguageSwitcher({ compact = false }: Props) {
             className="px-3 py-1.5 border border-[#F3F4ED] rounded-full flex items-center gap-1.5 text-sm text-white bg-transparent hover:bg-white/5 transition-colors"
           >
             <Languages className="w-4 h-4 text-white" />
-            <span className="leading-none">{language === 'fi' ? t('finnishLabel') : t('englishLabel')}</span>
+            <span className="leading-none">{buttonText}</span>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="bg-white">
-          <DropdownMenuItem onSelect={() => setLanguage('en')} className="flex items-center justify-between">
+        <DropdownMenuContent align="end" className="bg-white !animate-none">
+          <DropdownMenuItem
+            onSelect={() => setLanguage('en')}
+            className="flex items-center justify-between"
+          >
             <span>{t('englishLabel')}</span>
             {language === 'en' ? <Check className="w-4 h-4" /> : null}
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setLanguage('fi')} className="flex items-center justify-between">
+          <DropdownMenuItem
+            onSelect={() => setLanguage('fi')}
+            className="flex items-center justify-between"
+          >
             <span>{t('finnishLabel')}</span>
             {language === 'fi' ? <Check className="w-4 h-4" /> : null}
           </DropdownMenuItem>
@@ -54,7 +67,10 @@ export default function LanguageSwitcher({ compact = false }: Props) {
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'fi')}>
+      <Select
+        value={language}
+        onValueChange={(value) => setLanguage(value as 'en' | 'fi')}
+      >
         <SelectTrigger className="w-28">
           <SelectValue placeholder={'Language'} />
         </SelectTrigger>
@@ -65,4 +81,4 @@ export default function LanguageSwitcher({ compact = false }: Props) {
       </Select>
     </div>
   );
-}
+});
