@@ -100,7 +100,21 @@ function DonorDashboardPage(): React.ReactElement {
     };
 
     fetchLatestDonations();
-  }, [isInitialized, currentUser, router, allDonations, foodItems]);
+  }, [isInitialized, currentUser, router]); // Remove allDonations and foodItems from dependencies
+
+  // Add a separate effect to update dashboard data when donations/foodItems change
+  useEffect(() => {
+    if (!currentUser || !isInitialized) return;
+
+    const userDonations = allDonations
+      .filter((d) => d.donor_id === currentUser.id)
+      .map((d) => {
+        const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
+        return { ...d, food_item: foodItem! };
+      });
+
+    setDashboardData((prev) => ({ ...prev, donations: userDonations }));
+  }, [allDonations, foodItems, currentUser, isInitialized]);
 
   // Memoized PDF generation function
   const handleExportPDF = useCallback(async () => {
