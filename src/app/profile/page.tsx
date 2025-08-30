@@ -87,10 +87,26 @@ export default function ProfilePage(): React.ReactElement {
         address: formData.address,
         contact_number: formData.contact_number,
         driver_instructions: formData.driver_instructions,
+        updated_at: new Date().toISOString(),
       };
 
       // Update user in database
-      await updateUser(updatedUser);
+      const result = await updateUser(updatedUser);
+
+      if (!result || !result.data) {
+        throw new Error('Failed to update profile');
+      }
+
+      // Update local form data with the returned data
+      setFormData({
+        full_name: result.data.full_name || '',
+        email: result.data.email || '',
+        role: result.data.role || '',
+        organization_name: result.data.organization_name || '',
+        address: result.data.address || '',
+        contact_number: result.data.contact_number || '',
+        driver_instructions: result.data.driver_instructions || '',
+      });
 
       // Success - exit editing mode
       setIsEditing(false);
