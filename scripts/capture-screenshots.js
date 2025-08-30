@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
- * Automated Screenshot Capture for Lokalise Translation Context
+ * Automated Screenshot Capture for Translation Context
  *
  * This script captures screenshots of key pages in the Zipli app
- * to provide visual context for translators in Lokalise.
+ * to provide visual context for translators.
  *
  * Usage:
  *   npm run screenshots:local     # Save screenshots locally only
- *   npm run screenshots:dry-run   # Simulate Lokalise upload
- *   npm run screenshots:test      # Upload 2-3 test screenshots
- *   npm run screenshots:upload    # Full upload to Lokalise
+ *   npm run screenshots:dry-run   # Simulate screenshot capture
+ *   npm run screenshots:test      # Capture 2-3 test screenshots
+ *   npm run screenshots:capture   # Full screenshot capture
  */
 
 const { chromium } = require('playwright');
@@ -319,7 +319,7 @@ class ScreenshotCapture {
   constructor(options = {}) {
     this.dryRun = options.dryRun || false;
     this.testMode = options.testMode || false;
-    this.uploadToLokalise = options.uploadToLokalise || false;
+    this.uploadToLokalise = false;
     this.browser = null;
     this.context = null;
     this.screenshots = [];
@@ -553,26 +553,7 @@ class ScreenshotCapture {
   }
 
   async uploadToLokaliseAPI(screenshots) {
-    if (this.dryRun) {
-      console.log('\n🔄 DRY RUN - Would upload to Lokalise:');
-      screenshots.forEach((screenshot) => {
-        console.log(`  📤 ${screenshot.filename}`);
-        console.log(`     Tags: ${screenshot.tags.join(', ')}`);
-        console.log(`     Description: ${screenshot.description}`);
-      });
-      return;
-    }
-
-    if (!this.uploadToLokalise) {
-      console.log(
-        '\n💾 Screenshots saved locally. Use --upload flag to send to Lokalise.'
-      );
-      return;
-    }
-
-    console.log('\n📤 Uploading screenshots to Lokalise...');
-    // TODO: Implement Lokalise API upload
-    console.log('  ⚠️  Lokalise upload not implemented yet');
+    console.log('\n💾 Screenshots saved locally.');
   }
 
   async run() {
@@ -585,11 +566,10 @@ class ScreenshotCapture {
       console.log(`📊 Captured ${screenshots.length} screenshots`);
       console.log(`📁 Saved to: ${CONFIG.screenshotsDir}`);
 
-      if (!this.dryRun && !this.uploadToLokalise) {
+      if (!this.dryRun) {
         console.log('\nNext steps:');
         console.log('1. Review screenshots in ./screenshots/ folder');
-        console.log('2. Run with --dry-run to test Lokalise upload');
-        console.log('3. Run with --test to upload a few test screenshots');
+        console.log('2. Use screenshots for documentation');
       }
     } catch (error) {
       console.error('❌ Screenshot capture failed:', error);
@@ -608,7 +588,6 @@ async function main() {
   const options = {
     dryRun: args.includes('--dry-run'),
     testMode: args.includes('--test'),
-    uploadToLokalise: args.includes('--upload'),
   };
 
   const capture = new ScreenshotCapture(options);

@@ -18,8 +18,6 @@
     "cleanup:food-items": "npx tsx scripts/cleanup-food-items.ts",
     "prepare": "husky",
     "type-check": "tsc --noEmit",
-    "lokalise:upload": "node scripts/upload-to-lokalise.js",
-    "lokalise:pull": "node scripts/lokalise-sync.js pull",
     "i18n:migrate": "node scripts/i18n-migration.js",
     "type-check:watch": "tsc --noEmit --watch",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
@@ -31,9 +29,7 @@
     "test:quick": "npm run type-check && npm run build",
     "build:analyze": "ANALYZE=true npm run build",
     "build:check": "npm run build && npm run start",
-    "clean": "rm -rf .next node_modules/.cache",
-    "lokalise:push": "node scripts/lokalise-sync.js push",
-    "lokalise:sync": "node scripts/lokalise-sync.js sync"
+    "clean": "rm -rf .next node_modules/.cache"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

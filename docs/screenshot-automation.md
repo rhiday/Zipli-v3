@@ -1,8 +1,8 @@
-# Automated Screenshot Capture for Lokalise
+# Automated Screenshot Capture
 
 ## Overview
 
-This system automatically captures screenshots of your Zipli application pages and uploads them to Lokalise to provide visual context for translators.
+This system automatically captures screenshots of your Zipli application pages for documentation and visual context.
 
 ## Quick Start
 
@@ -51,9 +51,9 @@ npm run screenshots:upload-all
 - `npm run screenshots:dry-run` - Simulate capture (no files created)
 - `npm run screenshots:test` - Capture first 3 pages only
 
-### Lokalise Upload
+### Screenshot Export
 
-- `npm run screenshots:upload-dry-run` - Simulate upload to Lokalise
+- `npm run screenshots:export` - Export screenshots for documentation
 - `npm run screenshots:upload-test` - Upload 3 test screenshots
 - `npm run screenshots:upload-all` - Upload all screenshots
 
@@ -140,7 +140,7 @@ Add to `PAGES_CONFIG` in `scripts/capture-screenshots.js`:
 }
 ```
 
-## Lokalise Integration
+## Screenshot Integration
 
 ### Metadata Added to Each Screenshot
 
@@ -170,7 +170,7 @@ Add to `PAGES_CONFIG` in `scripts/capture-screenshots.js`:
 ### Branch Isolation
 
 - All work done in `feature/automated-screenshots` branch
-- No impact on main Lokalise integration
+- No impact on main translation system
 - Easy to test and rollback
 
 ### Progressive Testing
@@ -178,7 +178,7 @@ Add to `PAGES_CONFIG` in `scripts/capture-screenshots.js`:
 1. **Configuration test** - No browsers needed
 2. **Dry run** - Simulates everything without files
 3. **Local capture** - Creates files locally only
-4. **Upload dry run** - Simulates Lokalise upload
+4. **Export screenshots** - Export for documentation
 5. **Test upload** - Uploads 3 files for verification
 6. **Full upload** - Only after manual approval
 
@@ -208,7 +208,7 @@ npx playwright install chromium
 
 #### Upload Failures
 
-- Verify Lokalise API token and project ID
+- Verify screenshot export configuration
 - Check file permissions in screenshots folder
 - Ensure PNG files are valid (not empty)
 
@@ -240,7 +240,7 @@ console.log('Debug: Page title:', await page.title());
 ### Maintenance
 
 - Update test credentials regularly
-- Remove old screenshots from Lokalise
+- Remove old screenshots from export folder
 - Update page configurations as app evolves
 - Archive outdated screenshots
 
@@ -248,7 +248,7 @@ console.log('Debug: Page title:', await page.title());
 
 1. **Developer** runs screenshot capture after UI changes
 2. **Content writer** gets notification of new screenshots
-3. **Translator** sees updated visual context in Lokalise
+3. **Team** sees updated visual context in documentation
 4. **QA** verifies screenshots represent current UI
 
 ## Next Steps

@@ -118,7 +118,7 @@ If automated capture doesn't work, you can:
    - Awesome Screenshot
    - GoFullPage
 
-## Upload to Lokalise
+## Export Screenshots
 
 After capturing screenshots:
 
@@ -145,8 +145,8 @@ npm run screenshots:upload-dry-run
 1. **Install browsers** (if not done)
 2. **Run local capture**
 3. **Review screenshots**
-4. **Upload to Lokalise**
-5. **Tag screenshots** in Lokalise interface
+4. **Export screenshots** for documentation
+5. **Tag screenshots** for reference
 6. **Train content team** on using visual context
 
 ## Summary of Commands

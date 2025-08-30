@@ -1,8 +1,8 @@
-# Visual Context for Translations in Lokalise
+# Visual Context for Translations
 
 ## Overview
 
-Lokalise provides several ways to give translators visual context about where text appears in your app.
+This guide provides several ways to give translators visual context about where text appears in your app.
 
 ## Method 1: Manual Screenshots (Recommended for Free Plan)
 
@@ -17,18 +17,18 @@ Capture key pages of your app:
 - Profile page
 - Error states
 
-### Step 2: Upload to Lokalise
+### Step 2: Export Screenshots
 
-1. Go to **Screenshots** tab in Lokalise
-2. Click **Upload screenshots**
-3. Select your images
+1. Save screenshots to your project's documentation folder
+2. Organize by page/feature
+3. Reference in translation documentation
 
-### Step 3: Tag Keys to Screenshots
+### Step 3: Document Context
 
-1. Click on uploaded screenshot
-2. Draw rectangles around text elements
-3. Link each rectangle to its translation key
-4. Lokalise will show this context when editing
+1. Create documentation for each screenshot
+2. Note where text elements appear
+3. Link to translation keys
+4. Share with translators as needed
 
 ### Benefits:
 
@@ -39,10 +39,11 @@ Capture key pages of your app:
 
 ## Method 2: Add Context Descriptions
 
-Run the context script to add descriptions:
+Add descriptions manually to translation files:
 
-```bash
-node scripts/add-translation-context.js
+```typescript
+// In src/lib/translations/en.ts
+dashboard: 'Dashboard', // Main navigation item
 ```
 
 This adds:
@@ -53,13 +54,12 @@ This adds:
 
 ## Method 3: Browser Extension (Advanced)
 
-### Lokalise Context Capture Extension
+### Browser Developer Tools
 
-1. Install Lokalise browser extension
-2. Navigate to your app
-3. Click "Capture" mode
-4. Click on text elements
-5. Extension auto-links to translation keys
+1. Use browser developer tools
+2. Inspect text elements
+3. Note translation keys
+4. Document context manually
 
 ## Method 4: Automated Screenshots (Developer Setup)
 
@@ -127,11 +127,11 @@ Always specify max lengths for:
 - Mobile UI elements (even shorter)
 - Error messages (40-50 chars)
 
-## Lokalise Screenshot Features
+## Screenshot Features
 
 ### Auto-Detection
 
-- Lokalise OCR can detect text in screenshots
+- OCR can detect text in screenshots
 - Automatically suggests key matches
 - Links keys to visual regions
 
@@ -158,7 +158,7 @@ Always specify max lengths for:
 
 ### Design Handoff
 
-- Export from Figma with Lokalise plugin
+- Export from Figma with design tokens
 - Link design specs to translation keys
 - Show intended visual hierarchy
 

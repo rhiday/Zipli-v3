@@ -84,11 +84,13 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             {t('somethingWentWrong')}
           </h2>
-          <p className="text-gray-600 mb-4">title="Default"</p>
+          <p className="text-gray-600 mb-4">
+            Something went wrong. Please try again.
+          </p>
           {process.env.NODE_ENV === 'development' && (
             <details className="mb-4 text-left">
               <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-                title="Default"
+                Show Error Details
               </summary>
               <pre className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded overflow-auto">
                 {error.message}
@@ -102,13 +104,13 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({
             onClick={resetError}
             className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors"
           >
-            title="Default"
+            Try Again
           </button>
           <button
             onClick={() => (window.location.href = '/')}
             className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
           >
-            title="Default"
+            Go Home
           </button>
         </div>
       </div>

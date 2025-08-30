@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Flow-based Screenshot Capture for Lokalise
+ * Flow-based Screenshot Capture
  * Captures focused screenshots based on user flows and links them to specific translation keys
  */
 
