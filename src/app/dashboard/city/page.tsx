@@ -184,7 +184,7 @@ const fleetData = [
   {
     id: 1,
     driver: 'Matti Virtanen',
-    vehicle: 'Ford Transit 1',
+    vehicle: 'Auto 1',
     plateNumber: 'ABC-123',
     status: 'onRoute',
     currentLocation: 'K-Citymarket Kallio',
@@ -194,7 +194,7 @@ const fleetData = [
   {
     id: 2,
     driver: 'Jari Korhonen',
-    vehicle: 'Mercedes Sprinter',
+    vehicle: 'Auto 2',
     plateNumber: 'XYZ-456',
     status: 'available',
     currentLocation: 'Terminal',
@@ -204,7 +204,7 @@ const fleetData = [
   {
     id: 3,
     driver: 'Sanna Nieminen',
-    vehicle: 'Ford Transit 2',
+    vehicle: 'Auto 3',
     plateNumber: 'DEF-789',
     status: 'returning',
     currentLocation: 'Pelastusarmeija',
