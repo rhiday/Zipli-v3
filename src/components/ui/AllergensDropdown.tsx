@@ -144,7 +144,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           </div>
         )}
         {open && (
-          <div className="absolute left-0 right-0 mt-1 bg-white border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+          <div className="absolute left-0 right-0 mt-1 bg-white border border-border rounded-md shadow-2xl z-[9999] max-h-60 overflow-y-auto">
             {options.map((option) => (
               <div
                 key={option}

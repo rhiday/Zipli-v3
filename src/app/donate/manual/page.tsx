@@ -294,9 +294,9 @@ function ManualDonationPageInner() {
           quantity: parseFloat(currentItem.quantity) || 0,
         });
 
-        // In edit mode, continue to pickup slots instead of showing success dialog
+        // In edit mode, continue to details instead of showing success dialog
         if (storeEditMode) {
-          router.push('/donate/pickup-slot');
+          router.push('/donate/details');
         } else {
           setShowSuccessDialog(true);
         }
@@ -455,29 +455,6 @@ function ManualDonationPageInner() {
             : undefined
         }
       />
-
-      <PhotoUpload
-        onImageUpload={handleImageUpload}
-        uploadedImage={currentItem.imageUrl}
-        hint={t('photosHelpIdentify')}
-      />
-
-      <div>
-        <label
-          htmlFor="description"
-          className="text-sm font-medium text-gray-700"
-        >
-          Description
-        </label>
-        <Textarea
-          id="description"
-          value={currentItem.description || ''}
-          onChange={(e) =>
-            handleCurrentItemChange('description', e.target.value)
-          }
-          placeholder={t('enterDescription')}
-        />
-      </div>
     </div>
   );
 
@@ -495,7 +472,7 @@ function ManualDonationPageInner() {
           <BottomActionBar>
             {hasItems && !showAddAnotherForm ? (
               <div className="flex justify-end">
-                <Button onClick={() => router.push('/donate/pickup-slot')}>
+                <Button onClick={() => router.push('/donate/details')}>
                   {t('continue')}
                 </Button>
               </div>
