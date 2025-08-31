@@ -488,6 +488,7 @@ describe('Database Store Tests', () => {
         country: null,
         postal_code: null,
         street_address: null,
+        driver_instructions: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

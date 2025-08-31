@@ -91,21 +91,17 @@ export default function ProfilePage(): React.ReactElement {
       };
 
       // Update user in database
-      const result = await updateUser(updatedUser);
+      await updateUser(updatedUser);
 
-      if (!result || !result.data) {
-        throw new Error('Failed to update profile');
-      }
-
-      // Update local form data with the returned data
+      // Update local form data with the submitted data (updateUser updates currentUser state)
       setFormData({
-        full_name: result.data.full_name || '',
-        email: result.data.email || '',
-        role: result.data.role || '',
-        organization_name: result.data.organization_name || '',
-        address: result.data.address || '',
-        contact_number: result.data.contact_number || '',
-        driver_instructions: result.data.driver_instructions || '',
+        full_name: updatedUser.full_name || '',
+        email: updatedUser.email || '',
+        role: updatedUser.role || '',
+        organization_name: updatedUser.organization_name || '',
+        address: updatedUser.address || '',
+        contact_number: updatedUser.contact_number || '',
+        driver_instructions: updatedUser.driver_instructions || '',
       });
 
       // Success - exit editing mode

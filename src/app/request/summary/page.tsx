@@ -223,7 +223,7 @@ export default function RequestSummaryPage() {
 
         // Clear the request store after confirming
         clearRequest();
-        setEditMode(false, null);
+        setEditMode(false, undefined);
         sessionStorage.removeItem('editingRequestId');
 
         // Navigate to success page or back to request detail
