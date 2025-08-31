@@ -173,7 +173,7 @@ class AuthService {
         .eq('id', user.id)
         .single();
 
-      return profileData;
+      return profileData as Profile | null;
     } catch (error) {
       console.error('Error getting current user', error);
       return null;

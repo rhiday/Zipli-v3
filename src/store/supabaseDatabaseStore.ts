@@ -382,8 +382,6 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
           // Just use the food items from the JOIN
           set({ donations, foodItems: [] }); // Let fetchFoodItems handle this
-
-          return { data: donations, error: null };
         } catch (error) {
           console.error('Error fetching donations', error);
           set({
@@ -406,7 +404,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
           if (data === null) throw new Error('No food items found');
 
-          set({ foodItems: data || [] });
+          set({ foodItems: (data as FoodItem[]) || [] });
         } catch (error) {
           console.error('Error fetching food items', error);
           set({
@@ -432,7 +430,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .order('full_name');
 
           if (error) throw error;
-          set({ users: data || [] });
+          set({ users: (data as Profile[]) || [] });
         } catch (error) {
           console.error('Error fetching user display names', error);
           set({
