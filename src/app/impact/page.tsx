@@ -22,6 +22,7 @@ import {
   Leaf,
   Scale,
   TrendingUp as TrendingIcon,
+  Users,
   Utensils,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -127,20 +128,55 @@ function ImpactPage(): React.ReactElement {
     // Calculate comprehensive impact metrics using real data
     const metrics = impactCalculator.calculateImpact(userDonations, periodDays);
 
-    // Generate realistic trend data based on actual donations
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    // Generate trend data for the last 6 months dynamically based on current date
+    const months = (() => {
+      const now = new Date();
+      return Array.from({ length: 6 }, (_, idx) => {
+        const d = new Date(now.getFullYear(), now.getMonth() - (5 - idx), 1);
+        return d.toLocaleString('en-US', { month: 'short' });
+      });
+    })();
     const trends = impactCalculator.calculateTrends(userDonations, months);
 
     // Get benchmark comparisons
     const benchmarks = impactCalculator.getBenchmarks(metrics);
 
     // Additional stats for compatibility with existing UI
+    const KG_PER_PERSON = 0.5;
+    const reqTotalPeople = userRequests.reduce(
+      (sum: number, r: any) => sum + (r.quantity || 0),
+      0
+    );
+    const requestedKg = Math.round(reqTotalPeople * KG_PER_PERSON * 10) / 10;
+    const activeRequests = userRequests.filter(
+      (r: any) => r.status === 'active'
+    ).length;
+    const fulfilledRequests = userRequests.filter(
+      (r: any) => r.status === 'fulfilled'
+    ).length;
+    const cancelledRequests = userRequests.filter(
+      (r: any) => r.status === 'cancelled'
+    ).length;
+    const fulfillmentDenom = activeRequests + fulfilledRequests;
+    const fulfillmentRate = fulfillmentDenom
+      ? Math.round((fulfilledRequests / fulfillmentDenom) * 100)
+      : 0;
+    const avgPeoplePerRequest = userRequests.length
+      ? Math.round((reqTotalPeople / userRequests.length) * 10) / 10
+      : 0;
+
     const additionalStats = {
       requestCount: userRequests.length,
       activeDonations: userDonations.filter((d) => d.status === 'available')
         .length,
       completedDonations: userDonations.filter((d) => d.status === 'picked_up')
         .length,
+      requestedKg,
+      activeRequests,
+      fulfilledRequests,
+      cancelledRequests,
+      fulfillmentRate,
+      avgPeoplePerRequest,
     };
 
     return {
@@ -336,6 +372,61 @@ function ImpactPage(): React.ReactElement {
                   {impactStats.co2AvoidedTons}t
                 </span>
                 <p className="text-sm text-primary-75 mt-1">CO2 Avoided</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Requests Analytics */}
+        <section>
+          <h3 className="text-lg font-semibold text-primary mb-4">
+            Requests Analytics
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 bg-white">
+              <div className="flex items-center gap-2">
+                <Scale className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
+                <span className="text-2xl font-semibold text-green-800">
+                  {impactStats.requestedKg || 0}kg
+                </span>
+                <p className="text-sm text-primary-75 mt-1">Requested (est.)</p>
+              </div>
+            </div>
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 bg-white">
+              <div className="flex items-center gap-2">
+                <BarChart className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
+                <span className="text-2xl font-semibold text-green-800">
+                  {impactStats.activeRequests || 0}
+                </span>
+                <p className="text-sm text-primary-75 mt-1">Active Requests</p>
+              </div>
+            </div>
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 bg-white">
+              <div className="flex items-center gap-2">
+                <BarChart className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
+                <span className="text-2xl font-semibold text-green-800">
+                  {impactStats.fulfillmentRate || 0}%
+                </span>
+                <p className="text-sm text-primary-75 mt-1">Fulfillment Rate</p>
+              </div>
+            </div>
+            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 bg-white">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-primary-50" />
+              </div>
+              <div>
+                <span className="text-2xl font-semibold text-green-800">
+                  {impactStats.avgPeoplePerRequest || 0}
+                </span>
+                <p className="text-sm text-primary-75 mt-1">
+                  Avg People/Request
+                </p>
               </div>
             </div>
           </div>
