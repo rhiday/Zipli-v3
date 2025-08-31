@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useDatabase } from '@/store';
 import {
   Scale,
@@ -35,12 +35,10 @@ type RequestDetail = {
   is_recurring: boolean;
 };
 
-export default function RequestDetailPage({
-  params,
-}: {
-  params: { id: string };
-}): React.ReactElement {
+export default function RequestDetailPage(): React.ReactElement {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
   const [request, setRequest] = useState<RequestDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +51,7 @@ export default function RequestDetailPage({
     setLoading(true);
     setError(null);
     try {
-      const requestData = getRequestById(params.id);
+      const requestData = getRequestById(id);
       if (!requestData) {
         throw new Error('Request not found');
       }
@@ -67,10 +65,10 @@ export default function RequestDetailPage({
   };
 
   useEffect(() => {
-    if (isInitialized && params.id) {
+    if (isInitialized && id) {
       fetchRequest();
     }
-  }, [isInitialized, params.id]);
+  }, [isInitialized, id]);
 
   const handleStatusUpdate = async (newStatus: 'fulfilled' | 'cancelled') => {
     if (!currentUser || !request) {
@@ -81,7 +79,7 @@ export default function RequestDetailPage({
     setActionLoading(true);
     setError(null);
     try {
-      updateRequest(params.id, { status: newStatus });
+      updateRequest(id, { status: newStatus });
       await fetchRequest();
     } catch (err: any) {
       setError(err.message || 'Failed to update request status.');

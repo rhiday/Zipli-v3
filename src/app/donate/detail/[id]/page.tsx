@@ -30,11 +30,9 @@ import { useDatabase, DonationWithFoodItem } from '@/store';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useDonationStore } from '@/store/donation';
 
-export default function DonationDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function DonationDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
   const { t } = useCommonTranslation();
   const currentUser = useDatabase((state) => state.currentUser);
   const router = useRouter();
@@ -56,9 +54,9 @@ export default function DonationDetailPage({
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    if (params.id) {
+    if (id) {
       // Find the donation by ID (regardless of owner)
-      const mainDonation = donations.find((d) => d.id === params.id);
+      const mainDonation = donations.find((d) => d.id === id);
 
       if (mainDonation) {
         const foodItem = foodItems.find(
@@ -82,7 +80,7 @@ export default function DonationDetailPage({
             (d) => d.donor_id === mainDonation.donor_id
           );
           const otherDons = donorDonations
-            .filter((d) => d.id !== params.id)
+            .filter((d) => d.id !== id)
             .map((d) => ({
               ...d,
               food_item: foodItems.find((fi) => fi.id === d.food_item_id)!,
@@ -94,7 +92,7 @@ export default function DonationDetailPage({
       }
     }
     setLoading(false);
-  }, [currentUser, params.id, donations, foodItems]);
+  }, [currentUser, id, donations, foodItems]);
 
   const handleRemoveListing = () => {
     if (!donation) return;
