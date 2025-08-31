@@ -108,7 +108,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   return (
     <div className="w-full" ref={containerRef}>
       <label className="block text-label font-semibold mb-2">{label}</label>
-      <div className="relative">
+      <div className="relative isolate">
         <Input
           readOnly
           value={''}
@@ -144,7 +144,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           </div>
         )}
         {open && (
-          <div className="absolute left-0 right-0 mt-1 bg-base border border-border rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
+          <div className="absolute left-0 right-0 mt-1 bg-white border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
             {options.map((option) => (
               <div
                 key={option}
