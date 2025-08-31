@@ -11,6 +11,7 @@ import {
   Edit,
   Trash2,
 } from 'lucide-react';
+import { ImageCarousel } from '@/components/ui/ImageCarousel';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Tag from '@/components/ui/Tag';
@@ -29,6 +30,7 @@ import {
 import { useDatabase, DonationWithFoodItem } from '@/store';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useDonationStore } from '@/store/donation';
+import { parseAllergens } from '@/lib/allergenUtils';
 
 export default function DonationDetailPage() {
   const params = useParams();
@@ -51,7 +53,6 @@ export default function DonationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -162,32 +163,30 @@ export default function DonationDetailPage() {
 
   return (
     <div className="min-h-dvh pb-20">
-      {/* Header with Image and Back Arrow */}
+      {/* Header with Image Carousel and Back Arrow */}
       <div className="relative h-60 w-full">
         <Button
           onClick={() => router.back()}
-          className="absolute top-12 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
+          className="absolute top-12 left-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        {donation.food_item.image_url && !imageError ? (
-          <Image
-            src={donation.food_item.image_url}
-            alt={donation.food_item.name}
-            fill
-            className="object-cover"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-            <Image
-              src="/images/placeholder.svg"
-              alt="NoImage"
-              width={160}
-              height={160}
-            />
-          </div>
-        )}
+        <ImageCarousel
+          images={
+            donation.food_item.image_urls
+              ? Array.isArray(donation.food_item.image_urls)
+                ? (donation.food_item.image_urls as string[])
+                : []
+              : donation.food_item.image_url
+                ? [donation.food_item.image_url]
+                : []
+          }
+          alt={donation.food_item.name}
+          className="h-full w-full rounded-none"
+          aspectRatio="auto"
+          showNavigation={true}
+          showDots={true}
+        />
       </div>
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -203,33 +202,11 @@ export default function DonationDetailPage() {
           {/* Tags */}
           {donation.food_item.allergens && (
             <div className="mt-4 flex flex-wrap gap-2">
-              {(() => {
-                let allergenArray: string[] = [];
-
-                if (Array.isArray(donation.food_item.allergens)) {
-                  allergenArray = donation.food_item.allergens;
-                } else if (typeof donation.food_item.allergens === 'string') {
-                  // Try to parse JSON string, fallback to splitting by comma
-                  try {
-                    const parsed = JSON.parse(donation.food_item.allergens);
-                    allergenArray = Array.isArray(parsed)
-                      ? parsed
-                      : [donation.food_item.allergens];
-                  } catch {
-                    // If not valid JSON, treat as comma-separated string
-                    allergenArray = donation.food_item.allergens
-                      .split(',')
-                      .map((item) => item.trim())
-                      .filter((item) => item.length > 0);
-                  }
-                } else {
-                  allergenArray = [String(donation.food_item.allergens)];
-                }
-
-                return allergenArray.map((tag: string) => (
-                  <Tag key={tag}>{tag.trim()}</Tag>
-                ));
-              })()}
+              {parseAllergens(donation.food_item.allergens).map(
+                (tag: string) => (
+                  <Tag key={tag}>{tag}</Tag>
+                )
+              )}
             </div>
           )}
 

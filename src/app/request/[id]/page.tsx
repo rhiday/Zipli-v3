@@ -60,7 +60,7 @@ export default function RequestDetailPage(): React.ReactElement {
       if (!requestData) {
         throw new Error('Request not found');
       }
-      setRequest(requestData);
+      setRequest(requestData as any);
     } catch (err: any) {
       setError(err.message || 'Failed to load request details.');
       setRequest(null);

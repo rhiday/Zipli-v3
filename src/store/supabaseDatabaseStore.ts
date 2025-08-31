@@ -8,6 +8,11 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase/client';
 import { authService } from '@/lib/auth/authService';
 import {
+  shouldMaintainSession,
+  initializeSessionTracking,
+  clearRememberMePreference,
+} from '@/lib/auth/sessionUtils';
+import {
   Database,
   Profile,
   FoodItem,
@@ -140,10 +145,22 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           console.log('🚀 Store init starting...');
           set({ loading: true, error: null });
 
+          // Initialize session tracking
+          initializeSessionTracking();
+
           // Check for existing session
           console.log('📋 Getting current user...');
           const currentUser = await authService.getCurrentUser();
           console.log('👤 Current user:', currentUser?.full_name || 'None');
+
+          // Check if we should maintain this session based on remember me preference
+          if (currentUser && !shouldMaintainSession()) {
+            console.log('🚪 Remember Me was disabled, logging out...');
+            await authService.signOut();
+            clearRememberMePreference();
+            set({ currentUser: null, isInitialized: true, loading: false });
+            return;
+          }
 
           // Always fetch data from Supabase
           console.log('📦 Fetching data...');
@@ -314,6 +331,9 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
         try {
           // Always sign out from Supabase
           await authService.signOut();
+
+          // Clear remember me preferences
+          clearRememberMePreference();
 
           get().cleanupSubscriptions();
 
@@ -574,9 +594,15 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       // ===== FOOD ITEM METHODS =====
       addFoodItem: async (foodItem) => {
         try {
+          // Ensure image_urls is properly formatted as JSON array if provided
+          const processedFoodItem = {
+            ...foodItem,
+            image_urls: foodItem.image_urls || [],
+          };
+
           const { data, error } = await supabase
             .from('food_items')
-            .insert(foodItem)
+            .insert(processedFoodItem)
             .select()
             .single();
 
@@ -600,9 +626,19 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       updateFoodItem: async (id: string, updates) => {
         try {
+          // Ensure image_urls is properly formatted if provided
+          const processedUpdates = {
+            ...updates,
+          };
+
+          // If image_urls is provided, ensure it's formatted correctly
+          if (updates.image_urls !== undefined) {
+            processedUpdates.image_urls = updates.image_urls || [];
+          }
+
           const { data, error } = await supabase
             .from('food_items')
-            .update(updates)
+            .update(processedUpdates)
             .eq('id', id)
             .select()
             .single();

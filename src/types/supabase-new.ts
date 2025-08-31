@@ -219,7 +219,6 @@ export type Database = {
           food_type: string | null;
           id: string;
           image_url: string | null;
-          image_urls: Json | null;
           name: string;
           quantity: number;
           unit: string | null;
@@ -236,7 +235,6 @@ export type Database = {
           food_type?: string | null;
           id?: string;
           image_url?: string | null;
-          image_urls?: Json | null;
           name: string;
           quantity?: number;
           unit?: string | null;
@@ -253,7 +251,6 @@ export type Database = {
           food_type?: string | null;
           id?: string;
           image_url?: string | null;
-          image_urls?: Json | null;
           name?: string;
           quantity?: number;
           unit?: string | null;
@@ -635,45 +632,3 @@ export const Constants = {
     },
   },
 } as const;
-
-// Helper types for easier usage
-export type UserRole = Database['public']['Enums']['user_role'];
-export type DonationStatus = Database['public']['Enums']['donation_status'];
-export type RequestStatus = Database['public']['Enums']['request_status'];
-
-export type Profile = Database['public']['Tables']['profiles']['Row'];
-export type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
-export type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
-
-export type FoodItem = Database['public']['Tables']['food_items']['Row'];
-export type FoodItemInsert =
-  Database['public']['Tables']['food_items']['Insert'];
-export type FoodItemUpdate =
-  Database['public']['Tables']['food_items']['Update'];
-
-export type Donation = Database['public']['Tables']['donations']['Row'];
-export type DonationInsert =
-  Database['public']['Tables']['donations']['Insert'];
-export type DonationUpdate =
-  Database['public']['Tables']['donations']['Update'];
-
-export type Request = Database['public']['Tables']['requests']['Row'];
-export type RequestInsert = Database['public']['Tables']['requests']['Insert'];
-export type RequestUpdate = Database['public']['Tables']['requests']['Update'];
-
-// Extended types with relationships
-export type DonationWithFoodItem = Donation & {
-  food_item: FoodItem;
-  donor: Profile;
-  receiver?: Profile;
-};
-
-export type RequestWithUser = Request & {
-  user: Profile;
-};
-
-// Auth types
-export interface AuthResponse {
-  data: Profile | null;
-  error: string | null;
-}

@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: '12.2.3 (519615d)';
   };
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
   public: {
     Tables: {
       city_monthly_data: {
@@ -122,21 +147,15 @@ export type Database = {
           claimed_at: string | null;
           created_at: string;
           donor_id: string;
-          end_date: string | null;
           food_item_id: string;
           id: string;
           instructions_for_driver: string | null;
-          latitude: number | null;
-          longitude: number | null;
           picked_up_at: string | null;
           pickup_slots: Json | null;
           pickup_time: string | null;
-          postal_code: string | null;
           quantity: number;
           receiver_id: string | null;
-          start_date: string | null;
           status: Database['public']['Enums']['donation_status'];
-          timezone: string | null;
           unit: string | null;
           updated_at: string;
         };
@@ -144,21 +163,15 @@ export type Database = {
           claimed_at?: string | null;
           created_at?: string;
           donor_id: string;
-          end_date?: string | null;
           food_item_id: string;
           id?: string;
           instructions_for_driver?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           picked_up_at?: string | null;
           pickup_slots?: Json | null;
           pickup_time?: string | null;
-          postal_code?: string | null;
           quantity?: number;
           receiver_id?: string | null;
-          start_date?: string | null;
           status?: Database['public']['Enums']['donation_status'];
-          timezone?: string | null;
           unit?: string | null;
           updated_at?: string;
         };
@@ -166,21 +179,15 @@ export type Database = {
           claimed_at?: string | null;
           created_at?: string;
           donor_id?: string;
-          end_date?: string | null;
           food_item_id?: string;
           id?: string;
           instructions_for_driver?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           picked_up_at?: string | null;
           pickup_slots?: Json | null;
           pickup_time?: string | null;
-          postal_code?: string | null;
           quantity?: number;
           receiver_id?: string | null;
-          start_date?: string | null;
           status?: Database['public']['Enums']['donation_status'];
-          timezone?: string | null;
           unit?: string | null;
           updated_at?: string;
         };
@@ -211,15 +218,12 @@ export type Database = {
       food_items: {
         Row: {
           allergens: string | null;
-          category: string | null;
           created_at: string;
           description: string | null;
           donor_id: string | null;
-          expires_at: string | null;
           food_type: string | null;
           id: string;
           image_url: string | null;
-          image_urls: Json | null;
           name: string;
           quantity: number;
           unit: string | null;
@@ -228,15 +232,12 @@ export type Database = {
         };
         Insert: {
           allergens?: string | null;
-          category?: string | null;
           created_at?: string;
           description?: string | null;
           donor_id?: string | null;
-          expires_at?: string | null;
           food_type?: string | null;
           id?: string;
           image_url?: string | null;
-          image_urls?: Json | null;
           name: string;
           quantity?: number;
           unit?: string | null;
@@ -245,15 +246,12 @@ export type Database = {
         };
         Update: {
           allergens?: string | null;
-          category?: string | null;
           created_at?: string;
           description?: string | null;
           donor_id?: string | null;
-          expires_at?: string | null;
           food_type?: string | null;
           id?: string;
           image_url?: string | null;
-          image_urls?: Json | null;
           name?: string;
           quantity?: number;
           unit?: string | null;
@@ -284,7 +282,6 @@ export type Database = {
           contact_number: string | null;
           country: string | null;
           created_at: string;
-          driver_instructions: string | null;
           email: string;
           full_name: string | null;
           id: string;
@@ -293,6 +290,7 @@ export type Database = {
           role: Database['public']['Enums']['user_role'];
           street_address: string | null;
           updated_at: string;
+          driver_instructions: string | null;
         };
         Insert: {
           address?: string | null;
@@ -300,7 +298,6 @@ export type Database = {
           contact_number?: string | null;
           country?: string | null;
           created_at?: string;
-          driver_instructions?: string | null;
           email: string;
           full_name?: string | null;
           id: string;
@@ -309,6 +306,7 @@ export type Database = {
           role: Database['public']['Enums']['user_role'];
           street_address?: string | null;
           updated_at?: string;
+          driver_instructions?: string | null;
         };
         Update: {
           address?: string | null;
@@ -316,7 +314,6 @@ export type Database = {
           contact_number?: string | null;
           country?: string | null;
           created_at?: string;
-          driver_instructions?: string | null;
           email?: string;
           full_name?: string | null;
           id?: string;
@@ -325,6 +322,7 @@ export type Database = {
           role?: Database['public']['Enums']['user_role'];
           street_address?: string | null;
           updated_at?: string;
+          driver_instructions?: string | null;
         };
         Relationships: [];
       };
@@ -357,80 +355,47 @@ export type Database = {
       };
       requests: {
         Row: {
-          address: string | null;
-          allergens: Json | null;
+          allergens: string[] | null;
           created_at: string;
-          delivery_preference: string | null;
           description: string;
-          dietary_preferences: Json | null;
-          end_date: string | null;
           id: string;
-          instructions: string | null;
           is_recurring: boolean;
-          latitude: number | null;
-          longitude: number | null;
           people_count: number;
           pickup_date: string;
           pickup_end_time: string;
           pickup_instructions: string | null;
           pickup_start_time: string;
-          postal_code: string | null;
-          recurrence_pattern: string | null;
-          start_date: string | null;
           status: Database['public']['Enums']['request_status'];
-          timezone: string | null;
           updated_at: string;
           user_id: string;
         };
         Insert: {
-          address?: string | null;
-          allergens?: Json | null;
+          allergens?: string[] | null;
           created_at?: string;
-          delivery_preference?: string | null;
           description: string;
-          dietary_preferences?: Json | null;
-          end_date?: string | null;
           id?: string;
-          instructions?: string | null;
           is_recurring?: boolean;
-          latitude?: number | null;
-          longitude?: number | null;
           people_count?: number;
           pickup_date: string;
           pickup_end_time: string;
           pickup_instructions?: string | null;
           pickup_start_time: string;
-          postal_code?: string | null;
-          recurrence_pattern?: string | null;
-          start_date?: string | null;
           status?: Database['public']['Enums']['request_status'];
-          timezone?: string | null;
           updated_at?: string;
           user_id: string;
         };
         Update: {
-          address?: string | null;
-          allergens?: Json | null;
+          allergens?: string[] | null;
           created_at?: string;
-          delivery_preference?: string | null;
           description?: string;
-          dietary_preferences?: Json | null;
-          end_date?: string | null;
           id?: string;
-          instructions?: string | null;
           is_recurring?: boolean;
-          latitude?: number | null;
-          longitude?: number | null;
           people_count?: number;
           pickup_date?: string;
           pickup_end_time?: string;
           pickup_instructions?: string | null;
           pickup_start_time?: string;
-          postal_code?: string | null;
-          recurrence_pattern?: string | null;
-          start_date?: string | null;
           status?: Database['public']['Enums']['request_status'];
-          timezone?: string | null;
           updated_at?: string;
           user_id?: string;
         };
@@ -620,6 +585,9 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       donation_status: ['available', 'claimed', 'picked_up', 'cancelled'],

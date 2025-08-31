@@ -188,7 +188,9 @@ export default function DonationSummaryPage() {
           name: item.name,
           description: item.description || null,
           allergens: JSON.stringify(item.allergens || []),
-          image_url: item.imageUrl || null,
+          image_url:
+            item.imageUrl || (item.imageUrls && item.imageUrls[0]) || null, // Use first image if imageUrl not set
+          image_urls: item.imageUrls || (item.imageUrl ? [item.imageUrl] : []), // Ensure array format
         });
 
         // Update the donation
@@ -223,7 +225,12 @@ export default function DonationSummaryPage() {
               name: item.name,
               description: item.description || null,
               allergens: JSON.stringify(item.allergens || []),
-              image_url: item.imageUrl || null,
+              image_url:
+                item.imageUrl || (item.imageUrls && item.imageUrls[0]) || null, // Use first image if imageUrl not set
+              image_urls:
+                item.imageUrls || (item.imageUrl ? [item.imageUrl] : []), // Ensure array format
+              category: null,
+              expires_at: null,
               donor_id: currentUser?.id || null,
               food_type: null,
               quantity: parseFloat(item.quantity) || 1,
