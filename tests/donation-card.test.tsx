@@ -95,6 +95,7 @@ describe('DonationCard', () => {
       country: 'Test Country',
       postal_code: '12345',
       street_address: '123 Donor Street',
+      driver_instructions: null,
       created_at: '2024-12-01T08:00:00Z',
       updated_at: '2024-12-01T08:00:00Z',
     },

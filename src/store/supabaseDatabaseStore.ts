@@ -521,16 +521,44 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       deleteDonation: async (id: string) => {
         try {
-          const { error } = await supabase
+          // First, get the donation to find the food_item_id
+          const donationToDelete = get().donations.find((d) => d.id === id);
+          if (!donationToDelete) {
+            return { error: 'Donation not found' };
+          }
+
+          // Delete the donation first (this is the main operation)
+          const { error: donationError } = await supabase
             .from('donations')
             .delete()
             .eq('id', id);
 
-          if (error) return { error: error.message };
+          if (donationError) return { error: donationError.message };
+
+          // Then try to delete the associated food item
+          // This is safe because if the food item is referenced elsewhere, it will fail silently
+          const { error: foodItemError } = await supabase
+            .from('food_items')
+            .delete()
+            .eq('id', donationToDelete.food_item_id);
+
+          // Log food item deletion error but don't fail the operation
+          if (foodItemError) {
+            console.log(
+              'Food item deletion skipped (may be referenced elsewhere):',
+              foodItemError.message
+            );
+          }
 
           // Remove from local state
           const donations = get().donations.filter((d) => d.id !== id);
-          set({ donations });
+          const foodItems = foodItemError
+            ? get().foodItems // Keep food items if deletion failed
+            : get().foodItems.filter(
+                (fi) => fi.id !== donationToDelete.food_item_id
+              );
+
+          set({ donations, foodItems });
 
           return { error: null };
         } catch (error) {
@@ -610,9 +638,21 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       addRequest: async (requestData: RequestInsert) => {
         try {
+          // Ensure allergens is properly formatted as array for PostgreSQL
+          const formattedRequest = {
+            ...requestData,
+            allergens: Array.isArray(requestData.allergens)
+              ? requestData.allergens
+              : requestData.allergens
+                ? [requestData.allergens]
+                : null,
+          };
+
+          console.log('🔧 Supabase insert payload:', formattedRequest);
+
           const { data, error } = await supabase
             .from('requests')
-            .insert(requestData)
+            .insert(formattedRequest)
             .select()
             .single();
 

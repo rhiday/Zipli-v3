@@ -1,6 +1,7 @@
 # Zipli API Documentation
 
 ## Overview
+
 The Zipli API provides endpoints for managing food donations, user authentication, and real-time communication between food donors and receivers.
 
 **Base URL**: `https://zipli-v3.vercel.app/api`
@@ -10,16 +11,19 @@ The Zipli API provides endpoints for managing food donations, user authenticatio
 ## Authentication
 
 ### Generate QR Token
+
 Generate a new QR code token for pickup authentication.
 
 **Endpoint**: `GET /auth/qr-token`
 
 **Headers**:
+
 ```
 Origin: https://allowed-domain.com
 ```
 
 **Response**:
+
 ```json
 {
   "token": "abc123def456",
@@ -31,14 +35,17 @@ Origin: https://allowed-domain.com
 **Rate Limit**: 10 requests per minute per IP
 
 ### Validate Token
+
 Validate a QR code token for pickup authorization.
 
 **Endpoint**: `GET /auth/validate-token?token={token}`
 
 **Parameters**:
+
 - `token` (required): The QR code token to validate
 
 **Response Success** (200):
+
 ```json
 {
   "valid": true,
@@ -51,6 +58,7 @@ Validate a QR code token for pickup authorization.
 ```
 
 **Response Error** (404/403):
+
 ```json
 {
   "valid": false,
@@ -63,16 +71,19 @@ Validate a QR code token for pickup authorization.
 ## Food Item Processing
 
 ### Process Item Details
+
 Extract structured information from natural language description of food items.
 
 **Endpoint**: `POST /process-item-details`
 
 **Headers**:
+
 ```
 Content-Type: application/json
 ```
 
 **Request Body**:
+
 ```json
 {
   "transcript": "I have 5 kilograms of fresh apples and 2 loaves of bread"
@@ -80,6 +91,7 @@ Content-Type: application/json
 ```
 
 **Response** (200):
+
 ```json
 {
   "items": [
@@ -104,6 +116,7 @@ Content-Type: application/json
 ```
 
 **Error Response** (400):
+
 ```json
 {
   "error": "Invalid request body",
@@ -114,20 +127,24 @@ Content-Type: application/json
 **Rate Limit**: 20 requests per minute per IP
 
 ### Transcribe Audio
+
 Convert audio recordings to text for food item processing.
 
 **Endpoint**: `POST /transcribe-audio`
 
 **Headers**:
+
 ```
 Content-Type: multipart/form-data
 ```
 
 **Request Body**:
+
 - `audio` (file): Audio file (MP3, MP4, WAV, WebM, OGG)
 - Maximum file size: 25MB
 
 **Response** (200):
+
 ```json
 {
   "transcript": "I have five kilograms of fresh apples to donate",
@@ -140,6 +157,7 @@ Content-Type: multipart/form-data
 **Error Responses**:
 
 **400 - No File**:
+
 ```json
 {
   "error": "No audio file uploaded or file is empty"
@@ -147,6 +165,7 @@ Content-Type: multipart/form-data
 ```
 
 **400 - File Too Large**:
+
 ```json
 {
   "error": "Audio file too large. Maximum size is 25MB."
@@ -154,6 +173,7 @@ Content-Type: multipart/form-data
 ```
 
 **400 - Invalid File Type**:
+
 ```json
 {
   "error": "Invalid file type. Please upload an audio file (MP3, MP4, WAV, WebM, or OGG)."
@@ -165,6 +185,7 @@ Content-Type: multipart/form-data
 ## Error Codes
 
 ### Standard HTTP Status Codes
+
 - `200` - Success
 - `400` - Bad Request (invalid input)
 - `401` - Unauthorized
@@ -174,6 +195,7 @@ Content-Type: multipart/form-data
 - `500` - Internal Server Error
 
 ### Custom Error Codes
+
 - `INVALID_TOKEN` - Token is malformed or doesn't exist
 - `EXPIRED_TOKEN` - Token has passed its expiration time
 - `USED_TOKEN` - Token has already been consumed
@@ -188,11 +210,12 @@ Content-Type: multipart/form-data
 All endpoints implement rate limiting to prevent abuse:
 
 - **QR Token Generation**: 10 requests per minute per IP
-- **Token Validation**: 30 requests per minute per IP  
+- **Token Validation**: 30 requests per minute per IP
 - **Item Processing**: 20 requests per minute per IP
 - **Audio Transcription**: 10 requests per minute per IP
 
 Rate limit headers are included in responses:
+
 ```
 X-RateLimit-Limit: 30
 X-RateLimit-Remaining: 29
@@ -204,6 +227,7 @@ X-RateLimit-Reset: 1701435600
 The API implements strict CORS policies for security:
 
 **Allowed Origins**:
+
 - `http://localhost:3000` (development)
 - `http://localhost:3001` (development)
 - `https://zipli-v3.vercel.app` (production)
@@ -215,17 +239,20 @@ The API implements strict CORS policies for security:
 ## Security Features
 
 ### Input Sanitization
+
 - All text inputs are sanitized to prevent XSS attacks
 - File uploads are validated for type and size
 - SQL injection protection through parameterized queries
 
 ### Token Security
+
 - Tokens expire after 1 hour
 - Tokens can only be used once
 - Secure random token generation
 - No sensitive data in token payload
 
 ### API Key Protection
+
 - OpenAI API keys are server-side only
 - No API keys exposed in client-side code
 - Environment variable validation
@@ -233,20 +260,21 @@ The API implements strict CORS policies for security:
 ## Usage Examples
 
 ### JavaScript/TypeScript
+
 ```typescript
 // Generate QR token
 const generateToken = async () => {
   const response = await fetch('/api/auth/qr-token', {
     method: 'GET',
     headers: {
-      'Origin': 'https://zipli-v3.vercel.app'
-    }
+      Origin: 'https://zipli-v3.vercel.app',
+    },
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to generate token');
   }
-  
+
   return await response.json();
 };
 
@@ -255,11 +283,11 @@ const processItems = async (transcript: string) => {
   const response = await fetch('/api/process-item-details', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ transcript })
+    body: JSON.stringify({ transcript }),
   });
-  
+
   return await response.json();
 };
 
@@ -267,17 +295,18 @@ const processItems = async (transcript: string) => {
 const transcribeAudio = async (audioFile: File) => {
   const formData = new FormData();
   formData.append('audio', audioFile);
-  
+
   const response = await fetch('/api/transcribe-audio', {
     method: 'POST',
-    body: formData
+    body: formData,
   });
-  
+
   return await response.json();
 };
 ```
 
 ### cURL Examples
+
 ```bash
 # Generate QR token
 curl -X GET "https://zipli-v3.vercel.app/api/auth/qr-token" \
@@ -300,12 +329,15 @@ curl -X POST "https://zipli-v3.vercel.app/api/transcribe-audio" \
 ## Testing
 
 ### Postman Collection
+
 A Postman collection is available for API testing:
+
 - Import the collection from `/docs/postman/zipli-api.json`
 - Set environment variables for base URL and test tokens
 - Run automated tests for all endpoints
 
 ### Test Environment
+
 - Base URL: `https://zipli-staging.vercel.app/api`
 - Test tokens available in development
 - Mock OpenAI responses for consistent testing
@@ -313,6 +345,7 @@ A Postman collection is available for API testing:
 ## Support
 
 For API support and questions:
+
 - Create an issue in the GitHub repository
 - Review the test files in `/tests/api-routes.test.ts`
 - Check the implementation in `/src/app/api/` directories
@@ -320,6 +353,7 @@ For API support and questions:
 ## Changelog
 
 ### Version 1.0 (Current)
+
 - Initial API release
 - QR token authentication
 - Food item AI processing

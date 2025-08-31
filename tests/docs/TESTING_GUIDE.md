@@ -1,6 +1,7 @@
 # 🧪 Comprehensive Testing Guide for Zipli
 
 ## 🚀 Quick Start
+
 **Server is running at**: http://localhost:3000  
 **Test with real Supabase data** - All changes persist!
 
@@ -8,14 +9,14 @@
 
 ## 📋 Test Accounts
 
-| Role | Email | Password | Purpose |
-|------|-------|----------|---------|
-| **Food Donor** | hasan@zipli.test | password | Restaurant owner donating food |
-| **Food Donor** | alice@zipli.test | password | Another restaurant donor |
-| **Food Receiver** | maria@zipli.test | password | Red Cross representative |
-| **Food Receiver** | kirkko@zipli.test | password | Church food assistance |
-| **City Admin** | city@zipli.test | password | City official with analytics access |
-| **Terminal** | terminal@zipli.test | password | Airport terminal operator |
+| Role              | Email               | Password | Purpose                             |
+| ----------------- | ------------------- | -------- | ----------------------------------- |
+| **Food Donor**    | hasan@zipli.test    | password | Restaurant owner donating food      |
+| **Food Donor**    | alice@zipli.test    | password | Another restaurant donor            |
+| **Food Receiver** | maria@zipli.test    | password | Red Cross representative            |
+| **Food Receiver** | kirkko@zipli.test   | password | Church food assistance              |
+| **City Admin**    | city@zipli.test     | password | City official with analytics access |
+| **Terminal**      | terminal@zipli.test | password | Airport terminal operator           |
 
 ---
 
@@ -26,25 +27,29 @@
 **Open http://localhost:3000 in your browser**
 
 #### Test Invalid Login
+
 1. Click "Login" button
 2. Enter: `wrong@email.com` / `wrongpassword`
 3. **Expected**: Error message "Invalid credentials"
 4. ✅ Check: Error handled gracefully
 
 #### Test Valid Login (Food Donor)
-1. Click "Login" 
+
+1. Click "Login"
 2. Enter: `hasan@zipli.test` / `password`
 3. **Expected**: Redirected to donor dashboard
 4. ✅ Check: User name displayed in header
 5. ✅ Check: Correct role-based UI shown
 
 #### Test Quick Role Switching (Development Feature)
+
 1. Look for **Dev User Switcher** in bottom-right corner
 2. Click different users to switch roles instantly
 3. **Expected**: UI updates based on role
 4. ✅ Check: No need to re-enter passwords
 
 #### Test Logout
+
 1. Click user menu → "Logout"
 2. **Expected**: Return to landing page
 3. ✅ Check: Protected pages redirect to login
@@ -56,11 +61,13 @@
 **Login as**: `hasan@zipli.test` / `password`
 
 #### View Existing Donations
+
 1. Navigate to "My Donations" or Dashboard
 2. **Expected**: See list of your active donations
 3. ✅ Check: Donation cards show food items, quantities, pickup times
 
 #### Create New Donation
+
 1. Click "Donate Food" or "+" button
 2. **Choose Method**:
    - **Voice Input**: Click microphone, describe items
@@ -76,6 +83,7 @@
 6. ✅ Check: Real-time update (no refresh needed)
 
 #### Manage Donations
+
 1. Find an active donation
 2. Try these actions:
    - **Edit**: Update quantity or times
@@ -91,6 +99,7 @@
 **Login as**: `maria@zipli.test` / `password`
 
 #### Browse Available Donations
+
 1. Navigate to "Available Food" or marketplace
 2. **Expected**: See all available donations
 3. ✅ Check: Can filter by:
@@ -100,6 +109,7 @@
    - Pickup time
 
 #### Claim a Donation
+
 1. Click on a donation card
 2. View details:
    - Food description
@@ -114,6 +124,7 @@
 8. ✅ Check: Appears in "My Claims"
 
 #### QR Code for Pickup
+
 1. Go to "My Claims"
 2. Find claimed donation
 3. Click "Show QR Code"
@@ -127,6 +138,7 @@
 **Open two browser windows side by side**
 
 #### Test Live Updates
+
 1. **Window 1**: Login as `hasan@zipli.test`
 2. **Window 2**: Login as `maria@zipli.test`
 3. **In Window 1**: Create new donation
@@ -134,6 +146,7 @@
 5. ✅ Check: No page refresh needed
 
 #### Test Claim Notifications
+
 1. **Window 2**: Claim a donation from Window 1's user
 2. **Expected in Window 1**: Notification of claim
 3. ✅ Check: Donor sees who claimed
@@ -145,6 +158,7 @@
 **Login as**: `city@zipli.test` / `password`
 
 #### View Analytics
+
 1. Navigate to City Dashboard
 2. **Check these sections**:
    - Total donations this month
@@ -156,6 +170,7 @@
 4. ✅ Check: Data is accurate
 
 #### Partner Organizations
+
 1. Click "Partner Organizations"
 2. **Expected**: List of all donors/receivers
 3. ✅ Check: Shows activity metrics
@@ -166,6 +181,7 @@
 ### 6. 📱 Mobile Responsiveness Testing
 
 #### Test on Mobile (or Browser Mobile View)
+
 1. **Chrome**: Press F12 → Click mobile icon
 2. **Test these views**:
    - iPhone SE (375px)
@@ -179,6 +195,7 @@
    - ✅ Text is readable
 
 #### Test Touch Interactions
+
 1. Voice input on mobile
 2. Photo upload from camera
 3. Swipe gestures (if any)
@@ -189,6 +206,7 @@
 ### 7. 🔴 Error Handling Testing
 
 #### Network Errors
+
 1. Open DevTools (F12) → Network tab
 2. Set to "Offline"
 3. Try to:
@@ -200,6 +218,7 @@
 6. Set back to "Online"
 
 #### Invalid Data
+
 1. Try submitting forms with:
    - Empty required fields
    - Invalid email format
@@ -209,6 +228,7 @@
 3. ✅ Check: Form highlights errors
 
 #### Session Timeout
+
 1. Login to app
 2. Wait 10+ minutes idle
 3. Try an action
@@ -220,6 +240,7 @@
 ### 8. 🎯 Performance Testing
 
 #### Page Load Times
+
 1. Open DevTools → Network tab
 2. Enable "Slow 3G" throttling
 3. Navigate between pages
@@ -227,6 +248,7 @@
 5. ✅ Check: Loading indicators shown
 
 #### Search Performance
+
 1. Go to food marketplace
 2. Search for items
 3. Apply multiple filters
@@ -238,6 +260,7 @@
 ### 9. 🛡️ Security Testing
 
 #### Cross-User Access
+
 1. Login as `hasan@zipli.test`
 2. Note a donation ID from URL
 3. Logout and login as `maria@zipli.test`
@@ -246,6 +269,7 @@
 6. ✅ Check: Can't edit others' data
 
 #### SQL Injection (Basic Test)
+
 1. In any search field, try:
    - `'; DROP TABLE users; --`
    - `<script>alert('XSS')</script>`
@@ -256,13 +280,13 @@
 
 ## 🐛 Common Issues & Solutions
 
-| Issue | Solution |
-|-------|----------|
-| **Login fails** | Check internet connection, verify credentials |
-| **No Dev Switcher** | Only shows in development mode |
-| **Real-time not working** | Check WebSocket connection in Network tab |
-| **Images not loading** | Check Supabase storage configuration |
-| **Slow performance** | Clear browser cache, check network speed |
+| Issue                     | Solution                                      |
+| ------------------------- | --------------------------------------------- |
+| **Login fails**           | Check internet connection, verify credentials |
+| **No Dev Switcher**       | Only shows in development mode                |
+| **Real-time not working** | Check WebSocket connection in Network tab     |
+| **Images not loading**    | Check Supabase storage configuration          |
+| **Slow performance**      | Clear browser cache, check network speed      |
 
 ---
 
@@ -272,7 +296,9 @@ When you find an issue, document it like this:
 
 ```markdown
 ### Bug: [Brief description]
+
 **Steps to reproduce:**
+
 1. [Step 1]
 2. [Step 2]
 3. [Step 3]
@@ -332,6 +358,7 @@ If you're short on time, test these critical paths:
 ## 🔧 Advanced Testing (Optional)
 
 ### Browser Testing
+
 - [ ] Chrome (latest)
 - [ ] Firefox (latest)
 - [ ] Safari (latest)
@@ -340,12 +367,14 @@ If you're short on time, test these critical paths:
 - [ ] Chrome Mobile (Android)
 
 ### Accessibility Testing
+
 - [ ] Keyboard navigation works
 - [ ] Screen reader compatible
 - [ ] Color contrast passes WCAG
 - [ ] Focus indicators visible
 
 ### Load Testing
+
 - [ ] Create 50+ donations
 - [ ] Have 10+ users online
 - [ ] Monitor performance

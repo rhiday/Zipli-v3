@@ -186,7 +186,7 @@ NEXT_PUBLIC_LOG_LEVEL=INFO
 
 ---
 
-**Deployment Date**: ****\_\_\_****  
-**Deployed By**: ****\_\_\_****  
-**Version/Commit**: ****\_\_\_****  
-**Backup Confirmed**: ****\_\_\_****
+**Deployment Date**: \***\*\_\_\_\*\***  
+**Deployed By**: \***\*\_\_\_\*\***  
+**Version/Commit**: \***\*\_\_\_\*\***  
+**Backup Confirmed**: \***\*\_\_\_\*\***

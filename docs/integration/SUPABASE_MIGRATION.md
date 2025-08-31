@@ -9,6 +9,7 @@ This document outlines the completed migration of Zipli from a mock Zustand stor
 ## 📋 Migration Overview
 
 ### What Was Migrated
+
 - **Database Architecture**: From in-memory mock data to PostgreSQL
 - **Authentication**: From mock auth to Supabase Auth with JWT
 - **Store Pattern**: From `@/store/databaseStore` to unified `@/store`
@@ -16,6 +17,7 @@ This document outlines the completed migration of Zipli from a mock Zustand stor
 - **Type System**: Complete TypeScript integration with generated types
 
 ### Key Improvements
+
 - ✅ **Real Database**: PostgreSQL with ACID transactions
 - ✅ **Authentication**: JWT-based with automatic profile creation
 - ✅ **Real-time Updates**: Live data synchronization
@@ -30,6 +32,7 @@ This document outlines the completed migration of Zipli from a mock Zustand stor
 ### Core Tables
 
 #### 1. **profiles** - User profiles linked to Supabase Auth
+
 ```sql
 CREATE TABLE profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -45,6 +48,7 @@ CREATE TABLE profiles (
 ```
 
 #### 2. **food_items** - Catalog of food items
+
 ```sql
 CREATE TABLE food_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -58,6 +62,7 @@ CREATE TABLE food_items (
 ```
 
 #### 3. **donations** - Food donations
+
 ```sql
 CREATE TABLE donations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -74,6 +79,7 @@ CREATE TABLE donations (
 ```
 
 #### 4. **requests** - Food requests
+
 ```sql
 CREATE TABLE requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -91,6 +97,7 @@ CREATE TABLE requests (
 ```
 
 #### 5. **donation_claims** - Matching system
+
 ```sql
 CREATE TABLE donation_claims (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -104,6 +111,7 @@ CREATE TABLE donation_claims (
 ```
 
 ### Enum Types
+
 ```sql
 CREATE TYPE user_role AS ENUM ('food_donor', 'food_receiver', 'city', 'terminals');
 CREATE TYPE donation_status AS ENUM ('available', 'claimed', 'completed', 'expired');
@@ -118,33 +126,38 @@ CREATE TYPE claim_status AS ENUM ('pending', 'approved', 'rejected', 'completed'
 ### Row Level Security (RLS) Policies
 
 #### Profiles
+
 - Users can read all profiles (for donor/receiver discovery)
 - Users can only update their own profile
 - Automatic profile creation via database triggers
 
 #### Donations
+
 - Public read access (marketplace functionality)
 - Only donors can create/update their own donations
 - City officials can read all donations for analytics
 
 #### Requests
+
 - Public read access (for matching)
 - Only request creators can update their own requests
 - City officials have full access for coordination
 
 #### Donation Claims
+
 - Claimers can read their own claims
 - Donors can read claims for their donations
 - City officials have full access for dispute resolution
 
 ### Helper Functions
+
 ```sql
 -- Check if user has specific role
 CREATE OR REPLACE FUNCTION auth.user_has_role(required_role user_role)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM profiles 
+    SELECT 1 FROM profiles
     WHERE id = auth.uid() AND role = required_role
   );
 END;
@@ -155,7 +168,7 @@ CREATE OR REPLACE FUNCTION auth.get_user_profile()
 RETURNS profiles AS $$
 BEGIN
   RETURN (
-    SELECT * FROM profiles 
+    SELECT * FROM profiles
     WHERE id = auth.uid()
   );
 END;
@@ -169,25 +182,30 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ### Store Architecture
 
 #### New Unified Store (`src/store/supabaseDatabaseStore.ts`)
+
 ```tsx
 interface DatabaseState {
   // Authentication
   currentUser: User | null;
   isInitialized: boolean;
-  
+
   // Data
   users: User[];
   donations: Donation[];
   requests: Request[];
   foodItems: FoodItem[];
-  
+
   // Operations
   login: (email: string, password: string) => Promise<AuthResponse>;
   logout: () => void;
-  addDonation: (donation: CreateDonationData) => Promise<DatabaseResponse<Donation>>;
-  updateDonation: (updates: Partial<Donation>) => Promise<DatabaseResponse<Donation>>;
+  addDonation: (
+    donation: CreateDonationData
+  ) => Promise<DatabaseResponse<Donation>>;
+  updateDonation: (
+    updates: Partial<Donation>
+  ) => Promise<DatabaseResponse<Donation>>;
   // ... all CRUD operations
-  
+
   // Real-time
   subscribeToUpdates: () => void;
   unsubscribeFromUpdates: () => void;
@@ -195,18 +213,14 @@ interface DatabaseState {
 ```
 
 #### Component Integration Pattern
+
 ```tsx
 // ✅ New pattern (all components now use this)
 import { useDatabase } from '@/store';
 
 const MyComponent = () => {
-  const { 
-    currentUser, 
-    donations, 
-    addDonation,
-    isInitialized 
-  } = useDatabase();
-  
+  const { currentUser, donations, addDonation, isInitialized } = useDatabase();
+
   // Component logic with real-time data
   // All operations are type-safe and authenticated
 };
@@ -215,10 +229,11 @@ const MyComponent = () => {
 ### Authentication Flow
 
 #### 1. User Signup/Login
+
 ```tsx
 const handleLogin = async (email: string, password: string) => {
   const result = await login(email, password);
-  
+
   if (result.data?.user) {
     // User is authenticated
     // Profile automatically created via database trigger
@@ -229,6 +244,7 @@ const handleLogin = async (email: string, password: string) => {
 ```
 
 #### 2. Automatic Profile Creation
+
 ```sql
 -- Database trigger creates profile on user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -253,21 +269,28 @@ CREATE TRIGGER on_auth_user_created
 ### Real-time Features
 
 #### Automatic Subscriptions
+
 ```tsx
 // Store automatically sets up real-time subscriptions
 const subscribeToUpdates = () => {
   // Donations real-time
   supabase
     .channel('donations')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'donations' }, 
-        handleDonationUpdate)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'donations' },
+      handleDonationUpdate
+    )
     .subscribe();
-    
-  // Requests real-time  
+
+  // Requests real-time
   supabase
     .channel('requests')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' },
-        handleRequestUpdate)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'requests' },
+      handleRequestUpdate
+    )
     .subscribe();
 };
 ```
@@ -277,6 +300,7 @@ const subscribeToUpdates = () => {
 ## 📝 Migration Process
 
 ### Phase 1: Database Setup ✅
+
 1. **Schema Design**: Created comprehensive 5-table schema
 2. **RLS Policies**: Implemented security policies
 3. **Triggers**: Set up automatic profile creation
@@ -284,24 +308,28 @@ const subscribeToUpdates = () => {
 5. **Enum Types**: Standardized status and role management
 
 ### Phase 2: Authentication Integration ✅
+
 1. **Auth Service**: Created `authService.ts` wrapper
 2. **JWT Integration**: Token-based authentication
 3. **Profile Management**: Automatic profile creation
 4. **Role-based Access**: Integrated with RLS policies
 
 ### Phase 3: Store Migration ✅
+
 1. **New Store**: Built `supabaseDatabaseStore.ts`
 2. **API Compatibility**: Maintained existing component APIs
 3. **Type Generation**: Generated types from schema
 4. **Real-time Setup**: Implemented live subscriptions
 
 ### Phase 4: Component Migration ✅
+
 1. **Import Updates**: Changed from `@/store/databaseStore` to `@/store`
 2. **Batch Migration**: Updated all 30+ components systematically
 3. **Testing**: Verified each component works with new store
 4. **Cleanup**: Removed deprecated imports
 
 ### Phase 5: Documentation ✅
+
 1. **Updated README**: Comprehensive migration documentation
 2. **Schema Documentation**: Detailed database reference
 3. **Development Guide**: Updated development workflow
@@ -312,6 +340,7 @@ const subscribeToUpdates = () => {
 ## 🚀 Deployment Guide
 
 ### Environment Setup
+
 ```env
 # Required for production
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -323,19 +352,21 @@ OPENAI_API_KEY=sk-your-openai-key
 ```
 
 ### Database Migration Steps
+
 1. **Create Supabase Project**
    - Go to [supabase.com](https://supabase.com)
    - Create new project
    - Note URL and anon key
 
 2. **Run Migration Files**
+
    ```sql
    -- 1. Core schema
    \i supabase/migrations/20250813_create_core_tables.sql
-   
+
    -- 2. Security policies
    \i supabase/migrations/20250813_setup_rls_policies.sql
-   
+
    -- 3. Authentication triggers
    \i supabase/migrations/20250813_auth_triggers.sql
    ```
@@ -348,6 +379,7 @@ OPENAI_API_KEY=sk-your-openai-key
    ```
 
 ### Production Checklist
+
 - [ ] Database migrations applied
 - [ ] Environment variables configured
 - [ ] RLS policies active
@@ -361,7 +393,9 @@ OPENAI_API_KEY=sk-your-openai-key
 ## 🔍 Testing & Validation
 
 ### Component Testing
+
 All components have been verified to work with the new Supabase store:
+
 - ✅ Authentication components (login, register, profile)
 - ✅ Dashboard components (donor, receiver, city)
 - ✅ Donation flow (create, edit, detail, summary)
@@ -370,6 +404,7 @@ All components have been verified to work with the new Supabase store:
 - ✅ Feed and marketplace components
 
 ### Database Testing
+
 - ✅ CRUD operations work correctly
 - ✅ RLS policies enforce security
 - ✅ Real-time updates propagate
@@ -378,6 +413,7 @@ All components have been verified to work with the new Supabase store:
 - ✅ Type safety maintained
 
 ### Integration Testing
+
 - ✅ User signup → profile creation
 - ✅ Login → dashboard routing
 - ✅ Donation creation → real-time updates
@@ -389,17 +425,20 @@ All components have been verified to work with the new Supabase store:
 ## 📚 Next Steps
 
 ### Immediate (Ready Now)
+
 - [ ] Deploy to production with Supabase
 - [ ] Test with real users
 - [ ] Monitor performance and errors
 
 ### Short Term
+
 - [ ] Add more comprehensive error handling
 - [ ] Implement caching strategies
 - [ ] Add performance monitoring
 - [ ] Create admin dashboard features
 
-### Long Term  
+### Long Term
+
 - [ ] Advanced matching algorithms
 - [ ] Geolocation-based features
 - [ ] Push notifications via Edge Functions
@@ -411,13 +450,15 @@ All components have been verified to work with the new Supabase store:
 ## 🎯 Success Metrics
 
 ### Technical ✅
+
 - **Zero Breaking Changes**: All existing functionality maintained
 - **Type Safety**: 100% TypeScript coverage
 - **Real-time**: Live data updates working
 - **Security**: RLS policies enforced
 - **Performance**: Database queries optimized
 
-### User Experience ✅  
+### User Experience ✅
+
 - **Authentication**: Smooth login/signup flow
 - **Data Persistence**: All user data saved to database
 - **Real-time Updates**: Live collaboration features
@@ -425,6 +466,7 @@ All components have been verified to work with the new Supabase store:
 - **Offline Capability**: Ready for PWA features
 
 ### Development Experience ✅
+
 - **Type Safety**: IntelliSense and compile-time checks
 - **Real Database**: No more mock data limitations
 - **Scalability**: Ready for production loads

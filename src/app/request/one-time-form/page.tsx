@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
-import { AllergensDropdown } from '@/components/ui/AllergensDropdown';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -17,6 +16,7 @@ import { useRequestStore } from '@/store/request';
 type OneTimeFormInputs = {
   description: string;
   quantity: string;
+  allergens: string;
 };
 
 export default function OneTimeRequestForm() {
@@ -28,11 +28,9 @@ export default function OneTimeRequestForm() {
     isEditMode,
     editingRequestId,
     setEditMode,
+    allergenTextFromArray,
+    arrayFromAllergenText,
   } = useRequestStore();
-  const [selectedAllergens, setSelectedAllergens] = useState<string[]>(
-    requestData.allergens || []
-  );
-  const [allergensInteracted, setAllergensInteracted] = useState(false);
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const {
@@ -44,6 +42,7 @@ export default function OneTimeRequestForm() {
     defaultValues: {
       description: requestData.description || '',
       quantity: requestData.quantity ? requestData.quantity.toString() : '',
+      allergens: allergenTextFromArray(requestData.allergens || []),
     },
   });
 
@@ -51,8 +50,7 @@ export default function OneTimeRequestForm() {
   const isFormValid =
     watchedFields.description?.trim() &&
     watchedFields.quantity?.trim() &&
-    Number(watchedFields.quantity) > 0 &&
-    selectedAllergens.length > 0;
+    Number(watchedFields.quantity) > 0;
 
   const onSubmit = async (data: OneTimeFormInputs) => {
     setAttemptedSubmit(true);
@@ -63,12 +61,15 @@ export default function OneTimeRequestForm() {
     }
 
     try {
+      // Convert allergen text to array for storage
+      const allergensArray = arrayFromAllergenText(data.allergens);
+
       // Update the store with form data
       setRequestData({
         request_type: 'one-time',
         description: data.description,
         quantity: Number(data.quantity),
-        allergens: selectedAllergens,
+        allergens: allergensArray,
       });
 
       // Store in session storage for backward compatibility
@@ -76,7 +77,7 @@ export default function OneTimeRequestForm() {
         request_type: 'one-time',
         description: data.description,
         quantity: Number(data.quantity),
-        allergens: selectedAllergens,
+        allergens: allergensArray,
       };
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
@@ -176,41 +177,20 @@ export default function OneTimeRequestForm() {
         </div>
 
         {/* Allergens */}
-        <AllergensDropdown
-          label={t('allergiesIntolerancesDiets')}
-          options={[
-            t('notSpecified'),
-            t('glutenFree'),
-            t('lactoseFree'),
-            t('lowLactose'),
-            t('eggFree'),
-            t('soyFree'),
-            t('noPeanuts'),
-            t('noOtherNuts'),
-            t('noFish'),
-            t('noCrustaceans'),
-            t('noCelery'),
-            t('noMustard'),
-            t('noSesamSeeds'),
-            t('noSulphurDioxide'),
-            t('noLupin'),
-            t('noMolluscs'),
-          ]}
-          value={selectedAllergens}
-          onChange={(allergens) => {
-            setSelectedAllergens(allergens);
-            if (!allergensInteracted) {
-              setAllergensInteracted(true);
-            }
-          }}
-          placeholder={t('selectAllergens')}
-          error={
-            !selectedAllergens.length &&
-            (allergensInteracted || attemptedSubmit)
-              ? t('selectAllergens')
-              : undefined
-          }
-        />
+        <div>
+          <label className="block text-label font-semibold mb-2">
+            {t('allergiesIntolerancesDiets')}
+          </label>
+          <Textarea
+            {...register('allergens')}
+            placeholder="e.g. Gluten-free, Lactose-free, Contains nuts"
+            variant="default"
+            rows={3}
+          />
+          <div className="mt-1 text-[14px] font-manrope text-[rgba(2,29,19,0.60)]">
+            Separate multiple items with commas or new lines
+          </div>
+        </div>
       </form>
     </PageContainer>
   );

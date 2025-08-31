@@ -52,6 +52,8 @@ export default function DonationDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -94,10 +96,34 @@ export default function DonationDetailPage() {
     setLoading(false);
   }, [currentUser, id, donations, foodItems]);
 
-  const handleRemoveListing = () => {
+  const handleRemoveListing = async () => {
     if (!donation) return;
-    deleteDonation(donation.id);
-    router.push('/donate');
+
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      console.log('🗑️ Deleting donation:', donation.id);
+      const response = await deleteDonation(donation.id);
+
+      if (response.error) {
+        console.error('❌ Error deleting donation:', response.error);
+        setDeleteError(response.error);
+        setIsDeleting(false);
+        return;
+      }
+
+      console.log('✅ Donation deleted successfully');
+      // Close dialog and redirect after successful deletion
+      setShowDeleteConfirm(false);
+      router.push('/donate');
+    } catch (error) {
+      console.error('❌ Unexpected error during deletion:', error);
+      setDeleteError(
+        error instanceof Error ? error.message : 'Failed to delete donation'
+      );
+      setIsDeleting(false);
+    }
   };
 
   const handleEditListing = () => {
@@ -175,13 +201,37 @@ export default function DonationDetailPage() {
           </div>
 
           {/* Tags */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            {donation.food_item.allergens &&
-              (Array.isArray(donation.food_item.allergens)
-                ? donation.food_item.allergens
-                : String(donation.food_item.allergens).split(',')
-              ).map((tag: string) => <Tag key={tag}>{tag.trim()}</Tag>)}
-          </div>
+          {donation.food_item.allergens && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {(() => {
+                let allergenArray: string[] = [];
+
+                if (Array.isArray(donation.food_item.allergens)) {
+                  allergenArray = donation.food_item.allergens;
+                } else if (typeof donation.food_item.allergens === 'string') {
+                  // Try to parse JSON string, fallback to splitting by comma
+                  try {
+                    const parsed = JSON.parse(donation.food_item.allergens);
+                    allergenArray = Array.isArray(parsed)
+                      ? parsed
+                      : [donation.food_item.allergens];
+                  } catch {
+                    // If not valid JSON, treat as comma-separated string
+                    allergenArray = donation.food_item.allergens
+                      .split(',')
+                      .map((item) => item.trim())
+                      .filter((item) => item.length > 0);
+                  }
+                } else {
+                  allergenArray = [String(donation.food_item.allergens)];
+                }
+
+                return allergenArray.map((tag: string) => (
+                  <Tag key={tag}>{tag.trim()}</Tag>
+                ));
+              })()}
+            </div>
+          )}
 
           <p className="mt-4 text-gray-600 leading-relaxed">
             {donation.food_item.description}
@@ -224,15 +274,35 @@ export default function DonationDetailPage() {
                     This action cannot be undone.
                   </DialogDescription>
                 </DialogHeader>
+                {deleteError && (
+                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-sm text-red-600">{deleteError}</p>
+                  </div>
+                )}
                 <DialogFooter>
                   <Button
                     variant="secondary"
-                    onClick={() => setShowDeleteConfirm(false)}
+                    onClick={() => {
+                      setShowDeleteConfirm(false);
+                      setDeleteError(null);
+                    }}
+                    disabled={isDeleting}
                   >
                     Cancel
                   </Button>
-                  <Button variant="destructive" onClick={handleRemoveListing}>
-                    Yes, Remove
+                  <Button
+                    variant="destructive"
+                    onClick={handleRemoveListing}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <>
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                        Removing...
+                      </>
+                    ) : (
+                      'Yes, Remove'
+                    )}
                   </Button>
                 </DialogFooter>
               </DialogContent>

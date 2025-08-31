@@ -6,7 +6,7 @@
 ✅ **Authentication**: Supabase Auth with JWT and profiles  
 ✅ **Store Architecture**: All 30+ components using new Supabase store  
 ✅ **Type Safety**: Complete TypeScript integration  
-✅ **Real-time Features**: Live subscriptions ready  
+✅ **Real-time Features**: Live subscriptions ready
 
 ---
 
@@ -15,19 +15,21 @@
 ### **BEFORE ANY UI CHANGE - ALWAYS:**
 
 1. **Use Design System First**
+
    ```tsx
    // ❌ NEVER DO THIS
    className="bg-green-500 text-white px-4 py-2 rounded-xl"
-   
-   // ✅ ALWAYS DO THIS  
+
+   // ✅ ALWAYS DO THIS
    import { buildButtonClasses } from '@/lib/component-utils';
    className={buildButtonClasses('primary', 'md')}
    ```
 
 2. **Import Design Tokens**
+
    ```tsx
    import { COLORS, RADIUS, COMPONENT_PATTERNS } from '@/lib/design-tokens';
-   
+
    // Use tokens instead of hardcoded values
    className={`bg-${COLORS.lime} rounded-${RADIUS.md}`}
    ```
@@ -41,22 +43,25 @@
 ### **UI CHANGE PROTOCOL - MANDATORY STEPS:**
 
 #### Step 1: Audit Current Usage
+
 ```bash
 rg "ComponentName" --type tsx -A 2 -B 2
 ```
 
 #### Step 2: Use Component Utilities
+
 ```tsx
-import { 
-  buildButtonClasses, 
-  buildCardClasses, 
+import {
+  buildButtonClasses,
+  buildCardClasses,
   buildInputClasses,
   layoutClasses,
-  textClasses 
+  textClasses,
 } from '@/lib/component-utils';
 ```
 
 #### Step 3: Validate Changes
+
 ```tsx
 import { validateComponent } from '@/lib/ui-test-helper';
 
@@ -65,6 +70,7 @@ validateComponent(componentCode, 'ComponentName');
 ```
 
 #### Step 4: Test Checklist
+
 - [ ] Mobile responsive (375px width)
 - [ ] Works in Finnish and English
 - [ ] All user roles work
@@ -72,6 +78,7 @@ validateComponent(componentCode, 'ComponentName');
 - [ ] Build succeeds (`pnpm build`)
 
 ### **FORBIDDEN ACTIONS:**
+
 - ❌ No arbitrary values: `w-[345px]`, `bg-[#ff0000]`
 - ❌ No hardcoded colors outside design system
 - ❌ No magic numbers for spacing/sizing
@@ -79,17 +86,18 @@ validateComponent(componentCode, 'ComponentName');
 - ❌ No hardcoded English text without translations
 
 ### **REQUIRED IMPORTS FOR UI WORK:**
+
 ```tsx
 // Always import these for UI changes
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useDatabase } from '@/store'; // ✅ New unified store
-import { 
+import {
   buildButtonClasses,
-  buildCardClasses, 
+  buildCardClasses,
   buildInputClasses,
   textClasses,
-  layoutClasses 
+  layoutClasses,
 } from '@/lib/component-utils';
 import { COLORS, RADIUS } from '@/lib/design-tokens';
 ```
@@ -97,6 +105,7 @@ import { COLORS, RADIUS } from '@/lib/design-tokens';
 ## 🔄 **SAFE CHANGE METHODOLOGY**
 
 ### For Small Changes (text, spacing, colors):
+
 1. Use design tokens only
 2. Test component in isolation
 3. Check 2-3 pages that use it
@@ -104,6 +113,7 @@ import { COLORS, RADIUS } from '@/lib/design-tokens';
 5. Deploy and verify
 
 ### For Medium Changes (new props, variants):
+
 1. Add new functionality without removing old
 2. Use feature flags if needed
 3. Test backwards compatibility
@@ -111,6 +121,7 @@ import { COLORS, RADIUS } from '@/lib/design-tokens';
 5. Gradual rollout
 
 ### For Large Changes (component restructure):
+
 1. **STOP** - Create plan first
 2. Create new component alongside old
 3. Migrate usage page by page
@@ -120,6 +131,7 @@ import { COLORS, RADIUS } from '@/lib/design-tokens';
 ## 📋 **COMPONENT CREATION RULES**
 
 ### New Component Checklist:
+
 - [ ] Uses design system tokens
 - [ ] Supports all necessary variants
 - [ ] Has proper TypeScript interfaces
@@ -129,6 +141,7 @@ import { COLORS, RADIUS } from '@/lib/design-tokens';
 - [ ] Consistent with existing patterns
 
 ### Component Template:
+
 ```tsx
 import { cn } from '@/lib/utils';
 import { buildButtonClasses } from '@/lib/component-utils';
@@ -141,19 +154,16 @@ interface ComponentProps {
   children: React.ReactNode;
 }
 
-export function Component({ 
+export function Component({
   variant = 'primary',
-  size = 'md', 
+  size = 'md',
   className,
-  children 
+  children,
 }: ComponentProps) {
   const { t } = useLanguage();
-  
+
   return (
-    <div className={cn(
-      buildButtonClasses(variant, size),
-      className
-    )}>
+    <div className={cn(buildButtonClasses(variant, size), className)}>
       {children}
     </div>
   );
@@ -164,7 +174,8 @@ export function Component({
 
 If UI changes break something:
 
-1. **Immediate**: 
+1. **Immediate**:
+
    ```bash
    git revert HEAD
    git push origin main
@@ -183,6 +194,7 @@ If UI changes break something:
 ## 📊 **PROGRESS TRACKING**
 
 When making UI changes, update progress in `DESIGN_SYSTEM_ROLLOUT.md`:
+
 - Mark components as migrated
 - Note any issues encountered
 - Document decisions made
@@ -190,24 +202,26 @@ When making UI changes, update progress in `DESIGN_SYSTEM_ROLLOUT.md`:
 ## 🎯 **PRIORITY ORDER FOR CHANGES**
 
 1. **High Impact**: Button, Input, Card components
-2. **Medium Impact**: Navigation, Layout components  
+2. **Medium Impact**: Navigation, Layout components
 3. **Low Impact**: Content, Display components
 
 ## 💬 **COMMUNICATION RULES**
 
 ### Commit Messages:
+
 ```bash
 # For design system changes
 feat(Button): migrate to design system utilities
 fix(Card): use consistent border radius from design tokens
 refactor(Input): remove arbitrary values, use design system
 
-# For regular UI changes  
+# For regular UI changes
 fix(DonationCard): adjust spacing using design tokens
 feat(TimeSlot): add variant using component utilities
 ```
 
 ### Before Large Changes:
+
 - Document the plan in `DESIGN_SYSTEM_ROLLOUT.md`
 - Create clear migration strategy
 - Identify rollback points
@@ -217,6 +231,7 @@ feat(TimeSlot): add variant using component utilities
 ## 🗄️ **SUPABASE DATABASE INTEGRATION**
 
 ### **Store Usage (MANDATORY)**
+
 ```tsx
 // ✅ ALWAYS use this import pattern
 import { useDatabase } from '@/store';
@@ -226,31 +241,34 @@ import { useDatabase } from '@/store/databaseStore';
 ```
 
 ### **Database Operations**
+
 ```tsx
 const {
   // Authentication
-  currentUser,           // Current authenticated user
-  isInitialized,         // Store initialization status
-  login, logout,         // Auth operations
-  
+  currentUser, // Current authenticated user
+  isInitialized, // Store initialization status
+  login,
+  logout, // Auth operations
+
   // Data Access
-  donations,             // Real-time donations list
-  requests,              // Real-time requests list
-  users,                 // Users list
-  foodItems,             // Food items catalog
-  
-  // CRUD Operations  
-  addDonation,           // Create donation (type-safe)
-  updateDonation,        // Update donation (type-safe)
-  deleteDonation,        // Delete donation
-  addRequest,            // Create request (type-safe)
-  updateRequest,         // Update request (type-safe)
-  
+  donations, // Real-time donations list
+  requests, // Real-time requests list
+  users, // Users list
+  foodItems, // Food items catalog
+
+  // CRUD Operations
+  addDonation, // Create donation (type-safe)
+  updateDonation, // Update donation (type-safe)
+  deleteDonation, // Delete donation
+  addRequest, // Create request (type-safe)
+  updateRequest, // Update request (type-safe)
+
   // Real-time subscriptions are automatic!
 } = useDatabase();
 ```
 
 ### **Authentication Flow**
+
 ```tsx
 // User signup/login automatically:
 // 1. Creates Supabase auth user
@@ -268,14 +286,15 @@ const handleLogin = async () => {
 ```
 
 ### **Type Safety Requirements**
+
 ```tsx
 // All database operations are now type-safe
-import type { 
+import type {
   User,
-  Donation, 
+  Donation,
   Request,
   FoodItem,
-  DonationWithFoodItem 
+  DonationWithFoodItem,
 } from '@/store';
 
 // TypeScript will enforce correct types
