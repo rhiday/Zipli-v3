@@ -249,16 +249,15 @@ function ManualDonationPageInner() {
         setHasAttemptedSave(false);
       }
 
-      // Auto-suggest allergens only if user hasn't set any allergens yet
-      if (field === 'name' && value.trim() && prev.allergens.length === 0) {
-        const suggestedAllergens = suggestAllergensForFood(value);
-        if (suggestedAllergens.length > 0) {
-          updated.allergens = suggestedAllergens;
-        }
-        // Don't automatically add 'None' - let user select it from dropdown
-      } else if (field === 'name' && !value.trim()) {
-        updated.allergens = []; // Clear allergens if name is cleared
-      }
+      // Auto-suggestion disabled - users will manually select allergens
+      // if (field === 'name' && value.trim() && prev.allergens.length === 0) {
+      //   const suggestedAllergens = suggestAllergensForFood(value);
+      //   if (suggestedAllergens.length > 0) {
+      //     updated.allergens = suggestedAllergens;
+      //   }
+      // } else if (field === 'name' && !value.trim()) {
+      //   updated.allergens = []; // Clear allergens if name is cleared
+      // }
 
       return updated;
     });
