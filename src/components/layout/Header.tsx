@@ -14,13 +14,14 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ title }) => {
-  const {
-    currentUser,
-    isInitialized,
-    donations: allDonations,
-    foodItems,
-    getAllRequests,
-  } = useDatabase();
+  // Use selectors to prevent unnecessary re-renders
+  const currentUser = useDatabase((state) => state.currentUser);
+  const donations = useDatabase((state) => state.donations);
+  const requests = useDatabase((state) => state.requests);
+  const foodItems = useDatabase((state) => state.foodItems);
+  const isInitialized = useDatabase((state) => state.isInitialized);
+  const getAllRequests = useDatabase((state) => state.getAllRequests);
+
   const router = useRouter();
   const { t } = useCommonTranslation();
 
@@ -37,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     }> = [];
 
     // Get user's donations (if any)
-    const userDonations = allDonations
+    const userDonations = donations
       .filter(
         (d) =>
           d.donor_id === currentUser.id &&
@@ -83,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       const bTime = new Date(b.created_at).getTime();
       return bTime - aTime; // Most recent first
     });
-  }, [isInitialized, currentUser, allDonations, foodItems, getAllRequests]);
+  }, [isInitialized, currentUser, donations, foodItems, getAllRequests]);
 
   // Debug: log the creation time order
   console.log(

@@ -165,7 +165,6 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           // Always fetch data from Supabase
           console.log('📦 Fetching data...');
           await Promise.all([
-            state.fetchFoodItems(),
             state.fetchDonations(),
             state.fetchUsers(),
             state.fetchRequests(),
@@ -173,12 +172,17 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           console.log('✅ Data fetching completed');
 
           // Setup real-time subscriptions
-          state.setupRealtimeSubscriptions();
+          // Move real-time setup to after UI is ready
           set({
             currentUser,
             isInitialized: true,
             loading: false,
           });
+
+          // Defer real-time setup
+          setTimeout(() => {
+            state.setupRealtimeSubscriptions();
+          }, 100);
         } catch (error) {
           console.error('Initialization error', error);
           set({
@@ -352,7 +356,7 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       // ===== DATA FETCHING METHODS =====
       fetchDonations: async () => {
         try {
-          // OPTIMIZED: Single query with JOINs instead of N+1 queries
+          // Fix the donations query - use pickup_time instead of pickup_date
           const { data: donationsData, error: donationsError } = await supabase
             .from('donations')
             .select(
@@ -362,52 +366,24 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
               donor:profiles!donations_donor_id_fkey(*)
             `
             )
-            .order('created_at', { ascending: false });
+            .eq('status', 'available') // Only available donations
+            .gte('pickup_time', new Date().toISOString()) // ✅ Use pickup_time, not pickup_date
+            .order('created_at', { ascending: false })
+            .limit(50); // Limit to 50 most recent
 
-          if (donationsError) throw donationsError;
+          if (donationsData === null) throw new Error('No donations found');
 
-          // Transform the joined data to match expected format
-          const donations: DonationWithFoodItem[] = (donationsData || []).map(
-            (donation) => ({
-              ...donation,
-              food_item: donation.food_item || {
-                id: donation.food_item_id,
-                name: 'Unknown item',
-                description: null,
-                image_url: null,
-                allergens: null,
-                donor_id: donation.donor_id,
-                food_type: null,
-                quantity: 0,
-                unit: null,
-                user_id: donation.donor_id,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-              donor: donation.donor || {
-                id: donation.donor_id,
-                full_name: 'Unknown donor',
-                email: '',
-                role: 'food_donor' as any,
-                organization_name: '',
-                contact_number: null,
-                address: null,
-                city: null,
-                country: null,
-                postal_code: null,
-                street_address: null,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-            })
-          );
+          // Use more efficient data processing
+          const donations = (donationsData || []).map((donation) => ({
+            ...donation,
+            food_item: donation.food_item || null, // Simpler fallback
+            donor: donation.donor || null, // Simpler fallback
+          }));
 
-          // Also fetch and cache food items separately for other uses
-          const { data: foodItemsData } = await supabase
-            .from('food_items')
-            .select('*');
+          // Just use the food items from the JOIN
+          set({ donations, foodItems: [] }); // Let fetchFoodItems handle this
 
-          set({ donations, foodItems: foodItemsData || [] });
+          return { data: donations, error: null };
         } catch (error) {
           console.error('Error fetching donations', error);
           set({
@@ -421,12 +397,15 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       fetchFoodItems: async () => {
         try {
-          const { data, error } = await supabase
+          // Only fetch food items that are actually used
+          const { data } = await supabase
             .from('food_items')
-            .select('*')
-            .order('name');
+            .select('id, name, description, allergens') // Only needed fields
+            .order('name')
+            .limit(100); // Limit to 100 items
 
-          if (error) throw error;
+          if (data === null) throw new Error('No food items found');
+
           set({ foodItems: data || [] });
         } catch (error) {
           console.error('Error fetching food items', error);
@@ -440,16 +419,22 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       },
 
       fetchUsers: async () => {
+        const currentUser = get().currentUser;
+        if (currentUser) {
+          // Just use current user data, don't fetch all profiles
+          set({ users: [currentUser] });
+          return;
+        }
         try {
           const { data, error } = await supabase
             .from('profiles')
-            .select('*')
+            .select('id, full_name, organization_name') // Only 3 fields
             .order('full_name');
 
           if (error) throw error;
           set({ users: data || [] });
         } catch (error) {
-          console.error('Error fetching users', error);
+          console.error('Error fetching user display names', error);
           set({
             error:
               error instanceof Error ? error.message : 'Failed to fetch users',

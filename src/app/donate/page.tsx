@@ -83,30 +83,19 @@ function DonorDashboardPage(): React.ReactElement {
       organization_name: null, // Not available in mock user
     };
 
-    // Fetch latest donations to ensure we have current data
-    const fetchLatestDonations = async () => {
-      const { fetchDonations, fetchFoodItems } = useDatabase.getState();
-      await fetchDonations();
-      await fetchFoodItems();
+    // Use existing data from store (already fetched during app initialization)
+    const { donations: freshDonations, foodItems: freshFoodItems } =
+      useDatabase.getState();
 
-      // Get the fresh state after fetching
-      const { donations: freshDonations, foodItems: freshFoodItems } =
-        useDatabase.getState();
+    const userDonations = freshDonations
+      .filter((d) => d.donor_id === currentUser.id)
+      .map((d) => {
+        const foodItem = freshFoodItems.find((fi) => fi.id === d.food_item_id);
+        return { ...d, food_item: foodItem! };
+      });
 
-      const userDonations = freshDonations
-        .filter((d) => d.donor_id === currentUser.id)
-        .map((d) => {
-          const foodItem = freshFoodItems.find(
-            (fi) => fi.id === d.food_item_id
-          );
-          return { ...d, food_item: foodItem! };
-        });
-
-      setDashboardData({ profile, donations: userDonations });
-      setLoading(false);
-    };
-
-    fetchLatestDonations();
+    setDashboardData({ profile, donations: userDonations });
+    setLoading(false);
   }, [isInitialized, currentUser, router]); // Remove allDonations and foodItems from dependencies
 
   // Add a separate effect to update dashboard data when donations/foodItems change
@@ -179,8 +168,6 @@ function DonorDashboardPage(): React.ReactElement {
             </div>
           </section>
         </main>
-
-        <BottomNav />
       </div>
     );
   }
@@ -260,44 +247,6 @@ function DonorDashboardPage(): React.ReactElement {
           </div>
         </section>
 
-        {/* Active Listings Section */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-primary">
-              {t('activeDonations')}
-            </h2>
-            {dashboardData.donations.length > 0 && (
-              <Link
-                href="/donate/all-offers"
-                className="text-sm text-primary hover:text-primary-75"
-              >
-                View all →
-              </Link>
-            )}
-          </div>
-
-          {dashboardData.donations.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4">
-              {dashboardData.donations.slice(0, 4).map((donation) => (
-                <DonationCard key={donation.id} donation={donation} />
-              ))}
-            </div>
-          ) : (
-            <div className="bg-gray-50 rounded-lg p-8 text-center">
-              <PackageIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-600 mb-4">No active donations</p>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => router.push('/donate/manual')}
-              >
-                <PlusIcon className="w-4 h-4 mr-2" />
-                Create your first donation
-              </Button>
-            </div>
-          )}
-        </section>
-
         {/* Export to PDF as ActionButton */}
         <div className="my-4">
           <div
@@ -372,8 +321,6 @@ title="Default"
           </div>
         </section> */}
       </main>
-
-      <BottomNav />
 
       {/* Force-hide any rogue Figma card section if it still exists */}
       <style>{`.rogue-donation-card { display: none !important; }`}</style>

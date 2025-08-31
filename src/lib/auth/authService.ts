@@ -166,7 +166,14 @@ class AuthService {
         return null;
       }
 
-      return await this.getProfile(user.id);
+      // Only fetch needed fields in auth service
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, organization_name, role') // Only essential fields
+        .eq('id', user.id)
+        .single();
+
+      return profileData;
     } catch (error) {
       console.error('Error getting current user', error);
       return null;
