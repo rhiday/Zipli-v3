@@ -19,9 +19,15 @@ import { Checkbox } from '@/components/ui/Checkbox';
 export default function RequestSummaryPage() {
   const router = useRouter();
   const { t } = useCommonTranslation();
-  const { requestData, pickupSlots, clearRequest, setEditMode } =
-    useRequestStore();
-  const { currentUser, addRequest } = useDatabase();
+  const {
+    requestData,
+    pickupSlots,
+    clearRequest,
+    setEditMode,
+    isEditMode,
+    editingRequestId,
+  } = useRequestStore();
+  const { currentUser, addRequest, updateRequest } = useDatabase();
   const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
   const [requestPeriod, setRequestPeriod] = useState<{
     startDate: string;
@@ -74,6 +80,13 @@ export default function RequestSummaryPage() {
     console.log('🚀 Starting request submission...');
     console.log('📝 Current user:', currentUser?.full_name);
     console.log('📦 Request data:', requestData);
+    console.log('🥜 Allergens (raw):', requestData.allergens);
+    console.log('🥜 Allergens (type):', typeof requestData.allergens);
+    console.log(
+      '🥜 Allergens (isArray):',
+      Array.isArray(requestData.allergens)
+    );
+    console.log('🥜 Allergens (length):', requestData.allergens?.length || 0);
     console.log('📅 Pickup slots:', pickupSlots.length);
     console.log('🏠 Address:', address.trim());
 
@@ -147,11 +160,23 @@ export default function RequestSummaryPage() {
       const fallbackStart = '09:00';
       const fallbackEnd = '17:00';
 
+      // Ensure allergens are properly formatted as an array for PostgreSQL
+      const allergensArray = Array.isArray(requestData.allergens)
+        ? requestData.allergens
+        : [];
+
+      console.log('🔧 Formatted allergens array:', allergensArray);
+      console.log(
+        '🔧 Formatted allergens JSON:',
+        JSON.stringify(allergensArray)
+      );
+
       // Create the request in the database with explicit type
       const requestPayload: RequestInsert = {
         user_id: currentUser.id,
         description: requestData.description,
         people_count: requestData.quantity || 1,
+        allergens: allergensArray,
         pickup_date:
           pickupSlots.length > 0 && formattedSlots[0]?.date
             ? formattedSlots[0].date
@@ -169,23 +194,46 @@ export default function RequestSummaryPage() {
       };
 
       console.log('Submitting request with payload:', requestPayload);
+      console.log('🔄 Edit mode:', isEditMode, 'Request ID:', editingRequestId);
 
-      const response = await addRequest(requestPayload);
-
-      if (response.error) {
-        console.error('Error creating request:', response.error);
-        alert(`Failed to submit request: ${response.error}`);
-        return;
+      let response;
+      if (isEditMode && editingRequestId) {
+        // Update existing request
+        response = await updateRequest(editingRequestId, requestPayload);
+        if (response.error) {
+          console.error('❌ Error updating request:', response.error);
+          alert(`Failed to update request: ${response.error}`);
+          return;
+        }
+        console.log('✅ Request updated successfully:', response.data?.id);
+      } else {
+        // Create new request
+        response = await addRequest(requestPayload);
+        if (response.error) {
+          console.error('❌ Error creating request:', response.error);
+          alert(`Failed to submit request: ${response.error}`);
+          return;
+        }
+        console.log('✅ Request created successfully:', response.data?.id);
       }
 
       if (response.data) {
-        console.log('✅ Request created successfully:', response.data.id);
+        console.log('✅ Saved allergens:', response.data.allergens);
+        console.log('✅ Full response data:', response.data);
 
         // Clear the request store after confirming
         clearRequest();
-        router.push('/request/success');
+        setEditMode(false, null);
+        sessionStorage.removeItem('editingRequestId');
+
+        // Navigate to success page or back to request detail
+        if (isEditMode) {
+          router.push(`/request/${response.data.id}`);
+        } else {
+          router.push('/request/success');
+        }
       } else {
-        console.error('No data returned from addRequest');
+        console.error('❌ No data returned from request operation');
         alert('Failed to submit request: No data returned');
       }
     } catch (error) {
@@ -254,7 +302,11 @@ export default function RequestSummaryPage() {
               onClick={handleSubmitRequest}
               disabled={!address.trim() || isSaving}
             >
-              {isSaving ? t('continuing') : t('submitRequest')}
+              {isSaving
+                ? t('continuing')
+                : isEditMode
+                  ? 'Update Request'
+                  : t('submitRequest')}
             </Button>
           </div>
         </BottomActionBar>

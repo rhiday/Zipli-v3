@@ -5,6 +5,7 @@
 This project requires several environment variables to function properly. Follow these steps to set them up:
 
 ### 1. Create Environment File
+
 ```bash
 cp .env.example .env.local
 ```
@@ -14,16 +15,19 @@ cp .env.example .env.local
 Edit `.env.local` with your actual values:
 
 #### OpenAI API Key
+
 - Get your API key from https://platform.openai.com/api-keys
 - Set `OPENAI_API_KEY=sk-your-actual-key-here`
 
 #### Supabase Configuration
+
 - Get these values from your Supabase project dashboard
 - Set `NEXT_PUBLIC_SUPABASE_URL` to your project URL
 - Set `NEXT_PUBLIC_SUPABASE_ANON_KEY` to your anon/public key
 - Set `SUPABASE_SERVICE_ROLE_KEY` to your service role key
 
 #### Storage Configuration
+
 - Set `SUPABASE_STORAGE_BUCKET=donations` (or your bucket name)
 
 ### 3. Security Notes
@@ -44,6 +48,7 @@ Edit `.env.local` with your actual values:
 ## Troubleshooting
 
 If you see errors about missing environment variables:
+
 1. Ensure `.env.local` exists in the project root
 2. Verify all required variables are set
 3. Restart your development server after adding variables

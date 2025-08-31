@@ -610,9 +610,21 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       addRequest: async (requestData: RequestInsert) => {
         try {
+          // Ensure allergens is properly formatted as array for PostgreSQL
+          const formattedRequest = {
+            ...requestData,
+            allergens: Array.isArray(requestData.allergens)
+              ? requestData.allergens
+              : requestData.allergens
+                ? [requestData.allergens]
+                : null,
+          };
+
+          console.log('🔧 Supabase insert payload:', formattedRequest);
+
           const { data, error } = await supabase
             .from('requests')
-            .insert(requestData)
+            .insert(formattedRequest)
             .select()
             .single();
 

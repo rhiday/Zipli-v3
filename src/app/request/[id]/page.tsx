@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
+import { useRequestStore } from '@/store/request';
 import {
   Scale,
   CalendarIcon,
@@ -14,9 +15,9 @@ import {
   ArrowRight,
   MapPin,
   HandHeart,
+  Edit,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Tag from '@/components/ui/Tag';
 import { Avatar } from '@/components/ui/Avatar';
 import { getInitials } from '@/lib/utils';
 import { useCommonTranslation } from '@/lib/i18n-enhanced';
@@ -28,6 +29,8 @@ type RequestDetail = {
   pickup_date: string;
   pickup_start_time: string;
   pickup_end_time: string;
+  pickup_instructions: string | null;
+  allergens: string[] | null;
   status: 'active' | 'fulfilled' | 'cancelled';
   created_at: string;
   updated_at: string;
@@ -48,6 +51,8 @@ export default function RequestDetailPage({
 
   const { currentUser, getRequestById, updateRequest, users, isInitialized } =
     useDatabase();
+  const { setEditMode, clearRequest, setRequestData, setPickupSlots } =
+    useRequestStore();
 
   const fetchRequest = async () => {
     setLoading(true);
@@ -90,33 +95,57 @@ export default function RequestDetailPage({
     }
   };
 
+  const handleEditRequest = () => {
+    if (!request) return;
+
+    // Clear current request store and set edit mode
+    clearRequest();
+    setEditMode(true, request.id);
+
+    // Pre-populate form with existing data
+    setRequestData({
+      request_type: request.is_recurring ? 'recurring' : 'one-time',
+      description: request.description,
+      quantity: request.people_count,
+      allergens: request.allergens || [],
+      pickupDate: request.pickup_date,
+      startTime: request.pickup_start_time,
+      endTime: request.pickup_end_time,
+    });
+
+    // Set pickup slot for one-time requests
+    if (!request.is_recurring) {
+      setPickupSlots([
+        {
+          id: '1',
+          date: new Date(request.pickup_date),
+          startTime: request.pickup_start_time,
+          endTime: request.pickup_end_time,
+        },
+      ]);
+    }
+
+    // Navigate to appropriate form
+    if (request.is_recurring) {
+      router.push('/request/recurring-form');
+    } else {
+      router.push('/request/one-time-form');
+    }
+  };
+
   const getUserEmail = (userId: string) => {
     const user = users.find((u) => u.id === userId);
     return user?.email || 'Unknown user';
   };
 
-  const parseRequestInfo = (description: string) => {
-    const parts = description.split(' | ');
-    const mainPart = parts[0] || description; // "Request for 3 portions - Vegan"
-    const addressPart =
-      parts.find((p) => p.startsWith('Address:'))?.replace('Address: ', '') ||
-      '';
-    const instructionsPart =
-      parts
-        .find((p) => p.startsWith('Instructions:'))
-        ?.replace('Instructions: ', '') || '';
-
-    // Extract clean request name
-    const requestName = mainPart.replace('Request for ', ''); // "3 portions - Vegan"
-    const allergensPart = requestName.split(' - ').slice(1).join(', ') || ''; // {t('pages.requests.vegan')}
-    const quantityPart = requestName.split(' - ')[0] || ''; // "3 portions"
-
+  const parseRequestInfo = (request: RequestDetail) => {
+    // Use actual database fields instead of parsing description string
     return {
-      requestName,
-      quantity: quantityPart,
-      allergens: allergensPart,
-      address: addressPart,
-      instructions: instructionsPart,
+      requestName: request.description,
+      quantity: `${request.people_count} people`,
+      allergens: request.allergens || [],
+      instructions:
+        request.pickup_instructions || 'No additional instructions provided.',
     };
   };
 
@@ -154,7 +183,7 @@ export default function RequestDetailPage({
 
   const isOwner = currentUser?.id === request.user_id;
   const canTakeAction = request.status === 'active';
-  const requestInfo = parseRequestInfo(request.description);
+  const requestInfo = parseRequestInfo(request);
   const requesterUser = users.find((u) => u.id === request.user_id);
   const requesterName =
     requesterUser?.full_name ||
@@ -216,19 +245,24 @@ export default function RequestDetailPage({
             </span>
           </div>
 
-          {/* Tags for allergens/dietary restrictions */}
-          {requestInfo.allergens && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {requestInfo.allergens.split(',').map((allergen: string) => (
-                <Tag key={allergen.trim()}>{allergen.trim()}</Tag>
-              ))}
+          {/* Allergens/dietary restrictions as plain text */}
+          {requestInfo.allergens && requestInfo.allergens.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                Allergies, Intolerances & Diets:
+              </p>
+              <p className="text-gray-600 leading-relaxed">
+                {requestInfo.allergens.join(', ')}
+              </p>
             </div>
           )}
 
-          {/* Request description */}
-          <p className="mt-4 text-gray-600 leading-relaxed">
-            {requestInfo.instructions || 'No additional instructions provided.'}
-          </p>
+          {/* Request instructions */}
+          {requestInfo.instructions && (
+            <p className="mt-4 text-gray-600 leading-relaxed">
+              {requestInfo.instructions}
+            </p>
+          )}
 
           {/* Date and time info */}
           <div className="mt-4 space-y-2">
@@ -252,14 +286,6 @@ export default function RequestDetailPage({
               </span>
             </div>
           </div>
-
-          {/* Address if available */}
-          {requestInfo.address && (
-            <div className="mt-4 flex items-start gap-3 text-gray-600">
-              <MapPin className="h-5 w-5 flex-shrink-0" />
-              <span className="font-medium">{requestInfo.address}</span>
-            </div>
-          )}
 
           {/* Recurring indicator */}
           {request.is_recurring && (
@@ -285,20 +311,32 @@ export default function RequestDetailPage({
                 )}
                 {t('confirmForToday')}
               </Button>
-              <Button
-                variant="destructive-outline"
-                size="cta"
-                className="w-full"
-                onClick={() => handleStatusUpdate('cancelled')}
-                disabled={actionLoading}
-              >
-                {actionLoading ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : (
-                  <XIcon className="h-5 w-5" />
-                )}
-                {t('cancel')}
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  size="cta"
+                  className="flex-1"
+                  onClick={handleEditRequest}
+                  disabled={actionLoading}
+                >
+                  <Edit className="h-5 w-5" />
+                  Edit Request
+                </Button>
+                <Button
+                  variant="destructive-outline"
+                  size="cta"
+                  className="flex-1"
+                  onClick={() => handleStatusUpdate('cancelled')}
+                  disabled={actionLoading}
+                >
+                  {actionLoading ? (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
+                    <XIcon className="h-5 w-5" />
+                  )}
+                  {t('cancel')}
+                </Button>
+              </div>
             </div>
           )}
 

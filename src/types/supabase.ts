@@ -355,6 +355,7 @@ export type Database = {
       };
       requests: {
         Row: {
+          allergens: string[] | null;
           created_at: string;
           description: string;
           id: string;
@@ -369,6 +370,7 @@ export type Database = {
           user_id: string;
         };
         Insert: {
+          allergens?: string[] | null;
           created_at?: string;
           description: string;
           id?: string;
@@ -383,6 +385,7 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          allergens?: string[] | null;
           created_at?: string;
           description?: string;
           id?: string;

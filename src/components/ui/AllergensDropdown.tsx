@@ -36,7 +36,7 @@ const getShortLabel = (fullLabel: string): string => {
     'Contains lupin': 'Lupin',
     'Contains molluscs': 'Molluscs',
     // Finnish versions
-    Määritelty: 'Määritelty',
+    'Ei määritelty': 'Ei määritelty',
     Gluteeniton: 'Gluteeniton',
     Laktoositon: 'Laktoositon',
     Vähälaktoosinen: 'Vähälaktoosinen',

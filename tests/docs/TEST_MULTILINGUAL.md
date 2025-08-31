@@ -3,25 +3,31 @@
 ## How to Test
 
 ### 1. Start the Development Server
+
 ```bash
 npm run dev
 ```
+
 Then open http://localhost:3000
 
 ### 2. Test Language Switching
+
 Look for the language switcher component (usually in the header/navbar). Try switching between English and Finnish.
 
 ### 3. Check Translation Loading
+
 Open the browser console and look for any translation-related warnings. In development mode, missing translations will be logged.
 
 ### 4. Test Key Areas
 
 #### Authentication Pages
+
 - `/auth/login` - Login page
 - `/auth/register` - Registration page
 - `/auth/forgot-password` - Password reset
 
 #### Main Application Pages
+
 - `/donate` - Donation dashboard
 - `/donate/manual` - Manual donation form
 - `/request` - Request dashboard
@@ -29,12 +35,16 @@ Open the browser console and look for any translation-related warnings. In devel
 - `/impact` - Impact dashboard
 
 ### 5. Verify Translation Keys
+
 The translation files are located at:
+
 - `public/locales/en/translations.json` - English translations
 - `public/locales/fi/translations.json` - Finnish translations (currently using English as placeholder)
 
 ### 6. Check Context Organization
+
 Translation keys are organized by context:
+
 - `common.*` - Shared across the app
 - `pages.auth.*` - Authentication pages
 - `pages.donations.*` - Donation-related pages
@@ -42,12 +52,14 @@ Translation keys are organized by context:
 - `components.*` - Component-specific translations
 
 ### 7. Test Translation Hooks
+
 Different sections use specialized hooks:
+
 ```javascript
 // In donation pages
 const { t } = useDonationsTranslation();
 
-// In auth pages  
+// In auth pages
 const { t } = useAuthTranslation();
 
 // For common translations
@@ -96,6 +108,7 @@ grep -r "t('" src/ | cut -d"'" -f2 | sort -u
 ## Translation File Structure
 
 The translations follow this structure:
+
 ```json
 {
   "common": {

@@ -32,34 +32,19 @@ export default function DonationDetailsPage() {
   }
 
   const handleImageUpload = (imageUrl: string) => {
-    updateDonationItem(currentItem.id, { imageUrl: imageUrl || undefined });
+    updateDonationItem({ ...currentItem, imageUrl: imageUrl || undefined });
   };
 
   const handleDescriptionChange = (description: string) => {
-    updateDonationItem(currentItem.id, { description });
+    updateDonationItem({ ...currentItem, description });
   };
 
   const handleNext = async () => {
     if (currentItemIndex < totalItems - 1) {
       setCurrentItemIndex(currentItemIndex + 1);
     } else {
-      // All items completed, save to database and proceed to pickup slots
-      setIsSaving(true);
-      try {
-        // Update all food items with photos and descriptions
-        for (const item of donationItems) {
-          if (item.food_item_id) {
-            await updateFoodItem(item.food_item_id, {
-              image_url: item.imageUrl,
-              description: item.description,
-            });
-          }
-        }
-        router.push('/donate/pickup-slot');
-      } catch (error) {
-        console.error('Failed to update items:', error);
-        setIsSaving(false);
-      }
+      // All items completed, proceed to pickup slots
+      router.push('/donate/pickup-slot');
     }
   };
 
@@ -76,6 +61,7 @@ export default function DonationDetailsPage() {
       header={
         <SecondaryNavbar
           title={t('addPhotoDescription')}
+          backHref="/donate/manual"
           onBackClick={() => router.back()}
         />
       }
@@ -103,10 +89,7 @@ export default function DonationDetailsPage() {
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            {t('itemXOfY', {
-              current: currentItemIndex + 1,
-              total: totalItems,
-            })}
+            Item {currentItemIndex + 1} of {totalItems}
           </p>
         </div>
 
@@ -116,7 +99,7 @@ export default function DonationDetailsPage() {
           quantity={currentItem.quantity}
           allergens={currentItem.allergens}
           imageUrl={currentItem.imageUrl}
-          description={currentItem.description}
+          description={currentItem.description || undefined}
         />
 
         {/* Photo Upload */}

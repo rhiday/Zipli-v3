@@ -127,7 +127,6 @@ Goal: Build "Zipli," a food donation platform connecting food donors (restaurant
 
 ### Sample Layout Structure
 
-
 ---
 
 ## 6. Technology Stack

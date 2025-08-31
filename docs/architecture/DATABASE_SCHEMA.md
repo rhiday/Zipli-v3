@@ -9,6 +9,7 @@ Complete reference for the Zipli PostgreSQL database schema with relationships, 
 ## 📊 Schema Overview
 
 ### Core Tables
+
 - **profiles** - User profiles linked to Supabase Auth
 - **food_items** - Catalog of food items available for donation
 - **donations** - Food donation listings
@@ -16,9 +17,10 @@ Complete reference for the Zipli PostgreSQL database schema with relationships, 
 - **donation_claims** - Matching system between donations and requests
 
 ### Enum Types
+
 - **user_role** - User role definitions
 - **donation_status** - Donation lifecycle states
-- **request_status** - Request lifecycle states  
+- **request_status** - Request lifecycle states
 - **claim_status** - Claim processing states
 
 ---
@@ -26,6 +28,7 @@ Complete reference for the Zipli PostgreSQL database schema with relationships, 
 ## 🏗️ Table Definitions
 
 ### 1. profiles
+
 **Purpose**: User profiles automatically created from Supabase Auth
 
 ```sql
@@ -43,18 +46,21 @@ CREATE TABLE profiles (
 ```
 
 **Relationships**:
+
 - `id` → `auth.users(id)` (Supabase Auth)
 - One-to-many with `donations` (via `donor_id`)
 - One-to-many with `requests` (via `user_id`)
 - One-to-many with `donation_claims` (via `claimer_id`)
 
 **Constraints**:
+
 - Primary key on `id`
 - `role` must be valid enum value
 - `full_name` and `email` required
 - Cascade delete from auth.users
 
 **Indexes**:
+
 ```sql
 CREATE INDEX idx_profiles_role ON profiles(role);
 CREATE INDEX idx_profiles_email ON profiles(email);
@@ -63,6 +69,7 @@ CREATE INDEX idx_profiles_email ON profiles(email);
 ---
 
 ### 2. food_items
+
 **Purpose**: Catalog of food items that can be donated
 
 ```sql
@@ -78,13 +85,16 @@ CREATE TABLE food_items (
 ```
 
 **Relationships**:
+
 - One-to-many with `donations` (via `food_item_id`)
 
 **Constraints**:
+
 - Primary key on `id` with auto-generated UUID
 - `name` required
 
 **Indexes**:
+
 ```sql
 CREATE INDEX idx_food_items_name ON food_items(name);
 CREATE INDEX idx_food_items_category ON food_items(category);
@@ -93,6 +103,7 @@ CREATE INDEX idx_food_items_category ON food_items(category);
 ---
 
 ### 3. donations
+
 **Purpose**: Food donation listings created by donors
 
 ```sql
@@ -111,17 +122,20 @@ CREATE TABLE donations (
 ```
 
 **Relationships**:
+
 - `food_item_id` → `food_items(id)`
 - `donor_id` → `profiles(id)`
 - One-to-many with `donation_claims` (via `donation_id`)
 
 **Constraints**:
+
 - Primary key on `id`
 - Foreign keys to `food_items` and `profiles`
 - `quantity` must be positive integer
 - Cascade delete from related tables
 
 **Indexes**:
+
 ```sql
 CREATE INDEX idx_donations_donor_id ON donations(donor_id);
 CREATE INDEX idx_donations_status ON donations(status);
@@ -130,6 +144,7 @@ CREATE INDEX idx_donations_created_at ON donations(created_at);
 ```
 
 **Triggers**:
+
 ```sql
 -- Update timestamp on modification
 CREATE TRIGGER set_donations_updated_at
@@ -141,6 +156,7 @@ CREATE TRIGGER set_donations_updated_at
 ---
 
 ### 4. requests
+
 **Purpose**: Food requests created by receivers
 
 ```sql
@@ -160,9 +176,11 @@ CREATE TABLE requests (
 ```
 
 **Relationships**:
+
 - `user_id` → `profiles(id)`
 
 **Constraints**:
+
 - Primary key on `id`
 - Foreign key to `profiles`
 - `people_count` must be positive integer
@@ -170,6 +188,7 @@ CREATE TABLE requests (
 - Cascade delete from profiles
 
 **Indexes**:
+
 ```sql
 CREATE INDEX idx_requests_user_id ON requests(user_id);
 CREATE INDEX idx_requests_status ON requests(status);
@@ -178,6 +197,7 @@ CREATE INDEX idx_requests_created_at ON requests(created_at);
 ```
 
 **Triggers**:
+
 ```sql
 -- Update timestamp on modification
 CREATE TRIGGER set_requests_updated_at
@@ -189,6 +209,7 @@ CREATE TRIGGER set_requests_updated_at
 ---
 
 ### 5. donation_claims
+
 **Purpose**: Matching system between donations and requests
 
 ```sql
@@ -204,16 +225,19 @@ CREATE TABLE donation_claims (
 ```
 
 **Relationships**:
+
 - `donation_id` → `donations(id)`
 - `claimer_id` → `profiles(id)`
 
 **Constraints**:
+
 - Primary key on `id`
 - Foreign keys to `donations` and `profiles`
 - Cascade delete from related tables
 - `claimed_at` defaults to current timestamp
 
 **Indexes**:
+
 ```sql
 CREATE INDEX idx_donation_claims_donation_id ON donation_claims(donation_id);
 CREATE INDEX idx_donation_claims_claimer_id ON donation_claims(claimer_id);
@@ -226,22 +250,25 @@ CREATE INDEX idx_donation_claims_claimed_at ON donation_claims(claimed_at);
 ## 🏷️ Enum Types
 
 ### user_role
+
 **Purpose**: Define user roles in the system
 
 ```sql
 CREATE TYPE user_role AS ENUM (
     'food_donor',      -- Organizations/individuals donating food
-    'food_receiver',   -- Organizations receiving food donations  
+    'food_receiver',   -- Organizations receiving food donations
     'city',            -- City officials managing the system
     'terminals'        -- Terminal/hub operators
 );
 ```
 
 **Usage**:
+
 - `profiles.role` - User's primary role
 - Determines dashboard access and permissions
 
-### donation_status  
+### donation_status
+
 **Purpose**: Track donation lifecycle
 
 ```sql
@@ -254,10 +281,12 @@ CREATE TYPE donation_status AS ENUM (
 ```
 
 **Usage**:
+
 - `donations.status` - Current donation state
 - Controls visibility in marketplace
 
 ### request_status
+
 **Purpose**: Track request lifecycle
 
 ```sql
@@ -269,22 +298,25 @@ CREATE TYPE request_status AS ENUM (
 ```
 
 **Usage**:
+
 - `requests.status` - Current request state
 - Used for matching and filtering
 
 ### claim_status
+
 **Purpose**: Track claim processing
 
 ```sql
 CREATE TYPE claim_status AS ENUM (
     'pending',         -- Claim submitted, awaiting approval
     'approved',        -- Approved by donor
-    'rejected',        -- Rejected by donor  
+    'rejected',        -- Rejected by donor
     'completed'        -- Successfully completed transfer
 );
 ```
 
 **Usage**:
+
 - `donation_claims.status` - Claim processing state
 - Workflow management between donors and receivers
 
@@ -293,6 +325,7 @@ CREATE TYPE claim_status AS ENUM (
 ## 🔐 Row Level Security (RLS)
 
 ### Security Philosophy
+
 - **Public Discovery**: Users can discover donations and requests
 - **Owner Control**: Users can only modify their own data
 - **Role-based Access**: City officials have broader access for coordination
@@ -301,12 +334,13 @@ CREATE TYPE claim_status AS ENUM (
 ### Helper Functions
 
 #### auth.user_has_role(role)
+
 ```sql
 CREATE OR REPLACE FUNCTION auth.user_has_role(required_role user_role)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM profiles 
+    SELECT 1 FROM profiles
     WHERE id = auth.uid() AND role = required_role
   );
 END;
@@ -314,12 +348,13 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 #### auth.get_user_profile()
+
 ```sql
 CREATE OR REPLACE FUNCTION auth.get_user_profile()
 RETURNS profiles AS $$
 BEGIN
   RETURN (
-    SELECT * FROM profiles 
+    SELECT * FROM profiles
     WHERE id = auth.uid()
   );
 END;
@@ -329,6 +364,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ### RLS Policies
 
 #### profiles
+
 ```sql
 -- Read: All users can see all profiles (for discovery)
 CREATE POLICY "profiles_select_policy" ON profiles
@@ -342,6 +378,7 @@ CREATE POLICY "profiles_update_policy" ON profiles
 ```
 
 #### food_items
+
 ```sql
 -- Read: All users can see food items catalog
 CREATE POLICY "food_items_select_policy" ON food_items
@@ -352,7 +389,8 @@ CREATE POLICY "food_items_insert_policy" ON food_items
     FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 ```
 
-#### donations  
+#### donations
+
 ```sql
 -- Read: All users can see available donations
 CREATE POLICY "donations_select_policy" ON donations
@@ -378,12 +416,13 @@ CREATE POLICY "donations_delete_policy" ON donations
 ```
 
 #### requests
+
 ```sql
 -- Read: All users can see active requests
 CREATE POLICY "requests_select_policy" ON requests
     FOR SELECT USING (true);
 
--- Insert: Only receivers can create requests  
+-- Insert: Only receivers can create requests
 CREATE POLICY "requests_insert_policy" ON requests
     FOR INSERT WITH CHECK (
         auth.user_has_role('food_receiver'::user_role) AND
@@ -403,6 +442,7 @@ CREATE POLICY "requests_delete_policy" ON requests
 ```
 
 #### donation_claims
+
 ```sql
 -- Read: Claimers see their claims, donors see claims for their donations
 CREATE POLICY "donation_claims_select_policy" ON donation_claims
@@ -432,6 +472,7 @@ CREATE POLICY "donation_claims_update_policy" ON donation_claims
 ## 🔄 Database Triggers
 
 ### Automatic Profile Creation
+
 ```sql
 -- Create profile when user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -454,6 +495,7 @@ CREATE TRIGGER on_auth_user_created
 ```
 
 ### Updated Timestamp Maintenance
+
 ```sql
 -- Generic function to update updated_at column
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -481,15 +523,17 @@ CREATE TRIGGER set_requests_updated_at
 ## 📈 Performance Optimizations
 
 ### Indexes Strategy
+
 - **Primary Keys**: All tables have UUID primary keys with automatic generation
 - **Foreign Keys**: Indexed for join performance
 - **Query Patterns**: Indexes on commonly filtered columns (status, dates, user roles)
 - **Text Search**: Indexes on name and description fields
 
 ### Query Optimization
+
 ```sql
 -- Optimized donation listing query
-SELECT 
+SELECT
     d.id,
     d.quantity,
     d.status,
@@ -508,6 +552,7 @@ ORDER BY d.created_at DESC;
 ```
 
 ### Real-time Subscriptions
+
 ```sql
 -- Enable real-time for all tables
 ALTER PUBLICATION supabase_realtime ADD TABLE profiles;
@@ -522,6 +567,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE food_items;
 ## 🧪 Sample Data
 
 ### Users
+
 ```sql
 -- Sample profiles for testing
 INSERT INTO profiles (id, role, full_name, email, organization_name) VALUES
@@ -532,6 +578,7 @@ INSERT INTO profiles (id, role, full_name, email, organization_name) VALUES
 ```
 
 ### Food Items
+
 ```sql
 -- Sample food items catalog
 INSERT INTO food_items (name, description, allergens, category) VALUES
@@ -546,11 +593,12 @@ INSERT INTO food_items (name, description, allergens, category) VALUES
 ## 🔍 Migration Queries
 
 ### Data Migration from Mock Store
+
 ```sql
 -- If migrating from existing mock data
 -- Example: Migrate donations
 INSERT INTO donations (food_item_id, donor_id, quantity, status, pickup_date)
-SELECT 
+SELECT
     fi.id as food_item_id,
     p.id as donor_id,
     mock_data.quantity,
@@ -562,9 +610,10 @@ JOIN food_items fi ON fi.name = mock_data.food_name;
 ```
 
 ### Schema Validation
+
 ```sql
 -- Verify schema integrity
-SELECT 
+SELECT
     table_name,
     constraint_name,
     constraint_type
@@ -573,7 +622,7 @@ WHERE table_schema = 'public'
 ORDER BY table_name, constraint_type;
 
 -- Check RLS policies
-SELECT 
+SELECT
     schemaname,
     tablename,
     policyname,
@@ -590,6 +639,7 @@ ORDER BY tablename;
 ## 📚 TypeScript Integration
 
 ### Generated Types
+
 ```typescript
 // Generated from Supabase schema
 export interface Database {
@@ -637,6 +687,7 @@ export interface Database {
 ```
 
 ### Usage in Components
+
 ```typescript
 import { Database } from '@/types/supabase';
 
@@ -644,12 +695,14 @@ type Profile = Database['public']['Tables']['profiles']['Row'];
 type Donation = Database['public']['Tables']['donations']['Row'];
 
 // Type-safe database operations
-const createDonation = async (donation: Database['public']['Tables']['donations']['Insert']) => {
+const createDonation = async (
+  donation: Database['public']['Tables']['donations']['Insert']
+) => {
   const { data, error } = await supabase
     .from('donations')
     .insert(donation)
     .select();
-    
+
   if (error) throw error;
   return data;
 };
@@ -660,9 +713,10 @@ const createDonation = async (donation: Database['public']['Tables']['donations'
 ## 🛠️ Maintenance & Monitoring
 
 ### Health Checks
+
 ```sql
 -- Table sizes and row counts
-SELECT 
+SELECT
     schemaname,
     tablename,
     n_tup_ins as inserts,
@@ -672,7 +726,7 @@ FROM pg_stat_user_tables
 WHERE schemaname = 'public';
 
 -- Index usage
-SELECT 
+SELECT
     tablename,
     indexname,
     idx_scan as index_scans,
@@ -684,17 +738,19 @@ ORDER BY idx_scan DESC;
 ```
 
 ### Backup Strategy
+
 - **Automated Backups**: Supabase automatic daily backups
 - **Point-in-time Recovery**: Available for Pro plans
 - **Export Options**: SQL dump or CSV export for data portability
 
 ### Monitoring Queries
+
 ```sql
 -- Active real-time subscriptions
 SELECT count(*) FROM pg_stat_replication;
 
 -- Recent donations activity
-SELECT 
+SELECT
     DATE_TRUNC('day', created_at) as date,
     COUNT(*) as donations_count,
     SUM(quantity) as total_quantity
