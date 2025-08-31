@@ -566,11 +566,9 @@ class ScreenshotCapture {
       console.log(`📊 Captured ${screenshots.length} screenshots`);
       console.log(`📁 Saved to: ${CONFIG.screenshotsDir}`);
 
-      if (!this.dryRun) {
-        console.log('\nNext steps:');
-        console.log('1. Review screenshots in ./screenshots/ folder');
-        console.log('2. Use screenshots for documentation');
-      }
+      console.log('\nNext steps:');
+      console.log('1. Review screenshots in ./screenshots/ folder');
+      console.log('2. Use screenshots for documentation');
     } catch (error) {
       console.error('❌ Screenshot capture failed:', error);
       process.exit(1);
