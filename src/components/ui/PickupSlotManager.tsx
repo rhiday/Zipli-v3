@@ -49,6 +49,7 @@ export const PickupSlotManager: React.FC<PickupSlotManagerProps> = ({
 }) => {
   const { t } = useCommonTranslation();
   const [showAddForm, setShowAddForm] = useState(slots.length === 0);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [currentSlot, setCurrentSlot] = useState<
     Omit<PickupSlot, 'id'> & { id: string | 'new' }
   >({
@@ -241,7 +242,7 @@ export const PickupSlotManager: React.FC<PickupSlotManagerProps> = ({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('dateLabel')}
               </label>
-              <Popover>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="secondary"
@@ -256,13 +257,14 @@ export const PickupSlotManager: React.FC<PickupSlotManagerProps> = ({
                       : 'Pick a date'}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-full p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={currentSlot.date}
-                    onSelect={(date) =>
-                      setCurrentSlot({ ...currentSlot, date })
-                    }
+                    onSelect={(date) => {
+                      setCurrentSlot({ ...currentSlot, date });
+                      setIsCalendarOpen(false);
+                    }}
                     disabled={(date) => date < new Date()}
                     initialFocus
                   />

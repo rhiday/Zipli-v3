@@ -116,7 +116,7 @@ export const TimeSlotSelector: React.FC<TimeSlotSelectorProps> = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="w-auto p-0 bg-white border-gray-200"
+            className="w-full p-0 bg-white border-gray-200"
             align="start"
           >
             <Calendar
