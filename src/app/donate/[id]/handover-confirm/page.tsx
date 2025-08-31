@@ -15,13 +15,20 @@ export default function HandoverConfirmPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleConfirm = async () => {
+    const donationId = Array.isArray(params.id) ? params.id[0] : params.id;
+
+    if (!donationId) {
+      setError('Donation ID not found');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
       const { error } = await supabase
         .from('donations')
         .update({ status: 'picked_up', updated_at: new Date().toISOString() })
-        .eq('id', Array.isArray(params.id) ? params.id[0] : params.id);
+        .eq('id', donationId);
       if (error) throw error;
       router.push('/donate');
     } catch (err: any) {

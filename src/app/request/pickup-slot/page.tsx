@@ -59,6 +59,7 @@ export default function PickupSlotPage() {
   });
   const [openPopover, setOpenPopover] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(pickupSlots.length === 0);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleBackClick = () => {
     router.back();
@@ -270,7 +271,7 @@ export default function PickupSlotPage() {
               <label className="block text-black font-semibold mb-3">
                 {t('deliveryDate')}
               </label>
-              <Popover>
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="secondary"
@@ -293,14 +294,17 @@ export default function PickupSlotPage() {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0 bg-white border-gray-200"
+                  className="w-full p-0 bg-white border-gray-200"
                   align="start"
                 >
                   <Calendar
                     mode="single"
                     weekStartsOn={1}
                     selected={currentSlot.date}
-                    onSelect={(date) => handleCurrentSlotChange('date', date)}
+                    onSelect={(date) => {
+                      handleCurrentSlotChange('date', date);
+                      setIsCalendarOpen(false);
+                    }}
                     initialFocus
                     disabled={(date) =>
                       date < new Date(new Date().setDate(new Date().getDate()))

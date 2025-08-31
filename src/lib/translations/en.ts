@@ -1,5 +1,5 @@
 // English translations - static file
-// Sourced from Lokalise, updated manually as needed
+// Updated manually as needed
 
 export const en = {
   // Common actions
@@ -195,7 +195,7 @@ export const en = {
   startTimeLabel: 'Start time',
   endTimeLabel: 'End time',
 
-  // Request flow specific (from Ninja's Lokalise updates)
+  // Request flow specific
   selectRequestType: 'Select Request Type',
   oneTimeRequest: 'One-time Request',
   recurringRequest: 'Recurring Request',

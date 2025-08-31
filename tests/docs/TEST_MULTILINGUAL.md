@@ -69,19 +69,17 @@ const { t } = useCommonTranslation();
 ## Known Issues to Fix
 
 1. **Build Optimization**: Some components still need syntax cleanup for production build
-2. **Finnish Translations**: Currently using English placeholders - need actual Finnish translations
-3. **Lokalise Integration**: Ready for integration but needs API keys and configuration
+2. **Finnish Translations**: Complete Finnish translations are now available
 
 ## Next Steps
 
-1. **Configure Lokalise**:
-   - Add Lokalise API keys to `.env.local`
-   - Set up webhook for automatic translation updates
-   - Configure CI/CD pipeline for sync
+1. **Production Build**:
+   - Fix remaining syntax issues
+   - Run `npm run build` to verify
+   - Deploy to staging for testing
 
 2. **Add Missing Translations**:
    - Review all pages for hardcoded strings
-   - Add proper Finnish translations
    - Test with native speakers
 
 3. **Production Build**:

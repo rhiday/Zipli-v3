@@ -44,6 +44,8 @@ export default function DonationSchedulePage() {
   >('daily');
   const [schedules, setSchedules] = useState<DonationSchedule[]>([]);
   const [showAddForm, setShowAddForm] = useState(true);
+  const [isStartDateOpen, setIsStartDateOpen] = useState(false);
+  const [isEndDateOpen, setIsEndDateOpen] = useState(false);
 
   // Current schedule form state
   const [currentSchedule, setCurrentSchedule] = useState<
@@ -273,7 +275,10 @@ export default function DonationSchedulePage() {
                   <label className="block text-black font-semibold mb-3">
                     Start Date
                   </label>
-                  <Popover>
+                  <Popover
+                    open={isStartDateOpen}
+                    onOpenChange={setIsStartDateOpen}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         variant="secondary"
@@ -294,16 +299,17 @@ export default function DonationSchedulePage() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-auto p-0 bg-white border-gray-200"
+                      className="w-full p-0 bg-white border-gray-200"
                       align="start"
                     >
                       <Calendar
                         mode="single"
                         weekStartsOn={1}
                         selected={currentSchedule.startDate}
-                        onSelect={(date) =>
-                          handleScheduleChange('startDate', date)
-                        }
+                        onSelect={(date) => {
+                          handleScheduleChange('startDate', date);
+                          setIsStartDateOpen(false);
+                        }}
                         initialFocus
                         disabled={(date) => date < new Date()}
                       />
@@ -315,7 +321,7 @@ export default function DonationSchedulePage() {
                   <label className="block text-black font-semibold mb-3">
                     End Date
                   </label>
-                  <Popover>
+                  <Popover open={isEndDateOpen} onOpenChange={setIsEndDateOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="secondary"
@@ -336,16 +342,17 @@ export default function DonationSchedulePage() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-auto p-0 bg-white border-gray-200"
+                      className="w-full p-0 bg-white border-gray-200"
                       align="start"
                     >
                       <Calendar
                         mode="single"
                         weekStartsOn={1}
                         selected={currentSchedule.endDate}
-                        onSelect={(date) =>
-                          handleScheduleChange('endDate', date)
-                        }
+                        onSelect={(date) => {
+                          handleScheduleChange('endDate', date);
+                          setIsEndDateOpen(false);
+                        }}
                         initialFocus
                         disabled={(date) =>
                           date < (currentSchedule.startDate || new Date())

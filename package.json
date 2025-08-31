@@ -12,14 +12,10 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
     "seed": "node scripts/seed-supabase.js",
     "cleanup:food-items": "npx tsx scripts/cleanup-food-items.ts",
     "prepare": "husky",
     "type-check": "tsc --noEmit",
-    "lokalise:upload": "node scripts/upload-to-lokalise.js",
-    "lokalise:pull": "node scripts/lokalise-sync.js pull",
     "i18n:migrate": "node scripts/i18n-migration.js",
     "type-check:watch": "tsc --noEmit --watch",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings=400",
@@ -31,9 +27,7 @@
     "test:quick": "npm run type-check && npm run build",
     "build:analyze": "ANALYZE=true npm run build",
     "build:check": "npm run build && npm run start",
-    "clean": "rm -rf .next node_modules/.cache",
-    "lokalise:push": "node scripts/lokalise-sync.js push",
-    "lokalise:sync": "node scripts/lokalise-sync.js sync"
+    "clean": "rm -rf .next node_modules/.cache"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -50,7 +44,6 @@
     "@radix-ui/react-tooltip": "^1.2.4",
     "@supabase/supabase-js": "^2.39.0",
     "@tanstack/react-query": "^5.0.0",
-    "@types/react-syntax-highlighter": "^15.5.13",
     "@types/uuid": "^10.0.0",
     "date-fns": "^2.30.0",
     "dotenv": "^16.5.0",
@@ -79,15 +72,7 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^3.2.6",
     "@shadcn/ui": "^0.0.4",
-    "@storybook/addon-essentials": "^8.6.12",
-    "@storybook/addon-onboarding": "^8.6.12",
-    "@storybook/blocks": "^8.6.12",
-    "@storybook/experimental-addon-test": "^8.6.12",
-    "@storybook/experimental-nextjs-vite": "8.6.12",
-    "@storybook/react": "^8.6.12",
-    "@storybook/test": "^8.6.12",
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.6.1",
@@ -95,8 +80,6 @@
     "@types/jest-axe": "^3.5.9",
     "@types/node": "^22.15.3",
     "@types/react": "^18.3.20",
-    "@vitest/browser": "^3.1.2",
-    "@vitest/coverage-v8": "^3.1.2",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.0.0",
@@ -108,13 +91,11 @@
     "lint-staged": "^15.5.2",
     "playwright": "^1.52.0",
     "prettier": "^3.6.2",
-    "storybook": "^8.6.12",
     "tailwind-merge": "^3.2.0",
     "tailwindcss-animate": "^1.0.7",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.0",
-    "vitest": "^3.1.2"
+    "typescript": "^5.4.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

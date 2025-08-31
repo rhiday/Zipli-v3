@@ -4,7 +4,7 @@ import { useCommonTranslation } from '@/hooks/useTranslations';
 
 export default function DonorDashboard() {
   const { t } = useCommonTranslation();
-  
+
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Food Donor Dashboard</h1>
@@ -17,4 +17,4 @@ export default function DonorDashboard() {
       </ul>
     </div>
   );
-} 
+}

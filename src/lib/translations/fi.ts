@@ -1,5 +1,5 @@
 // Finnish translations - static file
-// Sourced from Lokalise, updated manually as needed
+// Updated manually as needed
 
 export const fi = {
   // Common actions
@@ -195,7 +195,7 @@ export const fi = {
   startTimeLabel: 'Alkuaika',
   endTimeLabel: 'Loppuaika',
 
-  // Request flow specific (from Ninja's Lokalise updates)
+  // Request flow specific
   selectRequestType: 'Valitse pyyntötyyppi',
   oneTimeRequest: 'Kertaluonteinen pyyntö',
   recurringRequest: 'Toistuva pyyntö',
@@ -236,7 +236,7 @@ export const fi = {
   selectDays: 'Valitse viikonpäivät',
   timeRangeForSelectedDays: 'Valittavissa oleva aikaikkuna valituille päiville',
 
-  // Pickup scheduling (from Ninja's updates)
+  // Pickup scheduling
   schedulePickup: 'Aseta noutoajankohta',
   addPickupSlot: 'Lisää noutoajankohta',
   editPickupSlot: 'Muokkaa noutoajankohtaa',
@@ -280,12 +280,12 @@ export const fi = {
   friday: 'Perjantai',
   saturday: 'Lauantai',
 
-  // Allergens (from Ninja's updates)
+  // Allergens
   allergens: 'Allergeenit',
   allergiesIntolerances: 'Allergiat, intoleranssit ja ruokarajoitteet',
   selectDietaryRestrictions: 'Valitse ruokarajoitteet',
 
-  // Success page specific (from Ninja's updates)
+  // Success page specific
   nextSteps: 'Seuraavat vaiheet',
   requestAddedToSystem: 'Kiitos, ilmoituksesi on otettu vastaan!',
   matchingInProgress: 'Yhteensovitus käynnissä',

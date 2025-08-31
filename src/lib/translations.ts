@@ -1,5 +1,5 @@
 // Translation system - loads from static en.ts and fi.ts files
-// All translations come from static files, Lokalise is only for content management
+// All translations come from static files
 
 export type Language = 'en' | 'fi';
 export type TranslationKey = string;

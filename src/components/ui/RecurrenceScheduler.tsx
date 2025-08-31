@@ -145,6 +145,9 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
       ...value,
       customDates: newDates,
     });
+
+    // Close the calendar popup
+    setCalendarOpen(false);
   };
 
   const removeCustomDate = (dateStr: string) => {
@@ -296,7 +299,7 @@ export const RecurrenceScheduler: React.FC<RecurrenceSchedulerProps> = ({
                   <CalendarIcon className="h-4 w-4 text-secondary" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-base" align="start">
+              <PopoverContent className="w-full p-0 bg-base" align="start">
                 <Calendar
                   mode="single"
                   selected={undefined}

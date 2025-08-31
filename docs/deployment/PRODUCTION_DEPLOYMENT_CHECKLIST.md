@@ -176,7 +176,6 @@ NEXT_PUBLIC_LOG_LEVEL=INFO
 ### Known Limitations
 
 - Some API route tests fail (expected with Next.js setup)
-- Minor Storybook peer dependency warnings (non-blocking)
 
 ### Next Steps After Deployment
 
@@ -187,7 +186,7 @@ NEXT_PUBLIC_LOG_LEVEL=INFO
 
 ---
 
-**Deployment Date**: ****\_\_\_****  
-**Deployed By**: ****\_\_\_****  
-**Version/Commit**: ****\_\_\_****  
-**Backup Confirmed**: ****\_\_\_****
+**Deployment Date**: \***\*\_\_\_\*\***  
+**Deployed By**: \***\*\_\_\_\*\***  
+**Version/Commit**: \***\*\_\_\_\*\***  
+**Backup Confirmed**: \***\*\_\_\_\*\***

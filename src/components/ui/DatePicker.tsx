@@ -92,7 +92,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="z-50 w-auto p-0 bg-white border border-gray-200"
+          className="z-50 w-full p-0 bg-white border border-gray-200"
           align="start"
         >
           <Calendar

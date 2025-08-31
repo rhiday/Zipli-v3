@@ -1,7 +1,6 @@
 /**
  * Simple i18n system using static translation files
  * All translations load from static en.ts and fi.ts files
- * Lokalise is only for content management, not runtime loading
  */
 
 import { create } from 'zustand';
