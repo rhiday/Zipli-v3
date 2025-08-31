@@ -22,7 +22,7 @@
     "lokalise:pull": "node scripts/lokalise-sync.js pull",
     "i18n:migrate": "node scripts/i18n-migration.js",
     "type-check:watch": "tsc --noEmit --watch",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings=400",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
