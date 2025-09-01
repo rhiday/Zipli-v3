@@ -116,6 +116,7 @@ export const en = {
   co2Avoided: "Trees' worth of CO₂ saved",
   editFoodItem: 'Edit Food Item',
   addFoodItem: 'Add Food Item',
+  addPhotoDescription: 'Add Photo & Description',
   changesSaved: 'Changes Saved',
   pickupSlot: 'Pickup Slot',
   pickup: 'Pickup',
@@ -212,7 +213,7 @@ export const en = {
     'Also update this address in my profile for the future',
   updateInstructionsInProfile:
     'Also update these instructions in my profile as default',
-  enterYourFullAddress: 'Enter your full delivery address',
+  enterYourFullAddress: 'Enter your full address',
   pleaseRingTheDoorbell: 'e.g. Please ring the doorbell',
   portions: 'Portions',
   allergiesIntolerancesDiets: 'Allergies, intolerances & diets',
@@ -422,7 +423,7 @@ export const en = {
   qrLogin: 'QR Login',
 
   // Additional form placeholders and labels
-  addressPlaceholder: 'Address',
+  addressPlaceholder: 'Enter your full address',
   contactNumberPlaceholder: 'ContactNumber',
   emailAddressPlaceholder: 'Your email',
   passwordPlaceholder: 'Your password',

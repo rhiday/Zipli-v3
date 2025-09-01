@@ -116,7 +116,8 @@ export const fi = {
     'Säästetty tuotanto- ja jätekustannuksissa (keskiarvo)',
   co2Avoided: 'Puun verran hiilidioksidipäästöjä vältetty',
   editFoodItem: 'Muokkaa ruoka-ainetta',
-  addFoodItem: 'Lisää ruoka-aine',
+  addFoodItem: 'Lisää tuote',
+  addPhotoDescription: 'Lisää kuva ja kuvaus',
   changesSaved: 'Muutokset tallennettu',
   pickupSlot: 'Noutovuoro',
   pickup: 'Nouto',
@@ -215,7 +216,7 @@ export const fi = {
     'Päivitä tämä osoite myös profiiliini myöhempää käyttöä varten',
   updateInstructionsInProfile:
     'Päivitä nämä ohjeet profiiliini myöhempää käyttöä varten.',
-  enterYourFullAddress: 'Syötä täydellinen toimitusosoitteesi',
+  enterYourFullAddress: 'Syötä koko osoitteesi',
   pleaseRingTheDoorbell: 'esim. Ole hyvä ja soita ovikelloa',
   portions: 'Annosta',
   allergiesIntolerancesDiets: 'Allergiat, intoleranssit ja ruokarajoitteet',
@@ -466,7 +467,7 @@ export const fi = {
   qrLogin: 'QR-kirjautuminen',
 
   // Additional form placeholders and labels
-  addressPlaceholder: 'Osoite',
+  addressPlaceholder: 'Syötä koko osoitteesi',
   contactNumberPlaceholder: 'Puhelinnumero',
   emailAddressPlaceholder: 'Sinun sähköpostisi',
   passwordPlaceholder: 'Sinun salasanasi',

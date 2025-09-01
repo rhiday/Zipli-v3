@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { SummaryCard } from '@/components/ui/SummaryCard';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -17,7 +17,7 @@ import { Checkbox } from '@/components/ui/Checkbox';
 
 export default function DonationSummaryPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   // Get data from donation store
   const pickupSlots = useDonationStore((state) => state.pickupSlots);
