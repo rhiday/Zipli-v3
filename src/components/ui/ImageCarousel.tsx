@@ -61,6 +61,9 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
     };
   }, [autoPlay, autoPlayInterval, validImages.length]);
 
+  // Inline SVG placeholder for better performance
+  const placeholderSVG = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' fill='%23f3f4f6'/%3E%3Cpath fill='%239ca3af' d='M80 50c-13.255 0-24 10.745-24 24s10.745 24 24 24 24-10.745 24-24-10.745-24-24-24zm0 40c-8.837 0-16-7.163-16-16s7.163-16 16-16 16 7.163 16 16-7.163 16-16 16zm-8-48v-8h16v8h-16zm-8 88v-8h32v8H64zm-24-44h-8v-16h8v16zm88 0h-8v-16h8v16z'/%3E%3C/svg%3E`;
+
   // Return placeholder if no valid images
   if (!validImages.length) {
     return (
@@ -74,7 +77,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
         )}
       >
         <Image
-          src="/images/placeholder.svg"
+          src={placeholderSVG}
           alt="No Image"
           width={160}
           height={160}
@@ -102,7 +105,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
         {imageErrors[0] ? (
           <div className="h-full w-full bg-gray-100 flex items-center justify-center">
             <Image
-              src="/images/placeholder.svg"
+              src={placeholderSVG}
               alt="Error loading image"
               width={160}
               height={160}
@@ -114,6 +117,8 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
             src={validImages[0]}
             alt={alt}
             fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            quality={75}
             className="object-cover"
             onError={() => setImageErrors((prev) => ({ ...prev, 0: true }))}
             priority={true}
@@ -180,7 +185,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
         {imageErrors[currentIndex] ? (
           <div className="h-full w-full bg-gray-100 flex items-center justify-center">
             <Image
-              src="/images/placeholder.svg"
+              src={placeholderSVG}
               alt="Error loading image"
               width={160}
               height={160}
@@ -192,9 +197,12 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
             src={validImages[currentIndex]}
             alt={`${alt} ${currentIndex + 1}`}
             fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            quality={75}
             className="object-cover"
             onError={() => handleImageError(currentIndex)}
             priority={currentIndex === 0}
+            loading={currentIndex === 0 ? 'eager' : 'lazy'}
           />
         )}
       </div>
