@@ -398,4 +398,103 @@ export const fi = {
   seeAllRequests: 'Näytä kaikki pyynnöt',
   showMore: 'Näytä lisää',
   showLess: 'Näytä vähemmän',
+
+  // Navigation & UI (New additions)
+  zipli: 'Zipli',
+  whatWouldYouLikeToDo: 'Mitä haluaisit tehdä?',
+  donateOrSell: 'Lahjoita tai Myy',
+  offerFoodItems: 'Tarjoa ruokatuotteita muille.',
+  createRequestForItems: 'Luo pyyntö tietyille tuotteille.',
+  returnToHome: 'Palaa etusivulle',
+  apply: 'Käytä',
+
+  // Dashboard Titles (New additions)
+  foodDonorDashboard: 'Ruokalahjoittajan hallintapaneeli',
+  welcomeDonorDashboard: 'Tervetuloa lahjoittajan hallintapaneeliin',
+  foodReceiverDashboard: 'Ruoan vastaanottajan hallintapaneeli',
+  cityDashboard: 'Kaupungin hallintapaneeli',
+  terminalDashboard: 'Ruokaterminaalin hallintapaneeli',
+  welcomeTerminalDashboard:
+    'Tervetuloa terminaalin hallintapaneeliin. Täällä voit:',
+
+  // Dashboard Actions (New additions)
+  listAvailableFood: 'Listaa saatavilla oleva ruoka',
+  createNewDonations: 'Luo uusia lahjoituksia',
+  trackDonationStatus: 'Seuraa lahjoituksen tilaa',
+  managePickupSchedules: 'Hallitse noutoaikatauluja',
+  processLargeScaleDonations: 'Käsittele suuria ruokalahjoituksia',
+  coordinateWithMultiple:
+    'Koordinoi useiden lahjoittajien ja vastaanottajien kanssa',
+  manageFoodStorage: 'Hallitse ruoan varastointia ja jakelua',
+  trackProcessingCapacity: 'Seuraa käsittelykeskuksen kapasiteettia',
+
+  // Form Labels & Placeholders (New additions)
+  eg10: 'esim. 10',
+  ringDoorbell: 'Ole hyvä ja soita ovikelloa',
+  searchRequests: 'Hae pyyntöjä...',
+  enter6DigitCode: 'Syötä 6-numeroinen koodi',
+  enterNewPassword: 'Syötä uusi salasana',
+
+  // Status & Messages (New additions)
+  noRequestDataFound: 'Pyyntötietoja ei löytynyt',
+  qrCodeUnavailable: 'QR-koodi ei saatavilla',
+  notEnoughDataPoints: 'Ei tarpeeksi datapisteitä käyrän piirtämiseen',
+  didntReceiveCode: 'Etkö saanut koodia?',
+  uploadedPreview: 'Ladattu esikatselu',
+  placeholderImage: 'Paikkamerkki kuva',
+  noImage: 'Ei kuvaa',
+  errorLoadingImage: 'Virhe kuvan lataamisessa',
+
+  // Dialog Titles (New additions)
+  cancelRequest: 'Peruuta pyyntö',
+  confirmDelivery: 'Vahvista toimitus',
+  areYouSure: 'Oletko varma?',
+  confirmClaim: 'Vahvista lunastus',
+  editRequestPeriod: 'Muokkaa pyyntöjaksoa',
+  editSchedule: 'Muokkaa aikataulua',
+  editDeliveryTime: 'Muokkaa toimitusaikaa',
+  deleteSchedule: 'Poista aikataulu',
+  donationSummary: 'Lahjoituksen yhteenveto',
+
+  // User Roles (New additions - some already exist, adding missing ones)
+  cityOfficial: 'Kaupungin virkamies',
+
+  // Admin (New additions)
+  users: 'Käyttäjät',
+  totalUsers: 'Käyttäjät yhteensä',
+  qrLogin: 'QR-kirjautuminen',
+
+  // Additional form placeholders and labels
+  addressPlaceholder: 'Osoite',
+  contactNumberPlaceholder: 'Puhelinnumero',
+  emailAddressPlaceholder: 'Sähköpostiosoite',
+
+  // Organization names (for reference, might not need translation)
+  tsanssi: 'Tsänssi',
+  redCross: 'Punainen Risti',
+  andreasChurch: 'Andreas kirkko',
+  helsinkiFoodTerminal: 'Helsingin ruokaterminaali',
+
+  // Additional UI text (fixing cross-language issues)
+  chooseRequestType: 'Valitse tarpeisiisi parhaiten sopiva tyyppi',
+  note: 'Huomio',
+  multipleRequestsNote:
+    'Voit luoda useita pyyntöjä tarpeidesi mukaan. Jokainen pyyntö sovitetaan saatavilla oleviin lahjoituksiin.',
+  noActiveDonationsOrRequests:
+    'Sinulla ei ole aktiivisia lahjoituksia tai pyyntöjä',
+
+  // New keys for fixing malformed text
+  editRequest: 'Muokkaa pyyntöä',
+  contactRequester: 'Ota yhteyttä pyytäjään',
+  viewAll: 'Näytä kaikki',
+  by: 'käyttäjältä',
+  searchDonations: 'Hae lahjoituksia...',
+  noDonationsAvailable: 'Lahjoituksia ei ole tällä hetkellä saatavilla',
+
+  // Additional keys for thank-you and pickup-slot pages
+  donationCreatedDesc:
+    'Lahjoituksesi on luotu onnistuneesti ja se on nyt saatavilla niitä tarvitseville.',
+  changesSavedDesc: 'Muutoksesi on tallennettu onnistuneesti.',
+  addDeliveryTimeSlots:
+    'Lisää yksi tai useampi toimitusaika antaaksesi lahjoittajille joustavuutta.',
 } as const;

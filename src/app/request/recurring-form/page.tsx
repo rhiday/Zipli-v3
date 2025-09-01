@@ -102,7 +102,7 @@ export default function RecurringRequestForm() {
       header={
         <>
           <SecondaryNavbar
-            title={isEditMode ? 'Edit Request' : t('recurringRequest')}
+            title={isEditMode ? t('editRequest') : t('recurringRequest')}
             backHref="/request/select-type"
             onBackClick={() => router.back()}
           />

@@ -7,13 +7,13 @@ export default function DonorDashboard() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Food Donor Dashboard</h1>
-      <p>Welcome to your donor dashboard</p>
+      <h1 className="text-2xl font-bold mb-4">{t('dashboard.donor.title')}</h1>
+      <p>{t('dashboard.donor.welcome')}</p>
       <ul className="list-disc pl-6 mt-4">
-        <li>List available food</li>
-        <li>Create new donations</li>
-        <li>Track donation status</li>
-        <li>Manage pickup schedules</li>
+        <li>{t('dashboard.donor.listAvailableFood')}</li>
+        <li>{t('dashboard.donor.createNewDonations')}</li>
+        <li>{t('dashboard.donor.trackDonationStatus')}</li>
+        <li>{t('dashboard.donor.managePickupSchedules')}</li>
       </ul>
     </div>
   );

@@ -178,7 +178,7 @@ export default function PickupSlotPage() {
             {t('deliverySchedule')}
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Add one or more delivery time slots to give donors flexibility.
+            {t('addDeliveryTimeSlots')}
           </p>
         </div>
 
