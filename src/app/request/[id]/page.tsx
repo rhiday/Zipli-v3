@@ -21,6 +21,14 @@ import { cn } from '@/lib/utils';
 import { Avatar } from '@/components/ui/Avatar';
 import { getInitials } from '@/lib/utils';
 import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 type RequestDetail = {
   id: string;
@@ -46,6 +54,9 @@ export default function RequestDetailPage(): React.ReactElement {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showConfirmDelivery, setShowConfirmDelivery] = useState(false);
+  const [confirmClauseChecked, setConfirmClauseChecked] = useState(false);
 
   const { currentUser, getRequestById, updateRequest, users, isInitialized } =
     useDatabase();
@@ -86,11 +97,38 @@ export default function RequestDetailPage(): React.ReactElement {
     try {
       updateRequest(id, { status: newStatus });
       await fetchRequest();
+
+      // Redirect to /receiver/dashboard after successful cancellation
+      if (newStatus === 'cancelled') {
+        router.push('/receiver/dashboard');
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to update request status.');
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const handleConfirmDelivery = () => {
+    setShowConfirmDelivery(true);
+  };
+
+  const confirmDeliveryWithClause = async () => {
+    if (!confirmClauseChecked) return;
+
+    setShowConfirmDelivery(false);
+    setConfirmClauseChecked(false);
+    await handleStatusUpdate('fulfilled');
+    router.push('/receiver/dashboard');
+  };
+
+  const handleCancelRequest = () => {
+    setShowCancelConfirm(true);
+  };
+
+  const confirmCancel = async () => {
+    setShowCancelConfirm(false);
+    await handleStatusUpdate('cancelled');
   };
 
   const handleEditRequest = () => {
@@ -299,42 +337,22 @@ export default function RequestDetailPage(): React.ReactElement {
                 variant="primary"
                 size="cta"
                 className="w-full"
-                onClick={() => handleStatusUpdate('fulfilled')}
+                onClick={handleConfirmDelivery}
                 disabled={actionLoading}
               >
-                {actionLoading ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : (
-                  <CheckIcon className="h-5 w-5" />
-                )}
-                {t('confirmForToday')}
+                <CheckIcon className="h-5 w-5" />
+                Confirm Delivery
               </Button>
-              <div className="flex gap-3">
-                <Button
-                  variant="secondary"
-                  size="cta"
-                  className="flex-1"
-                  onClick={handleEditRequest}
-                  disabled={actionLoading}
-                >
-                  <Edit className="h-5 w-5" />
-                  Edit Request
-                </Button>
-                <Button
-                  variant="destructive-outline"
-                  size="cta"
-                  className="flex-1"
-                  onClick={() => handleStatusUpdate('cancelled')}
-                  disabled={actionLoading}
-                >
-                  {actionLoading ? (
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  ) : (
-                    <XIcon className="h-5 w-5" />
-                  )}
-                  {t('cancel')}
-                </Button>
-              </div>
+              <Button
+                variant="destructive-outline"
+                size="cta"
+                className="w-full"
+                onClick={handleCancelRequest}
+                disabled={actionLoading}
+              >
+                <XIcon className="h-5 w-5" />
+                {t('cancel')}
+              </Button>
             </div>
           )}
 
@@ -395,6 +413,94 @@ export default function RequestDetailPage(): React.ReactElement {
           </Button>
         </section>
       </main>
+
+      {/* Cancel Confirmation Dialog */}
+      <Dialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Request</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this request? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setShowCancelConfirm(false)}
+              disabled={actionLoading}
+            >
+              Keep Request
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmCancel}
+              disabled={actionLoading}
+            >
+              {actionLoading ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                'Cancel Request'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm Delivery Dialog */}
+      <Dialog open={showConfirmDelivery} onOpenChange={setShowConfirmDelivery}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delivery</DialogTitle>
+            <DialogDescription>
+              Please confirm that the food has been successfully delivered and
+              received.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="confirm-clause"
+                checked={confirmClauseChecked}
+                onChange={(e) => setConfirmClauseChecked(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <label
+                htmlFor="confirm-clause"
+                className="text-sm text-gray-700 leading-relaxed"
+              >
+                I confirm that the food has been delivered and received in good
+                condition. I understand that by confirming this delivery, I
+                acknowledge that the transaction is complete and the request
+                will be marked as fulfilled.
+              </label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowConfirmDelivery(false);
+                setConfirmClauseChecked(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={confirmDeliveryWithClause}
+              disabled={!confirmClauseChecked || actionLoading}
+            >
+              {actionLoading ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                'Confirm Delivery'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

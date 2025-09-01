@@ -39,17 +39,14 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
 
     // Get user's donations (if any)
     const userDonations = donations
-      .filter(
-        (d) =>
-          d.donor_id === currentUser.id &&
-          (d.status === 'available' || d.status === 'claimed')
-      )
+      .filter((d) => d.donor_id === currentUser.id && d.status === 'available')
       .map((d) => {
-        const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
+        // Use the food_item data that comes with the donation
+        const foodItemName = (d as any).food_item?.name || 'Unknown_item';
         return {
           id: d.id,
           quantity: d.quantity,
-          name: foodItem?.name || 'Unknown_item',
+          name: foodItemName,
           created_at: d.created_at || d.pickup_time || new Date().toISOString(),
           type: 'donation' as const,
         };
