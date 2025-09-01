@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/Input';
 import { ItemPreview } from '@/components/ui/ItemPreview';
 import { Progress } from '@/components/ui/progress';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { MultiplePhotoUpload } from '@/components/ui/MultiplePhotoUpload';
+import { Textarea } from '@/components/ui/Textarea';
 import { useDatabase } from '@/store';
 import { useDonationStore } from '@/store/donation';
 import { PlusIcon } from 'lucide-react';
@@ -64,6 +66,7 @@ function ManualDonationPageInner() {
     allergens: [],
     description: null,
     imageUrl: undefined,
+    imageUrls: [],
   });
   const [showAddAnotherForm, setShowAddAnotherForm] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -334,6 +337,15 @@ function ManualDonationPageInner() {
     handleCurrentItemChange('imageUrl', imageUrl || undefined);
   };
 
+  const handleImagesUpload = (imageUrls: string[]) => {
+    handleCurrentItemChange('imageUrls', imageUrls);
+    // Also set imageUrl for backward compatibility
+    handleCurrentItemChange(
+      'imageUrl',
+      imageUrls.length > 0 ? imageUrls[0] : undefined
+    );
+  };
+
   const handleSaveItem = async () => {
     setHasAttemptedSave(true);
     if (
@@ -381,6 +393,7 @@ function ManualDonationPageInner() {
           allergens: [],
           description: null,
           imageUrl: undefined,
+          imageUrls: [],
         });
         setHasAttemptedSave(false);
       }
@@ -401,6 +414,7 @@ function ManualDonationPageInner() {
       allergens: [],
       description: null,
       imageUrl: undefined,
+      imageUrls: [],
     });
     setHasAttemptedSave(false);
     setShowAddAnotherForm(true);
@@ -428,6 +442,7 @@ function ManualDonationPageInner() {
         allergens: [],
         description: null,
         imageUrl: undefined,
+        imageUrls: [],
       });
       setShowAddAnotherForm(false);
     }
@@ -437,7 +452,8 @@ function ManualDonationPageInner() {
     if (isEditMode) {
       router.push('/donor/dashboard');
     } else {
-      router.back();
+      // Go to donate main page instead of using browser back
+      router.push('/donate');
     }
   };
 
@@ -513,6 +529,38 @@ function ManualDonationPageInner() {
             : undefined
         }
       />
+
+      {/* Photo Upload */}
+      <div>
+        <label className="text-sm font-medium text-gray-700 mb-2 block">
+          {t('addPhoto')} ({t('optional')})
+        </label>
+        <MultiplePhotoUpload
+          onImagesUpload={handleImagesUpload}
+          uploadedImages={currentItem.imageUrls || []}
+          hint={t('photosHelpIdentify')}
+          maxImages={5}
+        />
+      </div>
+
+      {/* Description */}
+      <div>
+        <label
+          htmlFor="description"
+          className="text-sm font-medium text-gray-700 mb-2 block"
+        >
+          {t('description')} ({t('optional')})
+        </label>
+        <Textarea
+          id="description"
+          value={currentItem.description || ''}
+          onChange={(e) =>
+            handleCurrentItemChange('description', e.target.value)
+          }
+          placeholder={t('enterDescription')}
+          rows={3}
+        />
+      </div>
     </div>
   );
 
@@ -530,7 +578,7 @@ function ManualDonationPageInner() {
           <BottomActionBar>
             {hasItems && !showAddAnotherForm ? (
               <div className="flex justify-end">
-                <Button onClick={() => router.push('/donate/details')}>
+                <Button onClick={() => router.push('/donate/pickup-slot')}>
                   {t('continue')}
                 </Button>
               </div>
