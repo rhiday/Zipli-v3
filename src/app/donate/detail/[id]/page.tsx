@@ -298,10 +298,9 @@ export default function DonationDetailPage() {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Are you sure?</DialogTitle>
+                    <DialogTitle>{t('areYouSure')}</DialogTitle>
                     <DialogDescription>
-                      This will permanently remove the listing from public view.
-                      This action cannot be undone.
+                      {t('removeListingDescription')}
                     </DialogDescription>
                   </DialogHeader>
                   {deleteError && (
@@ -318,7 +317,7 @@ export default function DonationDetailPage() {
                       }}
                       disabled={isDeleting}
                     >
-                      Cancel
+                      {t('cancel')}
                     </Button>
                     <Button
                       variant="destructive"
@@ -328,10 +327,10 @@ export default function DonationDetailPage() {
                       {isDeleting ? (
                         <>
                           <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
-                          Removing...
+                          {t('removing')}
                         </>
                       ) : (
-                        'Yes, Remove'
+                        t('yesRemove')
                       )}
                     </Button>
                   </DialogFooter>

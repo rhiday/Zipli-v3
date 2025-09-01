@@ -422,6 +422,10 @@ export const en = {
   areYouSure: 'Are you sure?',
   confirmClaim: 'Confirm Claim',
   removeListing: 'Remove Listing',
+  yesRemove: 'Yes, Remove',
+  removing: 'Removing...',
+  removeListingDescription:
+    'This will permanently remove the listing from public view. This action cannot be undone.',
   editRequestPeriod: 'Edit request period',
   editSchedule: 'Edit schedule',
   editDeliveryTime: 'Edit delivery time',

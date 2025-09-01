@@ -468,6 +468,10 @@ export const fi = {
   areYouSure: 'Oletko varma?',
   confirmClaim: 'Kuittaa nouto',
   removeListing: 'Posta ilmoitus',
+  yesRemove: 'Kyllä, poista',
+  removing: 'Poistetaan...',
+  removeListingDescription:
+    'Tämä poistaa ilmoituksen pysyvästi julkisesta näkyvyydestä. Tätä toimintoa ei voi kumota.',
   editRequestPeriod: 'Muokkaa pyyntöjaksoa',
   editSchedule: 'Muokkaa aikataulua',
   editDeliveryTime: 'Muokkaa toimitusaikaa',
