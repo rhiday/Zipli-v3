@@ -56,7 +56,7 @@ const SummaryOverview: React.FC<SummaryOverviewProps> = ({
           href="/donate/all-offers?filter=active"
           className="inline-flex items-center text-sm font-semibold text-primary hover:underline"
         >
-          title="Default"
+          {t('viewAll')}
           <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </div>

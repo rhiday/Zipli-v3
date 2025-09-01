@@ -18,7 +18,7 @@ export const fi = {
   impact: 'Vaikuttavuus',
   analytics: 'Analytiikka',
   overview: 'Yhteenveto',
-  donation: 'Lahjoitus',
+  donation: 'Ilmoitus',
   submitting: 'Lähetetään...',
   addDonation: 'Lisää lahjoitus',
   explore: 'Tutki',
@@ -33,9 +33,6 @@ export const fi = {
   totalFoodDonated: 'Ruokaa Pelastettu',
   donations: 'Lahjoitukset',
   costSavings: 'Säästöt',
-  co2Avoided: 'CO₂ Vältetty',
-  portionsOffered: 'Annosta Tarjottu',
-  savedInFoodDisposalCosts: 'Säästetty Hävittämiskustannuksissa',
   emissionReduction: 'Päästövähennys',
 
   // Navigation
@@ -106,15 +103,21 @@ export const fi = {
     'Siirry tarkastelemaan lisää sosiaalisen ja ympäristövaikutuksen dataa raportointia ja suunnittelua varten',
   exportToPdf: 'Vie PDF:ksi',
   environmentalAndSocialImpactData:
-    'Siirry tarkastelemaan dataa luomastasi vaikuttavuudesta auttaa raportoimaan, viestimään ja toiminnan suunnittelemaan toimintaa ven paremmin.',
+    'Keräämme vaikuttavuusdata auttaa raportoimaan, viestimään ja suunnittelemaan toimintaa entistä paremmin.',
 
   // Impact metrics (receiver adapted from Ninja's donor updates)
   peopleServedDesc: 'Ihmistä sai kunnon aterian pyynnösten kautta',
   foodRequestedDesc: 'Viimeisimmän pyyntösi yhteenlaskettu kilomäärä',
   activeRequestsDesc: 'Pyynnöt etsivät parhaillaan lahjoittajia',
   fulfilledRequestsDesc: 'Pyynnöt täytettiin onnistuneesti ruoan toimituksella',
+  totalFoodOffered: 'Viimeisimmän ilmoituksesi yhteenlaskettu kilomäärä',
+  portionsOffered: 'Ihmistä sai kunnon aterian (500g/annos)',
+  savedInFoodDisposalCosts:
+    'Säästetty tuotanto- ja jätekustannuksissa (keskiarvo)',
+  co2Avoided: 'Puun verran hiilidioksidipäästöjä vältetty',
   editFoodItem: 'Muokkaa ruoka-ainetta',
-  addFoodItem: 'Lisää ruoka-aine',
+  addFoodItem: 'Lisää tuote',
+  addPhotoDescription: 'Lisää kuva ja kuvaus',
   changesSaved: 'Muutokset tallennettu',
   pickupSlot: 'Noutovuoro',
   pickup: 'Nouto',
@@ -155,7 +158,7 @@ export const fi = {
   active: 'Aktiivinen',
   completed: 'Valmis',
   view: 'Näytä',
-  details: 'Tiedot',
+  details: 'Lisätiedot',
   requestDetails: 'Lisätiedot',
   englishLabel: 'English',
   finnishLabel: 'Suomi',
@@ -213,7 +216,7 @@ export const fi = {
     'Päivitä tämä osoite myös profiiliini myöhempää käyttöä varten',
   updateInstructionsInProfile:
     'Päivitä nämä ohjeet profiiliini myöhempää käyttöä varten.',
-  enterYourFullAddress: 'Syötä täydellinen toimitusosoitteesi',
+  enterYourFullAddress: 'Syötä koko osoitteesi',
   pleaseRingTheDoorbell: 'esim. Ole hyvä ja soita ovikelloa',
   portions: 'Annosta',
   allergiesIntolerancesDiets: 'Allergiat, intoleranssit ja ruokarajoitteet',
@@ -300,7 +303,6 @@ export const fi = {
   last30Days: 'Viimeiset 30 päivää',
   last3Months: 'Viimeiset 3 kuukautta',
   lastYear: 'Viimeinen vuosi',
-  totalFoodOffered: 'Lahjoitettu ruoka',
   portionsCreated: 'Luodut annokset',
   historicalTrends: 'Trendit',
   donationTrend: 'Lahjoitustrendi',
@@ -398,4 +400,104 @@ export const fi = {
   seeAllRequests: 'Näytä kaikki pyynnöt',
   showMore: 'Näytä lisää',
   showLess: 'Näytä vähemmän',
+
+  // Navigation & UI (New additions)
+  zipli: 'Zipli',
+  whatWouldYouLikeToDo: 'Mitä haluaisit tehdä?',
+  donateOrSell: 'Lahjoita tai Myy',
+  offerFoodItems: 'Tarjoa ruokatuotteita muille.',
+  createRequestForItems: 'Luo pyyntö tietyille tuotteille.',
+  returnToHome: 'Palaa etusivulle',
+  apply: 'Käytä',
+
+  // Dashboard Titles (New additions)
+  foodDonorDashboard: 'Ruokalahjoittajan hallintapaneeli',
+  welcomeDonorDashboard: 'Tervetuloa lahjoittajan hallintapaneeliin',
+  foodReceiverDashboard: 'Ruoan vastaanottajan hallintapaneeli',
+  cityDashboard: 'Kaupungin hallintapaneeli',
+  terminalDashboard: 'Ruokaterminaalin hallintapaneeli',
+  welcomeTerminalDashboard:
+    'Tervetuloa terminaalin hallintapaneeliin. Täällä voit:',
+
+  // Dashboard Actions (New additions)
+  listAvailableFood: 'Listaa saatavilla oleva ruoka',
+  createNewDonations: 'Luo uusia lahjoituksia',
+  trackDonationStatus: 'Seuraa lahjoituksen tilaa',
+  managePickupSchedules: 'Hallitse noutoaikatauluja',
+  processLargeScaleDonations: 'Käsittele suuria ruokalahjoituksia',
+  coordinateWithMultiple:
+    'Koordinoi useiden lahjoittajien ja vastaanottajien kanssa',
+  manageFoodStorage: 'Hallitse ruoan varastointia ja jakelua',
+  trackProcessingCapacity: 'Seuraa käsittelykeskuksen kapasiteettia',
+
+  // Form Labels & Placeholders (New additions)
+  eg10: 'esim. 10',
+  ringDoorbell: 'Ole hyvä ja soita ovikelloa',
+  searchRequests: 'Hae pyyntöjä...',
+  enter6DigitCode: 'Syötä 6-numeroinen koodi',
+  enterNewPassword: 'Syötä uusi salasana',
+
+  // Status & Messages (New additions)
+  noRequestDataFound: 'Pyyntötietoja ei löytynyt',
+  qrCodeUnavailable: 'QR-koodi ei saatavilla',
+  notEnoughDataPoints: 'Ei tarpeeksi datapisteitä käyrän piirtämiseen',
+  didntReceiveCode: 'Etkö saanut koodia?',
+  uploadedPreview: 'Ladattu esikatselu',
+  placeholderImage: 'Paikkamerkki kuva',
+  noImage: 'Ei kuvaa',
+  errorLoadingImage: 'Virhe kuvan lataamisessa',
+
+  // Dialog Titles (New additions)
+  cancelRequest: 'Peruuta pyyntö',
+  confirmDelivery: 'Vahvista toimitus',
+  areYouSure: 'Oletko varma?',
+  confirmClaim: 'Vahvista lunastus',
+  editRequestPeriod: 'Muokkaa pyyntöjaksoa',
+  editSchedule: 'Muokkaa aikataulua',
+  editDeliveryTime: 'Muokkaa toimitusaikaa',
+  deleteSchedule: 'Poista aikataulu',
+  donationSummary: 'Lahjoituksen yhteenveto',
+
+  // User Roles (New additions - some already exist, adding missing ones)
+  cityOfficial: 'Kaupungin virkamies',
+
+  // Admin (New additions)
+  users: 'Käyttäjät',
+  totalUsers: 'Käyttäjät yhteensä',
+  qrLogin: 'QR-kirjautuminen',
+
+  // Additional form placeholders and labels
+  addressPlaceholder: 'Syötä koko osoitteesi',
+  contactNumberPlaceholder: 'Puhelinnumero',
+  emailAddressPlaceholder: 'Sinun sähköpostisi',
+  passwordPlaceholder: 'Sinun salasanasi',
+
+  // Organization names (for reference, might not need translation)
+  tsanssi: 'Tsänssi',
+  redCross: 'Punainen Risti',
+  andreasChurch: 'Andreas kirkko',
+  helsinkiFoodTerminal: 'Helsingin ruokaterminaali',
+
+  // Additional UI text (fixing cross-language issues)
+  chooseRequestType: 'Valitse tarpeisiisi parhaiten sopiva tyyppi',
+  note: 'Huomio',
+  multipleRequestsNote:
+    'Voit luoda useita pyyntöjä tarpeidesi mukaan. Jokainen pyyntö sovitetaan saatavilla oleviin lahjoituksiin.',
+  noActiveDonationsOrRequests:
+    'Sinulla ei ole aktiivisia lahjoituksia tai pyyntöjä',
+
+  // New keys for fixing malformed text
+  editRequest: 'Muokkaa pyyntöä',
+  contactRequester: 'Ota yhteyttä pyytäjään',
+  viewAll: 'Näytä kaikki',
+  by: 'käyttäjältä',
+  searchDonations: 'Hae lahjoituksia...',
+  noDonationsAvailable: 'Lahjoituksia ei ole tällä hetkellä saatavilla',
+
+  // Additional keys for thank-you and pickup-slot pages
+  donationCreatedDesc:
+    'Lahjoituksesi on luotu onnistuneesti ja se on nyt saatavilla niitä tarvitseville.',
+  changesSavedDesc: 'Muutoksesi on tallennettu onnistuneesti.',
+  addDeliveryTimeSlots:
+    'Lisää yksi tai useampi toimitusaika antaaksesi lahjoittajille joustavuutta.',
 } as const;

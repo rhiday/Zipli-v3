@@ -25,9 +25,7 @@ export default function RequestTypeSelection() {
     >
       <div className="space-y-6">
         <div className="text-center mb-8">
-          <p className="text-body text-secondary">
-            Choose the type that best fits your needs
-          </p>
+          <p className="text-body text-secondary">{t('chooseRequestType')}</p>
         </div>
 
         <div className="space-y-4">
@@ -46,7 +44,7 @@ export default function RequestTypeSelection() {
                     {t('oneTimeRequest')}
                   </h3>
                   <p className="text-body text-secondary">
-                    Create a single request for immediate food needs
+                    {t('createSingleRequest')}
                   </p>
                 </div>
               </div>
@@ -69,7 +67,7 @@ export default function RequestTypeSelection() {
                     {t('recurringRequest')}
                   </h3>
                   <p className="text-body text-secondary">
-                    Set up a repeating schedule for ongoing food needs
+                    {t('setupRepeatingSchedule')}
                   </p>
                 </div>
               </div>
@@ -81,8 +79,7 @@ export default function RequestTypeSelection() {
         {/* Info Box */}
         <div className="mt-8 p-4 bg-cloud rounded-md">
           <p className="text-label text-secondary">
-            <strong>Note:</strong> You can create multiple requests based on
-            your needs. Each request will be matched with available donations.
+            <strong>{t('note')}:</strong> {t('multipleRequestsNote')}
           </p>
         </div>
       </div>

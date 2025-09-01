@@ -105,7 +105,7 @@ function ResetPasswordPageContent() {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="ConfirmNewPassword"
+              placeholder={t('confirmNewPassword')}
             />
           </div>
 

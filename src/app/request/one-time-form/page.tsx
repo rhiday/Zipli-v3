@@ -101,7 +101,7 @@ export default function OneTimeRequestForm() {
       header={
         <>
           <SecondaryNavbar
-            title={isEditMode ? 'Edit Request' : t('oneTimeRequest')}
+            title={isEditMode ? t('editRequest') : t('oneTimeRequest')}
             backHref="/request/select-type"
             onBackClick={() => router.back()}
           />

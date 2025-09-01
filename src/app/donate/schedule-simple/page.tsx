@@ -19,7 +19,13 @@ interface SimpleSchedule {
 }
 
 const DAYS_OF_WEEK = [
-  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
 ];
 
 const TIME_SLOTS = [
@@ -91,7 +97,8 @@ export default function SimpleSchedulePage() {
     <PageContainer
       header={
         <>
-          <SecondaryNavbar title="Page Title"
+          <SecondaryNavbar
+            title={t('schedulePickup')}
             backHref="/donate/recurring-form"
             onBackClick={() => router.back()}
           />

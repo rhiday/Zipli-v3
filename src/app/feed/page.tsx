@@ -108,13 +108,13 @@ export default function FeedPage(): React.ReactElement {
       <div className="mx-auto max-w-7xl space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-titleLg font-display text-primary">
-            title="Default"
+            {t('explore')}
           </h1>
           <div className="relative flex-1 sm:max-w-xs">
             <SearchIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary-50" />
             <Input
               type="text"
-              placeholder="SearchDonations"
+              placeholder={t('searchDonations')}
               value={searchTerm}
               onChange={handleSearchChange}
               className="pl-10 pr-4 w-full"
@@ -138,7 +138,7 @@ export default function FeedPage(): React.ReactElement {
             <h3 className="text-xl font-semibold text-primary">
               {t('noDonationsFound')}
             </h3>
-            <p className="mt-2 text-primary-75">title="Default"</p>
+            <p className="mt-2 text-primary-75">{t('noDonationsAvailable')}</p>
           </div>
         )}
       </div>
