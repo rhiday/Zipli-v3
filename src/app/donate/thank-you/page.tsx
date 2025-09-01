@@ -41,11 +41,14 @@ export default function DonationThankYouPage() {
           ? t('changesSaved') || 'Donation Updated!'
           : t('donationCreated') || 'Thank you!'}
       </h1>
-      <p className="text-center text-base text-black mb-6 max-w-xs">
-        {isEditMode
-          ? t('changesSaved') || 'Your donation has been successfully updated.'
-          : t('donationCreatedDesc')}
-      </p>
+      {(isEditMode ? t('changesSaved') : t('donationCreatedDesc')) && (
+        <p className="text-center text-base text-black mb-6 max-w-xs">
+          {isEditMode
+            ? t('changesSaved') ||
+              'Your donation has been successfully updated.'
+            : t('donationCreatedDesc')}
+        </p>
+      )}
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
