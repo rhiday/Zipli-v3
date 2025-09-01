@@ -15,5 +15,5 @@ export const translations = {
 
 // Simple translation getter
 export const getTranslations = (language: Language) => {
-  return language === 'fi' ? fi : en;
+  return language === 'en' ? en : fi;
 };

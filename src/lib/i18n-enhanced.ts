@@ -101,7 +101,7 @@ interface LanguageState {
 const useLanguageStore = create<LanguageState>()(
   persist(
     (set, get) => ({
-      language: 'en' as Language,
+      language: 'fi' as Language,
       translations: { en: {}, fi: {} } as Record<Language, any>,
       setLanguage: (language: Language) => set({ language }),
       setTranslations: (translations: Record<Language, any>) =>
