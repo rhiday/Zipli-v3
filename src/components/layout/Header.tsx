@@ -139,7 +139,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 bg-[#18E170] rounded-full shrink-0"></span>
             <span className="text-white/80">
-              You don't have any active donations or requests
+              {t('noActiveDonationsOrRequests')}
             </span>
           </div>
         ) : (

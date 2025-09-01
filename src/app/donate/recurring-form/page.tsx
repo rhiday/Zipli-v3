@@ -65,7 +65,7 @@ export default function RecurringDonationForm() {
       header={
         <>
           <SecondaryNavbar
-            title="Recurring Donation"
+            title={t('recurringDonation')}
             backHref="/donate"
             onBackClick={() => router.back()}
           />
@@ -94,13 +94,13 @@ export default function RecurringDonationForm() {
         {/* Food Description */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            Describe what type of food you want to donate
+            {t('pleaseDescribeFood')}
           </label>
           <Textarea
             {...register('description', {
-              required: 'Please describe the food you want to donate',
+              required: t('pleaseDescribeFood'),
             })}
-            placeholder="e.g., Fresh vegetables, prepared meals, dairy products..."
+            placeholder={t('foodDescriptionPlaceholderLong')}
             variant={errors.description ? 'error' : 'default'}
             rows={4}
           />
@@ -114,18 +114,18 @@ export default function RecurringDonationForm() {
         {/* Quantity */}
         <div>
           <label className="block text-label font-semibold mb-2">
-            Approximate quantity (kg)
+            {t('approximateQuantityKg')}
           </label>
           <Input
             {...register('quantity', {
-              required: 'Quantity is required',
-              min: { value: 1, message: 'Quantity must be at least 1' },
+              required: t('quantityRequired'),
+              min: { value: 1, message: t('quantityMinimum') },
               pattern: {
                 value: /^\d+$/,
-                message: 'Please enter a valid number',
+                message: t('enterValidNumber'),
               },
             })}
-            placeholder="Enter quantity"
+            placeholder={t('enterQuantity')}
             type="number"
             variant={errors.quantity ? 'error' : 'default'}
           />
@@ -159,7 +159,7 @@ export default function RecurringDonationForm() {
           ]}
           value={selectedAllergens}
           onChange={setSelectedAllergens}
-          placeholder="Select allergens"
+          placeholder={t('selectAllergens')}
         />
       </form>
     </PageContainer>

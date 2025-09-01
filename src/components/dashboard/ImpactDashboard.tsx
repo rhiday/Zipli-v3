@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Info, ChevronDown } from 'lucide-react';
 import ExportCard from './ExportCard';
-import { useTranslations } from '@/hooks/useTranslations';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import {
   formatWeight,
   formatCurrency,
@@ -29,6 +29,7 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
     userDonations = [],
     allRequests = [],
   }) => {
+    const { t } = useCommonTranslation();
     const [selectedMonth, setSelectedMonth] = useState('February');
 
     // Memoized month selector handler
@@ -41,21 +42,21 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
       () => [
         {
           value: portionsOffered,
-          label: 'Portions offered',
+          label: t('portionsOffered'),
           bgColor: 'bg-lime/20',
         },
         {
           value: formatCurrency(savedCosts),
-          label: 'Saved in food disposal costs',
+          label: t('savedInFoodDisposalCosts'),
           bgColor: 'bg-lime/20',
         },
         {
           value: formatPercentage(emissionReduction),
-          label: 'Emission reduction',
+          label: t('co2Avoided'),
           bgColor: 'bg-lime/20',
         },
       ],
-      [portionsOffered, savedCosts, emissionReduction]
+      [portionsOffered, savedCosts, emissionReduction, t]
     );
 
     // Memoized recipients data from actual donations
@@ -69,7 +70,7 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
         {/* Impact header with month selector */}
         <div className="flex justify-between items-start gap-4 mb-4">
           <h2 className="text-primary text-titleSm font-semibold flex-1">
-            Your impact
+            {t('yourImpact')}
           </h2>
           <button
             onClick={handleMonthSelect}
@@ -84,7 +85,7 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
           <h3 className="text-primary text-displaySm font-semibold mb-1">
             {formatWeight(totalWeight)}
           </h3>
-          <p className="text-secondary text-bodyLg">Total food offered</p>
+          <p className="text-secondary text-bodyLg">{t('totalFoodOffered')}</p>
         </div>
 
         {/* Stats grid */}

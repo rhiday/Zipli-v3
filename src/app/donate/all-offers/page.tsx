@@ -20,6 +20,7 @@ import { Database, Json } from '@/lib/supabase/types';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
 import FilterBar from '@/components/ui/FilterBar';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 type FoodItemDetails = {
   name: string;
@@ -59,6 +60,7 @@ const FOOD_TYPE_OPTIONS = [
 
 export default function AllItemsPage(): React.ReactElement {
   const router = useRouter();
+  const { t } = useCommonTranslation();
   const [items, setItems] = useState<DisplayItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -241,7 +243,7 @@ export default function AllItemsPage(): React.ReactElement {
   return (
     <div className="min-h-dvh bg-base pb-20">
       <Header
-        title={`All ${filters.type === 'donations' ? 'donations' : 'requests'} by ${userName}`}
+        title={`${t('all')} ${filters.type === 'donations' ? t('donations') : t('requests')} ${t('by')} ${userName}`}
       />
 
       <main className="relative z-20 -mt-6 rounded-t-3xl md:rounded-t-none bg-base py-6 px-4 md:px-8 space-y-6">

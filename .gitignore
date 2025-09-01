@@ -18,3 +18,4 @@ supabase/.temp/
 workspace.json
 .kiro/settings/mcp.json
 .vercel
+tsconfig.tsbuildinfo

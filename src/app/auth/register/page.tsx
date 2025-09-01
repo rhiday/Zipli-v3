@@ -7,8 +7,10 @@ import { Select } from '@/components/ui/Select';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 export default function RegisterPage() {
+  const { t } = useCommonTranslation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -38,14 +40,14 @@ export default function RegisterPage() {
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
       console.error('🎯 RegisterPage - Password mismatch');
-      setError('Passwords do not match');
+      setError(t('validation.passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
       console.error('🎯 RegisterPage - Password too short');
-      setError('Password must be at least 6 characters long');
+      setError(t('validation.passwordMinLength'));
       setLoading(false);
       return;
     }
@@ -107,7 +109,7 @@ export default function RegisterPage() {
       }
     } catch (err) {
       console.error('🎯 RegisterPage - Caught exception:', err);
-      setError('An error occurred during registration. Please try again.');
+      setError(t('errors.registrationFailed'));
       setLoading(false);
     }
   };
@@ -117,10 +119,10 @@ export default function RegisterPage() {
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">
-            Create your account
+            {t('auth.createAccount')}
           </h1>
           <p className="mt-2 text-body text-primary-75">
-            Join Zipli to start sharing food
+            {t('auth.joinZipliToShare')}
           </p>
         </div>
 
@@ -136,7 +138,7 @@ export default function RegisterPage() {
               htmlFor="email"
               className="block text-label font-medium text-primary mb-1"
             >
-              Email address *
+              {t('forms.emailAddress')} *
             </label>
             <Input
               id="email"
@@ -154,7 +156,7 @@ export default function RegisterPage() {
               htmlFor="fullName"
               className="block text-label font-medium text-primary mb-1"
             >
-              Full name *
+              {t('forms.fullName')} *
             </label>
             <Input
               id="fullName"
@@ -171,16 +173,16 @@ export default function RegisterPage() {
               htmlFor="role"
               className="block text-label font-medium text-primary mb-1"
             >
-              I am a *
+              {t('forms.iAmA')} *
             </label>
             <Select
               value={formData.role}
               onValueChange={(value) => handleInputChange('role', value)}
             >
-              <option value="food_donor">Food Donor</option>
-              <option value="food_receiver">Food Receiver</option>
-              <option value="city">City Official</option>
-              <option value="terminals">Terminal Operator</option>
+              <option value="food_donor">{t('roles.foodDonor')}</option>
+              <option value="food_receiver">{t('roles.foodReceiver')}</option>
+              <option value="city">{t('roles.cityOfficial')}</option>
+              <option value="terminals">{t('roles.terminalOperator')}</option>
             </Select>
           </div>
 
@@ -189,7 +191,7 @@ export default function RegisterPage() {
               htmlFor="organizationName"
               className="block text-label font-medium text-primary mb-1"
             >
-              Organization name
+              {t('forms.organizationName')}
             </label>
             <Input
               id="organizationName"
@@ -207,7 +209,7 @@ export default function RegisterPage() {
               htmlFor="contactNumber"
               className="block text-label font-medium text-primary mb-1"
             >
-              Contact number
+              {t('forms.contactNumber')}
             </label>
             <Input
               id="contactNumber"
@@ -225,7 +227,7 @@ export default function RegisterPage() {
               htmlFor="address"
               className="block text-label font-medium text-primary mb-1"
             >
-              Address
+              {t('forms.address')}
             </label>
             <Input
               id="address"
@@ -241,7 +243,7 @@ export default function RegisterPage() {
               htmlFor="password"
               className="block text-label font-medium text-primary mb-1"
             >
-              Password *
+              {t('forms.password')} *
             </label>
             <Input
               id="password"
@@ -259,7 +261,7 @@ export default function RegisterPage() {
               htmlFor="confirmPassword"
               className="block text-label font-medium text-primary mb-1"
             >
-              Confirm password *
+              {t('forms.confirmPassword')} *
             </label>
             <Input
               id="confirmPassword"
@@ -282,18 +284,18 @@ export default function RegisterPage() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
             </Button>
           </div>
         </form>
 
         <div className="text-center text-body">
-          <span className="text-inactive">Already have an account?</span>{' '}
+          <span className="text-inactive">{t('auth.alreadyHaveAccount')}</span>{' '}
           <Link
             href="/auth/login"
             className="font-medium text-earth hover:text-primary"
           >
-            Sign in
+            {t('auth.signIn')}
           </Link>
         </div>
       </div>

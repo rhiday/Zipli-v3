@@ -214,7 +214,7 @@ function DonorDashboardPage(): React.ReactElement {
                   {formatWeight(metrics.totalWeight)}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('totalFoodDonated')}
+                  {t('totalFoodOffered')}
                 </p>
               </div>
             </div>
@@ -244,7 +244,7 @@ function DonorDashboardPage(): React.ReactElement {
                   {formatCurrency(metrics.savedCosts)}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('costSavings')}
+                  {t('savedInFoodDisposalCosts')}
                 </p>
               </div>
             </div>
@@ -276,7 +276,7 @@ function DonorDashboardPage(): React.ReactElement {
           >
             <ActionButton
               href="#"
-              title={t('exportToPdf')}
+              title={t('exportImpactReport')}
               description={t('environmentalAndSocialImpactData')}
               icon={<FileDown />}
             />

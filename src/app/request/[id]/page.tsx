@@ -368,7 +368,7 @@ export default function RequestDetailPage(): React.ReactElement {
                   window.location.href = `mailto:${email}?subject=Re: Food Request - ${requestInfo.requestName}`;
                 }}
               >
-                Contact Requester
+                {t('contactRequester')}
               </Button>
             </div>
           )}

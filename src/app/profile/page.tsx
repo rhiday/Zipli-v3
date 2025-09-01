@@ -304,7 +304,7 @@ export default function ProfilePage(): React.ReactElement {
                       name="contact_number"
                       value={formData.contact_number}
                       onChange={handleChange}
-                      placeholder="ContactNumber"
+                      placeholder={t('contactNumberPlaceholder')}
                     />
                   </div>
 
