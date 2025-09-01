@@ -29,6 +29,7 @@
 - ✅ Automated testing on PRs
 - ✅ Branch protection on main
 - ✅ Required status checks before merge
+- ✅ **Database migration verification** (see [Database Migration Best Practices](./DATABASE_MIGRATION_BEST_PRACTICES.md))
 
 ## Quick Commands
 

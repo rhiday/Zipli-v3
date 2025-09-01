@@ -9,16 +9,39 @@ import { useDatabase } from '@/store';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Checkbox } from '@/components/ui/Checkbox';
+import {
+  setRememberMePreference,
+  setRememberedEmail,
+  getRememberedEmail,
+  clearRememberedEmail,
+} from '@/lib/auth/sessionUtils';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('tsanssi@etappiry.net');
-  const [password, setPassword] = useState('password');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const login = useDatabase((state) => state.login);
   const { t } = useCommonTranslation();
+
+  // Initialize email field with remembered email on component mount
+  React.useEffect(() => {
+    const rememberedEmail = getRememberedEmail();
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
+      setRememberMe(true); // If we have a remembered email, user likely wants remember me checked
+    }
+  }, []);
+
+  const handleRememberMeChange = (checked: boolean) => {
+    setRememberMe(checked);
+    // If user unchecks remember me, clear any stored email immediately
+    if (!checked) {
+      clearRememberedEmail();
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +59,10 @@ export default function LoginPage() {
 
       if (response.data) {
         const user = response.data;
+
+        // Store the remember me preference and email
+        setRememberMePreference(rememberMe);
+        setRememberedEmail(email, rememberMe);
 
         // Small delay to ensure store state is updated before redirect
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -127,7 +154,7 @@ export default function LoginPage() {
               id="remember-me"
               name="remember-me"
               checked={rememberMe}
-              onChange={setRememberMe}
+              onChange={handleRememberMeChange}
               label={t('rememberMe')}
             />
 

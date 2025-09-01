@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/Input';
 import { ItemPreview } from '@/components/ui/ItemPreview';
-import { PhotoUpload } from '@/components/ui/PhotoUpload';
 import { Progress } from '@/components/ui/progress';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { useDatabase } from '@/store';
@@ -23,8 +22,8 @@ import { Suspense, useEffect, useState } from 'react';
 
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
-import { Textarea } from '@/components/ui/Textarea';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { parseAllergens } from '@/lib/allergenUtils';
 
 interface DonationItem {
   id: string;
@@ -32,7 +31,8 @@ interface DonationItem {
   quantity: string;
   allergens: string[];
   description: string | null;
-  imageUrl?: string;
+  imageUrl?: string; // Keep for backward compatibility
+  imageUrls?: string[]; // New field for multiple images
 }
 
 function ManualDonationPageInner() {
@@ -46,6 +46,7 @@ function ManualDonationPageInner() {
     isEditMode: storeEditMode,
     editingDonationId,
     setEditMode,
+    setPickupSlots,
   } = useDonationStore();
   const updateDonation = useDatabase((state) => state.updateDonation);
   const updateFoodItem = useDatabase((state) => state.updateFoodItem);
@@ -87,17 +88,50 @@ function ManualDonationPageInner() {
 
       if (foundDonation) {
         const { food_item, quantity, id } = foundDonation;
-        const currentAllergens = food_item.allergens || [];
-        setCurrentItem({
+        // Parse allergens using utility function
+        const parsedAllergens = parseAllergens(food_item.allergens);
+
+        const itemData = {
           id,
           name: food_item.name,
           quantity: String(quantity).replace(' kg', ''),
-          allergens: Array.isArray(currentAllergens)
-            ? currentAllergens
-            : String(currentAllergens).split(','),
+          allergens: parsedAllergens,
           description: food_item.description,
-          imageUrl: food_item.image_url || undefined,
+          imageUrl: food_item.image_url || undefined, // Keep for backward compatibility
+          imageUrls: food_item.image_urls
+            ? Array.isArray(food_item.image_urls)
+              ? (food_item.image_urls as string[])
+              : []
+            : food_item.image_url
+              ? [food_item.image_url]
+              : [],
+        };
+
+        setCurrentItem(itemData);
+
+        // Also populate the donation store for the full edit flow
+        updateDonationItem({
+          ...itemData,
+          quantity: `${itemData.quantity} kg`, // Add kg suffix for store
         });
+
+        // Load pickup slots into the store if they exist
+        if (
+          foundDonation.pickup_slots &&
+          Array.isArray(foundDonation.pickup_slots)
+        ) {
+          // Convert pickup slots to the format expected by the store
+          const formattedSlots = foundDonation.pickup_slots.map(
+            (slot: any, index: number) => ({
+              id: `slot-${index}`,
+              date: new Date(slot.date),
+              startTime: slot.start_time,
+              endTime: slot.end_time,
+            })
+          );
+          setPickupSlots(formattedSlots);
+        }
+
         setShowAddAnotherForm(true);
       }
     }
@@ -115,17 +149,50 @@ function ManualDonationPageInner() {
 
       if (foundDonation) {
         const { food_item, quantity, id } = foundDonation;
-        const currentAllergens = food_item.allergens || [];
-        setCurrentItem({
+        // Parse allergens using utility function
+        const parsedAllergens = parseAllergens(food_item.allergens);
+
+        const itemData = {
           id,
           name: food_item.name,
           quantity: String(quantity).replace(' kg', ''),
-          allergens: Array.isArray(currentAllergens)
-            ? currentAllergens
-            : String(currentAllergens).split(','),
+          allergens: parsedAllergens,
           description: food_item.description,
-          imageUrl: food_item.image_url || undefined,
+          imageUrl: food_item.image_url || undefined, // Keep for backward compatibility
+          imageUrls: food_item.image_urls
+            ? Array.isArray(food_item.image_urls)
+              ? (food_item.image_urls as string[])
+              : []
+            : food_item.image_url
+              ? [food_item.image_url]
+              : [],
+        };
+
+        setCurrentItem(itemData);
+
+        // Also populate the donation store for the full edit flow
+        updateDonationItem({
+          ...itemData,
+          quantity: `${itemData.quantity} kg`, // Add kg suffix for store
         });
+
+        // Load pickup slots into the store if they exist
+        if (
+          foundDonation.pickup_slots &&
+          Array.isArray(foundDonation.pickup_slots)
+        ) {
+          // Convert pickup slots to the format expected by the store
+          const formattedSlots = foundDonation.pickup_slots.map(
+            (slot: any, index: number) => ({
+              id: `slot-${index}`,
+              date: new Date(slot.date),
+              startTime: slot.start_time,
+              endTime: slot.end_time,
+            })
+          );
+          setPickupSlots(formattedSlots);
+        }
+
         setShowAddAnotherForm(true);
       }
     }
@@ -279,26 +346,18 @@ function ManualDonationPageInner() {
 
     try {
       if (isEditMode && currentItem.id !== 'new') {
-        const donation = donations.find((d) => d.id === currentItem.id);
-        if (!donation) throw new Error('Donation not found');
+        // In edit mode, update the donation store and continue to details page
+        // Don't save to database here - let the normal flow handle it
+        const updatedItem = {
+          ...currentItem,
+          quantity: `${currentItem.quantity} kg`,
+        };
 
-        await updateFoodItem(donation.food_item_id, {
-          name: currentItem.name,
-          allergens: JSON.stringify(currentItem.allergens),
-          description: currentItem.description || undefined,
-          image_url: currentItem.imageUrl,
-        });
+        // Update the donation store with the current item
+        updateDonationItem(updatedItem);
 
-        await updateDonation(currentItem.id, {
-          quantity: parseFloat(currentItem.quantity) || 0,
-        });
-
-        // In edit mode, continue to details instead of showing success dialog
-        if (storeEditMode) {
-          router.push('/donate/details');
-        } else {
-          setShowSuccessDialog(true);
-        }
+        // Continue to details page for image and description editing
+        router.push('/donate/details');
       } else {
         // This is for adding a new item, not editing.
         if (currentItem.id === 'new') {

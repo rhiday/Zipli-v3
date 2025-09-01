@@ -18,7 +18,7 @@ import {
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
 import Image from 'next/image';
-import { jsPDF } from 'jspdf';
+import { loadJsPDF } from '@/lib/lazy-imports';
 import { useDatabase } from '@/store';
 import {
   SkeletonDashboardStat,
@@ -67,8 +67,8 @@ export default function ReceiverDashboardPage(): React.ReactElement {
 
     const profile: ProfileRow = {
       id: currentUser.id,
-      full_name: currentUser.full_name,
-      organization_name: null,
+      full_name: currentUser.full_name || 'User', // Use currentUser directly
+      organization_name: currentUser.organization_name,
     };
 
     const allRequests = getAllRequests();
@@ -78,10 +78,11 @@ export default function ReceiverDashboardPage(): React.ReactElement {
 
     setDashboardData({ profile, requests: userRequests });
     setLoading(false);
-  }, [isInitialized, currentUser, router, getAllRequests]);
+  }, [isInitialized, currentUser, router]);
 
   // Memoized PDF generation function
-  const handleExportPDF = useCallback(() => {
+  const handleExportPDF = useCallback(async () => {
+    const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text('Zipli Request Summary', 10, 10);

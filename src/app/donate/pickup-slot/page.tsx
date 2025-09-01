@@ -309,7 +309,7 @@ export default function PickupSlotPage() {
                     }}
                     initialFocus
                     disabled={(date) =>
-                      date < new Date(new Date().setDate(new Date().getDate()))
+                      date < new Date(new Date().setHours(0, 0, 0, 0))
                     }
                   />
                 </PopoverContent>

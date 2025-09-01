@@ -4,9 +4,8 @@ import { useRouter } from 'next/navigation';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { PhotoUpload } from '@/components/ui/PhotoUpload';
+import { MultiplePhotoUpload } from '@/components/ui/MultiplePhotoUpload';
 import { Textarea } from '@/components/ui/Textarea';
-import { ItemPreview } from '@/components/ui/ItemPreview';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store';
 import { useCommonTranslation } from '@/hooks/useTranslations';
@@ -31,8 +30,13 @@ export default function DonationDetailsPage() {
     return null;
   }
 
-  const handleImageUpload = (imageUrl: string) => {
-    updateDonationItem({ ...currentItem, imageUrl: imageUrl || undefined });
+  const handleImagesUpload = (imageUrls: string[]) => {
+    const updatedItem = {
+      ...currentItem,
+      imageUrls,
+      imageUrl: imageUrls.length > 0 ? imageUrls[0] : undefined, // Sync first image for backward compatibility
+    };
+    updateDonationItem(updatedItem);
   };
 
   const handleDescriptionChange = (description: string) => {
@@ -93,20 +97,12 @@ export default function DonationDetailsPage() {
           </p>
         </div>
 
-        {/* Current Item Preview */}
-        <ItemPreview
-          name={currentItem.name}
-          quantity={currentItem.quantity}
-          allergens={currentItem.allergens}
-          imageUrl={currentItem.imageUrl}
-          description={currentItem.description || undefined}
-        />
-
         {/* Photo Upload */}
-        <PhotoUpload
-          onImageUpload={handleImageUpload}
-          uploadedImage={currentItem.imageUrl}
+        <MultiplePhotoUpload
+          onImagesUpload={handleImagesUpload}
+          uploadedImages={currentItem.imageUrls || []}
           hint={t('photosHelpIdentify')}
+          maxImages={5}
         />
 
         {/* Description */}

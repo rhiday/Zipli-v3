@@ -7,7 +7,8 @@ interface DonationItem {
   quantity: string;
   description: string | null;
   allergens: string[];
-  imageUrl?: string;
+  imageUrl?: string; // Keep for backward compatibility
+  imageUrls?: string[]; // New field for multiple images
 }
 
 interface PickupSlot {

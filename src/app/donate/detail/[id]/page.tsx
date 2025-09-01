@@ -10,7 +10,9 @@ import {
   Plus,
   Edit,
   Trash2,
+  CheckIcon,
 } from 'lucide-react';
+import { ImageCarousel } from '@/components/ui/ImageCarousel';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Tag from '@/components/ui/Tag';
@@ -26,9 +28,11 @@ import {
   DialogFooter,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useDatabase, DonationWithFoodItem } from '@/store';
+import { useSupabaseDatabase as useDatabase } from '@/store/supabaseDatabaseStore';
+import { DonationWithFoodItem } from '@/types/supabase';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import { useDonationStore } from '@/store/donation';
+import { parseAllergens } from '@/lib/allergenUtils';
 
 export default function DonationDetailPage() {
   const params = useParams();
@@ -36,11 +40,11 @@ export default function DonationDetailPage() {
   const { t } = useCommonTranslation();
   const currentUser = useDatabase((state) => state.currentUser);
   const router = useRouter();
-  const donations = useDatabase((state) => state.donations);
-  const foodItems = useDatabase((state) => state.foodItems);
-  const users = useDatabase((state) => state.users);
+  const fetchDonationById = useDatabase((state) => state.fetchDonationById);
   const deleteDonation = useDatabase((state) => state.deleteDonation);
+  const updateDonation = useDatabase((state) => state.updateDonation);
   const { setEditMode, clearDonation } = useDonationStore();
+
   const [donation, setDonation] = useState<DonationWithFoodItem | null>(null);
   const [otherDonations, setOtherDonations] = useState<DonationWithFoodItem[]>(
     []
@@ -51,50 +55,62 @@ export default function DonationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [showConfirmClaim, setShowConfirmClaim] = useState(false);
+  const [confirmClauseChecked, setConfirmClauseChecked] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      // Find the donation by ID (regardless of owner)
-      const mainDonation = donations.find((d) => d.id === id);
+    const fetchDonation = async () => {
+      if (!id) return;
 
-      if (mainDonation) {
-        const foodItem = foodItems.find(
-          (fi) => fi.id === mainDonation.food_item_id
-        );
-        if (foodItem) {
-          setDonation({ ...mainDonation, food_item: foodItem });
+      setLoading(true);
+      setError(null);
 
-          // Check if current user is the owner
-          const userIsOwner =
-            currentUser && mainDonation.donor_id === currentUser.id;
-          setIsOwner(!!userIsOwner);
+      try {
+        const result = await fetchDonationById(id);
 
-          // Resolve donor information and other donations for this donor (viewer-agnostic)
-          const donor = users.find((u) => u.id === mainDonation.donor_id);
-          setDonorDisplayName(
-            donor?.full_name || donor?.organization_name || ''
-          );
-
-          const donorDonations = donations.filter(
-            (d) => d.donor_id === mainDonation.donor_id
-          );
-          const otherDons = donorDonations
-            .filter((d) => d.id !== id)
-            .map((d) => ({
-              ...d,
-              food_item: foodItems.find((fi) => fi.id === d.food_item_id)!,
-            }))
-            .slice(0, 4);
-          setOtherDonations(otherDons);
-          setTotalDonations(donorDonations.length);
+        if (result.error) {
+          setError(result.error);
+          setLoading(false);
+          return;
         }
+
+        if (!result.data) {
+          setError('Donation not found');
+          setLoading(false);
+          return;
+        }
+
+        const fetchedDonation = result.data;
+        setDonation(fetchedDonation);
+
+        // Check if current user is the owner
+        const userIsOwner =
+          currentUser && fetchedDonation.donor_id === currentUser.id;
+        setIsOwner(!!userIsOwner);
+
+        // Set donor display name
+        const donor = fetchedDonation.donor;
+        setDonorDisplayName(
+          donor?.full_name || donor?.organization_name || 'Generous Donor'
+        );
+
+        // For now, we'll set empty arrays for other donations
+        // You can implement fetching other donations by the same donor later
+        setOtherDonations([]);
+        setTotalDonations(1);
+      } catch (err) {
+        console.error('Error fetching donation:', err);
+        setError('Failed to load donation details');
+      } finally {
+        setLoading(false);
       }
-    }
-    setLoading(false);
-  }, [currentUser, id, donations, foodItems]);
+    };
+
+    fetchDonation();
+  }, [id, currentUser, fetchDonationById]);
 
   const handleRemoveListing = async () => {
     if (!donation) return;
@@ -134,6 +150,38 @@ export default function DonationDetailPage() {
     router.push('/donate/manual');
   };
 
+  const handleConfirmClaim = () => {
+    setShowConfirmClaim(true);
+  };
+
+  const confirmClaimWithClause = async () => {
+    if (!confirmClauseChecked || !donation) return;
+
+    setActionLoading(true);
+    setShowConfirmClaim(false);
+    setConfirmClauseChecked(false);
+
+    try {
+      const result = await updateDonation(donation.id, {
+        status: 'claimed',
+        claimed_at: new Date().toISOString(),
+      });
+
+      if (result.error) {
+        console.error('Error claiming donation:', result.error);
+        return;
+      }
+
+      // Refresh the donation data
+      await fetchDonationById(donation.id);
+      router.push('/donate');
+    } catch (error) {
+      console.error('Unexpected error claiming donation:', error);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-cream">
@@ -162,32 +210,30 @@ export default function DonationDetailPage() {
 
   return (
     <div className="min-h-dvh pb-20">
-      {/* Header with Image and Back Arrow */}
+      {/* Header with Image Carousel and Back Arrow */}
       <div className="relative h-60 w-full">
         <Button
           onClick={() => router.back()}
-          className="absolute top-12 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
+          className="absolute top-12 left-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 p-0 text-white backdrop-blur-sm"
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        {donation.food_item.image_url && !imageError ? (
-          <Image
-            src={donation.food_item.image_url}
-            alt={donation.food_item.name}
-            fill
-            className="object-cover"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-            <Image
-              src="/images/placeholder.svg"
-              alt="NoImage"
-              width={160}
-              height={160}
-            />
-          </div>
-        )}
+        <ImageCarousel
+          images={
+            donation.food_item.image_urls
+              ? Array.isArray(donation.food_item.image_urls)
+                ? (donation.food_item.image_urls as string[])
+                : []
+              : donation.food_item.image_url
+                ? [donation.food_item.image_url]
+                : []
+          }
+          alt={donation.food_item.name}
+          className="h-full w-full rounded-none"
+          aspectRatio="auto"
+          showNavigation={true}
+          showDots={true}
+        />
       </div>
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -203,33 +249,11 @@ export default function DonationDetailPage() {
           {/* Tags */}
           {donation.food_item.allergens && (
             <div className="mt-4 flex flex-wrap gap-2">
-              {(() => {
-                let allergenArray: string[] = [];
-
-                if (Array.isArray(donation.food_item.allergens)) {
-                  allergenArray = donation.food_item.allergens;
-                } else if (typeof donation.food_item.allergens === 'string') {
-                  // Try to parse JSON string, fallback to splitting by comma
-                  try {
-                    const parsed = JSON.parse(donation.food_item.allergens);
-                    allergenArray = Array.isArray(parsed)
-                      ? parsed
-                      : [donation.food_item.allergens];
-                  } catch {
-                    // If not valid JSON, treat as comma-separated string
-                    allergenArray = donation.food_item.allergens
-                      .split(',')
-                      .map((item) => item.trim())
-                      .filter((item) => item.length > 0);
-                  }
-                } else {
-                  allergenArray = [String(donation.food_item.allergens)];
-                }
-
-                return allergenArray.map((tag: string) => (
-                  <Tag key={tag}>{tag.trim()}</Tag>
-                ));
-              })()}
+              {parseAllergens(donation.food_item.allergens).map(
+                (tag: string) => (
+                  <Tag key={tag}>{tag}</Tag>
+                )
+              )}
             </div>
           )}
 
@@ -243,70 +267,72 @@ export default function DonationDetailPage() {
           </div>
 
           {isOwner ? (
-            <Dialog
-              open={showDeleteConfirm}
-              onOpenChange={setShowDeleteConfirm}
-            >
-              <div className="mt-6 flex items-center gap-3">
+            <div className="mt-6 flex flex-col gap-3">
+              <Button
+                variant="primary"
+                size="cta"
+                className="w-full"
+                onClick={handleConfirmClaim}
+                disabled={actionLoading}
+              >
+                <CheckIcon className="h-5 w-5" />
+                Confirm Claim
+              </Button>
+              <Dialog
+                open={showDeleteConfirm}
+                onOpenChange={setShowDeleteConfirm}
+              >
                 <DialogTrigger asChild>
                   <Button
                     variant="destructive-outline"
                     size="cta"
-                    className="flex-1"
+                    className="w-full"
                   >
                     <Trash2 className="h-5 w-5" /> Remove Listing
                   </Button>
                 </DialogTrigger>
-                <Button
-                  variant="primary"
-                  size="cta"
-                  className="flex-1"
-                  onClick={handleEditListing}
-                >
-                  <Edit className="h-5 w-5" /> Edit Listing
-                </Button>
-              </div>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Are you sure?</DialogTitle>
-                  <DialogDescription>
-                    This will permanently remove the listing from public view.
-                    This action cannot be undone.
-                  </DialogDescription>
-                </DialogHeader>
-                {deleteError && (
-                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                    <p className="text-sm text-red-600">{deleteError}</p>
-                  </div>
-                )}
-                <DialogFooter>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      setShowDeleteConfirm(false);
-                      setDeleteError(null);
-                    }}
-                    disabled={isDeleting}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={handleRemoveListing}
-                    disabled={isDeleting}
-                  >
-                    {isDeleting ? (
-                      <>
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
-                        Removing...
-                      </>
-                    ) : (
-                      'Yes, Remove'
-                    )}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Are you sure?</DialogTitle>
+                    <DialogDescription>
+                      This will permanently remove the listing from public view.
+                      This action cannot be undone.
+                    </DialogDescription>
+                  </DialogHeader>
+                  {deleteError && (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                      <p className="text-sm text-red-600">{deleteError}</p>
+                    </div>
+                  )}
+                  <DialogFooter>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setShowDeleteConfirm(false);
+                        setDeleteError(null);
+                      }}
+                      disabled={isDeleting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleRemoveListing}
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? (
+                        <>
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                          Removing...
+                        </>
+                      ) : (
+                        'Yes, Remove'
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           ) : (
             <div className="mt-6">
               <Button
@@ -356,6 +382,60 @@ export default function DonationDetailPage() {
           </section>
         )}
       </main>
+
+      {/* Confirm Claim Dialog */}
+      <Dialog open={showConfirmClaim} onOpenChange={setShowConfirmClaim}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Claim</DialogTitle>
+            <DialogDescription>
+              Please confirm that this donation has been claimed and received.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="confirm-claim-clause"
+                checked={confirmClauseChecked}
+                onChange={(e) => setConfirmClauseChecked(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <label
+                htmlFor="confirm-claim-clause"
+                className="text-sm text-gray-700 leading-relaxed"
+              >
+                I confirm that this donation has been claimed and received in
+                good condition. I understand that by confirming this claim, I
+                acknowledge that the donation will be marked as claimed and
+                removed from public listings.
+              </label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowConfirmClaim(false);
+                setConfirmClauseChecked(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={confirmClaimWithClause}
+              disabled={!confirmClauseChecked || actionLoading}
+            >
+              {actionLoading ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                'Confirm Claim'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

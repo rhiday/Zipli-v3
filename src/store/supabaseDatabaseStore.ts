@@ -8,6 +8,11 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase/client';
 import { authService } from '@/lib/auth/authService';
 import {
+  shouldMaintainSession,
+  initializeSessionTracking,
+  clearRememberMePreference,
+} from '@/lib/auth/sessionUtils';
+import {
   Database,
   Profile,
   FoodItem,
@@ -71,6 +76,9 @@ interface SupabaseDatabaseState {
   fetchFoodItems: () => Promise<void>;
   fetchUsers: () => Promise<void>;
   fetchRequests: () => Promise<void>;
+  fetchDonationById: (
+    id: string
+  ) => Promise<{ data: DonationWithFoodItem | null; error: string | null }>;
 
   // Donation methods
   getDonationById: (id: string) => DonationWithFoodItem | undefined;
@@ -140,28 +148,47 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           console.log('🚀 Store init starting...');
           set({ loading: true, error: null });
 
+          // Initialize session tracking
+          initializeSessionTracking();
+
           // Check for existing session
           console.log('📋 Getting current user...');
           const currentUser = await authService.getCurrentUser();
           console.log('👤 Current user:', currentUser?.full_name || 'None');
 
+          // Check if we should maintain this session based on remember me preference
+          if (currentUser && !shouldMaintainSession()) {
+            console.log('🚪 Remember Me was disabled, logging out...');
+            await authService.signOut();
+            clearRememberMePreference();
+            set({ currentUser: null, isInitialized: true, loading: false });
+            return;
+          }
+
           // Always fetch data from Supabase
           console.log('📦 Fetching data...');
           await Promise.all([
-            state.fetchFoodItems(),
             state.fetchDonations(),
             state.fetchUsers(),
-            state.fetchRequests(),
+            // Only fetch requests if user is not a food_donor
+            ...(currentUser?.role !== 'food_donor'
+              ? [state.fetchRequests()]
+              : []),
           ]);
           console.log('✅ Data fetching completed');
 
           // Setup real-time subscriptions
-          state.setupRealtimeSubscriptions();
+          // Move real-time setup to after UI is ready
           set({
             currentUser,
             isInitialized: true,
             loading: false,
           });
+
+          // Defer real-time setup
+          setTimeout(() => {
+            state.setupRealtimeSubscriptions();
+          }, 100);
         } catch (error) {
           console.error('Initialization error', error);
           set({
@@ -184,7 +211,10 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             set({ currentUser: result.data });
             // Refresh data after login
             await get().fetchDonations();
-            await get().fetchRequests();
+            // Only fetch requests if user is not a food_donor
+            if (result.data.role !== 'food_donor') {
+              await get().fetchRequests();
+            }
           }
 
           set({ loading: false });
@@ -315,6 +345,9 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           // Always sign out from Supabase
           await authService.signOut();
 
+          // Clear remember me preferences
+          clearRememberMePreference();
+
           get().cleanupSubscriptions();
 
           set({
@@ -332,8 +365,16 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       // ===== DATA FETCHING METHODS =====
       fetchDonations: async () => {
         try {
-          // OPTIMIZED: Single query with JOINs instead of N+1 queries
-          const { data: donationsData, error: donationsError } = await supabase
+          const currentUser = get().currentUser;
+
+          // Check if user is authenticated
+          if (!currentUser) {
+            console.log('No authenticated user, skipping donations fetch');
+            set({ donations: [] });
+            return;
+          }
+
+          let query = supabase
             .from('donations')
             .select(
               `
@@ -342,52 +383,38 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
               donor:profiles!donations_donor_id_fkey(*)
             `
             )
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: false })
+            .limit(50);
 
-          if (donationsError) throw donationsError;
+          // Apply role-based filtering
+          if (currentUser.role === 'food_donor') {
+            // Donors see their own donations
+            query = query.eq('donor_id', currentUser.id);
+          } else if (currentUser.role === 'food_receiver') {
+            // Receivers see available donations
+            query = query.eq('status', 'available');
+          } else if (
+            currentUser.role === 'city' ||
+            currentUser.role === 'terminals'
+          ) {
+            // Admins see all donations
+            // No additional filters needed
+          }
 
-          // Transform the joined data to match expected format
-          const donations: DonationWithFoodItem[] = (donationsData || []).map(
-            (donation) => ({
-              ...donation,
-              food_item: donation.food_item || {
-                id: donation.food_item_id,
-                name: 'Unknown item',
-                description: null,
-                image_url: null,
-                allergens: null,
-                donor_id: donation.donor_id,
-                food_type: null,
-                quantity: 0,
-                unit: null,
-                user_id: donation.donor_id,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-              donor: donation.donor || {
-                id: donation.donor_id,
-                full_name: 'Unknown donor',
-                email: '',
-                role: 'food_donor' as any,
-                organization_name: '',
-                contact_number: null,
-                address: null,
-                city: null,
-                country: null,
-                postal_code: null,
-                street_address: null,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-            })
-          );
+          const { data: donationsData, error: donationsError } = await query;
 
-          // Also fetch and cache food items separately for other uses
-          const { data: foodItemsData } = await supabase
-            .from('food_items')
-            .select('*');
+          if (donationsError) {
+            console.error('Error fetching donations:', donationsError);
+            throw donationsError;
+          }
 
-          set({ donations, foodItems: foodItemsData || [] });
+          const donations = (donationsData || []).map((donation) => ({
+            ...donation,
+            food_item: donation.food_item || null,
+            donor: donation.donor || null,
+          }));
+
+          set({ donations });
         } catch (error) {
           console.error('Error fetching donations', error);
           set({
@@ -401,13 +428,16 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       fetchFoodItems: async () => {
         try {
-          const { data, error } = await supabase
+          // Only fetch food items that are actually used
+          const { data } = await supabase
             .from('food_items')
-            .select('*')
-            .order('name');
+            .select('id, name, description, allergens') // Only needed fields
+            .order('name')
+            .limit(100); // Limit to 100 items
 
-          if (error) throw error;
-          set({ foodItems: data || [] });
+          if (data === null) throw new Error('No food items found');
+
+          set({ foodItems: (data as FoodItem[]) || [] });
         } catch (error) {
           console.error('Error fetching food items', error);
           set({
@@ -420,16 +450,22 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       },
 
       fetchUsers: async () => {
+        const currentUser = get().currentUser;
+        if (currentUser) {
+          // Just use current user data, don't fetch all profiles
+          set({ users: [currentUser] });
+          return;
+        }
         try {
           const { data, error } = await supabase
             .from('profiles')
-            .select('*')
+            .select('id, full_name, organization_name') // Only 3 fields
             .order('full_name');
 
           if (error) throw error;
-          set({ users: data || [] });
+          set({ users: (data as Profile[]) || [] });
         } catch (error) {
-          console.error('Error fetching users', error);
+          console.error('Error fetching user display names', error);
           set({
             error:
               error instanceof Error ? error.message : 'Failed to fetch users',
@@ -439,12 +475,42 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       fetchRequests: async () => {
         try {
-          const { data, error } = await supabase
+          const currentUser = get().currentUser;
+
+          // Check if user is authenticated
+          if (!currentUser) {
+            console.log('No authenticated user, skipping requests fetch');
+            set({ requests: [] });
+            return;
+          }
+
+          let query = supabase
             .from('requests')
             .select('*')
             .order('created_at', { ascending: false });
 
-          if (error) throw error;
+          // Apply role-based filtering
+          if (currentUser.role === 'food_receiver') {
+            // Receivers see their own requests
+            query = query.eq('user_id', currentUser.id);
+          } else if (currentUser.role === 'food_donor') {
+            // Donors see active requests
+            query = query.eq('status', 'active');
+          } else if (
+            currentUser.role === 'city' ||
+            currentUser.role === 'terminals'
+          ) {
+            // Admins see all requests
+            // No additional filters needed
+          }
+
+          const { data, error } = await query;
+
+          if (error) {
+            console.error('Error fetching requests:', error);
+            throw error;
+          }
+
           set({ requests: data || [] });
         } catch (error) {
           console.error('Error fetching requests', error);
@@ -454,6 +520,68 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
                 ? error.message
                 : 'Failed to fetch requests',
           });
+        }
+      },
+
+      fetchDonationById: async (id: string) => {
+        try {
+          const currentUser = get().currentUser;
+
+          // Check if user is authenticated
+          if (!currentUser) {
+            console.log('No authenticated user, cannot fetch donation');
+            return { data: null, error: 'Not authenticated' };
+          }
+
+          const { data, error } = await supabase
+            .from('donations')
+            .select(
+              `
+              *,
+              food_item:food_items(*),
+              donor:profiles!donations_donor_id_fkey(*)
+            `
+            )
+            .eq('id', id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching donation by ID:', error);
+            return { data: null, error: error.message };
+          }
+
+          if (!data) {
+            return { data: null, error: 'Donation not found' };
+          }
+
+          // Check if user has permission to view this donation
+          const canView =
+            currentUser.role === 'city' ||
+            currentUser.role === 'terminals' ||
+            data.donor_id === currentUser.id ||
+            (currentUser.role === 'food_receiver' &&
+              data.status === 'available');
+
+          if (!canView) {
+            return { data: null, error: 'Access denied' };
+          }
+
+          const donation = {
+            ...data,
+            food_item: data.food_item || null,
+            donor: data.donor || null,
+          };
+
+          return { data: donation, error: null };
+        } catch (error) {
+          console.error('Error fetching donation by ID:', error);
+          return {
+            data: null,
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch donation',
+          };
         }
       },
 
@@ -574,9 +702,15 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
       // ===== FOOD ITEM METHODS =====
       addFoodItem: async (foodItem) => {
         try {
+          // Ensure image_urls is properly formatted as JSON array if provided
+          const processedFoodItem = {
+            ...foodItem,
+            image_urls: foodItem.image_urls || [],
+          };
+
           const { data, error } = await supabase
             .from('food_items')
-            .insert(foodItem)
+            .insert(processedFoodItem)
             .select()
             .single();
 
@@ -600,9 +734,19 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       updateFoodItem: async (id: string, updates) => {
         try {
+          // Ensure image_urls is properly formatted if provided
+          const processedUpdates = {
+            ...updates,
+          };
+
+          // If image_urls is provided, ensure it's formatted correctly
+          if (updates.image_urls !== undefined) {
+            processedUpdates.image_urls = updates.image_urls || [];
+          }
+
           const { data, error } = await supabase
             .from('food_items')
-            .update(updates)
+            .update(processedUpdates)
             .eq('id', id)
             .select()
             .single();
@@ -774,41 +918,46 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             )
             .subscribe();
 
-          // OPTIMIZED: Similar pattern for requests
-          const requestsChannel = supabase
-            .channel('requests_realtime')
-            .on(
-              'postgres_changes',
-              { event: '*', schema: 'public', table: 'requests' },
-              (payload) => {
-                console.log(
-                  'Requests changed:',
-                  payload.eventType,
-                  (payload.new as any)?.id
-                );
+          // Only set up requests subscription if user is not a food_donor
+          const currentUser = get().currentUser;
+          if (currentUser?.role !== 'food_donor') {
+            const requestsChannel = supabase
+              .channel('requests_realtime')
+              .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'requests' },
+                (payload) => {
+                  console.log(
+                    'Requests changed:',
+                    payload.eventType,
+                    (payload.new as any)?.id
+                  );
 
-                const currentUser = get().currentUser;
-                if (!currentUser) return;
+                  const currentUser = get().currentUser;
+                  if (!currentUser) return;
 
-                const newRecord = payload.new as any;
-                const oldRecord = payload.old as any;
+                  const newRecord = payload.new as any;
+                  const oldRecord = payload.old as any;
 
-                const relevantChange =
-                  newRecord?.user_id === currentUser.id ||
-                  oldRecord?.user_id === currentUser.id ||
-                  payload.eventType === 'DELETE';
+                  const relevantChange =
+                    newRecord?.user_id === currentUser.id ||
+                    oldRecord?.user_id === currentUser.id ||
+                    payload.eventType === 'DELETE';
 
-                if (relevantChange) {
-                  clearTimeout((window as any)._requestRefetchTimeout);
-                  (window as any)._requestRefetchTimeout = setTimeout(() => {
-                    get().fetchRequests();
-                  }, 100);
+                  if (relevantChange) {
+                    clearTimeout((window as any)._requestRefetchTimeout);
+                    (window as any)._requestRefetchTimeout = setTimeout(() => {
+                      get().fetchRequests();
+                    }, 100);
+                  }
                 }
-              }
-            )
-            .subscribe();
+              )
+              .subscribe();
 
-          subscriptions.push(donationsChannel, requestsChannel);
+            subscriptions.push(requestsChannel);
+          }
+
+          subscriptions.push(donationsChannel);
           set({ subscriptions });
           console.log('Optimized real-time subscriptions set up successfully');
         } catch (error) {
