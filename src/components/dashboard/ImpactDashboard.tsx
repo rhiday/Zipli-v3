@@ -4,20 +4,30 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Info, ChevronDown } from 'lucide-react';
 import ExportCard from './ExportCard';
 import { useTranslations } from '@/hooks/useTranslations';
+import {
+  formatWeight,
+  formatCurrency,
+  formatPercentage,
+  calculateRecipientsData,
+} from '@/lib/dashboard-utils';
 
 interface ImpactDashboardProps {
   totalWeight?: number;
   portionsOffered?: number;
   savedCosts?: number;
   emissionReduction?: number;
+  userDonations?: any[];
+  allRequests?: any[];
 }
 
 const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
   ({
-    totalWeight = 46,
-    portionsOffered = 131,
-    savedCosts = 125,
-    emissionReduction = 89,
+    totalWeight = 0,
+    portionsOffered = 0,
+    savedCosts = 0,
+    emissionReduction = 0,
+    userDonations = [],
+    allRequests = [],
   }) => {
     const [selectedMonth, setSelectedMonth] = useState('February');
 
@@ -35,12 +45,12 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
           bgColor: 'bg-lime/20',
         },
         {
-          value: `${savedCosts}€`,
+          value: formatCurrency(savedCosts),
           label: 'Saved in food disposal costs',
           bgColor: 'bg-lime/20',
         },
         {
-          value: `${emissionReduction}%`,
+          value: formatPercentage(emissionReduction),
           label: 'Emission reduction',
           bgColor: 'bg-lime/20',
         },
@@ -48,29 +58,10 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
       [portionsOffered, savedCosts, emissionReduction]
     );
 
-    // Memoized recipients data
+    // Memoized recipients data from actual donations
     const recipientsData = useMemo(
-      () => [
-        {
-          id: 1,
-          name: 'Red cross',
-          info: '500g · Beef stew',
-          avatar: { type: 'icon', color: 'rose', icon: '+' },
-        },
-        {
-          id: 2,
-          name: 'Stadin Safka',
-          info: '500g · Beef stew',
-          avatar: { type: 'placeholder', color: 'gray' },
-        },
-        {
-          id: 3,
-          name: 'Recipient name',
-          info: '500g · Beef stew',
-          avatar: { type: 'placeholder', color: 'gray' },
-        },
-      ],
-      []
+      () => calculateRecipientsData(userDonations, allRequests),
+      [userDonations, allRequests]
     );
 
     return (
@@ -91,7 +82,7 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
         {/* Main impact stat */}
         <div className="mb-6">
           <h3 className="text-primary text-displaySm font-semibold mb-1">
-            {totalWeight}kg
+            {formatWeight(totalWeight)}
           </h3>
           <p className="text-secondary text-bodyLg">Total food offered</p>
         </div>

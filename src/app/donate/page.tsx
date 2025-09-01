@@ -30,6 +30,11 @@ import {
 import { useDonationStore } from '@/store/donation';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import { ActionButton } from '@/components/ui/action-button';
+import {
+  calculateDonorMetrics,
+  formatWeight,
+  formatCurrency,
+} from '@/lib/dashboard-utils';
 
 type ProfileRow = {
   id: string;
@@ -112,6 +117,11 @@ function DonorDashboardPage(): React.ReactElement {
     setDashboardData((prev) => ({ ...prev, donations: userDonations }));
   }, [allDonations, foodItems, currentUser, isInitialized]);
 
+  // Calculate dynamic metrics from user donations
+  const metrics = React.useMemo(() => {
+    return calculateDonorMetrics(dashboardData.donations);
+  }, [dashboardData.donations]);
+
   // Memoized PDF generation function
   const handleExportPDF = useCallback(async () => {
     const jsPDF = await loadJsPDF();
@@ -119,12 +129,21 @@ function DonorDashboardPage(): React.ReactElement {
     doc.setFontSize(16);
     doc.text('Zipli Donation Summary', 10, 10);
     doc.setFontSize(12);
-    doc.text(`Total food offered: 46kg`, 10, 20);
-    doc.text(`Portions offered: 131`, 10, 30);
-    doc.text(`Saved in food disposal costs: 125€`, 10, 40);
-    doc.text(`Emission reduction: 89%`, 10, 50);
+    doc.text(
+      `Total food offered: ${formatWeight(metrics.totalWeight)}`,
+      10,
+      20
+    );
+    doc.text(`Portions offered: ${metrics.portionsOffered}`, 10, 30);
+    doc.text(
+      `Saved in food disposal costs: ${formatCurrency(metrics.savedCosts)}`,
+      10,
+      40
+    );
+    doc.text(`CO2 avoided: ${metrics.co2Avoided}kg`, 10, 50);
+    doc.text(`Success rate: ${metrics.successRate}%`, 10, 60);
     doc.save('zipli-summary.pdf');
-  }, []);
+  }, [metrics]);
 
   if (loading) {
     return (
@@ -192,7 +211,7 @@ function DonorDashboardPage(): React.ReactElement {
               </div>
               <div>
                 <span className="text-2xl font-semibold text-green-800">
-                  46kg
+                  {formatWeight(metrics.totalWeight)}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
                   {t('totalFoodDonated')}
@@ -207,7 +226,7 @@ function DonorDashboardPage(): React.ReactElement {
               </div>
               <div>
                 <span className="text-2xl font-semibold text-green-800">
-                  131
+                  {metrics.portionsOffered}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
                   {t('portionsOffered')}
@@ -222,7 +241,7 @@ function DonorDashboardPage(): React.ReactElement {
               </div>
               <div>
                 <span className="text-2xl font-semibold text-green-800">
-                  125€
+                  {formatCurrency(metrics.savedCosts)}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
                   {t('costSavings')}
@@ -237,7 +256,7 @@ function DonorDashboardPage(): React.ReactElement {
               </div>
               <div>
                 <span className="text-2xl font-semibold text-green-800">
-                  10t
+                  {formatWeight(metrics.co2Avoided / 1000)}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
                   {t('co2Avoided')}

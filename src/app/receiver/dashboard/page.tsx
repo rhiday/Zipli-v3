@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/Skeleton';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import { ActionButton } from '@/components/ui/action-button';
+import { calculateReceiverMetrics, formatWeight } from '@/lib/dashboard-utils';
 
 type ProfileRow = {
   id: string;
@@ -80,6 +81,11 @@ export default function ReceiverDashboardPage(): React.ReactElement {
     setLoading(false);
   }, [isInitialized, currentUser, router]);
 
+  // Calculate dynamic stats from requests
+  const stats = React.useMemo(() => {
+    return calculateReceiverMetrics(dashboardData.requests);
+  }, [dashboardData.requests]);
+
   // Memoized PDF generation function
   const handleExportPDF = useCallback(async () => {
     const jsPDF = await loadJsPDF();
@@ -87,37 +93,17 @@ export default function ReceiverDashboardPage(): React.ReactElement {
     doc.setFontSize(16);
     doc.text('Zipli Request Summary', 10, 10);
     doc.setFontSize(12);
-    doc.text(`Total food requested: 85kg`, 10, 20);
-    doc.text(`People served: 250`, 10, 30);
     doc.text(
-      `Active requests: ${dashboardData.requests.filter((r) => r.status === 'active').length}`,
+      `Total food requested: ${formatWeight(stats.estimatedKg)}`,
       10,
-      40
+      20
     );
-    doc.text(
-      `Fulfilled requests: ${dashboardData.requests.filter((r) => r.status === 'fulfilled').length}`,
-      10,
-      50
-    );
+    doc.text(`People served: ${stats.totalPeople}`, 10, 30);
+    doc.text(`Active requests: ${stats.activeRequests}`, 10, 40);
+    doc.text(`Fulfilled requests: ${stats.fulfilledRequests}`, 10, 50);
+    doc.text(`Fulfillment rate: ${stats.fulfillmentRate}%`, 10, 60);
     doc.save('zipli-receiver-summary.pdf');
-  }, [dashboardData.requests]);
-
-  // Calculate stats from requests
-  const stats = React.useMemo(() => {
-    const totalPeople = dashboardData.requests.reduce(
-      (sum, req) => sum + req.people_count,
-      0
-    );
-    const activeRequests = dashboardData.requests.filter(
-      (r) => r.status === 'active'
-    ).length;
-    const fulfilledRequests = dashboardData.requests.filter(
-      (r) => r.status === 'fulfilled'
-    ).length;
-    const estimatedKg = Math.round(totalPeople * 0.5); // Rough estimate: 0.5kg per person
-
-    return { totalPeople, activeRequests, fulfilledRequests, estimatedKg };
-  }, [dashboardData.requests]);
+  }, [stats]);
 
   if (loading) {
     return (
@@ -199,7 +185,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
               </div>
               <div>
                 <span className="text-2xl font-semibold text-green-800">
-                  {stats.estimatedKg}kg
+                  {formatWeight(stats.estimatedKg)}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
                   {t('foodRequestedDesc')}
