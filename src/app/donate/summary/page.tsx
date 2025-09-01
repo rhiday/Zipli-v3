@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store';
-import { useCommonTranslation } from '@/hooks/useTranslations';
+import { useLanguage } from '@/hooks/useLanguage';
 import { SummaryCard } from '@/components/ui/SummaryCard';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -17,7 +17,7 @@ import { Checkbox } from '@/components/ui/Checkbox';
 
 export default function DonationSummaryPage() {
   const router = useRouter();
-  const { t } = useCommonTranslation();
+  const { t } = useLanguage();
 
   // Get data from donation store
   const pickupSlots = useDonationStore((state) => state.pickupSlots);
@@ -117,8 +117,12 @@ export default function DonationSummaryPage() {
     console.log('🏠 Address:', address.trim());
     console.log('✏️ Edit mode:', isEditMode, 'ID:', editingDonationId);
 
-    if (!address.trim() || !currentUser) {
-      console.error('Validation failed: missing address');
+    if (!address.trim() || !currentUser || pickupSlots.length === 0) {
+      console.error('Validation failed:', {
+        address: !address.trim() ? 'missing' : 'ok',
+        user: !currentUser ? 'missing' : 'ok',
+        pickupSlots: pickupSlots.length === 0 ? 'missing' : 'ok',
+      });
       return;
     }
 
@@ -273,11 +277,14 @@ export default function DonationSummaryPage() {
         }
       }
 
-      // Clear the donation store after confirming
-      const clearDonation = useDonationStore.getState().clearDonation;
-      clearDonation();
-
+      // Navigate first, then clear store to prevent flash
       router.push('/donate/thank-you');
+
+      // Clear the donation store after navigation
+      setTimeout(() => {
+        const clearDonation = useDonationStore.getState().clearDonation;
+        clearDonation();
+      }, 100);
     } catch (error) {
       console.error(`Error ${action} donations:`, error);
       // Show error message to user
@@ -287,8 +294,8 @@ export default function DonationSummaryPage() {
     }
   };
 
-  // Show loading if no donation data
-  if (donationItems.length === 0) {
+  // Show loading if no donation data (but not while saving)
+  if (donationItems.length === 0 && !isSaving) {
     return (
       <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">{t('noDonationItemsFound')}</p>
@@ -318,9 +325,15 @@ export default function DonationSummaryPage() {
           <div className="flex justify-end">
             <Button
               onClick={handleConfirmDonation}
-              disabled={!address.trim() || isSaving}
+              disabled={!address.trim() || pickupSlots.length === 0 || isSaving}
             >
-              {isSaving ? t('continuing') : t('continue')}
+              {isSaving
+                ? t('continuing')
+                : !address.trim()
+                  ? 'Add Address'
+                  : pickupSlots.length === 0
+                    ? 'Add Pickup Slot'
+                    : t('continue')}
             </Button>
           </div>
         </BottomActionBar>
@@ -378,34 +391,69 @@ export default function DonationSummaryPage() {
             </div>
           ))
         ) : (
-          // One-time pickup slot or old format
-          <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
-            <span className="font-semibold text-interactive">
-              {pickupSlots.length > 0 && pickupSlots[0].date
-                ? `${formatSlotDate(pickupSlots[0].date)}, ${pickupSlots[0].startTime} - ${pickupSlots[0].endTime}`
-                : t('dateNotSet')}
-            </span>
-            <button
-              onClick={() => router.push('/donate/pickup-slot')}
-              className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-              title="Edit pickup time"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
-                  fill="#024209"
-                />
-              </svg>
-            </button>
-          </div>
+          // Multiple pickup slots
+          <>
+            {pickupSlots.length > 0 ? (
+              pickupSlots.map((slot, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
+                >
+                  <span className="font-semibold text-interactive">
+                    {slot.date
+                      ? `${formatSlotDate(slot.date)}, ${slot.startTime} - ${slot.endTime}`
+                      : t('dateNotSet')}
+                  </span>
+                  <button
+                    onClick={() => router.push('/donate/pickup-slot')}
+                    className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+                    title="Edit pickup time"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                        fill="#024209"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
+                <span className="font-semibold text-interactive">
+                  {t('dateNotSet')}
+                </span>
+                <button
+                  onClick={() => router.push('/donate/pickup-slot')}
+                  className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+                  title="Edit pickup time"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165ZM10.9378 6.38324L13.1622 8.60762L14.6298 7.14L12.4054 4.91562L10.9378 6.38324ZM12.3595 9.41034L10.1351 7.18592L3.13513 14.1859V16.4103H5.35949L12.3595 9.41034Z"
+                      fill="#024209"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
