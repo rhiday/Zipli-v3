@@ -85,11 +85,15 @@ export const fi = {
   // Forms
   required: 'Pakollinen',
   optional: 'Valinnainen',
+  addPhoto: 'Lisää kuva',
   fieldRequired: 'Tämä kenttä on pakollinen',
 
   // Errors
   error: 'Virhe',
   somethingWentWrong: 'Jotakin meni vikaan',
+  imageUploadError: 'Kuvan koko on liian suuri. Valitse kuva alle 5MB.',
+  maxImagesError: 'Voit ladata enintään {maxImages} kuvaa.',
+  invalidFileTypeError: 'Valitse vain JPEG, PNG tai WebP kuvatiedostoja.',
 
   // Dashboard specific (adapted from Ninja's impact updates)
   yourImpact:
@@ -222,6 +226,7 @@ export const fi = {
   allergiesIntolerancesDiets: 'Allergiat, intoleranssit ja ruokarajoitteet',
   submitRequest: 'Lähetä pyyntö',
   continuing: 'Lähetetään...',
+  addAddress: 'Lisää osoite',
   backToDashboard: 'Takaisin kotinäkymään',
   peopleCount: 'Henkilömäärä',
   enterNumberOfPeople: 'Syötä määrä',
@@ -355,6 +360,10 @@ export const fi = {
   addAnotherItem: 'Lisää toinen tuote',
   goBackToDashboard: 'Takaisin kotinäkymään',
   photosHelpIdentify: 'Kuvat auttavat tunnistamaan ruokalahjoituksesi',
+  addPhotos: 'Lisää kuvia',
+  addMore: 'Lisää lisää',
+  uploading: 'Ladataan...',
+  maxSizeMb: 'Max 5MB kappale',
   enterDescription: 'Syötä kuvaus',
   savingEllipsis: 'Tallennetaan...',
   addItem: 'Lisää tuote',

@@ -7,6 +7,15 @@ interface MultiplePhotoUploadProps {
   onImagesUpload?: (imageUrls: string[]) => void;
   uploadedImages?: string[];
   maxImages?: number;
+  translations?: {
+    addPhotos?: string;
+    addMore?: string;
+    uploading?: string;
+    maxSizeMb?: string;
+    imageUploadError?: string;
+    maxImagesError?: string;
+    invalidFileTypeError?: string;
+  };
 }
 
 export const MultiplePhotoUpload: React.FC<MultiplePhotoUploadProps> = ({
@@ -15,10 +24,28 @@ export const MultiplePhotoUpload: React.FC<MultiplePhotoUploadProps> = ({
   onImagesUpload,
   uploadedImages = [],
   maxImages = 5,
+  translations = {},
 }) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Default translations (English fallbacks)
+  const t = {
+    addPhotos: translations.addPhotos || 'Add photos',
+    addMore: translations.addMore || 'Add more',
+    uploading: translations.uploading || 'Uploading...',
+    maxSizeMb: translations.maxSizeMb || 'Max 5MB each',
+    imageUploadError:
+      translations.imageUploadError ||
+      'Image size too big. Please select an image under 5MB.',
+    maxImagesError:
+      translations.maxImagesError ||
+      `You can only upload up to ${maxImages} images.`,
+    invalidFileTypeError:
+      translations.invalidFileTypeError ||
+      'Please select JPEG, PNG, or WebP image files only.',
+  };
 
   const compressImage = (
     file: File,
@@ -63,7 +90,12 @@ export const MultiplePhotoUpload: React.FC<MultiplePhotoUploadProps> = ({
     setUploading(true);
 
     if (uploadedImages.length + files.length > maxImages) {
-      setError(`You can only upload up to ${maxImages} images.`);
+      setError(
+        translations.maxImagesError?.replace(
+          '{maxImages}',
+          maxImages.toString()
+        ) || t.maxImagesError
+      );
       setUploading(false);
       return;
     }
@@ -72,7 +104,7 @@ export const MultiplePhotoUpload: React.FC<MultiplePhotoUploadProps> = ({
 
     for (const file of Array.from(files)) {
       if (file.size > maxSizeInBytes) {
-        setError('Image size too big. Please select an image under 5MB.');
+        setError(t.imageUploadError);
         setUploading(false);
         return;
       }
@@ -98,7 +130,7 @@ export const MultiplePhotoUpload: React.FC<MultiplePhotoUploadProps> = ({
           newImageUrls.push(result);
         }
       } else {
-        setError('Please select JPEG, PNG, or WebP image files only.');
+        setError(t.invalidFileTypeError);
         setUploading(false);
         return;
       }
@@ -168,10 +200,10 @@ export const MultiplePhotoUpload: React.FC<MultiplePhotoUploadProps> = ({
                 className={`text-xs mt-2 text-center px-2 ${uploading ? 'text-gray-400' : 'text-gray-600'}`}
               >
                 {uploading
-                  ? 'Uploading...'
+                  ? t.uploading
                   : uploadedImages.length === 0
-                    ? 'Add photos'
-                    : 'Add more'}
+                    ? t.addPhotos
+                    : t.addMore}
               </p>
             </button>
 
@@ -192,7 +224,7 @@ export const MultiplePhotoUpload: React.FC<MultiplePhotoUploadProps> = ({
 
       {/* Upload Info */}
       <p className="text-xs text-gray-500 text-center mt-3">
-        {uploadedImages.length}/{maxImages} photos • Max 5MB each
+        {uploadedImages.length}/{maxImages} photos • {t.maxSizeMb}
       </p>
     </div>
   );

@@ -256,7 +256,7 @@ function DonorDashboardPage(): React.ReactElement {
               </div>
               <div>
                 <span className="text-2xl font-semibold text-green-800">
-                  {formatWeight(metrics.co2Avoided / 1000)}
+                  {Math.round(metrics.co2Avoided / 1000)}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
                   {t('co2Avoided')}
