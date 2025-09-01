@@ -9,7 +9,7 @@ export interface Donation {
     created_at: string;
     category: string;
   };
-  status: 'available' | 'requested' | 'picked_up' | 'expired';
+  status: 'available' | 'claimed' | 'picked_up' | 'cancelled';
   created_at: string;
   picked_up_at?: string;
   donor_id: string;
@@ -57,7 +57,7 @@ export const impactCalculator = {
       0
     );
 
-    const pickedUp = donations.filter((d) => d.status === 'picked_up');
+    const pickedUp = donations.filter((d) => d.status === 'claimed');
     const successRate = donations.length
       ? Math.round((pickedUp.length / donations.length) * 100)
       : 0;

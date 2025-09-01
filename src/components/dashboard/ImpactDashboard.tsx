@@ -123,11 +123,12 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
                       : 'bg-gray-200 flex items-center justify-center'
                   } overflow-hidden`}
                 >
-                  {recipient.avatar.type === 'icon' && (
-                    <span className="text-rose-600 text-2xl font-bold">
-                      {recipient.avatar.icon}
-                    </span>
-                  )}
+                  {recipient.avatar.type === 'icon' &&
+                    'icon' in recipient.avatar && (
+                      <span className="text-rose-600 text-2xl font-bold">
+                        {recipient.avatar.icon}
+                      </span>
+                    )}
                 </div>
                 <div>
                   <h3 className="text-primary text-titleXs font-semibold">

@@ -45,7 +45,26 @@ const CO2_PER_KG = 2.5;
 export function calculateDonorMetrics(
   donations: DonationWithFoodItem[]
 ): DashboardMetrics {
-  const metrics = impactCalculator.calculateImpact(donations);
+  // Transform donations to match impact calculator interface
+  const transformedDonations = donations.map((d) => ({
+    ...d,
+    status: d.status as 'available' | 'claimed' | 'picked_up' | 'cancelled',
+    food_item: d.food_item
+      ? {
+          name: d.food_item.food_type || 'Unknown',
+          weight_kg: d.food_item.quantity || 0, // Use quantity as weight_kg
+          created_at: d.food_item.created_at,
+          category: d.food_item.category || 'general',
+        }
+      : {
+          name: 'Unknown',
+          weight_kg: 0,
+          created_at: d.created_at,
+          category: 'general',
+        },
+  }));
+
+  const metrics = impactCalculator.calculateImpact(transformedDonations);
 
   return {
     totalWeight: metrics.totalWeight,
@@ -99,7 +118,7 @@ export function calculateCityMetrics(
   profiles: any[] = []
 ): CityMetrics {
   const totalWeight = allDonations.reduce(
-    (sum, d) => sum + (d.food_item?.weight_kg || 0),
+    (sum, d) => sum + (d.food_item?.quantity || 0),
     0
   );
   const totalPeople = allRequests.reduce(
@@ -113,9 +132,7 @@ export function calculateCityMetrics(
 
   // Calculate environmental impact
   const co2Savings = Math.round(totalWeight * CO2_PER_KG);
-  const pickedUp = allDonations.filter(
-    (d) => d.status === 'picked_up' || d.status === 'completed'
-  );
+  const pickedUp = allDonations.filter((d) => d.status === 'claimed');
   const wasteReduction =
     allDonations.length > 0
       ? Math.round((pickedUp.length / allDonations.length) * 100)
@@ -140,10 +157,10 @@ export function calculateRecipientsData(
   userDonations: DonationWithFoodItem[],
   allRequests: any[] = []
 ) {
-  // Get unique recipients who picked up this user's donations
+  // Get unique recipients who claimed this user's donations
   const recipientIds = new Set(
     userDonations
-      .filter((d) => d.status === 'picked_up' || d.status === 'completed')
+      .filter((d) => d.status === 'claimed')
       .map((d) => d.receiver_id)
       .filter(Boolean)
   );
@@ -153,7 +170,7 @@ export function calculateRecipientsData(
     const userRequests = allRequests.filter((r) => r.user_id === receiverId);
     const totalWeight = userDonations
       .filter((d) => d.receiver_id === receiverId)
-      .reduce((sum, d) => sum + (d.food_item?.weight_kg || 0), 0);
+      .reduce((sum, d) => sum + (d.food_item?.quantity || 0), 0);
 
     return {
       id: receiverId,
@@ -169,13 +186,13 @@ export function calculateRecipientsData(
       {
         id: 1,
         name: 'Red Cross',
-        info: 'No pickups yet',
+        info: 'No claims yet',
         avatar: { type: 'icon', color: 'rose', icon: '+' },
       },
       {
         id: 2,
         name: 'Local Food Bank',
-        info: 'No pickups yet',
+        info: 'No claims yet',
         avatar: { type: 'placeholder', color: 'gray' },
       },
     ];
