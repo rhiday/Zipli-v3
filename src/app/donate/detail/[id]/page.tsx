@@ -393,7 +393,7 @@ export default function DonationDetailPage() {
           <DialogHeader>
             <DialogTitle>{t('confirmClaim')}</DialogTitle>
             <DialogDescription>
-              Please confirm that this donation has been claimed and received.
+              {t('confirmClaimDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -409,10 +409,7 @@ export default function DonationDetailPage() {
                 htmlFor="confirm-claim-clause"
                 className="text-sm text-gray-700 leading-relaxed"
               >
-                I confirm that this donation has been claimed and received in
-                good condition. I understand that by confirming this claim, I
-                acknowledge that the donation will be marked as claimed and
-                removed from public listings.
+                {t('confirmClaimClause')}
               </label>
             </div>
           </div>

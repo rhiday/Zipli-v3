@@ -426,6 +426,14 @@ export const en = {
   removing: 'Removing...',
   removeListingDescription:
     'This will permanently remove the listing from public view. This action cannot be undone.',
+  confirmClaimDescription:
+    'Please confirm that this donation has been claimed and received.',
+  confirmClaimClause:
+    'I confirm that this donation has been claimed and received in good condition. I understand that by confirming this claim, I acknowledge that the donation will be marked as claimed and removed from public listings.',
+  confirmDeliveryDescription:
+    'Please confirm that the food has been successfully delivered and received.',
+  confirmDeliveryClause:
+    'I confirm that the food has been delivered and received in good condition. I understand that by confirming this delivery, I acknowledge that the transaction is complete and the request will be marked as fulfilled.',
   editRequestPeriod: 'Edit request period',
   editSchedule: 'Edit schedule',
   editDeliveryTime: 'Edit delivery time',

@@ -451,10 +451,9 @@ export default function RequestDetailPage(): React.ReactElement {
       <Dialog open={showConfirmDelivery} onOpenChange={setShowConfirmDelivery}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Delivery</DialogTitle>
+            <DialogTitle>{t('confirmDelivery')}</DialogTitle>
             <DialogDescription>
-              Please confirm that the food has been successfully delivered and
-              received.
+              {t('confirmDeliveryDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -470,10 +469,7 @@ export default function RequestDetailPage(): React.ReactElement {
                 htmlFor="confirm-clause"
                 className="text-sm text-gray-700 leading-relaxed"
               >
-                I confirm that the food has been delivered and received in good
-                condition. I understand that by confirming this delivery, I
-                acknowledge that the transaction is complete and the request
-                will be marked as fulfilled.
+                {t('confirmDeliveryClause')}
               </label>
             </div>
           </div>
@@ -495,7 +491,7 @@ export default function RequestDetailPage(): React.ReactElement {
               {actionLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
-                'Confirm Delivery'
+                t('confirmDelivery')
               )}
             </Button>
           </DialogFooter>
