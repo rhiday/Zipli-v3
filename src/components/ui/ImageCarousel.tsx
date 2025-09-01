@@ -231,7 +231,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
       {/* Dots Indicator */}
       {showDots && validImages.length > 1 && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30">
           <div className="flex space-x-2">
             {validImages.map((_, index) => (
               <button
@@ -252,7 +252,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
       {/* Image Counter */}
       {validImages.length > 1 && (
-        <div className="absolute top-3 right-3 z-10 bg-black/40 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+        <div className="absolute top-3 right-3 z-30 bg-black/40 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
           {currentIndex + 1}/{validImages.length}
         </div>
       )}
