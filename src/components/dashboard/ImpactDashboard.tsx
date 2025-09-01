@@ -4,20 +4,30 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Info, ChevronDown } from 'lucide-react';
 import ExportCard from './ExportCard';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import {
+  formatWeight,
+  formatCurrency,
+  formatPercentage,
+  calculateRecipientsData,
+} from '@/lib/dashboard-utils';
 
 interface ImpactDashboardProps {
   totalWeight?: number;
   portionsOffered?: number;
   savedCosts?: number;
   emissionReduction?: number;
+  userDonations?: any[];
+  allRequests?: any[];
 }
 
 const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
   ({
-    totalWeight = 46,
-    portionsOffered = 131,
-    savedCosts = 125,
-    emissionReduction = 10,
+    totalWeight = 0,
+    portionsOffered = 0,
+    savedCosts = 0,
+    emissionReduction = 0,
+    userDonations = [],
+    allRequests = [],
   }) => {
     const { t } = useCommonTranslation();
     const [selectedMonth, setSelectedMonth] = useState('February');
@@ -36,12 +46,12 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
           bgColor: 'bg-lime/20',
         },
         {
-          value: `${savedCosts}€`,
+          value: formatCurrency(savedCosts),
           label: t('savedInFoodDisposalCosts'),
           bgColor: 'bg-lime/20',
         },
         {
-          value: `${emissionReduction}t`,
+          value: formatPercentage(emissionReduction),
           label: t('co2Avoided'),
           bgColor: 'bg-lime/20',
         },
@@ -49,29 +59,10 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
       [portionsOffered, savedCosts, emissionReduction, t]
     );
 
-    // Memoized recipients data
+    // Memoized recipients data from actual donations
     const recipientsData = useMemo(
-      () => [
-        {
-          id: 1,
-          name: 'Red cross',
-          info: '500g · Beef stew',
-          avatar: { type: 'icon', color: 'rose', icon: '+' },
-        },
-        {
-          id: 2,
-          name: 'Stadin Safka',
-          info: '500g · Beef stew',
-          avatar: { type: 'placeholder', color: 'gray' },
-        },
-        {
-          id: 3,
-          name: 'Recipient name',
-          info: '500g · Beef stew',
-          avatar: { type: 'placeholder', color: 'gray' },
-        },
-      ],
-      []
+      () => calculateRecipientsData(userDonations, allRequests),
+      [userDonations, allRequests]
     );
 
     return (
@@ -89,65 +80,29 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
           </button>
         </div>
 
-        {/* Stats grid - 4 boxes in 2x2 layout */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {/* Box 1: Weight */}
-          <div className="bg-lime/20 rounded-xl p-4">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-primary text-titleMd font-semibold">
-                {totalWeight}kg
-              </span>
-              <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-                <Info size={16} />
-              </button>
-            </div>
-            <p className="text-secondary text-caption">
-              {t('totalFoodOffered')}
-            </p>
-          </div>
+        {/* Main impact stat */}
+        <div className="mb-6">
+          <h3 className="text-primary text-displaySm font-semibold mb-1">
+            {formatWeight(totalWeight)}
+          </h3>
+          <p className="text-secondary text-bodyLg">{t('totalFoodOffered')}</p>
+        </div>
 
-          {/* Box 2: Portions */}
-          <div className="bg-lime/20 rounded-xl p-4">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-primary text-titleMd font-semibold">
-                {portionsOffered}
-              </span>
-              <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-                <Info size={16} />
-              </button>
+        {/* Stats grid */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {statsData.map((stat, index) => (
+            <div key={index} className={`${stat.bgColor} rounded-xl p-4`}>
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-primary text-titleMd font-semibold">
+                  {stat.value}
+                </span>
+                <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
+                  <Info size={16} />
+                </button>
+              </div>
+              <p className="text-secondary text-caption">{stat.label}</p>
             </div>
-            <p className="text-secondary text-caption">
-              {t('portionsOffered')}
-            </p>
-          </div>
-
-          {/* Box 3: Cost Savings */}
-          <div className="bg-lime/20 rounded-xl p-4">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-primary text-titleMd font-semibold">
-                {savedCosts}€
-              </span>
-              <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-                <Info size={16} />
-              </button>
-            </div>
-            <p className="text-secondary text-caption">
-              {t('savedInFoodDisposalCosts')}
-            </p>
-          </div>
-
-          {/* Box 4: CO2 */}
-          <div className="bg-lime/20 rounded-xl p-4">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-primary text-titleMd font-semibold">
-                {emissionReduction}t
-              </span>
-              <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-                <Info size={16} />
-              </button>
-            </div>
-            <p className="text-secondary text-caption">{t('co2Avoided')}</p>
-          </div>
+          ))}
         </div>
 
         {/* Export card */}
@@ -169,11 +124,12 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
                       : 'bg-gray-200 flex items-center justify-center'
                   } overflow-hidden`}
                 >
-                  {recipient.avatar.type === 'icon' && (
-                    <span className="text-rose-600 text-2xl font-bold">
-                      {recipient.avatar.icon}
-                    </span>
-                  )}
+                  {recipient.avatar.type === 'icon' &&
+                    'icon' in recipient.avatar && (
+                      <span className="text-rose-600 text-2xl font-bold">
+                        {recipient.avatar.icon}
+                      </span>
+                    )}
                 </div>
                 <div>
                   <h3 className="text-primary text-titleXs font-semibold">
