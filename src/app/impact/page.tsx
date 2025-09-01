@@ -101,9 +101,9 @@ function ImpactPage(): React.ReactElement {
           },
           status: d.status as
             | 'available'
-            | 'requested'
+            | 'claimed'
             | 'picked_up'
-            | 'expired',
+            | 'cancelled',
           created_at: d.created_at,
           picked_up_at: d.pickup_time || undefined,
           donor_id: d.donor_id,

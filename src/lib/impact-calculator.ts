@@ -189,7 +189,7 @@ export const generateRealisticMockData = (count: number): Donation[] => {
         created_at: createdAt,
         category: categories[Math.floor(Math.random() * categories.length)],
       },
-      status: pickedUpDaysLater ? 'picked_up' : 'available',
+      status: pickedUpDaysLater ? 'claimed' : 'available',
       created_at: createdAt,
       picked_up_at: pickedUpDaysLater
         ? new Date(

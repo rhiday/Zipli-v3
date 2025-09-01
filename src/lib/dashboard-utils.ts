@@ -47,7 +47,10 @@ export function calculateDonorMetrics(
 ): DashboardMetrics {
   // Transform donations to match impact calculator interface
   const transformedDonations = donations.map((d) => ({
-    ...d,
+    id: d.id,
+    donor_id: d.donor_id,
+    created_at: d.created_at,
+    picked_up_at: d.claimed_at || undefined,
     status: d.status as 'available' | 'claimed' | 'picked_up' | 'cancelled',
     food_item: d.food_item
       ? {
