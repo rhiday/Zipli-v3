@@ -431,7 +431,6 @@ export const en = {
   saveAddressToProfile: 'Save this address to my profile',
   saveInstructionsToProfile: 'Save these instructions to my profile',
   editPickupTime: 'Edit pickup time',
-  addPickupSlot: 'Add Pickup Slot',
   confirmPickup: 'Confirm pickup',
   rememberToMarkPickedUp:
     'Remember to mark food as picked up by clicking the donation name in the green window on the front page',

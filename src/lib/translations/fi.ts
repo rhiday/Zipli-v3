@@ -477,7 +477,6 @@ export const fi = {
   saveAddressToProfile: 'Tallenna muutokset profiiliin',
   saveInstructionsToProfile: 'Tallenna muutokset profiiliin',
   editPickupTime: 'Muokkaa noutoaikaa',
-  addPickupSlot: 'Lisää noutoajankohta',
   confirmPickup: 'Kuittaa nouto',
   rememberToMarkPickedUp:
     'Muista kuitata ruoka noudetuksi klikkaamalla lahjoituksen nimeä etusivun vihreässä ikkunassa',
