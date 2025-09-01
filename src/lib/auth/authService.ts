@@ -166,7 +166,14 @@ class AuthService {
         return null;
       }
 
-      return await this.getProfile(user.id);
+      // Only fetch needed fields in auth service
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, organization_name, role') // Only essential fields
+        .eq('id', user.id)
+        .single();
+
+      return profileData as Profile | null;
     } catch (error) {
       console.error('Error getting current user', error);
       return null;
@@ -204,19 +211,47 @@ class AuthService {
     updates: ProfileUpdate
   ): Promise<{ data: Profile | null; error: string | null }> {
     try {
+      // Validate required fields
+      if (!userId) {
+        return { data: null, error: 'User ID is required' };
+      }
+
+      // Remove undefined values from updates
+      const cleanUpdates = Object.fromEntries(
+        Object.entries(updates).filter(([_, v]) => v !== undefined)
+      );
+
+      // Ensure updated_at is set
+      cleanUpdates.updated_at = new Date().toISOString();
+
       const { data, error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(cleanUpdates)
         .eq('id', userId)
-        .select()
+        .select('*') // Explicitly select all fields
         .single();
 
       if (error) {
+        console.error('Supabase update error:', error);
         return { data: null, error: error.message };
+      }
+
+      if (!data) {
+        return { data: null, error: 'Profile not found' };
+      }
+
+      // Validate returned data
+      if (!data.id || !data.email || !data.role) {
+        console.error('Invalid profile data returned:', data);
+        return {
+          data: null,
+          error: 'Invalid profile data returned from server',
+        };
       }
 
       return { data, error: null };
     } catch (error) {
+      console.error('Profile update error:', error);
       return {
         data: null,
         error:

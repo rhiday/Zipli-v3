@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { SummaryCard } from '@/components/ui/SummaryCard';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -17,7 +17,7 @@ import { Checkbox } from '@/components/ui/Checkbox';
 
 export default function DonationSummaryPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   // Get data from donation store
   const pickupSlots = useDonationStore((state) => state.pickupSlots);
@@ -188,7 +188,9 @@ export default function DonationSummaryPage() {
           name: item.name,
           description: item.description || null,
           allergens: JSON.stringify(item.allergens || []),
-          image_url: item.imageUrl || null,
+          image_url:
+            item.imageUrl || (item.imageUrls && item.imageUrls[0]) || null, // Use first image if imageUrl not set
+          image_urls: item.imageUrls || (item.imageUrl ? [item.imageUrl] : []), // Ensure array format
         });
 
         // Update the donation
@@ -223,7 +225,12 @@ export default function DonationSummaryPage() {
               name: item.name,
               description: item.description || null,
               allergens: JSON.stringify(item.allergens || []),
-              image_url: item.imageUrl || null,
+              image_url:
+                item.imageUrl || (item.imageUrls && item.imageUrls[0]) || null, // Use first image if imageUrl not set
+              image_urls:
+                item.imageUrls || (item.imageUrl ? [item.imageUrl] : []), // Ensure array format
+              category: null,
+              expires_at: null,
               donor_id: currentUser?.id || null,
               food_type: null,
               quantity: parseFloat(item.quantity) || 1,

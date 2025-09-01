@@ -87,10 +87,22 @@ export default function ProfilePage(): React.ReactElement {
         address: formData.address,
         contact_number: formData.contact_number,
         driver_instructions: formData.driver_instructions,
+        updated_at: new Date().toISOString(),
       };
 
       // Update user in database
       await updateUser(updatedUser);
+
+      // Update local form data with the submitted data (updateUser updates currentUser state)
+      setFormData({
+        full_name: updatedUser.full_name || '',
+        email: updatedUser.email || '',
+        role: updatedUser.role || '',
+        organization_name: updatedUser.organization_name || '',
+        address: updatedUser.address || '',
+        contact_number: updatedUser.contact_number || '',
+        driver_instructions: updatedUser.driver_instructions || '',
+      });
 
       // Success - exit editing mode
       setIsEditing(false);
@@ -292,7 +304,7 @@ export default function ProfilePage(): React.ReactElement {
                       name="contact_number"
                       value={formData.contact_number}
                       onChange={handleChange}
-                      placeholder="ContactNumber"
+                      placeholder={t('contactNumberPlaceholder')}
                     />
                   </div>
 

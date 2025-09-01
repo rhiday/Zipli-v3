@@ -25,34 +25,33 @@ const getShortLabel = (fullLabel: string): string => {
     'Low-lactose': 'Low-lactose',
     'Egg-free': 'Egg-free',
     'Soy-free': 'Soy-free',
-    'Does not contain peanuts': 'Peanuts',
-    'Does not contain other nuts': 'Other nuts',
-    'Does not contain fish': 'Fish',
-    'Does not contain crustaceans': 'Crustaceans',
-    'Does not contain celery': 'Celery',
-    'Does not contain mustard': 'Mustard',
-    'Does not contain sesame seeds': 'Sesame seeds',
-    'Does not contain sulphur dioxide / sulphites >10 mg/kg or litre':
-      'Sulphites',
-    'Does not contain lupin': 'Lupin',
-    'Does not contain molluscs': 'Molluscs',
+    'Contains peanuts': 'Peanuts',
+    'Contains other nuts': 'Other nuts',
+    'Contains fish': 'Fish',
+    'Contains crustaceans': 'Crustaceans',
+    'Contains celery': 'Celery',
+    'Contains mustard': 'Mustard',
+    'Contains sesame seeds': 'Sesame seeds',
+    'Contains sulphur dioxide / sulphites >10 mg/kg or litre': 'Sulphites',
+    'Contains lupin': 'Lupin',
+    'Contains molluscs': 'Molluscs',
     // Finnish versions
-    Määritelty: 'Määritelty',
+    'Ei määritelty': 'Ei määritelty',
     Gluteeniton: 'Gluteeniton',
     Laktoositon: 'Laktoositon',
     Vähälaktoosinen: 'Vähälaktoosinen',
     Munaton: 'Munaton',
     Soijaton: 'Soijaton',
-    'Ei sisällä maapähkinöitä': 'Maapähkinät',
-    'Ei sisällä muita pähkinöitä': 'Muut pähkinät',
-    'Ei sisällä kalaa': 'Kala',
-    'Ei sisällä äyriäisiä': 'Äyriäiset',
-    'Ei sisällä selleriä': 'Selleri',
-    'Ei sisällä sinappia': 'Sinappi',
-    'Ei sisällä seesaminsiemeniä': 'Seesaminsiemenet',
-    'Ei sisällä rikkidioksidia / sulfiitteja (>10 mg/kg)': 'Sulfiitit',
-    'Ei sisällä lupiinia': 'Lupiini',
-    'Ei sisällä nilviäisiä': 'Nilviäiset',
+    'Sisältää maapähkinöitä': 'Maapähkinät',
+    'Sisältää muita pähkinöitä': 'Muut pähkinät',
+    'Sisältää kalaa': 'Kala',
+    'Sisältää äyriäisiä': 'Äyriäiset',
+    'Sisältää selleriä': 'Selleri',
+    'Sisältää sinappia': 'Sinappi',
+    'Sisältää seesaminsiemeniä': 'Seesaminsiemenet',
+    'Sisältää rikkidioksidia / sulfiitteja (>10 mg/kg)': 'Sulfiitit',
+    'Sisältää lupiinia': 'Lupiini',
+    'Sisältää nilviäisiä': 'Nilviäiset',
   };
 
   return shortcuts[fullLabel] || fullLabel;
@@ -108,7 +107,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
   return (
     <div className="w-full" ref={containerRef}>
       <label className="block text-label font-semibold mb-2">{label}</label>
-      <div className="relative">
+      <div className="relative isolate">
         <Input
           readOnly
           value={''}
@@ -144,7 +143,7 @@ export const AllergensDropdown: React.FC<AllergensDropdownProps> = ({
           </div>
         )}
         {open && (
-          <div className="absolute left-0 right-0 mt-1 bg-base border border-border rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
+          <div className="absolute left-0 right-0 mt-1 bg-white border border-border rounded-md shadow-2xl z-[9999] max-h-60 overflow-y-auto">
             {options.map((option) => (
               <div
                 key={option}

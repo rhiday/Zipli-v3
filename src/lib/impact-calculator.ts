@@ -1,5 +1,5 @@
-// Simple impact calculator for demo purposes
-// Returns static/mock data for a stable demo experience
+// Impact calculator
+// Computes metrics based on real donation data
 
 export interface Donation {
   id: string;
@@ -45,35 +45,112 @@ export const impactCalculator = {
     donations: Donation[],
     periodDays: number = 0
   ): ImpactMetrics => {
-    // For demo, return static values
+    // Coefficients (can be tuned or made configurable later)
+    const KG_PER_MEAL = 0.5; // 0.5 kg per meal (matches receiver dashboard estimate)
+    const CO2_PER_KG = 2.5; // kg CO2e avoided per kg of food rescued (approx.)
+    const DISPOSAL_COST_PER_KG_EUR = 2.0; // € saved per kg not disposed
+    const FOOD_VALUE_PER_KG_EUR = 3.5; // € value of food per kg
+    const SOCIAL_VALUE_PER_MEAL_EUR = 1.5; // € social value per meal
+
+    const totalWeight = donations.reduce(
+      (sum, d) => sum + (d.food_item?.weight_kg || 0),
+      0
+    );
+
+    const pickedUp = donations.filter((d) => d.status === 'picked_up');
+    const successRate = donations.length
+      ? Math.round((pickedUp.length / donations.length) * 100)
+      : 0;
+
+    const averageWeight = donations.length
+      ? parseFloat((totalWeight / donations.length).toFixed(1))
+      : 0;
+
+    const averageDaysToPickup = pickedUp.length
+      ? (() => {
+          const totalDays = pickedUp.reduce((sum, d) => {
+            const created = new Date(d.created_at).getTime();
+            const picked = d.picked_up_at
+              ? new Date(d.picked_up_at).getTime()
+              : created;
+            const days = Math.max(
+              0,
+              (picked - created) / (1000 * 60 * 60 * 24)
+            );
+            return sum + days;
+          }, 0);
+          return Math.round((totalDays / pickedUp.length) * 10) / 10;
+        })()
+      : 0;
+
+    const totalPortions = Math.round(totalWeight / KG_PER_MEAL);
+    const mealsProvided = totalPortions;
+    const peopleHelped = mealsProvided; // Assume 1 portion ≈ 1 meal/person
+
+    const co2Avoided = Math.round(totalWeight * CO2_PER_KG);
+    const co2AvoidedTons = Math.round((co2Avoided / 1000) * 10) / 10; // 1 decimal ton
+
+    const costSavings = Math.round(totalWeight * DISPOSAL_COST_PER_KG_EUR);
+    const foodValueSaved = Math.round(totalWeight * FOOD_VALUE_PER_KG_EUR);
+    const socialValue = Math.round(mealsProvided * SOCIAL_VALUE_PER_MEAL_EUR);
+
+    // Simple environmental score combining success and CO2 per kg rescued
+    const environmentalScore = Math.max(
+      0,
+      Math.min(
+        100,
+        Math.round(successRate * 0.6 + Math.min(40, co2AvoidedTons))
+      )
+    );
+
+    // For now, approximate waste reduction as success rate within period
+    const wasteReductionRate = successRate;
+
     return {
-      totalWeight: 46,
-      totalPortions: 131,
-      costSavings: 125,
-      co2Avoided: 10000, // kg
-      co2AvoidedTons: 10, // tons
-      peopleHelped: 43,
-      mealsProvided: 131,
-      foodValueSaved: 280,
-      socialValue: 450,
-      environmentalScore: 92,
-      successRate: 94,
-      averageDaysToPickup: 2,
-      wasteReductionRate: 87,
-      averageWeight: 3.2,
+      totalWeight: Math.round(totalWeight * 10) / 10,
+      totalPortions,
+      costSavings,
+      co2Avoided,
+      co2AvoidedTons,
+      peopleHelped,
+      mealsProvided,
+      foodValueSaved,
+      socialValue,
+      environmentalScore,
+      successRate,
+      averageDaysToPickup,
+      wasteReductionRate,
+      averageWeight,
     };
   },
 
   calculateTrends: (donations: Donation[], months: string[]): TrendData[] => {
-    // Return static trend data for demo
-    return [
-      { period: 'Jan', donations: 3, weight: 8, co2: 2, cost: 20 },
-      { period: 'Feb', donations: 5, weight: 12, co2: 3, cost: 30 },
-      { period: 'Mar', donations: 4, weight: 10, co2: 2.5, cost: 25 },
-      { period: 'Apr', donations: 7, weight: 18, co2: 4, cost: 45 },
-      { period: 'May', donations: 6, weight: 15, co2: 3.5, cost: 37 },
-      { period: 'Jun', donations: 8, weight: 21, co2: 5, cost: 52 },
-    ];
+    const CO2_PER_KG = 2.5;
+    const DISPOSAL_COST_PER_KG_EUR = 2.0;
+
+    // Build map from month short label (e.g., "Jan") to aggregates
+    const monthAgg: Record<string, { donations: number; weight: number }> = {};
+    donations.forEach((d) => {
+      const dt = new Date(d.created_at);
+      const label = dt.toLocaleString('en-US', { month: 'short' });
+      if (!monthAgg[label]) monthAgg[label] = { donations: 0, weight: 0 };
+      monthAgg[label].donations += 1;
+      monthAgg[label].weight += d.food_item?.weight_kg || 0;
+    });
+
+    const result = months.map((m) => {
+      const agg = monthAgg[m] || { donations: 0, weight: 0 };
+      const weightRounded = Math.round(agg.weight * 10) / 10;
+      return {
+        period: m,
+        donations: agg.donations,
+        weight: weightRounded,
+        co2: Math.round(weightRounded * CO2_PER_KG * 10) / 10,
+        cost: Math.round(weightRounded * DISPOSAL_COST_PER_KG_EUR),
+      };
+    });
+
+    return result;
   },
 
   getBenchmarks: (metrics: ImpactMetrics) => {

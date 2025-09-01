@@ -83,23 +83,19 @@ function DonorDashboardPage(): React.ReactElement {
       organization_name: null, // Not available in mock user
     };
 
-    // Fetch latest donations to ensure we have current data
-    const fetchLatestDonations = async () => {
-      const { fetchDonations } = useDatabase.getState();
-      await fetchDonations();
+    // Use existing data from store (already fetched during app initialization)
+    const { donations: freshDonations, foodItems: freshFoodItems } =
+      useDatabase.getState();
 
-      const userDonations = allDonations
-        .filter((d) => d.donor_id === currentUser.id)
-        .map((d) => {
-          const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
-          return { ...d, food_item: foodItem! };
-        });
+    const userDonations = freshDonations
+      .filter((d) => d.donor_id === currentUser.id)
+      .map((d) => {
+        const foodItem = freshFoodItems.find((fi) => fi.id === d.food_item_id);
+        return { ...d, food_item: foodItem! };
+      });
 
-      setDashboardData({ profile, donations: userDonations });
-      setLoading(false);
-    };
-
-    fetchLatestDonations();
+    setDashboardData({ profile, donations: userDonations });
+    setLoading(false);
   }, [isInitialized, currentUser, router]); // Remove allDonations and foodItems from dependencies
 
   // Add a separate effect to update dashboard data when donations/foodItems change
@@ -172,8 +168,6 @@ function DonorDashboardPage(): React.ReactElement {
             </div>
           </section>
         </main>
-
-        <BottomNav />
       </div>
     );
   }
@@ -201,7 +195,7 @@ function DonorDashboardPage(): React.ReactElement {
                   46kg
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('totalFoodDonated')}
+                  {t('totalFoodOffered')}
                 </p>
               </div>
             </div>
@@ -231,7 +225,7 @@ function DonorDashboardPage(): React.ReactElement {
                   125€
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
-                  {t('costSavings')}
+                  {t('savedInFoodDisposalCosts')}
                 </p>
               </div>
             </div>
@@ -263,7 +257,7 @@ function DonorDashboardPage(): React.ReactElement {
           >
             <ActionButton
               href="#"
-              title={t('exportToPdf')}
+              title={t('exportImpactReport')}
               description={t('environmentalAndSocialImpactData')}
               icon={<FileDown />}
             />
@@ -327,8 +321,6 @@ title="Default"
           </div>
         </section> */}
       </main>
-
-      <BottomNav />
 
       {/* Force-hide any rogue Figma card section if it still exists */}
       <style>{`.rogue-donation-card { display: none !important; }`}</style>

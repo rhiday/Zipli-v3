@@ -68,17 +68,6 @@ try {
     JSON.stringify(fiTranslations, null, 2)
   );
 
-  // Also create a combined file for easy Lokalise import
-  const kombinedTranslations = {
-    en: enTranslations,
-    fi: fiTranslations,
-  };
-
-  fs.writeFileSync(
-    path.join(localesDir, 'translations-for-lokalise.json'),
-    JSON.stringify(kombinedTranslations, null, 2)
-  );
-
   console.log('✅ Translations exported successfully!');
   console.log('📁 Files created:');
   console.log(
@@ -90,9 +79,6 @@ try {
     '   - public/locales/fi/common.json (' +
       Object.keys(fiTranslations).length +
       ' keys)'
-  );
-  console.log(
-    '   - public/locales/translations-for-lokalise.json (for import)'
   );
 } catch (error) {
   console.error('Error parsing translations:', error);

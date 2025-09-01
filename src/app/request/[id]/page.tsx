@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useDatabase } from '@/store';
+import { useRequestStore } from '@/store/request';
 import {
   Scale,
   CalendarIcon,
@@ -14,12 +15,20 @@ import {
   ArrowRight,
   MapPin,
   HandHeart,
+  Edit,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Tag from '@/components/ui/Tag';
 import { Avatar } from '@/components/ui/Avatar';
 import { getInitials } from '@/lib/utils';
 import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 type RequestDetail = {
   id: string;
@@ -28,6 +37,8 @@ type RequestDetail = {
   pickup_date: string;
   pickup_start_time: string;
   pickup_end_time: string;
+  pickup_instructions: string | null;
+  allergens: string[] | null;
   status: 'active' | 'fulfilled' | 'cancelled';
   created_at: string;
   updated_at: string;
@@ -35,29 +46,32 @@ type RequestDetail = {
   is_recurring: boolean;
 };
 
-export default function RequestDetailPage({
-  params,
-}: {
-  params: { id: string };
-}): React.ReactElement {
+export default function RequestDetailPage(): React.ReactElement {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
   const [request, setRequest] = useState<RequestDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showConfirmDelivery, setShowConfirmDelivery] = useState(false);
+  const [confirmClauseChecked, setConfirmClauseChecked] = useState(false);
 
   const { currentUser, getRequestById, updateRequest, users, isInitialized } =
     useDatabase();
+  const { setEditMode, clearRequest, setRequestData, setPickupSlots } =
+    useRequestStore();
 
   const fetchRequest = async () => {
     setLoading(true);
     setError(null);
     try {
-      const requestData = getRequestById(params.id);
+      const requestData = getRequestById(id);
       if (!requestData) {
         throw new Error('Request not found');
       }
-      setRequest(requestData);
+      setRequest(requestData as any);
     } catch (err: any) {
       setError(err.message || 'Failed to load request details.');
       setRequest(null);
@@ -67,10 +81,10 @@ export default function RequestDetailPage({
   };
 
   useEffect(() => {
-    if (isInitialized && params.id) {
+    if (isInitialized && id) {
       fetchRequest();
     }
-  }, [isInitialized, params.id]);
+  }, [isInitialized, id]);
 
   const handleStatusUpdate = async (newStatus: 'fulfilled' | 'cancelled') => {
     if (!currentUser || !request) {
@@ -81,12 +95,77 @@ export default function RequestDetailPage({
     setActionLoading(true);
     setError(null);
     try {
-      updateRequest(params.id, { status: newStatus });
+      updateRequest(id, { status: newStatus });
       await fetchRequest();
+
+      // Redirect to /receiver/dashboard after successful cancellation
+      if (newStatus === 'cancelled') {
+        router.push('/receiver/dashboard');
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to update request status.');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleConfirmDelivery = () => {
+    setShowConfirmDelivery(true);
+  };
+
+  const confirmDeliveryWithClause = async () => {
+    if (!confirmClauseChecked) return;
+
+    setShowConfirmDelivery(false);
+    setConfirmClauseChecked(false);
+    await handleStatusUpdate('fulfilled');
+    router.push('/receiver/dashboard');
+  };
+
+  const handleCancelRequest = () => {
+    setShowCancelConfirm(true);
+  };
+
+  const confirmCancel = async () => {
+    setShowCancelConfirm(false);
+    await handleStatusUpdate('cancelled');
+  };
+
+  const handleEditRequest = () => {
+    if (!request) return;
+
+    // Clear current request store and set edit mode
+    clearRequest();
+    setEditMode(true, request.id);
+
+    // Pre-populate form with existing data
+    setRequestData({
+      request_type: request.is_recurring ? 'recurring' : 'one-time',
+      description: request.description,
+      quantity: request.people_count,
+      allergens: request.allergens || [],
+      pickupDate: request.pickup_date,
+      startTime: request.pickup_start_time,
+      endTime: request.pickup_end_time,
+    });
+
+    // Set pickup slot for one-time requests
+    if (!request.is_recurring) {
+      setPickupSlots([
+        {
+          id: '1',
+          date: new Date(request.pickup_date),
+          startTime: request.pickup_start_time,
+          endTime: request.pickup_end_time,
+        },
+      ]);
+    }
+
+    // Navigate to appropriate form
+    if (request.is_recurring) {
+      router.push('/request/recurring-form');
+    } else {
+      router.push('/request/one-time-form');
     }
   };
 
@@ -95,28 +174,14 @@ export default function RequestDetailPage({
     return user?.email || 'Unknown user';
   };
 
-  const parseRequestInfo = (description: string) => {
-    const parts = description.split(' | ');
-    const mainPart = parts[0] || description; // "Request for 3 portions - Vegan"
-    const addressPart =
-      parts.find((p) => p.startsWith('Address:'))?.replace('Address: ', '') ||
-      '';
-    const instructionsPart =
-      parts
-        .find((p) => p.startsWith('Instructions:'))
-        ?.replace('Instructions: ', '') || '';
-
-    // Extract clean request name
-    const requestName = mainPart.replace('Request for ', ''); // "3 portions - Vegan"
-    const allergensPart = requestName.split(' - ').slice(1).join(', ') || ''; // {t('pages.requests.vegan')}
-    const quantityPart = requestName.split(' - ')[0] || ''; // "3 portions"
-
+  const parseRequestInfo = (request: RequestDetail) => {
+    // Use actual database fields instead of parsing description string
     return {
-      requestName,
-      quantity: quantityPart,
-      allergens: allergensPart,
-      address: addressPart,
-      instructions: instructionsPart,
+      requestName: request.description,
+      quantity: `${request.people_count} people`,
+      allergens: request.allergens || [],
+      instructions:
+        request.pickup_instructions || 'No additional instructions provided.',
     };
   };
 
@@ -154,7 +219,7 @@ export default function RequestDetailPage({
 
   const isOwner = currentUser?.id === request.user_id;
   const canTakeAction = request.status === 'active';
-  const requestInfo = parseRequestInfo(request.description);
+  const requestInfo = parseRequestInfo(request);
   const requesterUser = users.find((u) => u.id === request.user_id);
   const requesterName =
     requesterUser?.full_name ||
@@ -216,19 +281,24 @@ export default function RequestDetailPage({
             </span>
           </div>
 
-          {/* Tags for allergens/dietary restrictions */}
-          {requestInfo.allergens && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {requestInfo.allergens.split(',').map((allergen: string) => (
-                <Tag key={allergen.trim()}>{allergen.trim()}</Tag>
-              ))}
+          {/* Allergens/dietary restrictions as plain text */}
+          {requestInfo.allergens && requestInfo.allergens.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                Allergies, Intolerances & Diets:
+              </p>
+              <p className="text-gray-600 leading-relaxed">
+                {requestInfo.allergens.join(', ')}
+              </p>
             </div>
           )}
 
-          {/* Request description */}
-          <p className="mt-4 text-gray-600 leading-relaxed">
-            {requestInfo.instructions || 'No additional instructions provided.'}
-          </p>
+          {/* Request instructions */}
+          {requestInfo.instructions && (
+            <p className="mt-4 text-gray-600 leading-relaxed">
+              {requestInfo.instructions}
+            </p>
+          )}
 
           {/* Date and time info */}
           <div className="mt-4 space-y-2">
@@ -253,14 +323,6 @@ export default function RequestDetailPage({
             </div>
           </div>
 
-          {/* Address if available */}
-          {requestInfo.address && (
-            <div className="mt-4 flex items-start gap-3 text-gray-600">
-              <MapPin className="h-5 w-5 flex-shrink-0" />
-              <span className="font-medium">{requestInfo.address}</span>
-            </div>
-          )}
-
           {/* Recurring indicator */}
           {request.is_recurring && (
             <div className="mt-4 text-gray-600">
@@ -275,28 +337,20 @@ export default function RequestDetailPage({
                 variant="primary"
                 size="cta"
                 className="w-full"
-                onClick={() => handleStatusUpdate('fulfilled')}
+                onClick={handleConfirmDelivery}
                 disabled={actionLoading}
               >
-                {actionLoading ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : (
-                  <CheckIcon className="h-5 w-5" />
-                )}
-                {t('confirmForToday')}
+                <CheckIcon className="h-5 w-5" />
+                Confirm Delivery
               </Button>
               <Button
                 variant="destructive-outline"
                 size="cta"
                 className="w-full"
-                onClick={() => handleStatusUpdate('cancelled')}
+                onClick={handleCancelRequest}
                 disabled={actionLoading}
               >
-                {actionLoading ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                ) : (
-                  <XIcon className="h-5 w-5" />
-                )}
+                <XIcon className="h-5 w-5" />
                 {t('cancel')}
               </Button>
             </div>
@@ -314,7 +368,7 @@ export default function RequestDetailPage({
                   window.location.href = `mailto:${email}?subject=Re: Food Request - ${requestInfo.requestName}`;
                 }}
               >
-                Contact Requester
+                {t('contactRequester')}
               </Button>
             </div>
           )}
@@ -359,6 +413,94 @@ export default function RequestDetailPage({
           </Button>
         </section>
       </main>
+
+      {/* Cancel Confirmation Dialog */}
+      <Dialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Request</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this request? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setShowCancelConfirm(false)}
+              disabled={actionLoading}
+            >
+              Keep Request
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmCancel}
+              disabled={actionLoading}
+            >
+              {actionLoading ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                'Cancel Request'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm Delivery Dialog */}
+      <Dialog open={showConfirmDelivery} onOpenChange={setShowConfirmDelivery}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delivery</DialogTitle>
+            <DialogDescription>
+              Please confirm that the food has been successfully delivered and
+              received.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="confirm-clause"
+                checked={confirmClauseChecked}
+                onChange={(e) => setConfirmClauseChecked(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <label
+                htmlFor="confirm-clause"
+                className="text-sm text-gray-700 leading-relaxed"
+              >
+                I confirm that the food has been delivered and received in good
+                condition. I understand that by confirming this delivery, I
+                acknowledge that the transaction is complete and the request
+                will be marked as fulfilled.
+              </label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowConfirmDelivery(false);
+                setConfirmClauseChecked(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={confirmDeliveryWithClause}
+              disabled={!confirmClauseChecked || actionLoading}
+            >
+              {actionLoading ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                'Confirm Delivery'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

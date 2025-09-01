@@ -44,23 +44,21 @@ export default function DonationThankYouPage() {
       <p className="text-center text-base text-black mb-6 max-w-xs">
         {isEditMode
           ? t('changesSaved') || 'Your donation has been successfully updated.'
-          : t('thisIsWhomYouveHelped')}
+          : t('donationCreatedDesc')}
       </p>
 
       <div className="w-full max-w-md mb-8">
         <NextSteps
-          heading="NextSteps"
+          heading={t('nextSteps')}
           steps={
             isEditMode
               ? [
                   {
-                    title: t('changesSaved') || 'Donation_updated',
-                    description:
-                      t('changesSaved') ||
-                      'Your changes have been saved successfully.',
+                    title: t('changesSaved'),
+                    description: t('changesSavedDesc'),
                   },
                   {
-                    title: t('matchingInProgress') || 'Matching_continues',
+                    title: t('matchingInProgress'),
                     description: t('lookingForMatches'),
                   },
                   {
@@ -87,7 +85,7 @@ export default function DonationThankYouPage() {
       </div>
       <Link href="/donate">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">
-          title="Default"
+          {t('backToDashboard')}
         </button>
       </Link>
     </div>

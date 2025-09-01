@@ -1,5 +1,5 @@
 // English translations - static file
-// Sourced from Lokalise, updated manually as needed
+// Updated manually as needed
 
 export const en = {
   // Common actions
@@ -18,7 +18,7 @@ export const en = {
   impact: 'Impact',
   analytics: 'Analytics',
   overview: 'Overview',
-  donation: 'Donation',
+  donation: 'Listing',
   submitting: 'Submitting...',
   addDonation: 'Add Donation',
   explore: 'Explore',
@@ -33,9 +33,6 @@ export const en = {
   totalFoodDonated: 'Food Rescued',
   donations: 'Donations',
   costSavings: 'Cost Saved',
-  co2Avoided: 'CO₂ Prevented',
-  portionsOffered: 'Portions Offered',
-  savedInFoodDisposalCosts: 'Saved in Food Disposal Costs',
   emissionReduction: 'Emission Reduction',
 
   // Navigation
@@ -106,15 +103,20 @@ export const en = {
     'Access more data on your social and environmental impact for reporting and planning',
   exportToPdf: 'Export to PDF',
   environmentalAndSocialImpactData:
-    'Access more data on your financial, social and environmental impact for reporting, communicating and operation planning.',
+    'Data on your financial, social and environmental impact helps with reporting, communicating and operation planning.',
 
   // Impact metrics (receiver adapted from Ninja's donor updates)
   peopleServedDesc: 'People received proper meals through your requests',
   foodRequestedDesc: 'Total weight of food requested in your latest request',
   activeRequestsDesc: 'Requests currently being matched with donors',
   fulfilledRequestsDesc: 'Requests successfully completed with food delivered',
+  totalFoodOffered: 'Total weight of food in your latest food listing',
+  portionsOffered: 'People got a proper meal (500g/portion)',
+  savedInFoodDisposalCosts: 'Saved in production & disposal costs (average)',
+  co2Avoided: "Trees' worth of CO₂ saved",
   editFoodItem: 'Edit Food Item',
   addFoodItem: 'Add Food Item',
+  addPhotoDescription: 'Add Photo & Description',
   changesSaved: 'Changes Saved',
   pickupSlot: 'Pickup Slot',
   pickup: 'Pickup',
@@ -160,8 +162,6 @@ export const en = {
   englishLabel: 'English',
   finnishLabel: 'Finnish',
   createListing: 'Create listing',
-  createListingFoodItem: 'Create listing foodItem',
-  luoIlmoitusFoodItem: 'Luo ilmoitus foodItem',
   recurringDonation: 'Recurring Donation',
   english: 'English',
   finnish: 'Finnish',
@@ -195,7 +195,7 @@ export const en = {
   startTimeLabel: 'Start time',
   endTimeLabel: 'End time',
 
-  // Request flow specific (from Ninja's Lokalise updates)
+  // Request flow specific
   selectRequestType: 'Select Request Type',
   oneTimeRequest: 'One-time Request',
   recurringRequest: 'Recurring Request',
@@ -213,7 +213,7 @@ export const en = {
     'Also update this address in my profile for the future',
   updateInstructionsInProfile:
     'Also update these instructions in my profile as default',
-  enterYourFullAddress: 'Enter your full delivery address',
+  enterYourFullAddress: 'Enter your full address',
   pleaseRingTheDoorbell: 'e.g. Please ring the doorbell',
   portions: 'Portions',
   allergiesIntolerancesDiets: 'Allergies, intolerances & diets',
@@ -339,17 +339,16 @@ export const en = {
   lowLactose: 'Low-lactose',
   eggFree: 'Egg-free',
   soyFree: 'Soy-free',
-  noPeanuts: 'Does not contain peanuts',
-  noOtherNuts: 'Does not contain other nuts',
-  noFish: 'Does not contain fish',
-  noCrustaceans: 'Does not contain crustaceans',
-  noCelery: 'Does not contain celery',
-  noMustard: 'Does not contain mustard',
-  noSesamSeeds: 'Does not contain sesame seeds',
-  noSulphurDioxide:
-    'Does not contain sulphur dioxide / sulphites >10 mg/kg or litre',
-  noLupin: 'Does not contain lupin',
-  noMolluscs: 'Does not contain molluscs',
+  noPeanuts: 'Contains peanuts',
+  noOtherNuts: 'Contains other nuts',
+  noFish: 'Contains fish',
+  noCrustaceans: 'Contains crustaceans',
+  noCelery: 'Contains celery',
+  noMustard: 'Contains mustard',
+  noSesamSeeds: 'Contains sesame seeds',
+  noSulphurDioxide: 'Contains sulphur dioxide / sulphites >10 mg/kg or litre',
+  noLupin: 'Contains lupin',
+  noMolluscs: 'Contains molluscs',
 
   // Request details page
   confirmForToday: 'Confirm for today',
@@ -358,6 +357,111 @@ export const en = {
   seeAllRequests: 'See all requests',
   showMore: 'Show more',
   showLess: 'Show less',
+
+  // Navigation & UI (New additions)
+  zipli: 'Zipli',
+  whatWouldYouLikeToDo: 'What would you like to do?',
+  donateOrSell: 'Donate or Sell',
+  offerFoodItems: 'Offer food items to others.',
+  createRequestForItems: 'Create a request for specific items.',
+  returnToHome: 'Return to Home',
+  apply: 'Apply',
+
+  // Dashboard Titles (New additions)
+  foodDonorDashboard: 'Food Donor Dashboard',
+  welcomeDonorDashboard: 'Welcome to your donor dashboard',
+  foodReceiverDashboard: 'Food Receiver Dashboard',
+  cityDashboard: 'City Dashboard',
+  terminalDashboard: 'Food Terminal Dashboard',
+  welcomeTerminalDashboard:
+    'Welcome to your terminal dashboard. Here you will be able to:',
+
+  // Dashboard Actions (New additions)
+  listAvailableFood: 'List available food',
+  createNewDonations: 'Create new donations',
+  trackDonationStatus: 'Track donation status',
+  managePickupSchedules: 'Manage pickup schedules',
+  processLargeScaleDonations: 'Process large-scale food donations',
+  coordinateWithMultiple: 'Coordinate with multiple donors and receivers',
+  manageFoodStorage: 'Manage food storage and distribution',
+  trackProcessingCapacity: 'Track processing center capacity',
+
+  // Form Labels & Placeholders (New additions)
+  eg10: 'e.g. 10',
+  ringDoorbell: 'Please ring the doorbell',
+  searchRequests: 'Search requests...',
+  enter6DigitCode: 'Enter 6-digit code',
+  enterNewPassword: 'Enter new password',
+
+  // Status & Messages (New additions)
+  noRequestDataFound: 'No request data found',
+  qrCodeUnavailable: 'QR code unavailable',
+  notEnoughDataPoints: 'Not enough data points for a line chart',
+  didntReceiveCode: "Didn't receive the code?",
+  uploadedPreview: 'Uploaded preview',
+  placeholderImage: 'Placeholder image',
+  noImage: 'No Image',
+  errorLoadingImage: 'Error loading image',
+
+  // Dialog Titles (New additions)
+  cancelRequest: 'Cancel Request',
+  confirmDelivery: 'Confirm Delivery',
+  areYouSure: 'Are you sure?',
+  confirmClaim: 'Confirm Claim',
+  editRequestPeriod: 'Edit request period',
+  editSchedule: 'Edit schedule',
+  editDeliveryTime: 'Edit delivery time',
+  deleteSchedule: 'Delete schedule',
+  donationSummary: 'Donation Summary',
+
+  // User Roles (New additions - some already exist, adding missing ones)
+  cityOfficial: 'City Official',
+
+  // Admin (New additions)
+  users: 'Users',
+  totalUsers: 'Total Users',
+  qrLogin: 'QR Login',
+
+  // Additional form placeholders and labels
+  addressPlaceholder: 'Enter your full address',
+  contactNumberPlaceholder: 'ContactNumber',
+  emailAddressPlaceholder: 'Your email',
+  passwordPlaceholder: 'Your password',
+
+  // Additional status messages
+  allTime: 'All Time',
+  last30Days: 'Last 30 Days',
+  last3Months: 'Last 3 Months',
+  lastYear: 'Last Year',
+
+  // Organization names (for reference, might not need translation)
+  tsanssi: 'Tsänssi',
+  redCross: 'Red Cross',
+  andreasChurch: 'Andreas Church',
+  helsinkiFoodTerminal: 'Helsinki Food Terminal',
+
+  // Additional UI text (fixing cross-language issues)
+  chooseRequestType: 'Choose the type that best fits your needs',
+  note: 'Note',
+  multipleRequestsNote:
+    'You can create multiple requests based on your needs. Each request will be matched with available donations.',
+  noActiveDonationsOrRequests:
+    "You don't have any active donations or requests",
+
+  // New keys for fixing malformed text
+  editRequest: 'Edit Request',
+  contactRequester: 'Contact Requester',
+  viewAll: 'View All',
+  by: 'by',
+  searchDonations: 'Search donations...',
+  noDonationsAvailable: 'No donations available at this time',
+
+  // Additional keys for thank-you and pickup-slot pages
+  donationCreatedDesc:
+    'Your donation has been successfully created and is now available for those in need.',
+  changesSavedDesc: 'Your changes have been saved successfully.',
+  addDeliveryTimeSlots:
+    'Add one or more delivery time slots to give donors flexibility.',
 } as const;
 
 export type TranslationKey = keyof typeof en;

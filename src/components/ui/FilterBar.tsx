@@ -11,16 +11,29 @@ const TYPE_OPTIONS = [
   { label: 'Requests', value: 'requests' },
 ];
 const ALLERGENS = [
-  'Lactose-Free',
-  'Low-Lactose',
-  'Gluten-Free',
-  'Soy-Free',
+  'Not specified',
+  'Gluten-free',
+  'Lactose-free',
+  'Low-lactose',
+  'Egg-free',
+  'Soy-free',
+  'Contains peanuts',
+  'Contains other nuts',
+  'Contains fish',
+  'Contains crustaceans',
+  'Contains celery',
+  'Contains mustard',
+  'Contains sesame seeds',
+  'Contains sulphur dioxide / sulphites >10 mg/kg or litre',
+  'Contains lupin',
+  'Contains molluscs',
 ];
 const FOOD_TYPE_OPTIONS = [
   'Prepared meals',
   'Fresh produce',
   'Cold packaged foods',
-  'Bakery and Pastry', 'Other',
+  'Bakery and Pastry',
+  'Other',
 ];
 const DONATION_STATUSES = ['available', 'claimed', 'picked_up', 'cancelled'];
 const REQUEST_STATUSES = ['active', 'fulfilled', 'cancelled'];
@@ -49,23 +62,60 @@ const FilterBar: FC<FilterBarProps> = ({
   showDateRange = true,
 }) => {
   const [showAllFilters, setShowAllFilters] = useState(false);
-  const [modalFoodType, setModalFoodType] = useState(activeFilters.foodType ? String(activeFilters.foodType) : '');
-  const [modalMinQty, setModalMinQty] = useState(activeFilters.minQty ? String(activeFilters.minQty) : '');
-  const [modalDateFrom, setModalDateFrom] = useState(activeFilters.dateFrom ? String(activeFilters.dateFrom) : '');
-  const [modalDateTo, setModalDateTo] = useState(activeFilters.dateTo ? String(activeFilters.dateTo) : '');
+  const [modalFoodType, setModalFoodType] = useState(
+    activeFilters.foodType ? String(activeFilters.foodType) : ''
+  );
+  const [modalMinQty, setModalMinQty] = useState(
+    activeFilters.minQty ? String(activeFilters.minQty) : ''
+  );
+  const [modalDateFrom, setModalDateFrom] = useState(
+    activeFilters.dateFrom ? String(activeFilters.dateFrom) : ''
+  );
+  const [modalDateTo, setModalDateTo] = useState(
+    activeFilters.dateTo ? String(activeFilters.dateTo) : ''
+  );
+  const [modalAllergens, setModalAllergens] = useState<string[]>(
+    activeFilters.allergens && Array.isArray(activeFilters.allergens)
+      ? (activeFilters.allergens as string[])
+      : []
+  );
 
   React.useEffect(() => {
-    setModalFoodType(activeFilters.foodType ? String(activeFilters.foodType) : '');
+    setModalFoodType(
+      activeFilters.foodType ? String(activeFilters.foodType) : ''
+    );
     setModalMinQty(activeFilters.minQty ? String(activeFilters.minQty) : '');
-    setModalDateFrom(activeFilters.dateFrom ? String(activeFilters.dateFrom) : '');
+    setModalDateFrom(
+      activeFilters.dateFrom ? String(activeFilters.dateFrom) : ''
+    );
     setModalDateTo(activeFilters.dateTo ? String(activeFilters.dateTo) : '');
-  }, [activeFilters.foodType, activeFilters.minQty, activeFilters.dateFrom, activeFilters.dateTo]);
+    setModalAllergens(
+      activeFilters.allergens && Array.isArray(activeFilters.allergens)
+        ? (activeFilters.allergens as string[])
+        : []
+    );
+  }, [
+    activeFilters.foodType,
+    activeFilters.minQty,
+    activeFilters.dateFrom,
+    activeFilters.dateTo,
+    activeFilters.allergens,
+  ]);
+
+  const toggleAllergen = (allergen: string) => {
+    setModalAllergens((prev) =>
+      prev.includes(allergen)
+        ? prev.filter((a) => a !== allergen)
+        : [...prev, allergen]
+    );
+  };
 
   const applyModalFilters = () => {
     onFilterChange?.('foodType', modalFoodType);
     onFilterChange?.('minQty', modalMinQty);
     onFilterChange?.('dateFrom', modalDateFrom);
     onFilterChange?.('dateTo', modalDateTo);
+    onFilterChange?.('allergens', modalAllergens);
     setShowAllFilters(false);
   };
 
@@ -80,7 +130,7 @@ const FilterBar: FC<FilterBarProps> = ({
           </PopoverTrigger>
           <PopoverContent className="w-48 p-2 bg-white border rounded shadow">
             <div className="flex flex-col gap-1">
-              {statusOptions.map(opt => (
+              {statusOptions.map((opt) => (
                 <Button
                   key={opt}
                   variant={activeFilters.status === opt ? 'primary' : 'ghost'}
@@ -108,11 +158,49 @@ const FilterBar: FC<FilterBarProps> = ({
         <DialogContent className="max-w-lg w-full bg-white p-6 rounded shadow">
           <h2 className="text-lg font-semibold mb-4">All Filters</h2>
           <div className="space-y-4">
+            {showAllergens && (
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Dietary Restrictions & Allergens
+                </label>
+                <div className="max-h-48 overflow-y-auto border rounded p-2">
+                  {ALLERGENS.map((allergen) => (
+                    <div
+                      key={allergen}
+                      className="flex items-center gap-2 py-1 hover:bg-gray-50 px-1 rounded cursor-pointer"
+                      onClick={() => toggleAllergen(allergen)}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={modalAllergens.includes(allergen)}
+                        onChange={() => toggleAllergen(allergen)}
+                        className="w-4 h-4"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <label className="text-sm cursor-pointer flex-1">
+                        {allergen}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                {modalAllergens.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    className="text-xs text-gray-500 mt-1"
+                    onClick={() => setModalAllergens([])}
+                  >
+                    Clear all allergens
+                  </Button>
+                )}
+              </div>
+            )}
             {showFoodType && (
               <div>
-                <label className="block text-sm font-medium mb-1">Food Type</label>
+                <label className="block text-sm font-medium mb-1">
+                  Food Type
+                </label>
                 <div className="flex flex-col gap-1">
-                  {FOOD_TYPE_OPTIONS.map(opt => (
+                  {FOOD_TYPE_OPTIONS.map((opt) => (
                     <Button
                       key={opt}
                       variant={modalFoodType === opt ? 'primary' : 'ghost'}
@@ -124,7 +212,7 @@ const FilterBar: FC<FilterBarProps> = ({
                   ))}
                   {modalFoodType && (
                     <Button
-                      variant='ghost'
+                      variant="ghost"
                       className="justify-start w-full text-left text-xs text-gray-500 mt-1"
                       onClick={() => setModalFoodType('')}
                     >
@@ -136,41 +224,49 @@ const FilterBar: FC<FilterBarProps> = ({
             )}
             {showMinQty && (
               <div>
-                <label className="block text-sm font-medium mb-1">Min. Quantity/People</label>
+                <label className="block text-sm font-medium mb-1">
+                  Min. Quantity/People
+                </label>
                 <input
                   type="number"
                   className="w-full border rounded p-2"
                   value={modalMinQty}
-                  onChange={e => setModalMinQty(e.target.value)}
+                  onChange={(e) => setModalMinQty(e.target.value)}
                   placeholder="e.g. 10"
                 />
               </div>
             )}
             {showDateRange && (
               <div>
-                <label className="block text-sm font-medium mb-1">Date From</label>
+                <label className="block text-sm font-medium mb-1">
+                  Date From
+                </label>
                 <input
                   type="date"
                   className="w-full border rounded p-2"
                   value={modalDateFrom}
-                  onChange={e => setModalDateFrom(e.target.value)}
+                  onChange={(e) => setModalDateFrom(e.target.value)}
                 />
               </div>
             )}
             {showDateRange && (
               <div>
-                <label className="block text-sm font-medium mb-1">Date Until</label>
+                <label className="block text-sm font-medium mb-1">
+                  Date Until
+                </label>
                 <input
                   type="date"
                   className="w-full border rounded p-2"
                   value={modalDateTo}
-                  onChange={e => setModalDateTo(e.target.value)}
+                  onChange={(e) => setModalDateTo(e.target.value)}
                 />
               </div>
             )}
           </div>
           <div className="mt-6 flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setShowAllFilters(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setShowAllFilters(false)}>
+              Cancel
+            </Button>
             <Button onClick={applyModalFilters}>Apply</Button>
           </div>
         </DialogContent>
@@ -179,4 +275,4 @@ const FilterBar: FC<FilterBarProps> = ({
   );
 };
 
-export default FilterBar; 
+export default FilterBar;

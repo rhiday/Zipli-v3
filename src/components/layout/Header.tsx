@@ -14,13 +14,14 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ title }) => {
-  const {
-    currentUser,
-    isInitialized,
-    donations: allDonations,
-    foodItems,
-    getAllRequests,
-  } = useDatabase();
+  // Use selectors to prevent unnecessary re-renders
+  const currentUser = useDatabase((state) => state.currentUser);
+  const donations = useDatabase((state) => state.donations);
+  const requests = useDatabase((state) => state.requests);
+  const foodItems = useDatabase((state) => state.foodItems);
+  const isInitialized = useDatabase((state) => state.isInitialized);
+  const getAllRequests = useDatabase((state) => state.getAllRequests);
+
   const router = useRouter();
   const { t } = useCommonTranslation();
 
@@ -37,18 +38,15 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     }> = [];
 
     // Get user's donations (if any)
-    const userDonations = allDonations
-      .filter(
-        (d) =>
-          d.donor_id === currentUser.id &&
-          (d.status === 'available' || d.status === 'claimed')
-      )
+    const userDonations = donations
+      .filter((d) => d.donor_id === currentUser.id && d.status === 'available')
       .map((d) => {
-        const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
+        // Use the food_item data that comes with the donation
+        const foodItemName = (d as any).food_item?.name || 'Unknown_item';
         return {
           id: d.id,
           quantity: d.quantity,
-          name: foodItem?.name || 'Unknown_item',
+          name: foodItemName,
           created_at: d.created_at || d.pickup_time || new Date().toISOString(),
           type: 'donation' as const,
         };
@@ -83,7 +81,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       const bTime = new Date(b.created_at).getTime();
       return bTime - aTime; // Most recent first
     });
-  }, [isInitialized, currentUser, allDonations, foodItems, getAllRequests]);
+  }, [isInitialized, currentUser, donations, foodItems, getAllRequests]);
 
   // Debug: log the creation time order
   console.log(
@@ -141,7 +139,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 bg-[#18E170] rounded-full shrink-0"></span>
             <span className="text-white/80">
-              You don't have any active donations or requests
+              {t('noActiveDonationsOrRequests')}
             </span>
           </div>
         ) : (

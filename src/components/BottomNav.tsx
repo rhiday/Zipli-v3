@@ -44,7 +44,7 @@ export default function BottomNav() {
       case 'food_donor':
         return [
           { href: '/donate', label: t('dashboard'), icon: LayoutGrid },
-          { href: '#', label: 'Add', icon: Plus, isCentral: true },
+          { href: '#', label: t('add'), icon: Plus, isCentral: true },
           { href: '/impact', label: t('impact'), icon: TrendingUp },
         ];
       case 'food_receiver':
@@ -258,10 +258,10 @@ export default function BottomNav() {
                       <Calendar className="mr-3 h-5 w-5 text-primary" />
                       <div>
                         <p className="font-semibold text-primary">
-                          Recurring Donation
+                          {t('recurringDonation')}
                         </p>
                         <p className="text-xs text-secondary">
-                          Set up a repeating schedule for ongoing donations.
+                          {t('setupRepeatingSchedule')}
                         </p>
                       </div>
                     </Button>

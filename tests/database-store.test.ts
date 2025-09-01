@@ -176,6 +176,9 @@ describe('Database Store Tests', () => {
         description: 'A new test item',
         allergens: JSON.stringify(['None']),
         image_url: '/test.jpg',
+        image_urls: ['/test.jpg'],
+        category: 'test',
+        expires_at: null,
         quantity: 1,
         unit: 'piece',
         food_type: 'test',
@@ -488,6 +491,7 @@ describe('Database Store Tests', () => {
         country: null,
         postal_code: null,
         street_address: null,
+        driver_instructions: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

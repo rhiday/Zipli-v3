@@ -4,14 +4,16 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 export default function ContactPage(): React.ReactElement {
   const router = useRouter();
+  const { t } = useCommonTranslation();
 
   return (
     <div className="flex flex-col h-dvh bg-cream">
       <SecondaryNavbar
-        title="Contact"
+        title={t('contact')}
         backHref="#"
         onBackClick={() => router.back()}
       />

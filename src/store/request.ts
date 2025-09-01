@@ -53,6 +53,10 @@ interface RequestState {
   deletePickupSlot: (id: string) => void;
   setPickupSlots: (slots: PickupSlot[]) => void;
 
+  // Helper methods for allergen text/array conversion
+  allergenTextFromArray: (allergens: string[]) => string;
+  arrayFromAllergenText: (text: string) => string[];
+
   clearRequest: () => void;
 }
 
@@ -119,6 +123,19 @@ export const useRequestStore = create<RequestState>()(
         })),
 
       setPickupSlots: (slots) => set({ pickupSlots: slots }),
+
+      // Helper methods for allergen text/array conversion
+      allergenTextFromArray: (allergens: string[]): string => {
+        return allergens.length > 0 ? allergens.join(', ') : '';
+      },
+
+      arrayFromAllergenText: (text: string): string[] => {
+        if (!text.trim()) return [];
+        return text
+          .split(/[,\n]/)
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0);
+      },
 
       clearRequest: () => set(initialState),
     }),
