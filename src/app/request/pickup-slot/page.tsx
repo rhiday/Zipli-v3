@@ -281,10 +281,12 @@ export default function PickupSlotPage() {
                     currentSlot.date instanceof Date &&
                     !isNaN(currentSlot.date.getTime()) ? (
                       <span className="text-black">
-                        {format(currentSlot.date, 'dd/MM/yyyy')}
+                        {format(currentSlot.date, t('dateFormat'))}
                       </span>
                     ) : (
-                      <span className="text-gray-400">DD/MM/YYYY</span>
+                      <span className="text-gray-400">
+                        {t('dateFormatPlaceholder')}
+                      </span>
                     )}
                     <div className="pointer-events-none">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">

@@ -545,6 +545,7 @@ function ManualDonationPageInner() {
             addMore: t('addMore'),
             uploading: t('uploading'),
             maxSizeMb: t('maxSizeMb'),
+            photosCount: t('photosCount'),
             imageUploadError: t('imageUploadError'),
             maxImagesError: t('maxImagesError'),
             invalidFileTypeError: t('invalidFileTypeError'),

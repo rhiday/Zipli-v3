@@ -12,6 +12,7 @@ interface MultiplePhotoUploadProps {
     addMore?: string;
     uploading?: string;
     maxSizeMb?: string;
+    photosCount?: string;
     imageUploadError?: string;
     maxImagesError?: string;
     invalidFileTypeError?: string;
@@ -36,6 +37,7 @@ export const MultiplePhotoUpload: React.FC<MultiplePhotoUploadProps> = ({
     addMore: translations.addMore || 'Add more',
     uploading: translations.uploading || 'Uploading...',
     maxSizeMb: translations.maxSizeMb || 'Max 5MB each',
+    photosCount: translations.photosCount || 'photos',
     imageUploadError:
       translations.imageUploadError ||
       'Image size too big. Please select an image under 5MB.',
@@ -224,7 +226,7 @@ export const MultiplePhotoUpload: React.FC<MultiplePhotoUploadProps> = ({
 
       {/* Upload Info */}
       <p className="text-xs text-gray-500 text-center mt-3">
-        {uploadedImages.length}/{maxImages} photos • {t.maxSizeMb}
+        {uploadedImages.length}/{maxImages} {t.photosCount} • {t.maxSizeMb}
       </p>
     </div>
   );

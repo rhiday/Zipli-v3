@@ -84,7 +84,7 @@ export const fi = {
 
   // Forms
   required: 'Pakollinen',
-  optional: 'Valinnainen',
+  optional: 'valinnainen',
   addPhoto: 'Lisää kuva',
   fieldRequired: 'Tämä kenttä on pakollinen',
 
@@ -120,12 +120,14 @@ export const fi = {
     'Säästetty tuotanto- ja jätekustannuksissa (keskiarvo)',
   co2Avoided: 'Puun verran hiilidioksidipäästöjä vältetty',
   editFoodItem: 'Muokkaa ruoka-ainetta',
-  addFoodItem: 'Lisää tuote',
+  addFoodItem: 'Lisää ruoka-aineita',
   addPhotoDescription: 'Lisää kuva ja kuvaus',
   changesSaved: 'Muutokset tallennettu',
   pickupSlot: 'Noutovuoro',
   pickup: 'Nouto',
   selectDate: 'Valitse päivä',
+  dateFormatPlaceholder: 'pp.kk.vvvv',
+  dateFormat: 'dd.MM.yyyy',
   selectTime: 'Valitse aika',
   startTime: 'Alkuaika',
   endTime: 'Loppuaika',
@@ -290,6 +292,8 @@ export const fi = {
 
   // Allergens
   allergens: 'Allergeenit',
+  qtyLabel: 'Määrä',
+  descriptionLabel: 'Kuvaus',
   allergiesIntolerances: 'Allergiat, intoleranssit ja ruokarajoitteet',
   selectDietaryRestrictions: 'Valitse ruokarajoitteet',
 
@@ -356,17 +360,19 @@ export const fi = {
   quantityKg: 'Määrä (kg)',
   enterFoodName: 'Syötä ruoan nimi',
   enterQuantity: 'Syötä määrä',
-  currentItemsInDonation: 'Nykyiset tuotteet lahjoituksessa',
+  currentItemsInDonation: 'Ilmoituksen tämänhetkinen sisältö',
   addAnotherItem: 'Lisää toinen tuote',
   goBackToDashboard: 'Takaisin kotinäkymään',
   photosHelpIdentify: 'Kuvat auttavat tunnistamaan ruokalahjoituksesi',
   addPhotos: 'Lisää kuvia',
   addMore: 'Lisää lisää',
   uploading: 'Ladataan...',
-  maxSizeMb: 'Max 5MB kappale',
-  enterDescription: 'Syötä kuvaus',
+  maxSizeMb: 'enintään 5MB/kuva',
+  photosCount: 'kuvaa',
+  enterDescription:
+    'Lisää tähän halutessasi tärkeää tietoa ruuasta, esim. Ei saa pakastaa uudelleen',
   savingEllipsis: 'Tallennetaan...',
-  addItem: 'Lisää tuote',
+  addItem: 'Jatka',
 
   // Recurring donation form specific
   approximateQuantityKg: 'Arvioitu määrä (kg)',
