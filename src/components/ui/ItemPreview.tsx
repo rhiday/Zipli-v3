@@ -8,16 +8,31 @@ interface ItemPreviewProps {
   quantity: string;
   description?: string;
   imageUrl?: string;
+  imageUrls?: string[];
   allergens?: string[];
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
 export const ItemPreview: React.FC<ItemPreviewProps> = React.memo(
-  ({ name, quantity, description, imageUrl, allergens, onEdit, onDelete }) => {
+  ({
+    name,
+    quantity,
+    description,
+    imageUrl,
+    imageUrls,
+    allergens,
+    onEdit,
+    onDelete,
+  }) => {
     const { t } = useCommonTranslation();
     const [imageError, setImageError] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
+
+    // Get the primary image from either imageUrls array or single imageUrl
+    const primaryImage = imageUrls?.[0] || imageUrl;
+    const additionalImagesCount =
+      imageUrls && imageUrls.length > 1 ? imageUrls.length - 1 : 0;
 
     const handleImageLoad = useCallback(() => {
       setImageLoaded(true);
@@ -31,15 +46,18 @@ export const ItemPreview: React.FC<ItemPreviewProps> = React.memo(
 
     // Test if image URL is accessible
     React.useEffect(() => {
-      if (imageUrl && !imageError) {
+      if (primaryImage && !imageError) {
         const img = new Image();
         img.onload = handleImageLoad;
         img.onerror = handleImageError;
-        img.src = imageUrl;
+        img.src = primaryImage;
       }
-    }, [imageUrl, imageError, handleImageLoad, handleImageError]);
+    }, [primaryImage, imageError, handleImageLoad, handleImageError]);
 
-    const shouldShowPlaceholder = !imageUrl || imageError || !imageLoaded;
+    const shouldShowPlaceholder = !primaryImage || imageError || !imageLoaded;
+
+    // Inline SVG placeholder for better performance
+    const placeholderSVG = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='79' height='79' viewBox='0 0 79 79'%3E%3Crect width='79' height='79' fill='%23f3f4f6'/%3E%3Cpath fill='%239ca3af' d='M39.5 25c-7.73 0-14 6.27-14 14s6.27 14 14 14 14-6.27 14-14-6.27-14-14-14zm0 22c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z'/%3E%3C/svg%3E`;
 
     return (
       <div className="flex justify-center items-center w-full p-[12px_14px_12px_12px] gap-[18px] rounded-[12px] border border-[#D9DBD5] bg-[#F5F9EF]">
@@ -47,15 +65,20 @@ export const ItemPreview: React.FC<ItemPreviewProps> = React.memo(
           {!shouldShowPlaceholder && (
             <div
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: `url(${imageUrl})` }}
+              style={{ backgroundImage: `url(${primaryImage})` }}
             />
           )}
           {shouldShowPlaceholder && (
             <img
-              src="/images/placeholder.svg"
+              src={placeholderSVG}
               alt="Placeholder image"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover opacity-50"
             />
+          )}
+          {additionalImagesCount > 0 && (
+            <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-full">
+              +{additionalImagesCount}
+            </div>
           )}
         </div>
         <div className="flex-1 min-w-0">

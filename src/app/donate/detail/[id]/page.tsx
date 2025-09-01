@@ -281,7 +281,7 @@ export default function DonationDetailPage() {
                 disabled={actionLoading}
               >
                 <CheckIcon className="h-5 w-5" />
-                Confirm Claim
+                {t('confirmClaim')}
               </Button>
               <Dialog
                 open={showDeleteConfirm}
@@ -293,15 +293,14 @@ export default function DonationDetailPage() {
                     size="cta"
                     className="w-full"
                   >
-                    <Trash2 className="h-5 w-5" /> Remove Listing
+                    <Trash2 className="h-5 w-5" /> {t('removeListing')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Are you sure?</DialogTitle>
+                    <DialogTitle>{t('areYouSure')}</DialogTitle>
                     <DialogDescription>
-                      This will permanently remove the listing from public view.
-                      This action cannot be undone.
+                      {t('removeListingDescription')}
                     </DialogDescription>
                   </DialogHeader>
                   {deleteError && (
@@ -318,7 +317,7 @@ export default function DonationDetailPage() {
                       }}
                       disabled={isDeleting}
                     >
-                      Cancel
+                      {t('cancel')}
                     </Button>
                     <Button
                       variant="destructive"
@@ -328,10 +327,10 @@ export default function DonationDetailPage() {
                       {isDeleting ? (
                         <>
                           <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
-                          Removing...
+                          {t('removing')}
                         </>
                       ) : (
-                        'Yes, Remove'
+                        t('yesRemove')
                       )}
                     </Button>
                   </DialogFooter>
@@ -392,9 +391,9 @@ export default function DonationDetailPage() {
       <Dialog open={showConfirmClaim} onOpenChange={setShowConfirmClaim}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Claim</DialogTitle>
+            <DialogTitle>{t('confirmClaim')}</DialogTitle>
             <DialogDescription>
-              Please confirm that this donation has been claimed and received.
+              {t('confirmClaimDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -410,10 +409,7 @@ export default function DonationDetailPage() {
                 htmlFor="confirm-claim-clause"
                 className="text-sm text-gray-700 leading-relaxed"
               >
-                I confirm that this donation has been claimed and received in
-                good condition. I understand that by confirming this claim, I
-                acknowledge that the donation will be marked as claimed and
-                removed from public listings.
+                {t('confirmClaimClause')}
               </label>
             </div>
           </div>
@@ -435,7 +431,7 @@ export default function DonationDetailPage() {
               {actionLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
-                'Confirm Claim'
+                t('confirmClaim')
               )}
             </Button>
           </DialogFooter>
