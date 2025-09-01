@@ -18,7 +18,7 @@ export const en = {
   impact: 'Impact',
   analytics: 'Analytics',
   overview: 'Overview',
-  donation: 'Donation',
+  donation: 'Listing',
   submitting: 'Submitting...',
   addDonation: 'Add Donation',
   explore: 'Explore',
@@ -33,9 +33,6 @@ export const en = {
   totalFoodDonated: 'Food Rescued',
   donations: 'Donations',
   costSavings: 'Cost Saved',
-  co2Avoided: 'CO₂ Prevented',
-  portionsOffered: 'Portions Offered',
-  savedInFoodDisposalCosts: 'Saved in Food Disposal Costs',
   emissionReduction: 'Emission Reduction',
 
   // Navigation
@@ -106,13 +103,17 @@ export const en = {
     'Access more data on your social and environmental impact for reporting and planning',
   exportToPdf: 'Export to PDF',
   environmentalAndSocialImpactData:
-    'Access more data on your financial, social and environmental impact for reporting, communicating and operation planning.',
+    'Data on your financial, social and environmental impact helps with reporting, communicating and operation planning.',
 
   // Impact metrics (receiver adapted from Ninja's donor updates)
   peopleServedDesc: 'People received proper meals through your requests',
   foodRequestedDesc: 'Total weight of food requested in your latest request',
   activeRequestsDesc: 'Requests currently being matched with donors',
   fulfilledRequestsDesc: 'Requests successfully completed with food delivered',
+  totalFoodOffered: 'Total weight of food in your latest food listing',
+  portionsOffered: 'People got a proper meal (500g/portion)',
+  savedInFoodDisposalCosts: 'Saved in production & disposal costs (average)',
+  co2Avoided: "Trees' worth of CO₂ saved",
   editFoodItem: 'Edit Food Item',
   addFoodItem: 'Add Food Item',
   changesSaved: 'Changes Saved',
@@ -423,7 +424,8 @@ export const en = {
   // Additional form placeholders and labels
   addressPlaceholder: 'Address',
   contactNumberPlaceholder: 'ContactNumber',
-  emailAddressPlaceholder: 'EmailAddress',
+  emailAddressPlaceholder: 'Your email',
+  passwordPlaceholder: 'Your password',
 
   // Additional status messages
   allTime: 'All Time',

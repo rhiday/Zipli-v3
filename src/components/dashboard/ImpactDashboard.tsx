@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Info, ChevronDown } from 'lucide-react';
 import ExportCard from './ExportCard';
-import { useTranslations } from '@/hooks/useTranslations';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 interface ImpactDashboardProps {
   totalWeight?: number;
@@ -17,8 +17,9 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
     totalWeight = 46,
     portionsOffered = 131,
     savedCosts = 125,
-    emissionReduction = 89,
+    emissionReduction = 10,
   }) => {
+    const { t } = useCommonTranslation();
     const [selectedMonth, setSelectedMonth] = useState('February');
 
     // Memoized month selector handler
@@ -31,21 +32,21 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
       () => [
         {
           value: portionsOffered,
-          label: 'Portions offered',
+          label: t('portionsOffered'),
           bgColor: 'bg-lime/20',
         },
         {
           value: `${savedCosts}€`,
-          label: 'Saved in food disposal costs',
+          label: t('savedInFoodDisposalCosts'),
           bgColor: 'bg-lime/20',
         },
         {
-          value: `${emissionReduction}%`,
-          label: 'Emission reduction',
+          value: `${emissionReduction}t`,
+          label: t('co2Avoided'),
           bgColor: 'bg-lime/20',
         },
       ],
-      [portionsOffered, savedCosts, emissionReduction]
+      [portionsOffered, savedCosts, emissionReduction, t]
     );
 
     // Memoized recipients data
@@ -78,7 +79,7 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
         {/* Impact header with month selector */}
         <div className="flex justify-between items-start gap-4 mb-4">
           <h2 className="text-primary text-titleSm font-semibold flex-1">
-            Your impact
+            {t('yourImpact')}
           </h2>
           <button
             onClick={handleMonthSelect}
@@ -88,29 +89,65 @@ const ImpactDashboard: React.FC<ImpactDashboardProps> = React.memo(
           </button>
         </div>
 
-        {/* Main impact stat */}
-        <div className="mb-6">
-          <h3 className="text-primary text-displaySm font-semibold mb-1">
-            {totalWeight}kg
-          </h3>
-          <p className="text-secondary text-bodyLg">Total food offered</p>
-        </div>
-
-        {/* Stats grid */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {statsData.map((stat, index) => (
-            <div key={index} className={`${stat.bgColor} rounded-xl p-4`}>
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-primary text-titleMd font-semibold">
-                  {stat.value}
-                </span>
-                <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
-                  <Info size={16} />
-                </button>
-              </div>
-              <p className="text-secondary text-caption">{stat.label}</p>
+        {/* Stats grid - 4 boxes in 2x2 layout */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {/* Box 1: Weight */}
+          <div className="bg-lime/20 rounded-xl p-4">
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-primary text-titleMd font-semibold">
+                {totalWeight}kg
+              </span>
+              <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
+                <Info size={16} />
+              </button>
             </div>
-          ))}
+            <p className="text-secondary text-caption">
+              {t('totalFoodOffered')}
+            </p>
+          </div>
+
+          {/* Box 2: Portions */}
+          <div className="bg-lime/20 rounded-xl p-4">
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-primary text-titleMd font-semibold">
+                {portionsOffered}
+              </span>
+              <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
+                <Info size={16} />
+              </button>
+            </div>
+            <p className="text-secondary text-caption">
+              {t('portionsOffered')}
+            </p>
+          </div>
+
+          {/* Box 3: Cost Savings */}
+          <div className="bg-lime/20 rounded-xl p-4">
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-primary text-titleMd font-semibold">
+                {savedCosts}€
+              </span>
+              <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
+                <Info size={16} />
+              </button>
+            </div>
+            <p className="text-secondary text-caption">
+              {t('savedInFoodDisposalCosts')}
+            </p>
+          </div>
+
+          {/* Box 4: CO2 */}
+          <div className="bg-lime/20 rounded-xl p-4">
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-primary text-titleMd font-semibold">
+                {emissionReduction}t
+              </span>
+              <button className="p-0.5 text-secondary-25 hover:text-primary focus:outline-none focus:ring-1 focus:ring-primary rounded-full">
+                <Info size={16} />
+              </button>
+            </div>
+            <p className="text-secondary text-caption">{t('co2Avoided')}</p>
+          </div>
         </div>
 
         {/* Export card */}

@@ -128,6 +128,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder={t('emailAddressPlaceholder')}
             />
           </div>
 
@@ -146,10 +147,11 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder={t('passwordPlaceholder')}
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-start">
             <Checkbox
               id="remember-me"
               name="remember-me"
@@ -157,15 +159,6 @@ export default function LoginPage() {
               onChange={handleRememberMeChange}
               label={t('rememberMe')}
             />
-
-            <div className="text-body">
-              <Link
-                href="/auth/forgot-password"
-                className="font-medium text-earth hover:text-primary"
-              >
-                {t('forgotPassword')}
-              </Link>
-            </div>
           </div>
 
           <div>
@@ -179,9 +172,19 @@ export default function LoginPage() {
               {loading ? t('signingIn') : t('signIn')}
             </Button>
           </div>
+
+          <div className="text-center text-body">
+            <Link
+              href="/auth/forgot-password"
+              className="font-medium text-earth hover:text-primary"
+            >
+              {t('forgotPassword')}
+            </Link>
+          </div>
         </form>
 
-        <div className="text-center text-body">
+        {/* Temporarily hidden sign up section */}
+        {/* <div className="text-center text-body">
           <span className="text-inactive">{t('dontHaveAccount')}</span>{' '}
           <Link
             href="/auth/register"
@@ -189,7 +192,7 @@ export default function LoginPage() {
           >
             {t('signUp')}
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   );

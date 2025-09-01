@@ -18,7 +18,7 @@ export const fi = {
   impact: 'Vaikuttavuus',
   analytics: 'Analytiikka',
   overview: 'Yhteenveto',
-  donation: 'Lahjoitus',
+  donation: 'Ilmoitus',
   submitting: 'Lähetetään...',
   addDonation: 'Lisää lahjoitus',
   explore: 'Tutki',
@@ -33,9 +33,6 @@ export const fi = {
   totalFoodDonated: 'Ruokaa Pelastettu',
   donations: 'Lahjoitukset',
   costSavings: 'Säästöt',
-  co2Avoided: 'CO₂ Vältetty',
-  portionsOffered: 'Annosta Tarjottu',
-  savedInFoodDisposalCosts: 'Säästetty Hävittämiskustannuksissa',
   emissionReduction: 'Päästövähennys',
 
   // Navigation
@@ -106,13 +103,18 @@ export const fi = {
     'Siirry tarkastelemaan lisää sosiaalisen ja ympäristövaikutuksen dataa raportointia ja suunnittelua varten',
   exportToPdf: 'Vie PDF:ksi',
   environmentalAndSocialImpactData:
-    'Siirry tarkastelemaan dataa luomastasi vaikuttavuudesta auttaa raportoimaan, viestimään ja toiminnan suunnittelemaan toimintaa ven paremmin.',
+    'Keräämme vaikuttavuusdata auttaa raportoimaan, viestimään ja suunnittelemaan toimintaa entistä paremmin.',
 
   // Impact metrics (receiver adapted from Ninja's donor updates)
   peopleServedDesc: 'Ihmistä sai kunnon aterian pyynnösten kautta',
   foodRequestedDesc: 'Viimeisimmän pyyntösi yhteenlaskettu kilomäärä',
   activeRequestsDesc: 'Pyynnöt etsivät parhaillaan lahjoittajia',
   fulfilledRequestsDesc: 'Pyynnöt täytettiin onnistuneesti ruoan toimituksella',
+  totalFoodOffered: 'Viimeisimmän ilmoituksesi yhteenlaskettu kilomäärä',
+  portionsOffered: 'Ihmistä sai kunnon aterian (500g/annos)',
+  savedInFoodDisposalCosts:
+    'Säästetty tuotanto- ja jätekustannuksissa (keskiarvo)',
+  co2Avoided: 'Puun verran hiilidioksidipäästöjä vältetty',
   editFoodItem: 'Muokkaa ruoka-ainetta',
   addFoodItem: 'Lisää ruoka-aine',
   changesSaved: 'Muutokset tallennettu',
@@ -155,7 +157,7 @@ export const fi = {
   active: 'Aktiivinen',
   completed: 'Valmis',
   view: 'Näytä',
-  details: 'Tiedot',
+  details: 'Lisätiedot',
   requestDetails: 'Lisätiedot',
   englishLabel: 'English',
   finnishLabel: 'Suomi',
@@ -300,7 +302,6 @@ export const fi = {
   last30Days: 'Viimeiset 30 päivää',
   last3Months: 'Viimeiset 3 kuukautta',
   lastYear: 'Viimeinen vuosi',
-  totalFoodOffered: 'Lahjoitettu ruoka',
   portionsCreated: 'Luodut annokset',
   historicalTrends: 'Trendit',
   donationTrend: 'Lahjoitustrendi',
@@ -467,7 +468,8 @@ export const fi = {
   // Additional form placeholders and labels
   addressPlaceholder: 'Osoite',
   contactNumberPlaceholder: 'Puhelinnumero',
-  emailAddressPlaceholder: 'Sähköpostiosoite',
+  emailAddressPlaceholder: 'Sinun sähköpostisi',
+  passwordPlaceholder: 'Sinun salasanasi',
 
   // Organization names (for reference, might not need translation)
   tsanssi: 'Tsänssi',
