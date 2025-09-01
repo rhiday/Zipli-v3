@@ -426,6 +426,14 @@ export const en = {
   editDeliveryTime: 'Edit delivery time',
   deleteSchedule: 'Delete schedule',
   donationSummary: 'Donation Summary',
+  donationItems: 'Donation Items',
+  addressAndInstructions: 'Address & Instructions',
+  saveAddressToProfile: 'Save this address to my profile',
+  saveInstructionsToProfile: 'Save these instructions to my profile',
+  editPickupTime: 'Edit pickup time',
+  confirmPickup: 'Confirm pickup',
+  rememberToMarkPickedUp:
+    'Remember to mark food as picked up by clicking the donation name in the green window on the front page',
 
   // User Roles (New additions - some already exist, adding missing ones)
   cityOfficial: 'City Official',
@@ -470,8 +478,7 @@ export const en = {
   noDonationsAvailable: 'No donations available at this time',
 
   // Additional keys for thank-you and pickup-slot pages
-  donationCreatedDesc:
-    'Your donation has been successfully created and is now available for those in need.',
+  donationCreatedDesc: '',
   changesSavedDesc: 'Your changes have been saved successfully.',
   addDeliveryTimeSlots:
     'Add one or more delivery time slots to give donors flexibility.',

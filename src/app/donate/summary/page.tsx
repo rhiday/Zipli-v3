@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { useDonationStore } from '@/store/donation';
 import { useDatabase } from '@/store';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import { SummaryCard } from '@/components/ui/SummaryCard';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -17,7 +17,7 @@ import { Checkbox } from '@/components/ui/Checkbox';
 
 export default function DonationSummaryPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
 
   // Get data from donation store
   const pickupSlots = useDonationStore((state) => state.pickupSlots);
@@ -311,7 +311,7 @@ export default function DonationSummaryPage() {
       header={
         <>
           <SecondaryNavbar
-            title="Donation Summary"
+            title={t('donationSummary')}
             backHref="/donate/pickup-slot"
           />
           <div className="px-4 pt-2">
@@ -330,9 +330,9 @@ export default function DonationSummaryPage() {
               {isSaving
                 ? t('continuing')
                 : !address.trim()
-                  ? 'Add Address'
+                  ? t('addAddress')
                   : pickupSlots.length === 0
-                    ? 'Add Pickup Slot'
+                    ? t('addPickupSlot')
                     : t('continue')}
             </Button>
           </div>
@@ -343,7 +343,7 @@ export default function DonationSummaryPage() {
       {/* Donation Items Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-2">
-          Donation Items
+          {t('donationItems')}
         </h2>
         {donationItems.map((item, index) => (
           <ItemPreview
@@ -361,7 +361,7 @@ export default function DonationSummaryPage() {
       {/* Pickup schedule */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {recurringSchedule ? 'Recurring Schedule' : 'Pickup Schedule'}
+          {recurringSchedule ? 'Recurring Schedule' : t('pickupSchedule')}
         </h2>
         {recurringSchedule && Array.isArray(recurringSchedule) ? (
           // Multiple recurring schedules
@@ -377,7 +377,7 @@ export default function DonationSummaryPage() {
               <button
                 onClick={() => router.push('/donate/recurring-schedule')}
                 className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-                title="Edit schedule"
+                title={t('editSchedule')}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path
@@ -407,7 +407,7 @@ export default function DonationSummaryPage() {
                   <button
                     onClick={() => router.push('/donate/pickup-slot')}
                     className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-                    title="Edit pickup time"
+                    title={t('editPickupTime')}
                   >
                     <svg
                       width="20"
@@ -460,14 +460,14 @@ export default function DonationSummaryPage() {
       {/* Address & Instructions Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          Address & Instructions
+          {t('addressAndInstructions')}
         </h2>
         <div>
           <label
             htmlFor="address"
             className="block text-black font-semibold mb-3"
           >
-            Address
+            {t('address')}
           </label>
           <Textarea
             id="address"
@@ -481,7 +481,7 @@ export default function DonationSummaryPage() {
               id="update-address-profile"
               checked={updateAddressInProfile}
               onChange={setUpdateAddressInProfile}
-              label="Save this address to my profile"
+              label={t('saveAddressToProfile')}
             />
           </div>
         </div>
@@ -490,7 +490,7 @@ export default function DonationSummaryPage() {
             htmlFor="driver-instructions"
             className="block text-black font-semibold mb-3"
           >
-            Instructions for driver (optional)
+            {t('instructionsForDriver')}
           </label>
           <Textarea
             id="driver-instructions"
@@ -504,7 +504,7 @@ export default function DonationSummaryPage() {
               id="update-instructions-profile"
               checked={updateInstructionsInProfile}
               onChange={setUpdateInstructionsInProfile}
-              label="Save these instructions to my profile"
+              label={t('saveInstructionsToProfile')}
             />
           </div>
         </div>

@@ -136,7 +136,7 @@ export const fi = {
   deleteSlot: 'Poista vuoro',
   schedule: 'Aikataulu',
   recurring: 'Toistuva',
-  dateNotSet: 'Päivä ei asetettu',
+  dateNotSet: 'Päivämäärää ei ole asetettu',
   timeNotSet: 'Aika ei asetettu',
   noSlotsAdded: 'Vuoroja ei lisätty',
   addFirstSlot: 'Lisää ensimmäinen noutovuorosi',
@@ -215,7 +215,7 @@ export const fi = {
   requestSubmitted: 'Ilmoitus lähetetty',
   requestSubmittedDesc: 'Kiitos, ilmoituksesi on otettu vastaan!',
   requestPeriod: 'Pyynnön jakso',
-  pickupSchedule: 'Noutoaikataulu',
+  pickupSchedule: 'Noutoajankohta',
   deliverySchedule: 'Toimitusaikataulu',
   driverInstructions: 'Ohjeet kuljettajalle',
   updateAddressInProfile:
@@ -471,7 +471,15 @@ export const fi = {
   editSchedule: 'Muokkaa aikataulua',
   editDeliveryTime: 'Muokkaa toimitusaikaa',
   deleteSchedule: 'Poista aikataulu',
-  donationSummary: 'Lahjoituksen yhteenveto',
+  donationSummary: 'Ilmoituksen yhteenveto',
+  donationItems: 'Ruoka-aineet ilmoituksessa',
+  addressAndInstructions: 'Osoitetiedot & ohjeet',
+  saveAddressToProfile: 'Tallenna muutokset profiiliin',
+  saveInstructionsToProfile: 'Tallenna muutokset profiiliin',
+  editPickupTime: 'Muokkaa noutoaikaa',
+  confirmPickup: 'Kuittaa nouto',
+  rememberToMarkPickedUp:
+    'Muista kuitata ruoka noudetuksi klikkaamalla lahjoituksen nimeä etusivun vihreässä ikkunassa',
 
   // User Roles (New additions - some already exist, adding missing ones)
   cityOfficial: 'Kaupungin virkamies',
@@ -510,8 +518,7 @@ export const fi = {
   noDonationsAvailable: 'Lahjoituksia ei ole tällä hetkellä saatavilla',
 
   // Additional keys for thank-you and pickup-slot pages
-  donationCreatedDesc:
-    'Lahjoituksesi on luotu onnistuneesti ja se on nyt saatavilla niitä tarvitseville.',
+  donationCreatedDesc: '',
   changesSavedDesc: 'Muutoksesi on tallennettu onnistuneesti.',
   addDeliveryTimeSlots:
     'Lisää yksi tai useampi toimitusaika antaaksesi lahjoittajille joustavuutta.',
