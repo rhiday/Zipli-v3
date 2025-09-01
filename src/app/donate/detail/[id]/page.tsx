@@ -281,7 +281,7 @@ export default function DonationDetailPage() {
                 disabled={actionLoading}
               >
                 <CheckIcon className="h-5 w-5" />
-                Confirm Claim
+                {t('confirmClaim')}
               </Button>
               <Dialog
                 open={showDeleteConfirm}
@@ -293,7 +293,7 @@ export default function DonationDetailPage() {
                     size="cta"
                     className="w-full"
                   >
-                    <Trash2 className="h-5 w-5" /> Remove Listing
+                    <Trash2 className="h-5 w-5" /> {t('removeListing')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -392,7 +392,7 @@ export default function DonationDetailPage() {
       <Dialog open={showConfirmClaim} onOpenChange={setShowConfirmClaim}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Claim</DialogTitle>
+            <DialogTitle>{t('confirmClaim')}</DialogTitle>
             <DialogDescription>
               Please confirm that this donation has been claimed and received.
             </DialogDescription>
@@ -435,7 +435,7 @@ export default function DonationDetailPage() {
               {actionLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
-                'Confirm Claim'
+                t('confirmClaim')
               )}
             </Button>
           </DialogFooter>

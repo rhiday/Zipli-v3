@@ -421,6 +421,7 @@ export const en = {
   confirmDelivery: 'Confirm Delivery',
   areYouSure: 'Are you sure?',
   confirmClaim: 'Confirm Claim',
+  removeListing: 'Remove Listing',
   editRequestPeriod: 'Edit request period',
   editSchedule: 'Edit schedule',
   editDeliveryTime: 'Edit delivery time',
