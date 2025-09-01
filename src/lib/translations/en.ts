@@ -432,6 +432,9 @@ export const en = {
   saveInstructionsToProfile: 'Save these instructions to my profile',
   editPickupTime: 'Edit pickup time',
   addPickupSlot: 'Add Pickup Slot',
+  confirmPickup: 'Confirm pickup',
+  rememberToMarkPickedUp:
+    'Remember to mark food as picked up by clicking the donation name in the green window on the front page',
 
   // User Roles (New additions - some already exist, adding missing ones)
   cityOfficial: 'City Official',

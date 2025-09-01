@@ -478,6 +478,9 @@ export const fi = {
   saveInstructionsToProfile: 'Tallenna muutokset profiiliin',
   editPickupTime: 'Muokkaa noutoaikaa',
   addPickupSlot: 'Lisää noutoajankohta',
+  confirmPickup: 'Kuittaa nouto',
+  rememberToMarkPickedUp:
+    'Muista kuitata ruoka noudetuksi klikkaamalla lahjoituksen nimeä etusivun vihreässä ikkunassa',
 
   // User Roles (New additions - some already exist, adding missing ones)
   cityOfficial: 'Kaupungin virkamies',
