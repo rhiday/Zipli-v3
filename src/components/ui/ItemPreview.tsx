@@ -61,13 +61,19 @@ export const ItemPreview: React.FC<ItemPreviewProps> = React.memo(
         <div className="flex-1 min-w-0">
           <p className="text-base font-semibold text-earth truncate">{name}</p>
           <p className="text-sm text-gray-500 truncate">
-            {description && description !== name
-              ? `${description} · Qty: ${quantity}`
-              : `Qty: ${quantity}`}
+            {t('qtyLabel')}: {quantity}
           </p>
           {allergens && allergens.length > 0 && (
             <p className="text-sm text-gray-500 truncate">
-              Allergens: {allergens.join(', ')}
+              {t('allergens')}: {allergens.join(', ')}
+            </p>
+          )}
+          {description && description !== name && description.trim() && (
+            <p className="text-sm text-gray-500 truncate">
+              {t('descriptionLabel')}:{' '}
+              {description.length > 50
+                ? `${description.substring(0, 47)}...`
+                : description}
             </p>
           )}
         </div>

@@ -11,7 +11,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon, ClockIcon } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
 import {
@@ -37,7 +37,7 @@ interface DonationSchedule {
 
 export default function DonationSchedulePage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   const [donationData, setDonationData] = useState<any>(null);
   const [scheduleType, setScheduleType] = useState<
     'daily' | 'weekly' | 'custom'
@@ -286,10 +286,12 @@ export default function DonationSchedulePage() {
                       >
                         {currentSchedule.startDate ? (
                           <span className="text-black">
-                            {format(currentSchedule.startDate, 'dd/MM/yyyy')}
+                            {format(currentSchedule.startDate, t('dateFormat'))}
                           </span>
                         ) : (
-                          <span className="text-gray-400">DD/MM/YYYY</span>
+                          <span className="text-gray-400">
+                            {t('dateFormatPlaceholder')}
+                          </span>
                         )}
                         <div className="pointer-events-none">
                           <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">
@@ -329,10 +331,12 @@ export default function DonationSchedulePage() {
                       >
                         {currentSchedule.endDate ? (
                           <span className="text-black">
-                            {format(currentSchedule.endDate, 'dd/MM/yyyy')}
+                            {format(currentSchedule.endDate, t('dateFormat'))}
                           </span>
                         ) : (
-                          <span className="text-gray-400">DD/MM/YYYY</span>
+                          <span className="text-gray-400">
+                            {t('dateFormatPlaceholder')}
+                          </span>
                         )}
                         <div className="pointer-events-none">
                           <div className="flex items-center justify-center w-8 h-8 rounded-full border border-[#024209] bg-white">

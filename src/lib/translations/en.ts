@@ -121,6 +121,8 @@ export const en = {
   pickupSlot: 'Pickup Slot',
   pickup: 'Pickup',
   selectDate: 'Select Date',
+  dateFormatPlaceholder: 'DD/MM/YYYY',
+  dateFormat: 'dd/MM/yyyy',
   selectTime: 'Select Time',
   startTime: 'Start Time',
   endTime: 'End Time',
@@ -219,6 +221,7 @@ export const en = {
   allergiesIntolerancesDiets: 'Allergies, intolerances & diets',
   submitRequest: 'Submit Request',
   continuing: 'Submitting...',
+  addAddress: 'Add Address',
   backToDashboard: 'Back to Dashboard',
   peopleCount: 'Number of people',
   enterNumberOfPeople: 'Enter quantity',
@@ -282,6 +285,8 @@ export const en = {
 
   // Allergens (from Ninja's updates)
   allergens: 'Allergens',
+  qtyLabel: 'Qty',
+  descriptionLabel: 'Description',
   allergiesIntolerances: 'Allergies, intolerances & diets',
   selectDietaryRestrictions: 'Select dietary restrictions...',
 
@@ -312,9 +317,17 @@ export const en = {
   addAnotherItem: 'Add Another Item',
   goBackToDashboard: 'Go Back to Dashboard',
   photosHelpIdentify: 'Photos help identify your food donation',
+  addPhotos: 'Add photos',
+  addMore: 'Add more',
+  uploading: 'Uploading...',
+  maxSizeMb: 'Max 5MB each',
+  photosCount: 'photos',
+  imageUploadError: 'Image size too big. Please select an image under 5MB.',
+  maxImagesError: 'You can only upload up to {maxImages} images.',
+  invalidFileTypeError: 'Please select JPEG, PNG, or WebP image files only.',
   enterDescription: 'Enter description',
   savingEllipsis: 'Saving...',
-  addItem: 'Add Item',
+  addItem: 'Continue',
 
   // Recurring donation form specific
   approximateQuantityKg: 'Approximate quantity (kg)',

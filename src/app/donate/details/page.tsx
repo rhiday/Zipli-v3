@@ -112,6 +112,16 @@ export default function DonationDetailsPage() {
           uploadedImages={currentItem.imageUrls || []}
           hint={t('photosHelpIdentify')}
           maxImages={5}
+          translations={{
+            addPhotos: t('addPhotos'),
+            addMore: t('addMore'),
+            uploading: t('uploading'),
+            maxSizeMb: t('maxSizeMb'),
+            photosCount: t('photosCount'),
+            imageUploadError: t('imageUploadError'),
+            maxImagesError: t('maxImagesError'),
+            invalidFileTypeError: t('invalidFileTypeError'),
+          }}
         />
 
         {/* Description */}

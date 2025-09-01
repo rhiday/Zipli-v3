@@ -6,7 +6,6 @@ import Image from 'next/image';
 import {
   ArrowLeft,
   ShoppingBag,
-  MapPin,
   Plus,
   Edit,
   Trash2,
@@ -261,10 +260,16 @@ export default function DonationDetailPage() {
             {donation.food_item.description}
           </p>
 
-          <div className="mt-4 flex items-start gap-3 text-gray-600">
-            <MapPin className="h-5 w-5 flex-shrink-0" />
-            <span className="font-medium">Address not provided</span>
-          </div>
+          {donation.instructions_for_driver && (
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm font-medium text-gray-700">
+                Driver Instructions:
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {donation.instructions_for_driver}
+              </p>
+            </div>
+          )}
 
           {isOwner ? (
             <div className="mt-6 flex flex-col gap-3">

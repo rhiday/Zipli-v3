@@ -250,13 +250,13 @@ function DonorDashboardPage(): React.ReactElement {
             </div>
 
             {/* CO2 Avoided */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
+              <div className="flex items-center gap-2 mb-2">
                 <Leaf className="w-4 h-4 text-primary-50" />
               </div>
               <div>
                 <span className="text-2xl font-semibold text-green-800">
-                  {formatWeight(metrics.co2Avoided / 1000)}
+                  {Math.round(metrics.co2Avoided / 1000)}
                 </span>
                 <p className="text-sm text-primary-75 mt-1">
                   {t('co2Avoided')}
