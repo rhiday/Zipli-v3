@@ -250,8 +250,8 @@ function DonorDashboardPage(): React.ReactElement {
             </div>
 
             {/* CO2 Avoided */}
-            <div className="flex flex-col justify-between rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col rounded-xl border border-primary-10 shadow-sm p-4 w-full min-h-24 bg-white">
+              <div className="flex items-center gap-2 mb-2">
                 <Leaf className="w-4 h-4 text-primary-50" />
               </div>
               <div>

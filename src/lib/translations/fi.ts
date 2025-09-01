@@ -107,7 +107,7 @@ export const fi = {
     'Siirry tarkastelemaan lisää sosiaalisen ja ympäristövaikutuksen dataa raportointia ja suunnittelua varten',
   exportToPdf: 'Vie PDF:ksi',
   environmentalAndSocialImpactData:
-    'Keräämme vaikuttavuusdata auttaa raportoimaan, viestimään ja suunnittelemaan toimintaa entistä paremmin.',
+    'Keräämämme vaikuttavuusdata auttaa raportoimaan, viestimään ja suunnittelemaan toimintaa entistä paremmin.',
 
   // Impact metrics (receiver adapted from Ninja's donor updates)
   peopleServedDesc: 'Ihmistä sai kunnon aterian pyynnösten kautta',
