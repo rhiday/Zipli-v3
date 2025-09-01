@@ -71,7 +71,7 @@ export default function PickupSlotPage() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleBackClick = () => {
-    router.back();
+    router.push('/donate/manual');
   };
 
   const handleCurrentSlotChange = (
@@ -156,7 +156,6 @@ export default function PickupSlotPage() {
         <>
           <SecondaryNavbar
             title={t('addPickupSlot')}
-            backHref="/donate/manual"
             onBackClick={handleBackClick}
           />
           <div className="px-4 pt-2">

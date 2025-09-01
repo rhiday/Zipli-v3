@@ -65,16 +65,14 @@ export default function RequestSchedulePage() {
 
   // Date fields
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     const storedRequest = sessionStorage.getItem('pendingRequest');
     if (storedRequest) {
       const data = JSON.parse(storedRequest);
       setRequestData(data);
-      // Initialize dates if they exist
+      // Initialize start date if it exists
       if (data.startDate) setStartDate(new Date(data.startDate));
-      if (data.endDate) setEndDate(new Date(data.endDate));
     }
   }, []);
 
@@ -120,7 +118,7 @@ export default function RequestSchedulePage() {
   };
 
   const canAddSchedule = selectedDays.length > 0;
-  const hasValidDates = startDate && endDate && startDate <= endDate;
+  const hasValidDates = startDate !== undefined;
   const canContinue = hasValidDates && (schedules.length > 0 || canAddSchedule);
 
   const handleContinue = () => {
@@ -145,13 +143,11 @@ export default function RequestSchedulePage() {
       ...requestData,
       recurringSchedules: finalSchedules,
       startDate: startDate?.toISOString().split('T')[0],
-      endDate: endDate?.toISOString().split('T')[0],
     };
 
     // Update the Zustand store as well
     updateRequestStore({
       startDate: startDate?.toISOString().split('T')[0] || '',
-      endDate: endDate?.toISOString().split('T')[0] || '',
     });
 
     sessionStorage.setItem(
@@ -256,31 +252,19 @@ export default function RequestSchedulePage() {
                 disablePastDates={true}
                 className="w-full"
               />
-              <DatePicker
-                label={t('endDate')}
-                date={endDate}
-                onDateChange={setEndDate}
-                placeholder="dd.mm.yyyy"
-                dateFormat="dd.MM.yyyy"
-                disablePastDates={false}
-                minDate={startDate || new Date()}
-                className="w-full"
-              />
             </div>
-            {startDate && endDate && (
+            {startDate && (
               <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5] min-h-[56px]">
                 <div className="text-sm font-semibold text-[#024209]">
-                  {t('requestPeriod')}: {format(startDate, 'dd.MM.yyyy')} -{' '}
-                  {format(endDate, 'dd.MM.yyyy')}
+                  {t('startDate')}: {format(startDate, 'dd.MM.yyyy')}
                 </div>
                 <button
                   onClick={() => {
-                    // Clear dates to allow re-editing
+                    // Clear date to allow re-editing
                     setStartDate(undefined);
-                    setEndDate(undefined);
                   }}
                   className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-                  title="Edit request period"
+                  title="Edit start date"
                 >
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path

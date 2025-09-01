@@ -12,7 +12,7 @@ import { en } from './en';
 import { fi } from './fi';
 
 export const getTranslations = (language: Language) => {
-  return language === 'fi' ? fi : en;
+  return language === 'en' ? en : fi;
 };
 
 export const translations = {

@@ -24,6 +24,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import {
+  calculateCityMetrics,
+  formatWeight,
+  formatCurrency,
+  formatPercentage,
+} from '@/lib/dashboard-utils';
 
 // Enhanced mock data with more realistic values
 const monthlyData = [
@@ -58,18 +64,10 @@ type CityDashboardData = {
 };
 
 export default function CityDashboardPage(): React.ReactElement {
-  // City dashboard disabled for now - redirect to main dashboard
-  const router = useRouter();
-  React.useEffect(() => {
-    router.push('/donate');
-  }, [router]);
-
-  return <div>Redirecting...</div>;
+  return <CityDashboardPageEnabled />;
 }
 
-// Note: keep this component unused to avoid hook rule violations.
-// If you need it, export with a proper name and use it as a React component.
-function DisabledCityDashboardPage(): React.ReactElement {
+function CityDashboardPageEnabled(): React.ReactElement {
   const router = useRouter();
   const { currentUser, isInitialized, getAllDonations, getAllRequests } =
     useDatabase();
@@ -132,12 +130,7 @@ function DisabledCityDashboardPage(): React.ReactElement {
     const allDonations = getAllDonations();
     const allRequests = getAllRequests();
 
-    const cityStats = {
-      totalDonations: allDonations.length,
-      totalRequests: allRequests.length,
-      activeDonors: 24,
-      activeReceivers: 18,
-    };
+    const cityStats = calculateCityMetrics(allDonations, allRequests);
 
     setDashboardData({ profile, cityStats });
     setLoading(false);
@@ -149,12 +142,28 @@ function DisabledCityDashboardPage(): React.ReactElement {
     doc.setFontSize(16);
     doc.text('Helsinki City Food Waste Analysis', 10, 10);
     doc.setFontSize(12);
-    doc.text(`Total food redistributed: 3,800kg this month`, 10, 20);
-    doc.text(`Partner organizations: 42 active`, 10, 30);
-    doc.text(`Waste diverted: 89% reduction`, 10, 40);
-    doc.text(`CO2 savings: 2,150kg avoided`, 10, 50);
+    doc.text(
+      `Total food redistributed: ${formatWeight(dashboardData.cityStats.totalFoodRedistributed || 0)}`,
+      10,
+      20
+    );
+    doc.text(
+      `Partner organizations: ${dashboardData.cityStats.partnerOrganizations || 0} active`,
+      10,
+      30
+    );
+    doc.text(
+      `Waste reduction: ${formatPercentage(dashboardData.cityStats.wasteReduction || 0)}`,
+      10,
+      40
+    );
+    doc.text(
+      `CO2 savings: ${formatWeight(dashboardData.cityStats.co2Savings || 0)}`,
+      10,
+      50
+    );
     doc.save('helsinki-food-analytics.pdf');
-  }, []);
+  }, [dashboardData.cityStats]);
 
   // Memoized month selection handler
   const handleMonthSelect = useCallback((month: string) => {
@@ -164,12 +173,16 @@ function DisabledCityDashboardPage(): React.ReactElement {
   // Calculate city-wide impact stats
   const cityImpactStats = React.useMemo(() => {
     return {
-      totalFoodRedistributed: '3.8t',
-      partnerOrganizations: 42,
-      wasteReduction: '89%',
-      co2Savings: '2.15t',
+      totalFoodRedistributed: formatWeight(
+        dashboardData.cityStats.totalFoodRedistributed || 0
+      ),
+      partnerOrganizations: dashboardData.cityStats.partnerOrganizations || 0,
+      wasteReduction: formatPercentage(
+        dashboardData.cityStats.wasteReduction || 0
+      ),
+      co2Savings: formatWeight(dashboardData.cityStats.co2Savings || 0),
     };
-  }, []);
+  }, [dashboardData.cityStats]);
 
   if (loading) {
     return (
