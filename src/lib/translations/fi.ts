@@ -136,7 +136,7 @@ export const fi = {
   deleteSlot: 'Poista vuoro',
   schedule: 'Aikataulu',
   recurring: 'Toistuva',
-  dateNotSet: 'Päivä ei asetettu',
+  dateNotSet: 'Päivämäärää ei ole asetettu',
   timeNotSet: 'Aika ei asetettu',
   noSlotsAdded: 'Vuoroja ei lisätty',
   addFirstSlot: 'Lisää ensimmäinen noutovuorosi',
@@ -215,7 +215,7 @@ export const fi = {
   requestSubmitted: 'Ilmoitus lähetetty',
   requestSubmittedDesc: 'Kiitos, ilmoituksesi on otettu vastaan!',
   requestPeriod: 'Pyynnön jakso',
-  pickupSchedule: 'Noutoaikataulu',
+  pickupSchedule: 'Noutoajankohta',
   deliverySchedule: 'Toimitusaikataulu',
   driverInstructions: 'Ohjeet kuljettajalle',
   updateAddressInProfile:
@@ -471,7 +471,13 @@ export const fi = {
   editSchedule: 'Muokkaa aikataulua',
   editDeliveryTime: 'Muokkaa toimitusaikaa',
   deleteSchedule: 'Poista aikataulu',
-  donationSummary: 'Lahjoituksen yhteenveto',
+  donationSummary: 'Ilmoituksen yhteenveto',
+  donationItems: 'Ruoka-aineet ilmoituksessa',
+  addressAndInstructions: 'Osoitetiedot & ohjeet',
+  saveAddressToProfile: 'Tallenna muutokset profiiliin',
+  saveInstructionsToProfile: 'Tallenna muutokset profiiliin',
+  editPickupTime: 'Muokkaa noutoaikaa',
+  addPickupSlot: 'Lisää noutoajankohta',
 
   // User Roles (New additions - some already exist, adding missing ones)
   cityOfficial: 'Kaupungin virkamies',

@@ -426,6 +426,12 @@ export const en = {
   editDeliveryTime: 'Edit delivery time',
   deleteSchedule: 'Delete schedule',
   donationSummary: 'Donation Summary',
+  donationItems: 'Donation Items',
+  addressAndInstructions: 'Address & Instructions',
+  saveAddressToProfile: 'Save this address to my profile',
+  saveInstructionsToProfile: 'Save these instructions to my profile',
+  editPickupTime: 'Edit pickup time',
+  addPickupSlot: 'Add Pickup Slot',
 
   // User Roles (New additions - some already exist, adding missing ones)
   cityOfficial: 'City Official',
