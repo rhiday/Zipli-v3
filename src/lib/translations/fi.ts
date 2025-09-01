@@ -519,8 +519,7 @@ export const fi = {
   noDonationsAvailable: 'Lahjoituksia ei ole tällä hetkellä saatavilla',
 
   // Additional keys for thank-you and pickup-slot pages
-  donationCreatedDesc:
-    'Lahjoituksesi on luotu onnistuneesti ja se on nyt saatavilla niitä tarvitseville.',
+  donationCreatedDesc: '',
   changesSavedDesc: 'Muutoksesi on tallennettu onnistuneesti.',
   addDeliveryTimeSlots:
     'Lisää yksi tai useampi toimitusaika antaaksesi lahjoittajille joustavuutta.',

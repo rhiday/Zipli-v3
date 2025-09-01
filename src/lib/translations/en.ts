@@ -479,8 +479,7 @@ export const en = {
   noDonationsAvailable: 'No donations available at this time',
 
   // Additional keys for thank-you and pickup-slot pages
-  donationCreatedDesc:
-    'Your donation has been successfully created and is now available for those in need.',
+  donationCreatedDesc: '',
   changesSavedDesc: 'Your changes have been saved successfully.',
   addDeliveryTimeSlots:
     'Add one or more delivery time slots to give donors flexibility.',
