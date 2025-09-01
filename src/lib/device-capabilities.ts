@@ -197,7 +197,7 @@ class DeviceCapabilityDetector {
       case 'offscreencanvas':
         return typeof OffscreenCanvas !== 'undefined';
       case 'camera':
-        return this.supportsGetUserMedia();
+        return this.detectGetUserMedia();
       case 'touch':
         return 'ontouchstart' in window;
       case 'devicememory':
@@ -285,6 +285,3 @@ class DeviceCapabilityDetector {
 
 // Export singleton instance
 export const deviceCapabilities = new DeviceCapabilityDetector();
-
-// Export types
-export type { DeviceCapabilities };

@@ -105,7 +105,7 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
           )}
 
           <Button
-            variant="outline"
+            variant="secondary"
             size="lg"
             className="w-full mt-4"
             onClick={() => onOpenChange(false)}
