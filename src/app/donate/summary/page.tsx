@@ -357,6 +357,7 @@ export default function DonationSummaryPage() {
             name={item.name}
             quantity={item.quantity}
             imageUrl={item.imageUrl}
+            imageUrls={item.imageUrls}
             allergens={item.allergens}
             onEdit={() => handleEditItem(item.id)}
             onDelete={() => handleDeleteItem(item.id)}

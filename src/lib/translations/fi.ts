@@ -467,7 +467,20 @@ export const fi = {
   cancelRequest: 'Peruuta pyyntö',
   confirmDelivery: 'Vahvista toimitus',
   areYouSure: 'Oletko varma?',
-  confirmClaim: 'Vahvista lunastus',
+  confirmClaim: 'Kuittaa nouto',
+  removeListing: 'Posta ilmoitus',
+  yesRemove: 'Kyllä, poista',
+  removing: 'Poistetaan...',
+  removeListingDescription:
+    'Tämä poistaa ilmoituksen pysyvästi julkisesta näkyvyydestä. Tätä toimintoa ei voi kumota.',
+  confirmClaimDescription:
+    'Vahvista, että lahjoitus on noudettu ja vastaanotettu.',
+  confirmClaimClause:
+    'Vahvistan, että lahjoituksen lämpötilat on mitattu ja ruoka-aineet on säilytetty ruokaturvallisuusviranomaisten suositamien lämpötilojen sisällä. Kuittaan täten lahjoituksen noudetuksi.',
+  confirmDeliveryDescription:
+    'Vahvista, että ruoka on toimitettu ja vastaanotettu onnistuneesti.',
+  confirmDeliveryClause:
+    'Vahvistan, että toimituksen lämpötilat on mitattu ja ruoka-aineet on säilytetty ruokaturvallisuusviranomaisten suositamien lämpötilojen sisällä. Kuittaan täten toimituksen vastaanotetuksi.',
   editRequestPeriod: 'Muokkaa pyyntöjaksoa',
   editSchedule: 'Muokkaa aikataulua',
   editDeliveryTime: 'Muokkaa toimitusaikaa',

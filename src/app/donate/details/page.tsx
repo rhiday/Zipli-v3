@@ -52,14 +52,6 @@ export default function DonationDetailsPage() {
     }
   };
 
-  const handleSkip = () => {
-    if (currentItemIndex < totalItems - 1) {
-      setCurrentItemIndex(currentItemIndex + 1);
-    } else {
-      router.push('/donate/pickup-slot');
-    }
-  };
-
   const handleBackClick = () => {
     if (currentItemIndex > 0) {
       // If not on first item, go to previous item
@@ -80,18 +72,13 @@ export default function DonationDetailsPage() {
       }
       footer={
         <BottomActionBar>
-          <div className="flex justify-between w-full">
-            <Button variant="ghost" onClick={handleSkip} disabled={isSaving}>
-              {t('skip')}
-            </Button>
-            <Button onClick={handleNext} disabled={isSaving}>
-              {isSaving
-                ? t('savingEllipsis')
-                : currentItemIndex < totalItems - 1
-                  ? t('next')
-                  : t('continue')}
-            </Button>
-          </div>
+          <Button onClick={handleNext} disabled={isSaving} className="w-full">
+            {isSaving
+              ? t('savingEllipsis')
+              : currentItemIndex < totalItems - 1
+                ? t('next')
+                : t('continue')}
+          </Button>
         </BottomActionBar>
       }
       className="bg-white"
