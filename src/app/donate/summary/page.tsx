@@ -225,10 +225,16 @@ export default function DonationSummaryPage() {
           } else {
             console.log('🆕 Creating new food item...');
             // Create a new food item
+            // Format allergens as a PostgreSQL array string format
+            const allergensForStorage =
+              item.allergens && item.allergens.length > 0
+                ? `{${item.allergens.map((a) => `"${a.replace(/"/g, '\\"')}"`).join(',')}}`
+                : null;
+
             const newFoodItemResult = await addFoodItem({
               name: item.name,
               description: item.description || null,
-              allergens: JSON.stringify(item.allergens || []),
+              allergens: allergensForStorage,
               image_url:
                 item.imageUrl || (item.imageUrls && item.imageUrls[0]) || null, // Use first image if imageUrl not set
               image_urls:

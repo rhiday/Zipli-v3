@@ -223,17 +223,17 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
       {/* Dots Indicator */}
       {showDots && validImages.length > 1 && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
-          <div className="flex space-x-2">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 bg-black/20 px-2 py-1 rounded-full backdrop-blur-sm">
+          <div className="flex space-x-1.5">
             {validImages.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
                 className={cn(
-                  'w-2 h-2 rounded-full transition-all',
+                  'w-1.5 h-1.5 md:w-2 md:h-2 rounded-full transition-all',
                   index === currentIndex
-                    ? 'bg-white scale-125'
-                    : 'bg-white/50 hover:bg-white/75'
+                    ? 'bg-white scale-110'
+                    : 'bg-white/60 hover:bg-white/80'
                 )}
                 aria-label={`Go to image ${index + 1}`}
               />
