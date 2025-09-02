@@ -10,11 +10,28 @@ const nextConfig = {
 
   // Optimize for production
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      'recharts',
+      '@supabase/supabase-js',
+      'date-fns',
+      'react-hook-form',
+    ],
   },
 
   // Configure webpack for better tree shaking
   webpack: (config, { isServer }) => {
+    // Enable bundle analyzer when ANALYZE=true
+    if (process.env.ANALYZE === 'true' && !isServer) {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          openAnalyzer: false,
+        })
+      );
+    }
     if (!isServer) {
       // Replace react with preact in production for smaller bundle
       config.resolve.alias = {
@@ -35,11 +52,27 @@ const nextConfig = {
             priority: 40,
             enforce: true,
           },
+          // Split commons into smaller, more specific chunks
+          supabase: {
+            name: 'supabase',
+            test: /[\\/]node_modules[\\/]@supabase[\\/]/,
+            chunks: 'all',
+            priority: 30,
+            enforce: true,
+          },
+          ui: {
+            name: 'ui-libs',
+            test: /[\\/]node_modules[\\/](lucide-react|framer-motion|recharts|radix-ui)[\\/]/,
+            chunks: 'all',
+            priority: 25,
+            enforce: true,
+          },
           commons: {
             name: 'commons',
             chunks: 'all',
-            minChunks: 2,
+            minChunks: 3, // Increase threshold to reduce commons size
             priority: 20,
+            maxSize: 200000, // Limit commons to 200KB
           },
           lib: {
             test(module) {
