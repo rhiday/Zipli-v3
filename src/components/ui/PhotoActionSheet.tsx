@@ -43,18 +43,18 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
 
   const handleCameraSelect = () => {
     onOpenChange(false);
-    // Small delay to ensure modal closes before triggering camera
+    // Delay to ensure modal closes before triggering camera (iOS needs more time)
     setTimeout(() => {
       onCameraSelect();
-    }, 100);
+    }, 300);
   };
 
   const handleGallerySelect = () => {
     onOpenChange(false);
-    // Small delay to ensure modal closes before triggering gallery
+    // Delay to ensure modal closes before triggering gallery (iOS needs more time)
     setTimeout(() => {
       onGallerySelect();
-    }, 100);
+    }, 300);
   };
 
   const finalTitle = title || t('photoOptions') || 'Photo Options';
@@ -65,7 +65,7 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-w-lg mx-auto">
+      <DrawerContent className="bg-base">
         <DrawerHeader className="text-center border-b border-border">
           <div className="flex items-center justify-between">
             <div className="flex-1">
@@ -86,13 +86,15 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
             <Button
               variant="secondary"
               size="lg"
-              className="w-full flex items-center justify-start gap-4 h-14 text-left font-medium"
+              className="w-full justify-start py-5 text-left"
               onClick={handleCameraSelect}
             >
-              <div className="w-8 h-8 rounded-full bg-cream flex items-center justify-center">
+              <div className="w-8 h-8 mr-3 rounded-full bg-cream flex items-center justify-center">
                 <Camera size={18} className="text-blue" />
               </div>
-              <span className="text-primary">{finalCameraLabel}</span>
+              <div>
+                <p className="font-semibold text-primary">{finalCameraLabel}</p>
+              </div>
             </Button>
           )}
 
@@ -100,13 +102,17 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
             <Button
               variant="secondary"
               size="lg"
-              className="w-full flex items-center justify-start gap-4 h-14 text-left font-medium"
+              className="w-full justify-start py-5 text-left"
               onClick={handleGallerySelect}
             >
-              <div className="w-8 h-8 rounded-full bg-cream flex items-center justify-center">
+              <div className="w-8 h-8 mr-3 rounded-full bg-cream flex items-center justify-center">
                 <Image size={18} className="text-earth" />
               </div>
-              <span className="text-primary">{finalGalleryLabel}</span>
+              <div>
+                <p className="font-semibold text-primary">
+                  {finalGalleryLabel}
+                </p>
+              </div>
             </Button>
           )}
 
