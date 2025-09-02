@@ -394,6 +394,7 @@ export const fi = {
   notSpecified: 'Ei määritelty',
   glutenFree: 'Gluteeniton',
   lactoseFree: 'Laktoositon',
+  milkFree: 'Maidoton',
   lowLactose: 'Vähälaktoosinen',
   eggFree: 'Munaton',
   soyFree: 'Soijaton',
@@ -493,6 +494,17 @@ export const fi = {
   confirmPickup: 'Kuittaa nouto',
   rememberToMarkPickedUp:
     'Muista kuitata ruoka noudetuksi klikkaamalla lahjoituksen nimeä etusivun vihreässä ikkunassa',
+
+  // Photo upload options
+  photoOptions: 'Kuva-asetukset',
+  takePhoto: 'Ota kuva',
+  chooseFromGallery: 'Valitse galleriasta',
+  cameraNotAvailable: 'Kamera ei käytettävissä',
+  tapToTakePhotoOrChoose: 'Napauta ottaaksesi kuvan tai valitaksesi tiedoston',
+  tapToChooseFile: 'Napauta valitaksesi tiedoston',
+  dragDropOrClick: 'Vedä ja pudota tai klikkaa valitaksesi tiedostoja',
+  supportedFormats: 'Tuetut formaatit: JPG, PNG, WebP',
+  maxFileSize: 'Max',
 
   // User Roles (New additions - some already exist, adding missing ones)
   cityOfficial: 'Kaupungin virkamies',

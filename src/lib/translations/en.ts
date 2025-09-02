@@ -349,6 +349,7 @@ export const en = {
   notSpecified: 'Not specified',
   glutenFree: 'Gluten-free',
   lactoseFree: 'Lactose-free',
+  milkFree: 'Milk-free',
   lowLactose: 'Low-lactose',
   eggFree: 'Egg-free',
   soyFree: 'Soy-free',
@@ -447,6 +448,17 @@ export const en = {
   confirmPickup: 'Confirm pickup',
   rememberToMarkPickedUp:
     'Remember to mark food as picked up by clicking the donation name in the green window on the front page',
+
+  // Photo upload options
+  photoOptions: 'Photo Options',
+  takePhoto: 'Take Photo',
+  chooseFromGallery: 'Choose from Gallery',
+  cameraNotAvailable: 'Camera not available',
+  tapToTakePhotoOrChoose: 'Tap to take photo or choose file',
+  tapToChooseFile: 'Tap to choose file',
+  dragDropOrClick: 'Drag & drop or click to choose files',
+  supportedFormats: 'Supported formats: JPG, PNG, WebP',
+  maxFileSize: 'Max',
 
   // User Roles (New additions - some already exist, adding missing ones)
   cityOfficial: 'City Official',
