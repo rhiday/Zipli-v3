@@ -3,7 +3,7 @@
  */
 
 /**
- * Parse allergens from various formats (JSON string, array, comma-separated string)
+ * Parse allergens from various formats (JSON string, array, comma-separated string, PostgreSQL array)
  * Handles extreme corruption and multiple levels of JSON encoding
  */
 export function parseAllergens(allergens: any): string[] {
@@ -16,6 +16,19 @@ export function parseAllergens(allergens: any): string[] {
 
   // If it's a string, try to parse it with aggressive cleanup
   if (typeof allergens === 'string') {
+    // Check if it's a PostgreSQL array format like {value1,value2} or {"value 1","value 2"}
+    const pgArrayMatch = allergens.match(/^\{(.+)\}$/);
+    if (pgArrayMatch) {
+      // Parse PostgreSQL array format
+      const content = pgArrayMatch[1];
+      // Split by comma but respect quoted values
+      const items = content.match(/("(?:[^"\\]|\\.)*"|[^,]+)/g) || [];
+      return items
+        .map((item) => item.trim().replace(/^"|"$/g, '').replace(/\\"/g, '"'))
+        .map(normalizeAllergenName)
+        .filter((a) => a);
+    }
+
     return parseCorruptedAllergenString(allergens);
   }
 
@@ -32,8 +45,10 @@ function parseCorruptedAllergenString(str: string): string[] {
   if (!trimmed) return [];
 
   // First, try to extract meaningful content using regex
-  // Look for patterns like "Not specified" buried in the corruption
-  const contentRegex = /([A-Za-z][A-Za-z\s-]+[A-Za-z]|[A-Za-z]+)/g;
+  // Look for patterns like "Not specified" or "Ei määritelty" buried in the corruption
+  // Include Unicode characters for Finnish text (ä, ö, å)
+  const contentRegex =
+    /([A-Za-zÄÖÅäöå][A-Za-zÄÖÅäöå\s-]+[A-Za-zÄÖÅäöå]|[A-Za-zÄÖÅäöå]+)/g;
   const matches = trimmed.match(contentRegex);
 
   if (matches) {
@@ -130,7 +145,7 @@ export function formatAllergensForStorage(allergens: string[]): string {
 export function normalizeAllergenName(name: string): string {
   const normalized = name.trim();
 
-  // Handle common variations
+  // Handle common variations including Finnish
   const variations: Record<string, string> = {
     'Not specified': 'Not specified',
     '\"Not specified\"': 'Not specified',
@@ -138,6 +153,11 @@ export function normalizeAllergenName(name: string): string {
     none: 'Not specified',
     None: 'Not specified',
     NONE: 'Not specified',
+    // Finnish variations
+    'Ei määritelty': 'Ei määritelty',
+    '\"Ei määritelty\"': 'Ei määritelty',
+    'ei määritelty': 'Ei määritelty',
+    'EI MÄÄRITELTY': 'Ei määritelty',
   };
 
   return variations[normalized] || normalized;

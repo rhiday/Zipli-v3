@@ -349,6 +349,7 @@ export const en = {
   notSpecified: 'Not specified',
   glutenFree: 'Gluten-free',
   lactoseFree: 'Lactose-free',
+  milkFree: 'Milk-free',
   lowLactose: 'Low-lactose',
   eggFree: 'Egg-free',
   soyFree: 'Soy-free',
