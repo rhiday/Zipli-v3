@@ -339,35 +339,6 @@ export const EnhancedMultiplePhotoUpload: React.FC<
         </p>
       </div>
 
-      {/* Performance info in development */}
-      {process.env.NODE_ENV === 'development' &&
-        compressionResults.length > 0 && (
-          <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-            <p className="font-medium">Compression Stats:</p>
-            <p>
-              Total savings:{' '}
-              {(
-                compressionResults.reduce(
-                  (sum, r) => sum + (r.originalSize - r.compressedSize),
-                  0
-                ) /
-                1024 /
-                1024
-              ).toFixed(2)}
-              MB
-            </p>
-            <p>
-              Avg ratio:{' '}
-              {(
-                compressionResults.reduce(
-                  (sum, r) => sum + r.compressionRatio,
-                  0
-                ) / compressionResults.length
-              ).toFixed(2)}
-              x
-            </p>
-          </div>
-        )}
 
       {/* Photo Action Sheet */}
       <PhotoActionSheet

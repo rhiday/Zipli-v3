@@ -172,26 +172,36 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             return;
           }
 
-          // Use optimized batch data fetching
-          console.log('📦 Starting optimized batch data fetch...');
-          const { donations, requests } = await batchFetchUserData(currentUser!);
-          
-          // Update state with fetched data
-          set({ 
-            donations, 
-            requests,
-            users: [currentUser!] // Keep current user in users array for compatibility
-          });
-          
-          console.log('✅ Optimized data fetching completed');
+          if (currentUser) {
+            // Use optimized batch data fetching
+            console.log('📦 Starting optimized batch data fetch...');
+            const { donations, requests } = await batchFetchUserData(currentUser);
+            
+            // Update state with fetched data
+            set({ 
+              donations, 
+              requests,
+              users: [currentUser], // Keep current user in users array for compatibility
+              currentUser,
+              isInitialized: true,
+              loading: false,
+            });
+            
+            console.log('✅ Optimized data fetching completed');
+          } else {
+            // No user logged in - just set empty state
+            set({
+              donations: [],
+              requests: [],
+              users: [],
+              currentUser: null,
+              isInitialized: true,
+              loading: false,
+            });
+          }
 
           // Setup real-time subscriptions
           // Move real-time setup to after UI is ready
-          set({
-            currentUser,
-            isInitialized: true,
-            loading: false,
-          });
 
           // Defer real-time setup
           setTimeout(() => {

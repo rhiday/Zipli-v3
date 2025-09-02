@@ -58,13 +58,6 @@ export function middleware(request: NextRequest) {
   // Security headers for better performance
   response.headers.set('X-DNS-Prefetch-Control', 'on');
   
-  // Preload key resources hint
-  if (pathname === '/' || pathname === '/login' || pathname === '/donate') {
-    response.headers.set(
-      'Link',
-      '</fonts/inter.woff2>; rel=preload; as=font; type=font/woff2; crossorigin'
-    );
-  }
 
   return response;
 }
