@@ -14,8 +14,6 @@ export default function AuthCallback() {
 
       // Process the callback
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = hashParams.get('access_token');
-      const refreshToken = hashParams.get('refresh_token');
       const type = hashParams.get('type');
 
       if (error) {
