@@ -616,10 +616,10 @@ function ManualDonationPageInner() {
           </BottomActionBar>
         }
         className="bg-white"
-        contentClassName="p-4 space-y-6"
+        contentClassName="p-4 space-y-6 pb-8"
       >
         {hasItems && !showAddAnotherForm ? (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 pb-4">
             <h2 className="text-lg font-semibold">
               {t('currentItemsInDonation')}
             </h2>
@@ -635,7 +635,7 @@ function ManualDonationPageInner() {
                 onDelete={() => handleDeleteItem(item.id)}
               />
             ))}
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-4 mb-4">
               <button
                 onClick={handleAddAnotherItem}
                 className="flex items-center justify-center gap-2 text-interactive font-semibold text-base self-center"

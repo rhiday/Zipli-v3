@@ -26,6 +26,11 @@
     @apply bg-cream text-primary;
   }
 
+  /* Safe area padding for mobile devices */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
   /* Fix for mobile Safari flickering and scrolling issues */
   html,
   body {
