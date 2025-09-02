@@ -1,5 +1,5 @@
 /**
- * PhotoActionSheet - Camera and Gallery selection drawer
+ * PhotoActionSheet - Camera and Gallery selection drawer with dark mode support
  */
 
 import React from 'react';
@@ -59,16 +59,16 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-w-lg mx-auto">
-        <DrawerHeader className="text-center border-b border-gray-100">
+      <DrawerContent className="max-w-lg mx-auto dark:bg-gray-800">
+        <DrawerHeader className="text-center border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <DrawerTitle className="text-lg font-semibold text-gray-900">
+              <DrawerTitle className="text-lg font-semibold text-gray-900 dark:text-white">
                 {finalTitle}
               </DrawerTitle>
             </div>
             <DrawerClose asChild>
-              <Button variant="ghost" size="sm" className="p-2">
+              <Button variant="ghost" size="sm" className="p-2 dark:text-white dark:hover:bg-gray-700">
                 <X size={20} />
               </Button>
             </DrawerClose>
@@ -80,13 +80,13 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
             <Button
               variant="secondary"
               size="lg"
-              className="w-full flex items-center justify-start gap-4 h-14 text-left font-medium"
+              className="w-full flex items-center justify-start gap-4 h-14 text-left font-medium dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
               onClick={handleCameraSelect}
             >
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <Camera size={18} className="text-blue-600" />
+              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                <Camera size={18} className="text-blue-600 dark:text-blue-300" />
               </div>
-              <span className="text-gray-900">{finalCameraLabel}</span>
+              <span className="text-gray-900 dark:text-white">{finalCameraLabel}</span>
             </Button>
           )}
 
@@ -94,20 +94,20 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
             <Button
               variant="secondary"
               size="lg"
-              className="w-full flex items-center justify-start gap-4 h-14 text-left font-medium"
+              className="w-full flex items-center justify-start gap-4 h-14 text-left font-medium dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
               onClick={handleGallerySelect}
             >
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                <Image size={18} className="text-green-600" />
+              <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                <Image size={18} className="text-green-600 dark:text-green-300" />
               </div>
-              <span className="text-gray-900">{finalGalleryLabel}</span>
+              <span className="text-gray-900 dark:text-white">{finalGalleryLabel}</span>
             </Button>
           )}
 
           <Button
             variant="secondary"
             size="lg"
-            className="w-full mt-4"
+            className="w-full mt-4 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
             onClick={() => onOpenChange(false)}
           >
             {finalCancelLabel}

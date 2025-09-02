@@ -51,6 +51,9 @@ export default function RootLayout({
   // We keep html lang reactive via a data-attr on body for simplicity
   return (
     <html className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+      <head>
+        <meta name="google" content="notranslate" />
+      </head>
       <body>
         <LangSetter />
         <ErrorBoundary>

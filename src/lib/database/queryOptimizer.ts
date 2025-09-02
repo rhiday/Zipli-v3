@@ -45,9 +45,15 @@ function setCachedResult<T>(cacheKey: string, data: T, ttl: number): void {
  * Reduces network payload by ~70% compared to profiles(*)
  */
 export async function fetchOptimizedDonations(
-  currentUser: { id: string; role: string },
+  currentUser: { id: string; role: string } | null,
   limit: number = 20
 ): Promise<DonationWithFoodItem[]> {
+  // Return empty array if no user is logged in
+  if (!currentUser) {
+    console.log('📊 No user logged in, returning empty donations array');
+    return [];
+  }
+
   const cacheKey = `donations:${currentUser.id}:${currentUser.role}:${limit}`;
   
   // Check cache first
@@ -99,8 +105,14 @@ export async function fetchOptimizedDonations(
  * Optimized request fetching with caching
  */
 export async function fetchOptimizedRequests(
-  currentUser: { id: string; role: string }
+  currentUser: { id: string; role: string } | null
 ): Promise<Database['public']['Tables']['requests']['Row'][]> {
+  // Return empty array if no user is logged in
+  if (!currentUser) {
+    console.log('📊 No user logged in, returning empty requests array');
+    return [];
+  }
+
   const cacheKey = `requests:${currentUser.id}:${currentUser.role}`;
   
   // Check cache first
@@ -140,12 +152,21 @@ export async function fetchOptimizedRequests(
  * Reduces serial request waterfall from network analysis
  */
 export async function batchFetchUserData(
-  currentUser: { id: string; role: string }
+  currentUser: { id: string; role: string } | null
 ): Promise<{
   donations: DonationWithFoodItem[];
   requests: Database['public']['Tables']['requests']['Row'][];
 }> {
   console.log('🚀 Starting batch data fetch...');
+  
+  // Return empty arrays if no user is logged in
+  if (!currentUser) {
+    console.log('📊 No user logged in, returning empty data arrays');
+    return {
+      donations: [],
+      requests: [],
+    };
+  }
   
   // Fetch donations
   const donations = await fetchOptimizedDonations(currentUser);
