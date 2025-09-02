@@ -394,6 +394,7 @@ export const fi = {
   notSpecified: 'Ei määritelty',
   glutenFree: 'Gluteeniton',
   lactoseFree: 'Laktoositon',
+  milkFree: 'Maidoton',
   lowLactose: 'Vähälaktoosinen',
   eggFree: 'Munaton',
   soyFree: 'Soijaton',

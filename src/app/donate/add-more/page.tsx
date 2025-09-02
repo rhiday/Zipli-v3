@@ -217,6 +217,7 @@ export default function AddMoreProductsPage() {
           t('notSpecified'),
           t('glutenFree'),
           t('lactoseFree'),
+          t('milkFree'),
           t('lowLactose'),
           t('eggFree'),
           t('soyFree'),
