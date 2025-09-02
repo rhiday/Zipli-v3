@@ -174,13 +174,13 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
           // Use optimized batch data fetching
           console.log('📦 Starting optimized batch data fetch...');
-          const { donations, requests } = await batchFetchUserData(currentUser);
+          const { donations, requests } = await batchFetchUserData(currentUser!);
           
           // Update state with fetched data
           set({ 
             donations, 
             requests,
-            users: [currentUser] // Keep current user in users array for compatibility
+            users: [currentUser!] // Keep current user in users array for compatibility
           });
           
           console.log('✅ Optimized data fetching completed');

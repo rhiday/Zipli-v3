@@ -11,16 +11,8 @@
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/types/supabase';
 
-// Type definitions
-type DonationWithOptimizedProfile = Database['public']['Tables']['donations']['Row'] & {
-  food_item: Database['public']['Tables']['food_items']['Row'] | null;
-  donor: {
-    id: string;
-    full_name: string | null;
-    avatar_url: string | null;
-    role: string;
-  } | null;
-};
+// Import the existing type to ensure compatibility
+import type { DonationWithFoodItem } from '@/types/supabase';
 
 // Cache for request deduplication
 const queryCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
@@ -55,11 +47,11 @@ function setCachedResult<T>(cacheKey: string, data: T, ttl: number): void {
 export async function fetchOptimizedDonations(
   currentUser: { id: string; role: string },
   limit: number = 20
-): Promise<DonationWithOptimizedProfile[]> {
+): Promise<DonationWithFoodItem[]> {
   const cacheKey = `donations:${currentUser.id}:${currentUser.role}:${limit}`;
   
   // Check cache first
-  const cached = getCachedResult<DonationWithOptimizedProfile[]>(cacheKey, CACHE_CONFIGS.donations);
+  const cached = getCachedResult<DonationWithFoodItem[]>(cacheKey, CACHE_CONFIGS.donations);
   if (cached) return cached;
 
   let query = supabase
@@ -70,7 +62,6 @@ export async function fetchOptimizedDonations(
       donor:profiles!donations_donor_id_fkey(
         id,
         full_name,
-        avatar_url,
         role
       )
     `)
@@ -95,7 +86,7 @@ export async function fetchOptimizedDonations(
     ...donation,
     food_item: donation.food_item || null,
     donor: donation.donor || null,
-  }));
+  })) as DonationWithFoodItem[];
 
   // Cache the result
   setCachedResult(cacheKey, donations, CACHE_CONFIGS.donations);
@@ -151,27 +142,25 @@ export async function fetchOptimizedRequests(
 export async function batchFetchUserData(
   currentUser: { id: string; role: string }
 ): Promise<{
-  donations: DonationWithOptimizedProfile[];
+  donations: DonationWithFoodItem[];
   requests: Database['public']['Tables']['requests']['Row'][];
 }> {
   console.log('🚀 Starting batch data fetch...');
   
-  const promises = [
-    fetchOptimizedDonations(currentUser),
-  ];
-
-  // Only fetch requests for non-food_donor roles
+  // Fetch donations
+  const donations = await fetchOptimizedDonations(currentUser);
+  
+  // Fetch requests if user is not a food_donor
+  let requests: Database['public']['Tables']['requests']['Row'][] = [];
   if (currentUser.role !== 'food_donor') {
-    promises.push(fetchOptimizedRequests(currentUser));
+    requests = await fetchOptimizedRequests(currentUser);
   }
-
-  const results = await Promise.all(promises);
   
   console.log('✅ Batch data fetch completed');
   
   return {
-    donations: results[0],
-    requests: results[1] || [],
+    donations,
+    requests,
   };
 }
 
