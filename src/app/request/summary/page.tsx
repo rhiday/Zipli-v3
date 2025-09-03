@@ -170,6 +170,62 @@ export default function RequestSummaryPage() {
         '🔧 Formatted allergens JSON:',
         JSON.stringify(allergensArray)
       );
+      console.log('🔄 Session data:', sessionData);
+      console.log('🔄 Recurring schedule:', recurringSchedule);
+
+      // Handle recurring vs one-time request data
+      let recurrencePatternData = null;
+      let requestStartDate = null;
+      let requestEndDate = null;
+      let pickupDate = fallbackDate;
+      let pickupStartTime = fallbackStart;
+      let pickupEndTime = fallbackEnd;
+
+      if (recurringSchedule && Array.isArray(recurringSchedule)) {
+        // For recurring requests: store schedule data and use start date
+        recurrencePatternData = JSON.stringify({
+          schedules: recurringSchedule,
+          type: 'weekly', // Can be extended for other recurrence types
+        });
+
+        // Get start date from session data
+        if (sessionData.startDate) {
+          requestStartDate = sessionData.startDate;
+          pickupDate = sessionData.startDate; // Use start date as first pickup
+        }
+
+        // Calculate end date (default to 30 days from start for now)
+        if (requestStartDate) {
+          const startDateObj = new Date(requestStartDate);
+          const endDateObj = new Date(startDateObj);
+          endDateObj.setDate(endDateObj.getDate() + 30); // 30-day default period
+          requestEndDate = endDateObj.toISOString().split('T')[0];
+        }
+
+        // Use first schedule's time as primary pickup times
+        if (recurringSchedule[0]) {
+          pickupStartTime = recurringSchedule[0].startTime || fallbackStart;
+          pickupEndTime = recurringSchedule[0].endTime || fallbackEnd;
+        }
+
+        console.log('✅ Recurring request data:', {
+          recurrencePattern: recurrencePatternData,
+          startDate: requestStartDate,
+          endDate: requestEndDate,
+          primaryPickupDate: pickupDate,
+        });
+      } else if (pickupSlots.length > 0 && formattedSlots[0]) {
+        // For one-time requests: use pickup slots
+        pickupDate = formattedSlots[0].date;
+        pickupStartTime = formattedSlots[0].start_time;
+        pickupEndTime = formattedSlots[0].end_time;
+
+        console.log('✅ One-time request data:', {
+          pickupDate,
+          pickupStartTime,
+          pickupEndTime,
+        });
+      }
 
       // Create the request in the database with explicit type
       const requestPayload: RequestInsert = {
@@ -177,20 +233,16 @@ export default function RequestSummaryPage() {
         description: requestData.description,
         people_count: requestData.quantity || 1,
         allergens: allergensArray,
-        pickup_date:
-          pickupSlots.length > 0 && formattedSlots[0]?.date
-            ? formattedSlots[0].date
-            : new Date().toISOString().split('T')[0], // Use today's date as fallback
-        pickup_start_time:
-          pickupSlots.length > 0 && formattedSlots[0]?.start_time
-            ? formattedSlots[0].start_time
-            : '09:00',
-        pickup_end_time:
-          pickupSlots.length > 0 && formattedSlots[0]?.end_time
-            ? formattedSlots[0].end_time
-            : '17:00',
-        status: 'active' as const,
+        address: address.trim(),
+        instructions: instructions.trim() || null,
+        pickup_date: pickupDate,
+        pickup_start_time: pickupStartTime,
+        pickup_end_time: pickupEndTime,
         is_recurring: !!recurringSchedule,
+        recurrence_pattern: recurrencePatternData,
+        start_date: requestStartDate,
+        end_date: requestEndDate,
+        status: 'active' as const,
       };
 
       console.log('Submitting request with payload:', requestPayload);

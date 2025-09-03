@@ -37,7 +37,7 @@ type RequestDetail = {
   pickup_date: string;
   pickup_start_time: string;
   pickup_end_time: string;
-  pickup_instructions: string | null;
+  instructions: string | null;
   allergens: string[] | null;
   status: 'active' | 'fulfilled' | 'cancelled';
   created_at: string;
@@ -181,7 +181,7 @@ export default function RequestDetailPage(): React.ReactElement {
       quantity: `${request.people_count} people`,
       allergens: request.allergens || [],
       instructions:
-        request.pickup_instructions || 'No additional instructions provided.',
+        request.instructions || 'No additional instructions provided.',
     };
   };
 
