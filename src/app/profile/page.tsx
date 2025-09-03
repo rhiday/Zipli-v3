@@ -16,6 +16,7 @@ import { useDatabase } from '@/store';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
+import { ViewportContainer } from '@/components/layout/ViewportContainer';
 
 export default function ProfilePage(): React.ReactElement {
   const router = useRouter();
@@ -161,14 +162,14 @@ export default function ProfilePage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-cream">
+      <ViewportContainer variant="fullscreen" className="flex items-center justify-center bg-cream">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
-      </div>
+      </ViewportContainer>
     );
   }
 
   return (
-    <div className="flex flex-col h-dvh bg-cream">
+    <ViewportContainer variant="fullscreen" className="flex flex-col bg-cream">
       <SecondaryNavbar
         title={t('profile')}
         backHref="#"
@@ -427,6 +428,6 @@ export default function ProfilePage(): React.ReactElement {
           </div>
         </div>
       </div>
-    </div>
+    </ViewportContainer>
   );
 }

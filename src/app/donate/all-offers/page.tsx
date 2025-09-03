@@ -21,6 +21,8 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
 import FilterBar from '@/components/ui/FilterBar';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { ViewportContainer } from '@/components/layout/ViewportContainer';
+import { DonationCardSkeleton } from '@/components/ui/OptimizedSkeleton';
 
 type FoodItemDetails = {
   name: string;
@@ -241,7 +243,7 @@ export default function AllItemsPage(): React.ReactElement {
   }
 
   return (
-    <div className="min-h-dvh bg-base pb-20">
+    <ViewportContainer variant="page" className="bg-base pb-nav">
       <Header
         title={`${t('all')} ${filters.type === 'donations' ? t('donations') : t('requests')} ${t('by')} ${userName}`}
       />
@@ -423,6 +425,6 @@ export default function AllItemsPage(): React.ReactElement {
           </div>
         )}
       </main>
-    </div>
+    </ViewportContainer>
   );
 }

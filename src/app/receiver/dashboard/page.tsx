@@ -18,6 +18,7 @@ import {
 import Header from '@/components/layout/Header';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ViewportContainer } from '@/components/layout/ViewportContainer';
 import { loadJsPDF } from '@/lib/lazy-imports';
 import { useDatabase } from '@/store';
 import {
@@ -107,7 +108,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-dvh pb-20">
+      <ViewportContainer variant="page" className="pb-nav">
         <Header title="Loading..." />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -147,12 +148,12 @@ export default function ReceiverDashboardPage(): React.ReactElement {
             </div>
           </section>
         </main>
-      </div>
+      </ViewportContainer>
     );
   }
 
   return (
-    <div className="min-h-dvh pb-20">
+    <ViewportContainer variant="page" className="pb-nav">
       <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -281,6 +282,6 @@ export default function ReceiverDashboardPage(): React.ReactElement {
           </div>
         </section> */}
       </main>
-    </div>
+    </ViewportContainer>
   );
 }

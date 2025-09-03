@@ -32,6 +32,13 @@ import {
   RequestUpdate,
 } from '@/types/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { 
+  fetchOptimizedDonations, 
+  fetchOptimizedRequests, 
+  batchFetchUserData,
+  clearQueryCache,
+  getCacheStats 
+} from '@/lib/database/queryOptimizer';
 
 // Store state interface
 interface SupabaseDatabaseState {
@@ -165,25 +172,36 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             return;
           }
 
-          // Always fetch data from Supabase
-          console.log('📦 Fetching data...');
-          await Promise.all([
-            state.fetchDonations(),
-            state.fetchUsers(),
-            // Only fetch requests if user is not a food_donor
-            ...(currentUser?.role !== 'food_donor'
-              ? [state.fetchRequests()]
-              : []),
-          ]);
-          console.log('✅ Data fetching completed');
+          if (currentUser) {
+            // Use optimized batch data fetching
+            console.log('📦 Starting optimized batch data fetch...');
+            const { donations, requests } = await batchFetchUserData(currentUser);
+            
+            // Update state with fetched data
+            set({ 
+              donations, 
+              requests,
+              users: [currentUser], // Keep current user in users array for compatibility
+              currentUser,
+              isInitialized: true,
+              loading: false,
+            });
+            
+            console.log('✅ Optimized data fetching completed');
+          } else {
+            // No user logged in - just set empty state
+            set({
+              donations: [],
+              requests: [],
+              users: [],
+              currentUser: null,
+              isInitialized: true,
+              loading: false,
+            });
+          }
 
           // Setup real-time subscriptions
           // Move real-time setup to after UI is ready
-          set({
-            currentUser,
-            isInitialized: true,
-            loading: false,
-          });
 
           // Defer real-time setup
           setTimeout(() => {
@@ -374,46 +392,8 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             return;
           }
 
-          let query = supabase
-            .from('donations')
-            .select(
-              `
-              *,
-              food_item:food_items(*),
-              donor:profiles!donations_donor_id_fkey(*)
-            `
-            )
-            .order('created_at', { ascending: false })
-            .limit(50);
-
-          // Apply role-based filtering
-          if (currentUser.role === 'food_donor') {
-            // Donors see their own donations
-            query = query.eq('donor_id', currentUser.id);
-          } else if (currentUser.role === 'food_receiver') {
-            // Receivers see available donations
-            query = query.eq('status', 'available');
-          } else if (
-            currentUser.role === 'city' ||
-            currentUser.role === 'terminals'
-          ) {
-            // Admins see all donations
-            // No additional filters needed
-          }
-
-          const { data: donationsData, error: donationsError } = await query;
-
-          if (donationsError) {
-            console.error('Error fetching donations:', donationsError);
-            throw donationsError;
-          }
-
-          const donations = (donationsData || []).map((donation) => ({
-            ...donation,
-            food_item: donation.food_item || null,
-            donor: donation.donor || null,
-          }));
-
+          // Use optimized query with caching and reduced over-fetching
+          const donations = await fetchOptimizedDonations(currentUser, 50);
           set({ donations });
         } catch (error) {
           console.error('Error fetching donations', error);
@@ -484,34 +464,9 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             return;
           }
 
-          let query = supabase
-            .from('requests')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-          // Apply role-based filtering
-          if (currentUser.role === 'food_receiver') {
-            // Receivers see their own requests
-            query = query.eq('user_id', currentUser.id);
-          } else if (currentUser.role === 'food_donor') {
-            // Donors see active requests
-            query = query.eq('status', 'active');
-          } else if (
-            currentUser.role === 'city' ||
-            currentUser.role === 'terminals'
-          ) {
-            // Admins see all requests
-            // No additional filters needed
-          }
-
-          const { data, error } = await query;
-
-          if (error) {
-            console.error('Error fetching requests:', error);
-            throw error;
-          }
-
-          set({ requests: data || [] });
+          // Use optimized query with caching
+          const requests = await fetchOptimizedRequests(currentUser);
+          set({ requests });
         } catch (error) {
           console.error('Error fetching requests', error);
           set({
@@ -911,6 +866,8 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
                   // Debounce rapid changes
                   clearTimeout((window as any)._donationRefetchTimeout);
                   (window as any)._donationRefetchTimeout = setTimeout(() => {
+                    // Clear cache for fresh data after real-time update
+                    clearQueryCache('donations');
                     get().fetchDonations();
                   }, 100);
                 }
@@ -947,6 +904,8 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
                   if (relevantChange) {
                     clearTimeout((window as any)._requestRefetchTimeout);
                     (window as any)._requestRefetchTimeout = setTimeout(() => {
+                      // Clear cache for fresh data after real-time update
+                      clearQueryCache('requests');
                       get().fetchRequests();
                     }, 100);
                   }

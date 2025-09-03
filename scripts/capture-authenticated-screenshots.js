@@ -221,7 +221,7 @@ class AuthenticatedScreenshotCapture {
         // Click edit button if available
         try {
           await this.page.click('button:has-text("Edit")', { timeout: 3000 });
-        } catch (e) {
+        } catch {
           // Edit button might not exist
         }
         break;

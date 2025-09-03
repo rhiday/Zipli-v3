@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { ViewportContainer } from '@/components/layout/ViewportContainer';
 
 export default function DonationThankYouPage() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function DonationThankYouPage() {
   }, [isEditMode, setEditMode]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh px-4 bg-white">
+    <ViewportContainer variant="fullscreen" className="flex flex-col items-center justify-center px-4 bg-white">
       <div className="mt-12 mb-8">
         <svg
           width="164"
@@ -91,6 +92,6 @@ export default function DonationThankYouPage() {
           {t('backToDashboard')}
         </button>
       </Link>
-    </div>
+    </ViewportContainer>
   );
 }

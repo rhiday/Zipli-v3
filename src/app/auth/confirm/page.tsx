@@ -55,7 +55,7 @@ function ConfirmPageContent() {
             router.push('/dashboard');
         }
       }
-    } catch (err) {
+    } catch {
       setError(t('errors.genericError'));
       setLoading(false);
     }

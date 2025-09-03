@@ -11,6 +11,7 @@ import {
   DeviceCapabilities,
 } from '@/lib/device-capabilities';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { isIOS } from '@/lib/device-utils';
 
 interface EnhancedMultiplePhotoUploadProps {
   isMobile?: boolean;
@@ -193,11 +194,18 @@ export const EnhancedMultiplePhotoUpload: React.FC<
   const handleClick = useCallback(() => {
     if (disabled || uploading || uploadedImages.length >= maxImages) return;
 
-    // If mobile and camera is available, show action sheet
+    // On iOS devices, skip our custom modal and use native picker directly
+    // This avoids the double-modal issue where users see both our modal and iOS modal
+    if (isIOS()) {
+      fileInputRef.current?.click();
+      return;
+    }
+
+    // For non-iOS mobile devices with camera, show our custom action sheet
     if ((isMobile || deviceInfo?.isMobile) && deviceInfo?.hasCamera) {
       setShowActionSheet(true);
     } else {
-      // Fallback to file picker
+      // Fallback to file picker for desktop
       fileInputRef.current?.click();
     }
   }, [
@@ -338,36 +346,6 @@ export const EnhancedMultiplePhotoUpload: React.FC<
               : '5MB'}
         </p>
       </div>
-
-      {/* Performance info in development */}
-      {process.env.NODE_ENV === 'development' &&
-        compressionResults.length > 0 && (
-          <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-            <p className="font-medium">Compression Stats:</p>
-            <p>
-              Total savings:{' '}
-              {(
-                compressionResults.reduce(
-                  (sum, r) => sum + (r.originalSize - r.compressedSize),
-                  0
-                ) /
-                1024 /
-                1024
-              ).toFixed(2)}
-              MB
-            </p>
-            <p>
-              Avg ratio:{' '}
-              {(
-                compressionResults.reduce(
-                  (sum, r) => sum + r.compressionRatio,
-                  0
-                ) / compressionResults.length
-              ).toFixed(2)}
-              x
-            </p>
-          </div>
-        )}
 
       {/* Photo Action Sheet */}
       <PhotoActionSheet

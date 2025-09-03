@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { Phone, Mail } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { ViewportContainer } from '@/components/layout/ViewportContainer';
 
 export default function ContactPage(): React.ReactElement {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function ContactPage(): React.ReactElement {
   const t = content[language] || content.en;
 
   return (
-    <div className="flex flex-col h-dvh bg-cream">
+    <ViewportContainer variant="fullscreen" className="flex flex-col bg-cream">
       <SecondaryNavbar
         title={t.title}
         backHref="#"
@@ -86,6 +87,6 @@ export default function ContactPage(): React.ReactElement {
           </div>
         </div>
       </div>
-    </div>
+    </ViewportContainer>
   );
 }
