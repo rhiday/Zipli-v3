@@ -360,9 +360,7 @@ export type Database = {
           address: string | null;
           allergens: Json | null;
           created_at: string;
-          delivery_preference: string | null;
           description: string;
-          dietary_preferences: Json | null;
           end_date: string | null;
           id: string;
           instructions: string | null;
@@ -372,7 +370,6 @@ export type Database = {
           people_count: number;
           pickup_date: string;
           pickup_end_time: string;
-          pickup_instructions: string | null;
           pickup_start_time: string;
           postal_code: string | null;
           recurrence_pattern: string | null;
@@ -386,9 +383,7 @@ export type Database = {
           address?: string | null;
           allergens?: Json | null;
           created_at?: string;
-          delivery_preference?: string | null;
           description: string;
-          dietary_preferences?: Json | null;
           end_date?: string | null;
           id?: string;
           instructions?: string | null;
@@ -398,7 +393,6 @@ export type Database = {
           people_count?: number;
           pickup_date: string;
           pickup_end_time: string;
-          pickup_instructions?: string | null;
           pickup_start_time: string;
           postal_code?: string | null;
           recurrence_pattern?: string | null;
@@ -412,9 +406,7 @@ export type Database = {
           address?: string | null;
           allergens?: Json | null;
           created_at?: string;
-          delivery_preference?: string | null;
           description?: string;
-          dietary_preferences?: Json | null;
           end_date?: string | null;
           id?: string;
           instructions?: string | null;
@@ -424,7 +416,6 @@ export type Database = {
           people_count?: number;
           pickup_date?: string;
           pickup_end_time?: string;
-          pickup_instructions?: string | null;
           pickup_start_time?: string;
           postal_code?: string | null;
           recurrence_pattern?: string | null;

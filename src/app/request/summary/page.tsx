@@ -52,6 +52,27 @@ export default function RequestSummaryPage() {
     }
   };
 
+  const translateDayNames = (days: string[]) => {
+    // Map English day names to Finnish translations
+    const dayTranslations: { [key: string]: string } = {
+      monday: t('monday'),
+      tuesday: t('tuesday'),
+      wednesday: t('wednesday'),
+      thursday: t('thursday'),
+      friday: t('friday'),
+      saturday: t('saturday'),
+      sunday: t('sunday'),
+    };
+
+    return days
+      .map((day) => {
+        const translatedDay = dayTranslations[day.toLowerCase()] || day;
+        // Capitalize first letter for proper formatting
+        return translatedDay.charAt(0).toUpperCase() + translatedDay.slice(1);
+      })
+      .join(', ');
+  };
+
   useEffect(() => {
     if (currentUser) {
       if (currentUser.address) setAddress(currentUser.address);
@@ -170,6 +191,62 @@ export default function RequestSummaryPage() {
         '🔧 Formatted allergens JSON:',
         JSON.stringify(allergensArray)
       );
+      console.log('🔄 Session data:', sessionData);
+      console.log('🔄 Recurring schedule:', recurringSchedule);
+
+      // Handle recurring vs one-time request data
+      let recurrencePatternData = null;
+      let requestStartDate = null;
+      let requestEndDate = null;
+      let pickupDate = fallbackDate;
+      let pickupStartTime = fallbackStart;
+      let pickupEndTime = fallbackEnd;
+
+      if (recurringSchedule && Array.isArray(recurringSchedule)) {
+        // For recurring requests: store schedule data and use start date
+        recurrencePatternData = JSON.stringify({
+          schedules: recurringSchedule,
+          type: 'weekly', // Can be extended for other recurrence types
+        });
+
+        // Get start date from session data
+        if (sessionData.startDate) {
+          requestStartDate = sessionData.startDate;
+          pickupDate = sessionData.startDate; // Use start date as first pickup
+        }
+
+        // Calculate end date (default to 30 days from start for now)
+        if (requestStartDate) {
+          const startDateObj = new Date(requestStartDate);
+          const endDateObj = new Date(startDateObj);
+          endDateObj.setDate(endDateObj.getDate() + 30); // 30-day default period
+          requestEndDate = endDateObj.toISOString().split('T')[0];
+        }
+
+        // Use first schedule's time as primary pickup times
+        if (recurringSchedule[0]) {
+          pickupStartTime = recurringSchedule[0].startTime || fallbackStart;
+          pickupEndTime = recurringSchedule[0].endTime || fallbackEnd;
+        }
+
+        console.log('✅ Recurring request data:', {
+          recurrencePattern: recurrencePatternData,
+          startDate: requestStartDate,
+          endDate: requestEndDate,
+          primaryPickupDate: pickupDate,
+        });
+      } else if (pickupSlots.length > 0 && formattedSlots[0]) {
+        // For one-time requests: use pickup slots
+        pickupDate = formattedSlots[0].date || fallbackDate;
+        pickupStartTime = formattedSlots[0].start_time || fallbackStart;
+        pickupEndTime = formattedSlots[0].end_time || fallbackEnd;
+
+        console.log('✅ One-time request data:', {
+          pickupDate,
+          pickupStartTime,
+          pickupEndTime,
+        });
+      }
 
       // Create the request in the database with explicit type
       const requestPayload: RequestInsert = {
@@ -177,20 +254,16 @@ export default function RequestSummaryPage() {
         description: requestData.description,
         people_count: requestData.quantity || 1,
         allergens: allergensArray,
-        pickup_date:
-          pickupSlots.length > 0 && formattedSlots[0]?.date
-            ? formattedSlots[0].date
-            : new Date().toISOString().split('T')[0], // Use today's date as fallback
-        pickup_start_time:
-          pickupSlots.length > 0 && formattedSlots[0]?.start_time
-            ? formattedSlots[0].start_time
-            : '09:00',
-        pickup_end_time:
-          pickupSlots.length > 0 && formattedSlots[0]?.end_time
-            ? formattedSlots[0].end_time
-            : '17:00',
-        status: 'active' as const,
+        address: address.trim(),
+        instructions: instructions.trim() || null,
+        pickup_date: pickupDate,
+        pickup_start_time: pickupStartTime,
+        pickup_end_time: pickupEndTime,
         is_recurring: !!recurringSchedule,
+        recurrence_pattern: recurrencePatternData,
+        start_date: requestStartDate,
+        end_date: requestEndDate,
+        status: 'active' as const,
       };
 
       console.log('Submitting request with payload:', requestPayload);
@@ -364,8 +437,15 @@ export default function RequestSummaryPage() {
           </h2>
           <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
             <span className="font-semibold text-interactive">
-              {format(new Date(requestPeriod.startDate), 'dd.MM.yyyy')} -{' '}
-              {format(new Date(requestPeriod.endDate), 'dd.MM.yyyy')}
+              {format(new Date(requestPeriod.startDate), 'dd.MM.yyyy')}{' '}
+              {t('requestPeriodFrom')}
+              {requestPeriod.endDate && (
+                <>
+                  {' '}
+                  {t('requestPeriodTo')}{' '}
+                  {format(new Date(requestPeriod.endDate), 'dd.MM.yyyy')}
+                </>
+              )}
             </span>
             <button
               onClick={() => router.push('/request/schedule')}
@@ -398,7 +478,7 @@ export default function RequestSummaryPage() {
               className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
             >
               <span className="font-semibold text-interactive">
-                {schedule.days?.join(', ')}, {schedule.startTime} -{' '}
+                {translateDayNames(schedule.days || [])}, {schedule.startTime} -{' '}
                 {schedule.endTime}
               </span>
               <button
@@ -417,13 +497,45 @@ export default function RequestSummaryPage() {
               </button>
             </div>
           ))
+        ) : pickupSlots.length > 0 ? (
+          // Multiple one-time pickup slots
+          pickupSlots.map((slot, index) => (
+            <div
+              key={slot.id}
+              className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
+            >
+              <span className="font-semibold text-interactive">
+                {slot.date
+                  ? `${formatSlotDate(slot.date)}, ${slot.startTime} - ${slot.endTime}`
+                  : t('dateNotSet')}
+              </span>
+              <button
+                onClick={() => router.push('/request/pickup-slot')}
+                className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
+                title="Edit delivery time"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M12.0041 3.71165C12.2257 3.49 12.5851 3.49 12.8067 3.71165L15.8338 6.7387C16.0554 6.96034 16.0554 7.31966 15.8338 7.5413L5.99592 17.3792C5.88954 17.4856 5.74513 17.5454 5.59462 17.5454H2.56757C2.25413 17.5454 2 17.2913 2 16.9778V13.9508C2 13.8003 2.05977 13.6559 2.16615 13.5495L12.0041 3.71165Z"
+                    fill="#024209"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))
         ) : (
-          // One-time pickup slot or old format
+          // No pickup slots
           <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
             <span className="font-semibold text-interactive">
-              {pickupSlots.length > 0 && pickupSlots[0].date
-                ? `${formatSlotDate(pickupSlots[0].date)}, ${pickupSlots[0].startTime} - ${pickupSlots[0].endTime}`
-                : t('dateNotSet')}
+              {t('dateNotSet')}
             </span>
             <button
               onClick={() => router.push('/request/pickup-slot')}
