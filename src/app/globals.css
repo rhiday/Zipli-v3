@@ -26,9 +26,52 @@
     @apply bg-cream text-primary;
   }
 
-  /* Safe area padding for mobile devices */
+  /* Safe area utilities for mobile devices */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  .px-safe {
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
+  }
+
+  /* Viewport height utilities with progressive enhancement */
+  .min-h-screen-safe {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .h-screen-safe {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* Bottom navigation safe spacing */
+  .pb-nav {
+    padding-bottom: 76px; /* BottomNav height */
+  }
+
+  .mb-nav {
+    margin-bottom: 76px;
+  }
+
+  /* Consistent mobile scroll containers */
+  .mobile-scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Fix for older Android devices - better scroll performance */
+  @supports not (height: 100dvh) {
+    .legacy-viewport-fix {
+      height: 100vh;
+      height: calc(100vh - env(keyboard-inset-height, 0px));
+    }
   }
 
   /* Fix for mobile Safari flickering and scrolling issues */

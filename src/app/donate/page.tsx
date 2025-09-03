@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import BottomNav from '@/components/BottomNav';
+import { ViewportContainer } from '@/components/layout/ViewportContainer';
 import {
   ArrowRight,
   Info,
@@ -147,7 +148,7 @@ function DonorDashboardPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div className="min-h-[100svh] pb-20">
+      <ViewportContainer variant="page" className="pb-nav">
         <Header title={t('loading')} />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -187,12 +188,12 @@ function DonorDashboardPage(): React.ReactElement {
             </div>
           </section>
         </main>
-      </div>
+      </ViewportContainer>
     );
   }
 
   return (
-    <div className="min-h-[100svh] pb-20">
+    <ViewportContainer variant="page" className="pb-nav">
       <Header />
 
       <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
@@ -343,7 +344,7 @@ title="Default"
 
       {/* Force-hide any rogue Figma card section if it still exists */}
       <style>{`.rogue-donation-card { display: none !important; }`}</style>
-    </div>
+    </ViewportContainer>
   );
 }
 
