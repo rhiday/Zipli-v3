@@ -560,7 +560,6 @@ export const fi = {
   // Missing scheduling keys
   everyDay: 'Päivittäin',
   setYourSchedule: 'Aseta aikataulu',
-  addAnotherSchedule: 'Lisää toinen aikataulu',
   select: 'Valitse',
 
   // Missing action keys
@@ -570,7 +569,6 @@ export const fi = {
 
   // Missing BottomNav keys
   foodItem: 'Ruoka-aine',
-  createDonation: 'Luo lahjoitus',
 
   // Missing helper text keys
   separateMultipleItems:
