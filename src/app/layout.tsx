@@ -51,29 +51,15 @@ export default function RootLayout({
   // We keep html lang reactive via a data-attr on body for simplicity
   return (
     <html className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+      <head>
+        <meta name="google" content="notranslate" />
+      </head>
       <body>
         <LangSetter />
         <ErrorBoundary>
           <AppShell>{children}</AppShell>
           {isDev && <DevSwitcherOverlay />}
         </ErrorBoundary>
-        {/* Performance monitoring in development */}
-        {isDev && (
-          <Script
-            id="performance-monitor"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                if (typeof window !== 'undefined') {
-                  import('/src/lib/performance-monitor.js').then(module => {
-                    const monitor = module.getPerformanceMonitor();
-                    window.__performanceMonitor = monitor;
-                  }).catch(() => {});
-                }
-              `,
-            }}
-          />
-        )}
       </body>
     </html>
   );

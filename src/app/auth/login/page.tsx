@@ -15,6 +15,7 @@ import {
   getRememberedEmail,
   clearRememberedEmail,
 } from '@/lib/auth/sessionUtils';
+import { ViewportContainer } from '@/components/layout/ViewportContainer';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -92,7 +93,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
+    <ViewportContainer
+      variant="fullscreen"
+      className="relative flex items-center justify-center bg-cream p-4"
+    >
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="flex justify-end mb-4">
           <LanguageSwitcher />
@@ -194,6 +198,6 @@ export default function LoginPage() {
           </Link>
         </div> */}
       </div>
-    </div>
+    </ViewportContainer>
   );
 }

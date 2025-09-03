@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/Input';
 import { ItemPreview } from '@/components/ui/ItemPreview';
 import { Progress } from '@/components/ui/progress';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
-import { MultiplePhotoUpload } from '@/components/ui/MultiplePhotoUpload';
+import { EnhancedMultiplePhotoUpload } from '@/components/ui/EnhancedMultiplePhotoUpload';
 import { Textarea } from '@/components/ui/Textarea';
 import { useDatabase } from '@/store';
 import { useDonationStore } from '@/store/donation';
@@ -536,20 +536,26 @@ function ManualDonationPageInner() {
         <label className="text-sm font-medium text-gray-700 mb-2 block">
           {t('addPhoto')} ({t('optional')})
         </label>
-        <MultiplePhotoUpload
-          onImagesUpload={handleImagesUpload}
+        <EnhancedMultiplePhotoUpload
+          onImagesUpload={(imageUrls, compressionInfo) => {
+            handleImagesUpload(imageUrls);
+            if (compressionInfo) {
+              console.log(
+                'Compression saved:',
+                compressionInfo.reduce(
+                  (acc, info) =>
+                    acc + (info.originalSize - info.compressedSize),
+                  0
+                ),
+                'bytes'
+              );
+            }
+          }}
           uploadedImages={currentItem.imageUrls || []}
           hint={t('photosHelpIdentify')}
           maxImages={5}
-          translations={{
-            addPhotos: t('addPhotos'),
-            addMore: t('addMore'),
-            uploading: t('uploading'),
-            maxSizeMb: t('maxSizeMb'),
-            photosCount: t('photosCount'),
-            imageUploadError: t('imageUploadError'),
-            maxImagesError: t('maxImagesError'),
-            invalidFileTypeError: t('invalidFileTypeError'),
+          onError={(error) => {
+            console.error('Photo upload error:', error);
           }}
         />
       </div>
@@ -610,10 +616,10 @@ function ManualDonationPageInner() {
           </BottomActionBar>
         }
         className="bg-white"
-        contentClassName="p-4 space-y-6"
+        contentClassName="p-4 space-y-6 pb-8"
       >
         {hasItems && !showAddAnotherForm ? (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 pb-4">
             <h2 className="text-lg font-semibold">
               {t('currentItemsInDonation')}
             </h2>
@@ -629,7 +635,7 @@ function ManualDonationPageInner() {
                 onDelete={() => handleDeleteItem(item.id)}
               />
             ))}
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-4 mb-4">
               <button
                 onClick={handleAddAnotherItem}
                 className="flex items-center justify-center gap-2 text-interactive font-semibold text-base self-center"

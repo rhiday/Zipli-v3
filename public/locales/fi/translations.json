@@ -2,7 +2,7 @@
   "common": {
     "actions": {
       "save": "Tallenna",
-      "cancel": "Peruuta", 
+      "cancel": "Peruuta",
       "delete": "Poista",
       "edit": "Muokkaa",
       "add": "Lisää",
@@ -142,7 +142,7 @@
         "trackStatus": "Seuraa ilmoitusten tilaa",
         "viewImpact": "Nähdä vaikutuksesi",
         "activeDonations": "Aktiiviset ilmoitukset",
-        "completedDonations": "Aiemmat ilmoitukset", 
+        "completedDonations": "Aiemmat ilmoitukset",
         "totalDonations": "Ilmoitusten määrä yhteensä",
         "recentActivity": "Viimeaikainen toiminta",
         "noActivity": "Sinulla ei ole aktiivisia ilmoituksia",
@@ -382,6 +382,44 @@
       "selectAllergens": "Valitse allergeenit",
       "allergiesIntolerances": "Allergiat, intoleranssit ja ruokavaliot",
       "selectDietaryRestrictions": "Valitse ruokavaliorajoitukset..."
+    },
+    "weekdays": {
+      "sun": "Su",
+      "mon": "Ma",
+      "tue": "Ti",
+      "wed": "Ke",
+      "thu": "To",
+      "fri": "Pe",
+      "sat": "La",
+      "sunday": "Sunnuntai",
+      "monday": "Maanantai",
+      "tuesday": "Tiistai",
+      "wednesday": "Keskiviikko",
+      "thursday": "Torstai",
+      "friday": "Perjantai",
+      "saturday": "Lauantai"
+    },
+    "scheduling": {
+      "everyDay": "Päivittäin",
+      "recurringRequest": "Toistuva pyyntö",
+      "recurringSchedule": "Toistuva aikataulu",
+      "setYourSchedule": "Aseta aikataulu",
+      "addAnotherSchedule": "Lisää toinen aikataulu",
+      "addPickupSlot": "Lisää noutoikkuna",
+      "select": "Valitse",
+      "from": "alkaen",
+      "to": "saakka"
+    },
+    "actions": {
+      "confirmDelivery": "Vahvista toimitus",
+      "confirmDeliveryDescription": "Vahvista että olet vastaanottanut tämän ruoan",
+      "confirmDeliveryClause": "Vahvistan että olen vastaanottanut ruoan ja se on hyvässä kunnossa",
+      "contactRequester": "Ota yhteyttä pyytäjään",
+      "seeAllRequests": "Näytä kaikki pyynnöt",
+      "anonymousRequester": "Nimetön pyytäjä",
+      "created": "Luotu",
+      "fulfilled": "Täytetty",
+      "cancelled": "Peruutettu"
     }
   }
 }

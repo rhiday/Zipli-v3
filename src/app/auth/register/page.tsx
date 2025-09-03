@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { ViewportContainer } from '@/components/layout/ViewportContainer';
 
 export default function RegisterPage() {
   const { t } = useCommonTranslation();
@@ -115,7 +116,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative flex min-h-dvh flex-col items-center justify-center bg-cream p-4">
+    <ViewportContainer
+      variant="fullscreen"
+      className="relative flex items-center justify-center bg-cream p-4"
+    >
       <div className="w-full max-w-md space-y-8 rounded-lg bg-base p-8 shadow-lg">
         <div className="text-center">
           <h1 className="text-titleSm font-display text-primary">
@@ -299,6 +303,6 @@ export default function RegisterPage() {
           </Link>
         </div>
       </div>
-    </div>
+    </ViewportContainer>
   );
 }

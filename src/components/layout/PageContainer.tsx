@@ -33,10 +33,22 @@ export const PageContainer: React.FC<PageContainerProps> = ({
 
   return (
     <div
-      className={cn('flex h-dvh min-h-0 w-full flex-col bg-base', className)}
+      className={cn(
+        'flex h-screen min-h-0 w-full flex-col bg-base',
+        // Fallback for older devices that don't support dvh
+        'supports-[height:100dvh]:h-dvh',
+        className
+      )}
     >
       {header ? <div className="shrink-0">{header}</div> : null}
-      <main className={cn('min-h-0 flex-1 overflow-y-auto', contentClassName)}>
+      <main
+        className={cn(
+          'min-h-0 flex-1 overflow-y-auto',
+          // Add safe padding for older Android devices
+          'pb-safe',
+          contentClassName
+        )}
+      >
         {children}
       </main>
       {footer ? (

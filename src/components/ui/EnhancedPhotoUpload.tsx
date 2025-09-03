@@ -10,6 +10,7 @@ import {
   DeviceCapabilities,
 } from '@/lib/device-capabilities';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { isIOS } from '@/lib/device-utils';
 
 interface EnhancedPhotoUploadProps {
   isMobile?: boolean;
@@ -198,11 +199,18 @@ export const EnhancedPhotoUpload: React.FC<EnhancedPhotoUploadProps> = ({
   const handleClick = useCallback(() => {
     if (disabled || isProcessing) return;
 
-    // If mobile and camera is available, show action sheet
+    // On iOS devices, skip our custom modal and use native picker directly
+    // This avoids the double-modal issue where users see both our modal and iOS modal
+    if (isIOS()) {
+      fileInputRef.current?.click();
+      return;
+    }
+
+    // For non-iOS mobile devices with camera, show our custom action sheet
     if ((isMobile || deviceInfo?.isMobile) && deviceInfo?.hasCamera) {
       setShowActionSheet(true);
     } else {
-      // Fallback to file picker
+      // Fallback to file picker for desktop
       fileInputRef.current?.click();
     }
   }, [disabled, isProcessing, isMobile, deviceInfo]);

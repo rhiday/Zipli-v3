@@ -1,5 +1,5 @@
 /**
- * PhotoActionSheet - Camera and Gallery selection drawer
+ * PhotoActionSheet - Camera and Gallery selection drawer with dark mode support
  */
 
 import React from 'react';
@@ -43,12 +43,18 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
 
   const handleCameraSelect = () => {
     onOpenChange(false);
-    onCameraSelect();
+    // Delay to ensure modal closes before triggering camera (iOS needs more time)
+    setTimeout(() => {
+      onCameraSelect();
+    }, 300);
   };
 
   const handleGallerySelect = () => {
     onOpenChange(false);
-    onGallerySelect();
+    // Delay to ensure modal closes before triggering gallery (iOS needs more time)
+    setTimeout(() => {
+      onGallerySelect();
+    }, 300);
   };
 
   const finalTitle = title || t('photoOptions') || 'Photo Options';
@@ -59,11 +65,11 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-w-lg mx-auto">
-        <DrawerHeader className="text-center border-b border-gray-100">
+      <DrawerContent className="bg-base">
+        <DrawerHeader className="text-center border-b border-border">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <DrawerTitle className="text-lg font-semibold text-gray-900">
+              <DrawerTitle className="text-lg font-semibold text-primary">
                 {finalTitle}
               </DrawerTitle>
             </div>
@@ -80,13 +86,15 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
             <Button
               variant="secondary"
               size="lg"
-              className="w-full flex items-center justify-start gap-4 h-14 text-left font-medium"
+              className="w-full justify-start py-5 text-left"
               onClick={handleCameraSelect}
             >
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <Camera size={18} className="text-blue-600" />
+              <div className="w-8 h-8 mr-3 rounded-full bg-cream flex items-center justify-center">
+                <Camera size={18} className="text-blue" />
               </div>
-              <span className="text-gray-900">{finalCameraLabel}</span>
+              <div>
+                <p className="font-semibold text-primary">{finalCameraLabel}</p>
+              </div>
             </Button>
           )}
 
@@ -94,13 +102,17 @@ export const PhotoActionSheet: React.FC<PhotoActionSheetProps> = ({
             <Button
               variant="secondary"
               size="lg"
-              className="w-full flex items-center justify-start gap-4 h-14 text-left font-medium"
+              className="w-full justify-start py-5 text-left"
               onClick={handleGallerySelect}
             >
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                <Image size={18} className="text-green-600" />
+              <div className="w-8 h-8 mr-3 rounded-full bg-cream flex items-center justify-center">
+                <Image size={18} className="text-earth" />
               </div>
-              <span className="text-gray-900">{finalGalleryLabel}</span>
+              <div>
+                <p className="font-semibold text-primary">
+                  {finalGalleryLabel}
+                </p>
+              </div>
             </Button>
           )}
 

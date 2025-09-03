@@ -552,7 +552,7 @@ class ScreenshotCapture {
     return results;
   }
 
-  async uploadToLokaliseAPI(screenshots) {
+  async uploadToLokaliseAPI(_screenshots) {
     console.log('\n💾 Screenshots saved locally.');
   }
 

@@ -43,13 +43,16 @@ interface Request {
   description: string;
   people_count: number;
   allergens: string[];
-  start_date: string;
-  end_date: string;
+  address?: string;
+  instructions?: string;
+  start_date?: string;
+  end_date?: string;
   pickup_date: string;
   pickup_start_time: string;
   pickup_end_time: string;
   pickup_slots?: any[]; // Array of pickup slots for multiple slots
   is_recurring: boolean;
+  recurrence_pattern?: string; // JSON string for recurring schedule data
   status: 'active' | 'fulfilled' | 'cancelled';
   created_at: string;
   updated_at: string;

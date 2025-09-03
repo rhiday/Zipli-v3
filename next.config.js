@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
 
   // Performance optimizations
   compiler: {
@@ -10,11 +9,28 @@ const nextConfig = {
 
   // Optimize for production
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      'recharts',
+      '@supabase/supabase-js',
+      'date-fns',
+      'react-hook-form',
+    ],
   },
 
   // Configure webpack for better tree shaking
   webpack: (config, { isServer }) => {
+    // Enable bundle analyzer when ANALYZE=true
+    if (process.env.ANALYZE === 'true' && !isServer) {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          openAnalyzer: false,
+        })
+      );
+    }
     if (!isServer) {
       // Replace react with preact in production for smaller bundle
       config.resolve.alias = {
@@ -35,11 +51,27 @@ const nextConfig = {
             priority: 40,
             enforce: true,
           },
+          // Split commons into smaller, more specific chunks
+          supabase: {
+            name: 'supabase',
+            test: /[\\/]node_modules[\\/]@supabase[\\/]/,
+            chunks: 'all',
+            priority: 30,
+            enforce: true,
+          },
+          ui: {
+            name: 'ui-libs',
+            test: /[\\/]node_modules[\\/](lucide-react|framer-motion|recharts|radix-ui)[\\/]/,
+            chunks: 'all',
+            priority: 25,
+            enforce: true,
+          },
           commons: {
             name: 'commons',
             chunks: 'all',
-            minChunks: 2,
+            minChunks: 3, // Increase threshold to reduce commons size
             priority: 20,
+            maxSize: 200000, // Limit commons to 200KB
           },
           lib: {
             test(module) {
@@ -73,6 +105,14 @@ const nextConfig = {
     ];
   },
 
+  // Production performance optimizations
+  poweredByHeader: false,
+  generateEtags: true,
+  compress: true,
+
+  // Asset optimization
+  assetPrefix: process.env.ASSET_PREFIX || '',
+  
   images: {
     remotePatterns: [
       {
@@ -85,8 +125,47 @@ const nextConfig = {
     // Optimize image loading
     deviceSizes: [640, 768, 1024, 1280, 1600],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
-    formats: ['image/webp'],
-    minimumCacheTTL: 60,
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days cache
+    dangerouslyAllowSVG: false,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+
+  // Headers for better caching (complementing middleware)
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+      // Optimize font loading
+      {
+        source: '/fonts/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'cross-origin',
+          },
+        ],
+      },
+    ];
   },
 };
 

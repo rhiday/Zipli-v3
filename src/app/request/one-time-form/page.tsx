@@ -188,7 +188,7 @@ export default function OneTimeRequestForm() {
             rows={3}
           />
           <div className="mt-1 text-[14px] font-manrope text-[rgba(2,29,19,0.60)]">
-            Separate multiple items with commas or new lines
+            {t('separateMultipleItems')}
           </div>
         </div>
       </form>
