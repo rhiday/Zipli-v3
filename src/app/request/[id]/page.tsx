@@ -44,6 +44,10 @@ type RequestDetail = {
   updated_at: string;
   user_id: string;
   is_recurring: boolean;
+  recurrence_pattern: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  address: string | null;
 };
 
 export default function RequestDetailPage(): React.ReactElement {
@@ -180,9 +184,117 @@ export default function RequestDetailPage(): React.ReactElement {
       requestName: request.description,
       quantity: `${request.people_count} people`,
       allergens: request.allergens || [],
-      instructions:
-        request.instructions || 'No additional instructions provided.',
+      instructions: request.instructions || null,
     };
+  };
+
+  const parseRecurringSchedule = (recurrencePattern: string | null) => {
+    if (!recurrencePattern) return null;
+
+    try {
+      const pattern = JSON.parse(recurrencePattern);
+      if (pattern.schedules && Array.isArray(pattern.schedules)) {
+        return pattern.schedules.map((schedule: any) => ({
+          days: schedule.days || [],
+          startTime: schedule.startTime || '09:00',
+          endTime: schedule.endTime || '14:00',
+        }));
+      }
+    } catch (error) {
+      console.error('Error parsing recurrence pattern:', error);
+    }
+    return null;
+  };
+
+  // Helper to sort days in logical order
+  const sortDaysLogically = (days: string[]) => {
+    const dayOrder = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    return days.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
+  };
+
+  // Helper to group consecutive days
+  const groupConsecutiveDays = (days: string[]) => {
+    if (days.length === 0) return '';
+    if (days.length === 1) return days[0];
+
+    const sortedDays = sortDaysLogically(days);
+
+    // If all 7 days are selected, show "Every day"
+    if (sortedDays.length === 7) {
+      return t('everyDay') || 'Every day';
+    }
+
+    const dayOrder = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    const dayIndices = sortedDays.map((day) => dayOrder.indexOf(day));
+
+    const groups: string[] = [];
+    let start = 0;
+
+    for (let i = 1; i <= dayIndices.length; i++) {
+      if (i === dayIndices.length || dayIndices[i] !== dayIndices[i - 1] + 1) {
+        if (i - start === 1) {
+          groups.push(sortedDays[start]);
+        } else if (i - start === 2) {
+          groups.push(`${sortedDays[start]}, ${sortedDays[i - 1]}`);
+        } else {
+          groups.push(`${sortedDays[start]} - ${sortedDays[i - 1]}`);
+        }
+        start = i;
+      }
+    }
+
+    return groups.join(', ');
+  };
+
+  // Consolidate schedules with same time slots
+  const consolidateSchedules = (schedules: any[]) => {
+    const timeSlotMap = new Map<string, Set<string>>();
+
+    schedules.forEach((schedule) => {
+      const timeKey = `${schedule.startTime}-${schedule.endTime}`;
+      if (!timeSlotMap.has(timeKey)) {
+        timeSlotMap.set(timeKey, new Set());
+      }
+      schedule.days.forEach((day: string) => {
+        timeSlotMap.get(timeKey)?.add(day);
+      });
+    });
+
+    return Array.from(timeSlotMap.entries()).map(([timeKey, daysSet]) => {
+      const [startTime, endTime] = timeKey.split('-');
+      return {
+        days: Array.from(daysSet),
+        startTime,
+        endTime,
+      };
+    });
+  };
+
+  const formatRecurringSchedule = (schedules: any[]) => {
+    const consolidated = consolidateSchedules(schedules);
+    return consolidated.map((schedule) => {
+      const daysDisplay = groupConsecutiveDays(schedule.days);
+      return {
+        days: daysDisplay,
+        time: `${schedule.startTime} - ${schedule.endTime}`,
+      };
+    });
   };
 
   const { t } = useCommonTranslation();
@@ -224,7 +336,7 @@ export default function RequestDetailPage(): React.ReactElement {
   const requesterName =
     requesterUser?.full_name ||
     requesterUser?.organization_name ||
-    'Anonymous_requester';
+    t('anonymousRequester');
 
   const statusClass = (() => {
     switch (request.status) {
@@ -277,7 +389,7 @@ export default function RequestDetailPage(): React.ReactElement {
                 statusClass
               )}
             >
-              {request.status}
+              {t(request.status)}
             </span>
           </div>
 
@@ -294,41 +406,115 @@ export default function RequestDetailPage(): React.ReactElement {
           )}
 
           {/* Request instructions */}
-          {requestInfo.instructions && (
+          {requestInfo.instructions &&
+          requestInfo.instructions !==
+            'No additional instructions provided.' ? (
             <p className="mt-4 text-gray-600 leading-relaxed">
               {requestInfo.instructions}
+            </p>
+          ) : (
+            <p className="mt-4 text-gray-600 leading-relaxed">
+              {t('noInstructionsProvided')}
             </p>
           )}
 
           {/* Date and time info */}
           <div className="mt-4 space-y-2">
-            <div className="flex items-center gap-2 text-gray-600">
-              <CalendarIcon className="h-5 w-5 flex-shrink-0" />
-              <span>
-                {new Date(
-                  request.pickup_date + 'T00:00:00Z'
-                ).toLocaleDateString(undefined, {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  timeZone: 'UTC',
-                })}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <ClockIcon className="h-5 w-5 flex-shrink-0" />
-              <span>
-                From {request.pickup_start_time} to {request.pickup_end_time}
-              </span>
-            </div>
-          </div>
+            {request.is_recurring ? (
+              <>
+                {/* Request Period for recurring requests */}
+                {request.start_date && request.end_date && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <CalendarIcon className="h-5 w-5 flex-shrink-0" />
+                    <span>
+                      {t('requestPeriod')}:{' '}
+                      {new Date(
+                        request.start_date + 'T00:00:00Z'
+                      ).toLocaleDateString(undefined, {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        timeZone: 'UTC',
+                      })}{' '}
+                      -{' '}
+                      {new Date(
+                        request.end_date + 'T00:00:00Z'
+                      ).toLocaleDateString(undefined, {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        timeZone: 'UTC',
+                      })}
+                    </span>
+                  </div>
+                )}
 
-          {/* Recurring indicator */}
-          {request.is_recurring && (
-            <div className="mt-4 text-gray-600">
-              <span>🔄 Recurring request</span>
-            </div>
-          )}
+                {/* Recurring Schedule Details */}
+                {(() => {
+                  const schedules = parseRecurringSchedule(
+                    request.recurrence_pattern
+                  );
+                  if (schedules && schedules.length > 0) {
+                    const formattedSchedules =
+                      formatRecurringSchedule(schedules);
+                    return (
+                      <div className="space-y-1">
+                        {formattedSchedules.map((schedule, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 text-gray-600"
+                          >
+                            <ClockIcon className="h-5 w-5 flex-shrink-0" />
+                            <span>
+                              🔄 {t('recurringSchedule')}: {schedule.days},{' '}
+                              {schedule.time}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <ClockIcon className="h-5 w-5 flex-shrink-0" />
+                        <span>
+                          🔄 {t('recurringRequest')} -{' '}
+                          {t('scheduleDetailsNotAvailable')}
+                        </span>
+                      </div>
+                    );
+                  }
+                })()}
+              </>
+            ) : (
+              <>
+                {/* One-time request date and time */}
+                <div className="flex items-center gap-2 text-gray-600">
+                  <CalendarIcon className="h-5 w-5 flex-shrink-0" />
+                  <span>
+                    {new Date(
+                      request.pickup_date + 'T00:00:00Z'
+                    ).toLocaleDateString(undefined, {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      timeZone: 'UTC',
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <ClockIcon className="h-5 w-5 flex-shrink-0" />
+                  <span>
+                    {t('from')} {request.pickup_start_time} {t('to')}{' '}
+                    {request.pickup_end_time}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Action buttons for owner */}
           {isOwner && canTakeAction && (
@@ -341,7 +527,7 @@ export default function RequestDetailPage(): React.ReactElement {
                 disabled={actionLoading}
               >
                 <CheckIcon className="h-5 w-5" />
-                Confirm Delivery
+                {t('confirmDelivery')}
               </Button>
               <Button
                 variant="destructive-outline"
@@ -394,7 +580,8 @@ export default function RequestDetailPage(): React.ReactElement {
             <div>
               <p className="font-semibold text-gray-900">{requesterName}</p>
               <p className="text-sm text-gray-500">
-                Created {new Date(request.created_at).toLocaleDateString()}
+                {t('created')}{' '}
+                {new Date(request.created_at).toLocaleDateString()}
               </p>
             </div>
           </div>

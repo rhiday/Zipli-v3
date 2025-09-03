@@ -153,7 +153,16 @@ export default function BottomNav() {
             </button>
           </DrawerTrigger>
           <DrawerContent className="bg-base">
-            <div className="grid gap-3 p-6 pt-8">
+            <DrawerHeader>
+              <DrawerTitle className="text-center">
+                {currentUser?.role === 'food_receiver'
+                  ? t('createRequest')
+                  : currentUser?.role === 'city'
+                    ? t('analytics')
+                    : t('donate')}
+              </DrawerTitle>
+            </DrawerHeader>
+            <div className="grid gap-3 p-6 pt-2">
               {currentUser?.role === 'food_receiver' ? (
                 <>
                   <DrawerClose asChild>
