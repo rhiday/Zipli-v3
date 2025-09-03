@@ -52,6 +52,23 @@ export default function RequestSummaryPage() {
     }
   };
 
+  const translateDayNames = (days: string[]) => {
+    // Map English day names to Finnish translations
+    const dayTranslations: { [key: string]: string } = {
+      monday: t('monday'),
+      tuesday: t('tuesday'),
+      wednesday: t('wednesday'),
+      thursday: t('thursday'),
+      friday: t('friday'),
+      saturday: t('saturday'),
+      sunday: t('sunday'),
+    };
+
+    return days
+      .map((day) => dayTranslations[day.toLowerCase()] || day)
+      .join(', ');
+  };
+
   useEffect(() => {
     if (currentUser) {
       if (currentUser.address) setAddress(currentUser.address);
@@ -450,7 +467,7 @@ export default function RequestSummaryPage() {
               className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]"
             >
               <span className="font-semibold text-interactive">
-                {schedule.days?.join(', ')}, {schedule.startTime} -{' '}
+                {translateDayNames(schedule.days || [])}, {schedule.startTime} -{' '}
                 {schedule.endTime}
               </span>
               <button

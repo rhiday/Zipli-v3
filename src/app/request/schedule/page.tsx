@@ -117,7 +117,21 @@ export default function RequestSchedulePage() {
   };
 
   const formatScheduleDisplay = (schedule: RecurringSchedule) => {
-    const days = schedule.days.join(', ');
+    // Map English day names to Finnish translations
+    const dayTranslations: { [key: string]: string } = {
+      monday: t('monday'),
+      tuesday: t('tuesday'),
+      wednesday: t('wednesday'),
+      thursday: t('thursday'),
+      friday: t('friday'),
+      saturday: t('saturday'),
+      sunday: t('sunday'),
+    };
+
+    const translatedDays = schedule.days.map(
+      (day) => dayTranslations[day.toLowerCase()] || day
+    );
+    const days = translatedDays.join(', ');
     return `${days}, ${schedule.startTime} - ${schedule.endTime}`;
   };
 

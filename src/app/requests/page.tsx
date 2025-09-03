@@ -208,7 +208,10 @@ export default function RequestsListPage(): React.ReactElement {
 
                   <div className="text-xs text-secondary mb-3">
                     <div className="mb-1">
-                      📅 {new Date(request.pickup_date).toLocaleDateString()}
+                      📅{' '}
+                      {new Date(request.pickup_date).toLocaleDateString(
+                        'fi-FI'
+                      )}
                     </div>
                     <div>
                       ⏰ {request.pickup_start_time} - {request.pickup_end_time}

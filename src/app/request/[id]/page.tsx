@@ -426,7 +426,7 @@ export default function RequestDetailPage(): React.ReactElement {
                       {t('requestPeriod')}:{' '}
                       {new Date(
                         request.start_date + 'T00:00:00Z'
-                      ).toLocaleDateString(undefined, {
+                      ).toLocaleDateString('fi-FI', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
@@ -436,7 +436,7 @@ export default function RequestDetailPage(): React.ReactElement {
                       -{' '}
                       {new Date(
                         request.end_date + 'T00:00:00Z'
-                      ).toLocaleDateString(undefined, {
+                      ).toLocaleDateString('fi-FI', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
@@ -483,7 +483,7 @@ export default function RequestDetailPage(): React.ReactElement {
                   <span>
                     {new Date(
                       request.pickup_date + 'T00:00:00Z'
-                    ).toLocaleDateString(undefined, {
+                    ).toLocaleDateString('fi-FI', {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
@@ -568,7 +568,7 @@ export default function RequestDetailPage(): React.ReactElement {
               <p className="font-semibold text-gray-900">{requesterName}</p>
               <p className="text-sm text-gray-500">
                 {t('created')}{' '}
-                {new Date(request.created_at).toLocaleDateString()}
+                {new Date(request.created_at).toLocaleDateString('fi-FI')}
               </p>
             </div>
           </div>
