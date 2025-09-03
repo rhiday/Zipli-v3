@@ -65,7 +65,11 @@ export default function RequestSummaryPage() {
     };
 
     return days
-      .map((day) => dayTranslations[day.toLowerCase()] || day)
+      .map((day) => {
+        const translatedDay = dayTranslations[day.toLowerCase()] || day;
+        // Capitalize first letter for proper formatting
+        return translatedDay.charAt(0).toUpperCase() + translatedDay.slice(1);
+      })
       .join(', ');
   };
 
@@ -433,8 +437,15 @@ export default function RequestSummaryPage() {
           </h2>
           <div className="flex items-center justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
             <span className="font-semibold text-interactive">
-              {format(new Date(requestPeriod.startDate), 'dd.MM.yyyy')} -{' '}
-              {format(new Date(requestPeriod.endDate), 'dd.MM.yyyy')}
+              {format(new Date(requestPeriod.startDate), 'dd.MM.yyyy')}{' '}
+              {t('requestPeriodFrom')}
+              {requestPeriod.endDate && (
+                <>
+                  {' '}
+                  {t('requestPeriodTo')}{' '}
+                  {format(new Date(requestPeriod.endDate), 'dd.MM.yyyy')}
+                </>
+              )}
             </span>
             <button
               onClick={() => router.push('/request/schedule')}

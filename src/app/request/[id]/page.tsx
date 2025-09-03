@@ -217,13 +217,36 @@ export default function RequestDetailPage(): React.ReactElement {
       'Saturday',
       'Sunday',
     ];
-    return days.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
+    return days.sort((a, b) => {
+      // Normalize to title case for comparison
+      const dayA = a.charAt(0).toUpperCase() + a.slice(1).toLowerCase();
+      const dayB = b.charAt(0).toUpperCase() + b.slice(1).toLowerCase();
+      return dayOrder.indexOf(dayA) - dayOrder.indexOf(dayB);
+    });
+  };
+
+  // Helper to translate English day names to Finnish
+  const translateDayName = (englishDay: string) => {
+    const dayTranslations: { [key: string]: string } = {
+      monday: t('monday'),
+      tuesday: t('tuesday'),
+      wednesday: t('wednesday'),
+      thursday: t('thursday'),
+      friday: t('friday'),
+      saturday: t('saturday'),
+      sunday: t('sunday'),
+    };
+
+    const normalizedDay = englishDay.toLowerCase();
+    const translatedDay = dayTranslations[normalizedDay] || englishDay;
+    // Capitalize first letter for proper Finnish formatting
+    return translatedDay.charAt(0).toUpperCase() + translatedDay.slice(1);
   };
 
   // Helper to group consecutive days
   const groupConsecutiveDays = (days: string[]) => {
     if (days.length === 0) return '';
-    if (days.length === 1) return days[0];
+    if (days.length === 1) return translateDayName(days[0]);
 
     const sortedDays = sortDaysLogically(days);
 
@@ -249,11 +272,15 @@ export default function RequestDetailPage(): React.ReactElement {
     for (let i = 1; i <= dayIndices.length; i++) {
       if (i === dayIndices.length || dayIndices[i] !== dayIndices[i - 1] + 1) {
         if (i - start === 1) {
-          groups.push(sortedDays[start]);
+          groups.push(translateDayName(sortedDays[start]));
         } else if (i - start === 2) {
-          groups.push(`${sortedDays[start]}, ${sortedDays[i - 1]}`);
+          groups.push(
+            `${translateDayName(sortedDays[start])}, ${translateDayName(sortedDays[i - 1])}`
+          );
         } else {
-          groups.push(`${sortedDays[start]} - ${sortedDays[i - 1]}`);
+          groups.push(
+            `${translateDayName(sortedDays[start])} - ${translateDayName(sortedDays[i - 1])}`
+          );
         }
         start = i;
       }
@@ -427,22 +454,27 @@ export default function RequestDetailPage(): React.ReactElement {
                       {new Date(
                         request.start_date + 'T00:00:00Z'
                       ).toLocaleDateString('fi-FI', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
                         day: 'numeric',
+                        month: 'numeric',
+                        year: 'numeric',
                         timeZone: 'UTC',
                       })}{' '}
-                      -{' '}
-                      {new Date(
-                        request.end_date + 'T00:00:00Z'
-                      ).toLocaleDateString('fi-FI', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        timeZone: 'UTC',
-                      })}
+                      {t('requestPeriodFrom')}{' '}
+                      {request.end_date ? (
+                        <>
+                          {t('requestPeriodTo')}{' '}
+                          {new Date(
+                            request.end_date + 'T00:00:00Z'
+                          ).toLocaleDateString('fi-FI', {
+                            day: 'numeric',
+                            month: 'numeric',
+                            year: 'numeric',
+                            timeZone: 'UTC',
+                          })}
+                        </>
+                      ) : (
+                        ''
+                      )}
                     </span>
                   </div>
                 )}
@@ -460,12 +492,11 @@ export default function RequestDetailPage(): React.ReactElement {
                         {formattedSchedules.map((schedule, index) => (
                           <div
                             key={index}
-                            className="flex items-center gap-2 text-gray-600"
+                            className="flex items-start gap-2 text-gray-600"
                           >
-                            <ClockIcon className="h-5 w-5 flex-shrink-0" />
+                            <span className="text-lg mt-0">🔄</span>
                             <span>
-                              🔄 {t('recurringSchedule')}: {schedule.days},{' '}
-                              {schedule.time}
+                              {schedule.days}, {schedule.time}
                             </span>
                           </div>
                         ))}

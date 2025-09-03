@@ -128,9 +128,11 @@ export default function RequestSchedulePage() {
       sunday: t('sunday'),
     };
 
-    const translatedDays = schedule.days.map(
-      (day) => dayTranslations[day.toLowerCase()] || day
-    );
+    const translatedDays = schedule.days.map((day) => {
+      const translatedDay = dayTranslations[day.toLowerCase()] || day;
+      // Capitalize first letter for proper formatting
+      return translatedDay.charAt(0).toUpperCase() + translatedDay.slice(1);
+    });
     const days = translatedDays.join(', ');
     return `${days}, ${schedule.startTime} - ${schedule.endTime}`;
   };

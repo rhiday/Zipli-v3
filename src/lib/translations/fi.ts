@@ -567,4 +567,14 @@ export const fi = {
   anonymousRequester: 'Nimetön pyytäjä',
   created: 'Luotu',
   fulfilled: 'Täytetty',
+
+  // Missing BottomNav keys
+  foodItem: 'Ruoka-aine',
+  createDonation: 'Luo lahjoitus',
+
+  // Missing helper text keys
+  separateMultipleItems:
+    'Erota useammat kohteet pilkuilla tai uusilla riveillä',
+  requestPeriodFrom: 'alkaen',
+  requestPeriodTo: 'päättyen',
 } as const;
