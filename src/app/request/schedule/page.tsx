@@ -167,7 +167,7 @@ export default function RequestSchedulePage() {
         header={
           <>
             <SecondaryNavbar
-              title={t('recurringRequest')}
+              title={t('scheduling.recurringRequest')}
               backHref="/request/recurring-form"
               onBackClick={() => router.back()}
             />
@@ -240,8 +240,8 @@ export default function RequestSchedulePage() {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-[#021d13]">
               {schedules.length > 0
-                ? t('addAnotherSchedule')
-                : t('setYourSchedule')}
+                ? t('scheduling.addAnotherSchedule')
+                : t('scheduling.setYourSchedule')}
             </h2>
 
             {/* Day Selection */}
@@ -262,7 +262,7 @@ export default function RequestSchedulePage() {
                         : 'border-[#D9DBD5] bg-white text-gray-700 hover:border-gray-400'
                     )}
                   >
-                    {t(day)}
+                    {t(`weekdays.${day}`)}
                   </button>
                 ))}
               </div>
@@ -312,7 +312,7 @@ export default function RequestSchedulePage() {
                   onClick={addSchedule}
                   className="text-interactive font-semibold text-base underline underline-offset-4 hover:no-underline transition-all"
                 >
-                  {t('addPickupSlot')}
+                  {t('scheduling.addPickupSlot')}
                 </button>
               </div>
             )}
@@ -374,8 +374,10 @@ export default function RequestSchedulePage() {
         <div className="fixed inset-0 z-[9999] bg-black/50 flex items-end">
           <div className="bg-white w-full rounded-t-3xl p-6 max-w-md mx-auto">
             <h3 className="text-lg font-semibold mb-4">
-              {t('select')}{' '}
-              {editingTime === 'start' ? t('startTime') : t('endTime')}
+              {t('scheduling.select')}{' '}
+              {editingTime === 'start'
+                ? t('common.time.startTime')
+                : t('common.time.endTime')}
             </h3>
             <div className="grid grid-cols-3 gap-2 mb-6">
               {TIME_OPTIONS.map((time) => (

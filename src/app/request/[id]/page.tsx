@@ -229,7 +229,7 @@ export default function RequestDetailPage(): React.ReactElement {
 
     // If all 7 days are selected, show "Every day"
     if (sortedDays.length === 7) {
-      return t('everyDay') || 'Every day';
+      return t('scheduling.everyDay') || 'Every day';
     }
 
     const dayOrder = [
@@ -336,7 +336,7 @@ export default function RequestDetailPage(): React.ReactElement {
   const requesterName =
     requesterUser?.full_name ||
     requesterUser?.organization_name ||
-    t('anonymousRequester');
+    t('actions.anonymousRequester');
 
   const statusClass = (() => {
     switch (request.status) {
@@ -407,16 +407,12 @@ export default function RequestDetailPage(): React.ReactElement {
 
           {/* Request instructions */}
           {requestInfo.instructions &&
-          requestInfo.instructions !==
-            'No additional instructions provided.' ? (
-            <p className="mt-4 text-gray-600 leading-relaxed">
-              {requestInfo.instructions}
-            </p>
-          ) : (
-            <p className="mt-4 text-gray-600 leading-relaxed">
-              {t('noInstructionsProvided')}
-            </p>
-          )}
+            requestInfo.instructions !==
+              'No additional instructions provided.' && (
+              <p className="mt-4 text-gray-600 leading-relaxed">
+                {requestInfo.instructions}
+              </p>
+            )}
 
           {/* Date and time info */}
           <div className="mt-4 space-y-2">
@@ -468,24 +464,15 @@ export default function RequestDetailPage(): React.ReactElement {
                           >
                             <ClockIcon className="h-5 w-5 flex-shrink-0" />
                             <span>
-                              🔄 {t('recurringSchedule')}: {schedule.days},{' '}
-                              {schedule.time}
+                              🔄 {t('scheduling.recurringSchedule')}:{' '}
+                              {schedule.days}, {schedule.time}
                             </span>
                           </div>
                         ))}
                       </div>
                     );
-                  } else {
-                    return (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <ClockIcon className="h-5 w-5 flex-shrink-0" />
-                        <span>
-                          🔄 {t('recurringRequest')} -{' '}
-                          {t('scheduleDetailsNotAvailable')}
-                        </span>
-                      </div>
-                    );
                   }
+                  return null;
                 })()}
               </>
             ) : (
@@ -508,8 +495,8 @@ export default function RequestDetailPage(): React.ReactElement {
                 <div className="flex items-center gap-2 text-gray-600">
                   <ClockIcon className="h-5 w-5 flex-shrink-0" />
                   <span>
-                    {t('from')} {request.pickup_start_time} {t('to')}{' '}
-                    {request.pickup_end_time}
+                    {t('scheduling.from')} {request.pickup_start_time}{' '}
+                    {t('scheduling.to')} {request.pickup_end_time}
                   </span>
                 </div>
               </>
@@ -527,7 +514,7 @@ export default function RequestDetailPage(): React.ReactElement {
                 disabled={actionLoading}
               >
                 <CheckIcon className="h-5 w-5" />
-                {t('confirmDelivery')}
+                {t('actions.confirmDelivery')}
               </Button>
               <Button
                 variant="destructive-outline"
@@ -554,7 +541,7 @@ export default function RequestDetailPage(): React.ReactElement {
                   window.location.href = `mailto:${email}?subject=Re: Food Request - ${requestInfo.requestName}`;
                 }}
               >
-                {t('contactRequester')}
+                {t('actions.contactRequester')}
               </Button>
             </div>
           )}
@@ -580,7 +567,7 @@ export default function RequestDetailPage(): React.ReactElement {
             <div>
               <p className="font-semibold text-gray-900">{requesterName}</p>
               <p className="text-sm text-gray-500">
-                {t('created')}{' '}
+                {t('actions.created')}{' '}
                 {new Date(request.created_at).toLocaleDateString()}
               </p>
             </div>
@@ -596,7 +583,7 @@ export default function RequestDetailPage(): React.ReactElement {
             onClick={() => router.push('/requests')}
           >
             <ArrowRight className="h-5 w-5" />
-            {t('seeAllRequests')}
+            {t('actions.seeAllRequests')}
           </Button>
         </section>
       </main>
@@ -638,9 +625,9 @@ export default function RequestDetailPage(): React.ReactElement {
       <Dialog open={showConfirmDelivery} onOpenChange={setShowConfirmDelivery}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('confirmDelivery')}</DialogTitle>
+            <DialogTitle>{t('actions.confirmDelivery')}</DialogTitle>
             <DialogDescription>
-              {t('confirmDeliveryDescription')}
+              {t('actions.confirmDeliveryDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -656,7 +643,7 @@ export default function RequestDetailPage(): React.ReactElement {
                 htmlFor="confirm-clause"
                 className="text-sm text-gray-700 leading-relaxed"
               >
-                {t('confirmDeliveryClause')}
+                {t('actions.confirmDeliveryClause')}
               </label>
             </div>
           </div>
@@ -678,7 +665,7 @@ export default function RequestDetailPage(): React.ReactElement {
               {actionLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
-                t('confirmDelivery')
+                t('actions.confirmDelivery')
               )}
             </Button>
           </DialogFooter>
