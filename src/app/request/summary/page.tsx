@@ -216,9 +216,9 @@ export default function RequestSummaryPage() {
         });
       } else if (pickupSlots.length > 0 && formattedSlots[0]) {
         // For one-time requests: use pickup slots
-        pickupDate = formattedSlots[0].date;
-        pickupStartTime = formattedSlots[0].start_time;
-        pickupEndTime = formattedSlots[0].end_time;
+        pickupDate = formattedSlots[0].date || fallbackDate;
+        pickupStartTime = formattedSlots[0].start_time || fallbackStart;
+        pickupEndTime = formattedSlots[0].end_time || fallbackEnd;
 
         console.log('✅ One-time request data:', {
           pickupDate,
