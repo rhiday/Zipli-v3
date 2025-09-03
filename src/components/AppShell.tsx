@@ -4,6 +4,7 @@ import { useDatabase } from '@/store';
 import { usePathname } from 'next/navigation';
 import React, { useEffect } from 'react';
 import BottomNav from './BottomNav';
+import { useLayoutConfig } from '@/hooks/useLayoutConfig';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ interface AppShellProps {
 const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const pathname = usePathname();
   const init = useDatabase((state) => state.init);
+  const { showBottomNav } = useLayoutConfig();
 
   // Initialize store for all routes (auth routes need it too for DevLoginSwitcher)
   useEffect(() => {
@@ -21,11 +23,6 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
   const isDocsRoute = pathname.startsWith('/docs');
-
-  // Hides bottom nav on all pages within the donation and request creation flows, and profile page.
-  const flowRegex =
-    /^\/(donate|request)\/(new|manual|pickup-slot|summary|thank-you|success|detail|[^/]+\/handover-confirm)/;
-  const hideBottomNav = flowRegex.test(pathname) || pathname === '/profile';
 
   return (
     <AuthProvider>
@@ -45,7 +42,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
             {/* Main content container */}
             <main className="flex-grow overflow-y-auto">{children}</main>
             {/* BottomNav is now part of this container and positioned absolutely */}
-            {!hideBottomNav && <BottomNav />}
+            {showBottomNav && <BottomNav />}
           </div>
         </div>
       )}

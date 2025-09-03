@@ -128,7 +128,7 @@ function DonorDashboardPage(): React.ReactElement {
     const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text('Zipli Donation Summary', 10, 10);
+    doc.text(t('donationSummaryTitle'), 10, 10);
     doc.setFontSize(12);
     doc.text(
       `Total food offered: ${formatWeight(metrics.totalWeight)}`,
@@ -143,7 +143,7 @@ function DonorDashboardPage(): React.ReactElement {
     );
     doc.text(`CO2 avoided: ${metrics.co2Avoided}kg`, 10, 50);
     doc.text(`Success rate: ${metrics.successRate}%`, 10, 60);
-    doc.save('zipli-summary.pdf');
+    doc.save(t('donationSummaryFilename'));
   }, [metrics]);
 
   if (loading) {

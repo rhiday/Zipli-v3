@@ -127,7 +127,7 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(
               <div className="flex h-full w-full items-center justify-center bg-gray-100">
                 <Image
                   src="/images/placeholder.svg"
-                  alt={'NoImage'}
+                  alt={t('noImage')}
                   fill
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   className="object-cover"

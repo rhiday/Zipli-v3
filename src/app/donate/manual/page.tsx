@@ -677,7 +677,7 @@ function ManualDonationPageInner() {
 function ManualDonationPage() {
   const { t } = useCommonTranslation();
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>{t('loading')}</div>}>
       <ManualDonationPageInner />
     </Suspense>
   );

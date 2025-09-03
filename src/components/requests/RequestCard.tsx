@@ -56,9 +56,9 @@ const RequestCard: React.FC<RequestCardProps> = React.memo(
         tomorrow.setDate(now.getDate() + 1);
 
         if (date.toDateString() === now.toDateString()) {
-          return 'Default';
+          return t('today');
         } else if (date.toDateString() === tomorrow.toDateString()) {
-          return 'Default';
+          return t('tomorrow');
         } else {
           return date.toLocaleDateString('en-GB', {
             day: '2-digit',
@@ -113,7 +113,7 @@ const RequestCard: React.FC<RequestCardProps> = React.memo(
                 </span>
                 {is_recurring && (
                   <span className="inline-flex items-center rounded-full bg-purple-100 text-purple-800 px-2.5 py-0.5 text-xs font-medium">
-                    Recurring
+                    {t('recurring')}
                   </span>
                 )}
               </div>
@@ -122,7 +122,7 @@ const RequestCard: React.FC<RequestCardProps> = React.memo(
             {/* Description */}
             <div>
               <h3 className="font-bold text-gray-900 text-lg mb-2 leading-tight line-clamp-2">
-                {description || 'Food_request'}
+                {description || t('foodRequest')}
               </h3>
             </div>
 
@@ -130,7 +130,9 @@ const RequestCard: React.FC<RequestCardProps> = React.memo(
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-base text-gray-700">
                 <Users className="w-4 h-4" />
-                <span>{people_count} people</span>
+                <span>
+                  {people_count} {t('people')}
+                </span>
               </div>
 
               <div className="flex items-center gap-2 text-base text-gray-700">

@@ -73,11 +73,11 @@ export default function RequestDetailPage(): React.ReactElement {
     try {
       const requestData = getRequestById(id);
       if (!requestData) {
-        throw new Error('Request not found');
+        throw new Error(t('requestNotFound'));
       }
       setRequest(requestData as any);
     } catch (err: any) {
-      setError(err.message || 'Failed to load request details.');
+      setError(err.message || t('loadingFailed'));
       setRequest(null);
     } finally {
       setLoading(false);
@@ -107,7 +107,7 @@ export default function RequestDetailPage(): React.ReactElement {
         router.push('/receiver/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to update request status.');
+      setError(err.message || t('updateFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -175,7 +175,7 @@ export default function RequestDetailPage(): React.ReactElement {
 
   const getUserEmail = (userId: string) => {
     const user = users.find((u) => u.id === userId);
-    return user?.email || 'Unknown user';
+    return user?.email || t('unknownUser');
   };
 
   const parseRequestInfo = (request: RequestDetail) => {
@@ -434,8 +434,7 @@ export default function RequestDetailPage(): React.ReactElement {
 
           {/* Request instructions */}
           {requestInfo.instructions &&
-            requestInfo.instructions !==
-              'No additional instructions provided.' && (
+            requestInfo.instructions !== t('noAdditionalInstructions') && (
               <p className="mt-4 text-gray-600 leading-relaxed">
                 {requestInfo.instructions}
               </p>
@@ -645,7 +644,7 @@ export default function RequestDetailPage(): React.ReactElement {
               {actionLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
-                'Cancel Request'
+                t('cancelRequest')
               )}
             </Button>
           </DialogFooter>

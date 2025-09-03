@@ -79,13 +79,13 @@ export default function RequestsPage(): React.ReactElement {
 
   const getUserEmail = (userId: string) => {
     const user = users.find((u) => u.id === userId);
-    return user?.email || 'Unknown user';
+    return user?.email || t('unknownUser');
   };
 
   if (loading) {
     return (
       <PageContainer
-        header={<SecondaryNavbar title="Food Requests" backHref="#" />}
+        header={<SecondaryNavbar title={t('foodRequests')} backHref="#" />}
         className="bg-white"
         contentClassName="flex items-center justify-center min-h-[50vh]"
       >
@@ -99,7 +99,7 @@ export default function RequestsPage(): React.ReactElement {
       header={
         <div className="flex items-center justify-between px-4 py-4 border-b border-primary-10">
           <h1 className="text-xl font-semibold text-[#021d13]">
-            Food Requests
+            {t('foodRequests')}
           </h1>
           <Link href="/request/select-type">
             <Button
@@ -119,7 +119,7 @@ export default function RequestsPage(): React.ReactElement {
         <div className="relative flex-1">
           <Input
             type="text"
-            placeholder="Search requests..."
+            placeholder={t('searchRequests')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 rounded-[12px] border-[#D9DBD5] h-12"
@@ -136,7 +136,7 @@ export default function RequestsPage(): React.ReactElement {
           }
         >
           <SelectTrigger className="w-full rounded-[12px] border-[#D9DBD5] h-12">
-            <SelectValue placeholder="All Statuses" />
+            <SelectValue placeholder={t('allStatuses')} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
@@ -217,9 +217,7 @@ export default function RequestsPage(): React.ReactElement {
       {filteredRequests.length === 0 && (
         <div className="rounded-[12px] border-2 border-dashed border-[#D9DBD5] p-8 text-center">
           <p className="text-gray-500 font-medium">
-            {searchTerm
-              ? 'No requests found matching your search.'
-              : 'No requests available at the moment.'}
+            {searchTerm ? t('noRequestsFoundSearch') : t('noRequestsAvailable')}
           </p>
         </div>
       )}

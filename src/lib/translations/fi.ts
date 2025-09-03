@@ -575,4 +575,53 @@ export const fi = {
     'Erota useammat kohteet pilkuilla tai uusilla riveillä',
   requestPeriodFrom: 'alkaen',
   requestPeriodTo: 'päättyen',
+
+  // User input placeholders (New keys added)
+  enterQuantityKg: 'Syötä määrä kiloina',
+  allergenExampleText: 'esim. Gluteeniton, Laktoositon, Sisältää pähkinöitä',
+  allStatuses: 'Kaikki tilat',
+
+  // Alert messages (New keys added)
+  enterAddress: 'Syötä osoitteesi',
+  completeRequestDetails: 'Täydennä pyynnön tiedot',
+  submissionFailed: 'Pyynnön lähetys epäonnistui',
+  noDataReturned: 'Tietoja ei palautettu',
+  unknownError: 'Tuntematon virhe',
+
+  // Interface text (New keys added)
+  updateRequest: 'Päivitä pyyntö',
+  startNewRequest: 'Aloita uusi pyyntö',
+  foodRequest: 'Ruokapyyntö',
+  noneSpecified: 'Ei määritelty',
+  unknownUser: 'Tuntematon käyttäjä',
+  editStartDate: 'Muokkaa aloituspäivää',
+
+  // Section headers (New keys added)
+  pickupSlots: 'Noutoajankohdat',
+  foodRequests: 'Ruokapyynnöt',
+
+  // Error messages (New keys added)
+  requestNotFound: 'Pyyntöä ei löytynyt',
+  loadingFailed: 'Lataus epäonnistui',
+  updateFailed: 'Päivitys epäonnistui',
+  noRequestsFoundSearch: 'Hakua vastaavia pyyntöjä ei löytynyt.',
+  noRequestsAvailable: 'Pyyntöjä ei ole tällä hetkellä saatavilla.',
+  noAdditionalInstructions: 'Lisäohjeita ei annettu.',
+  genericError: 'Tapahtui virhe. Yritä uudelleen.',
+  adjustFilters: 'Kokeile muuttaa hakuehtoja tai suodattimia',
+  noRequestsYet: 'Et ole vielä luonut yhtään pyyntöä',
+
+  // Additional UI text
+  startNewDonation: 'Aloita uusi lahjoitus',
+  people: 'henkilöä',
+  itemProgress: 'Kohde {current} / {total}',
+
+  // PDF and file names
+  donationSummaryTitle: 'Zipli Lahjoitusyhteenveto',
+  requestSummaryTitle: 'Zipli Pyyntöyhteenveto',
+  donationSummaryFilename: 'zipli-lahjoitus.pdf',
+  receiverSummaryFilename: 'zipli-vastaanottaja.pdf',
+
+  // Accessibility labels (new keys only)
+  // noImage and editPickupTime already exist above
 } as const;
