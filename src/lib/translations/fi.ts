@@ -547,4 +547,24 @@ export const fi = {
   changesSavedDesc: 'Muutoksesi on tallennettu onnistuneesti.',
   addDeliveryTimeSlots:
     'Lisää yksi tai useampi toimitusaika antaaksesi lahjoittajille joustavuutta.',
+
+  // Missing weekday abbreviations
+  sun: 'Su',
+  mon: 'Ma',
+  tue: 'Ti',
+  wed: 'Ke',
+  thu: 'To',
+  fri: 'Pe',
+  sat: 'La',
+
+  // Missing scheduling keys
+  everyDay: 'Päivittäin',
+  setYourSchedule: 'Aseta aikataulu',
+  addAnotherSchedule: 'Lisää toinen aikataulu',
+  select: 'Valitse',
+
+  // Missing action keys
+  anonymousRequester: 'Nimetön pyytäjä',
+  created: 'Luotu',
+  fulfilled: 'Täytetty',
 } as const;

@@ -229,7 +229,7 @@ export default function RequestDetailPage(): React.ReactElement {
 
     // If all 7 days are selected, show "Every day"
     if (sortedDays.length === 7) {
-      return t('scheduling.everyDay') || 'Every day';
+      return t('everyDay') || 'Every day';
     }
 
     const dayOrder = [
@@ -336,7 +336,7 @@ export default function RequestDetailPage(): React.ReactElement {
   const requesterName =
     requesterUser?.full_name ||
     requesterUser?.organization_name ||
-    t('actions.anonymousRequester');
+    t('anonymousRequester');
 
   const statusClass = (() => {
     switch (request.status) {
@@ -464,8 +464,8 @@ export default function RequestDetailPage(): React.ReactElement {
                           >
                             <ClockIcon className="h-5 w-5 flex-shrink-0" />
                             <span>
-                              🔄 {t('scheduling.recurringSchedule')}:{' '}
-                              {schedule.days}, {schedule.time}
+                              🔄 {t('recurringSchedule')}: {schedule.days},{' '}
+                              {schedule.time}
                             </span>
                           </div>
                         ))}
@@ -495,8 +495,8 @@ export default function RequestDetailPage(): React.ReactElement {
                 <div className="flex items-center gap-2 text-gray-600">
                   <ClockIcon className="h-5 w-5 flex-shrink-0" />
                   <span>
-                    {t('scheduling.from')} {request.pickup_start_time}{' '}
-                    {t('scheduling.to')} {request.pickup_end_time}
+                    {t('from')} {request.pickup_start_time} {t('until')}{' '}
+                    {request.pickup_end_time}
                   </span>
                 </div>
               </>
@@ -514,7 +514,7 @@ export default function RequestDetailPage(): React.ReactElement {
                 disabled={actionLoading}
               >
                 <CheckIcon className="h-5 w-5" />
-                {t('actions.confirmDelivery')}
+                {t('confirmDelivery')}
               </Button>
               <Button
                 variant="destructive-outline"
@@ -541,7 +541,7 @@ export default function RequestDetailPage(): React.ReactElement {
                   window.location.href = `mailto:${email}?subject=Re: Food Request - ${requestInfo.requestName}`;
                 }}
               >
-                {t('actions.contactRequester')}
+                {t('contactRequester')}
               </Button>
             </div>
           )}
@@ -567,7 +567,7 @@ export default function RequestDetailPage(): React.ReactElement {
             <div>
               <p className="font-semibold text-gray-900">{requesterName}</p>
               <p className="text-sm text-gray-500">
-                {t('actions.created')}{' '}
+                {t('created')}{' '}
                 {new Date(request.created_at).toLocaleDateString()}
               </p>
             </div>
@@ -583,7 +583,7 @@ export default function RequestDetailPage(): React.ReactElement {
             onClick={() => router.push('/requests')}
           >
             <ArrowRight className="h-5 w-5" />
-            {t('actions.seeAllRequests')}
+            {t('seeAllRequests')}
           </Button>
         </section>
       </main>
@@ -625,9 +625,9 @@ export default function RequestDetailPage(): React.ReactElement {
       <Dialog open={showConfirmDelivery} onOpenChange={setShowConfirmDelivery}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('actions.confirmDelivery')}</DialogTitle>
+            <DialogTitle>{t('confirmDelivery')}</DialogTitle>
             <DialogDescription>
-              {t('actions.confirmDeliveryDescription')}
+              {t('confirmDeliveryDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -643,7 +643,7 @@ export default function RequestDetailPage(): React.ReactElement {
                 htmlFor="confirm-clause"
                 className="text-sm text-gray-700 leading-relaxed"
               >
-                {t('actions.confirmDeliveryClause')}
+                {t('confirmDeliveryClause')}
               </label>
             </div>
           </div>
@@ -665,7 +665,7 @@ export default function RequestDetailPage(): React.ReactElement {
               {actionLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
-                t('actions.confirmDelivery')
+                t('confirmDelivery')
               )}
             </Button>
           </DialogFooter>
