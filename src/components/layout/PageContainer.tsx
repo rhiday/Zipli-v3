@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useLayoutConfig } from '@/hooks/useLayoutConfig';
 
 interface PageContainerProps {
   header?: React.ReactNode;
@@ -26,10 +26,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
   className,
   contentClassName,
 }) => {
-  const pathname = usePathname();
-  const flowRegex =
-    /^\/(donate|request)\/(new|manual|pickup-slot|summary|thank-you|success|detail|one-time-form|recurring-form|select-type|[^/]+\/handover-confirm)/;
-  const isBottomNavVisible = !flowRegex.test(pathname || '');
+  const { needsBottomNavSpacing } = useLayoutConfig();
 
   return (
     <div
@@ -52,7 +49,9 @@ export const PageContainer: React.FC<PageContainerProps> = ({
         {children}
       </main>
       {footer ? (
-        <div className={cn('shrink-0', isBottomNavVisible ? 'mb-[76px]' : '')}>
+        <div
+          className={cn('shrink-0', needsBottomNavSpacing ? 'mb-[76px]' : '')}
+        >
           {footer}
         </div>
       ) : null}

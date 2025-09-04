@@ -236,7 +236,7 @@ export default function RequestSchedulePage() {
                       setStartDate(undefined);
                     }}
                     className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-                    title="Edit start date"
+                    title={t('editStartDate')}
                   >
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <path
@@ -338,7 +338,7 @@ export default function RequestSchedulePage() {
           {schedules.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-[#021d13]">
-                Pickup slots
+                {t('pickupSlots')}
               </h2>
               <div className="space-y-3">
                 {schedules.map((schedule) => (

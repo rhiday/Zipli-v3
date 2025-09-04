@@ -87,7 +87,7 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('genericError'));
       setLoading(false);
     }
   };

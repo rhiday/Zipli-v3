@@ -122,7 +122,7 @@ export default function OneTimeRequestForm() {
             {isSubmitting
               ? t('continuing')
               : isEditMode
-                ? 'Update Request'
+                ? t('updateRequest')
                 : t('continue')}
           </Button>
         </BottomActionBar>
@@ -138,7 +138,7 @@ export default function OneTimeRequestForm() {
           </label>
           <Textarea
             {...register('description', {
-              required: 'Please describe the food you need',
+              required: t('pleaseDescribeFood'),
             })}
             placeholder={t('foodDescriptionPlaceholder')}
             variant={errors.description ? 'error' : 'default'}
@@ -158,15 +158,30 @@ export default function OneTimeRequestForm() {
           </label>
           <Input
             {...register('quantity', {
-              required: 'Quantity is required',
-              min: { value: 1, message: 'Quantity must be at least 1' },
+              required: t('quantityRequired'),
+              min: { value: 1, message: t('quantityMinimum') },
               pattern: {
                 value: /^\d+$/,
-                message: 'Please enter a valid number',
+                message: t('enterValidNumber'),
               },
             })}
-            placeholder="Enter quantity in kg"
+            placeholder={t('enterQuantityKg')}
             type="number"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            min="1"
+            step="1"
+            onKeyPress={(e) => {
+              if (
+                !/[0-9]/.test(e.key) &&
+                e.key !== 'Backspace' &&
+                e.key !== 'Delete' &&
+                e.key !== 'Tab' &&
+                e.key !== 'Enter'
+              ) {
+                e.preventDefault();
+              }
+            }}
             variant={errors.quantity ? 'error' : 'default'}
           />
           {errors.quantity && (
@@ -183,7 +198,7 @@ export default function OneTimeRequestForm() {
           </label>
           <Textarea
             {...register('allergens')}
-            placeholder="e.g. Gluten-free, Lactose-free, Contains nuts"
+            placeholder={t('allergenExampleText')}
             variant="default"
             rows={3}
           />

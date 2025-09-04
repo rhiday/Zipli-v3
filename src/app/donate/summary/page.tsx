@@ -306,7 +306,7 @@ export default function DonationSummaryPage() {
       <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">{t('noDonationItemsFound')}</p>
         <Button onClick={() => router.push('/donate/new')}>
-          Start New Donation
+          {t('startNewDonation')}
         </Button>
       </div>
     );
@@ -368,7 +368,7 @@ export default function DonationSummaryPage() {
       {/* Pickup schedule */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {recurringSchedule ? 'Recurring Schedule' : t('pickupSchedule')}
+          {recurringSchedule ? t('recurringSchedule') : t('pickupSchedule')}
         </h2>
         {recurringSchedule && Array.isArray(recurringSchedule) ? (
           // Multiple recurring schedules
@@ -501,7 +501,7 @@ export default function DonationSummaryPage() {
           </label>
           <Textarea
             id="driver-instructions"
-            placeholder="Please ring the doorbell"
+            placeholder={t('pleaseRingTheDoorbell')}
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}

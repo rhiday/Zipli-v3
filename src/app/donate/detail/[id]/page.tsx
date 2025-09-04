@@ -421,7 +421,7 @@ export default function DonationDetailPage() {
                 setConfirmClauseChecked(false);
               }}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               variant="primary"

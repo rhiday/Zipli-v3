@@ -201,7 +201,7 @@ export default function PickupSlotPage() {
                 <button
                   onClick={() => handleEditSlot(slot.id)}
                   className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-                  aria-label="Edit"
+                  aria-label={t('edit')}
                 >
                   <svg
                     width="20"

@@ -73,11 +73,11 @@ export default function RequestDetailPage(): React.ReactElement {
     try {
       const requestData = getRequestById(id);
       if (!requestData) {
-        throw new Error('Request not found');
+        throw new Error(t('requestNotFound'));
       }
       setRequest(requestData as any);
     } catch (err: any) {
-      setError(err.message || 'Failed to load request details.');
+      setError(err.message || t('loadingFailed'));
       setRequest(null);
     } finally {
       setLoading(false);
@@ -107,7 +107,7 @@ export default function RequestDetailPage(): React.ReactElement {
         router.push('/receiver/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to update request status.');
+      setError(err.message || t('updateFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -175,7 +175,7 @@ export default function RequestDetailPage(): React.ReactElement {
 
   const getUserEmail = (userId: string) => {
     const user = users.find((u) => u.id === userId);
-    return user?.email || 'Unknown user';
+    return user?.email || t('unknownUser');
   };
 
   const parseRequestInfo = (request: RequestDetail) => {
@@ -424,7 +424,7 @@ export default function RequestDetailPage(): React.ReactElement {
           {requestInfo.allergens && requestInfo.allergens.length > 0 && (
             <div className="mt-4">
               <p className="text-sm font-medium text-gray-700 mb-1">
-                Allergies, Intolerances & Diets:
+                {t('allergiesIntolerancesDiets')}
               </p>
               <p className="text-gray-600 leading-relaxed">
                 {requestInfo.allergens.join(', ')}
@@ -434,8 +434,7 @@ export default function RequestDetailPage(): React.ReactElement {
 
           {/* Request instructions */}
           {requestInfo.instructions &&
-            requestInfo.instructions !==
-              'No additional instructions provided.' && (
+            requestInfo.instructions !== t('noAdditionalInstructions') && (
               <p className="mt-4 text-gray-600 leading-relaxed">
                 {requestInfo.instructions}
               </p>
@@ -623,10 +622,9 @@ export default function RequestDetailPage(): React.ReactElement {
       <Dialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Cancel Request</DialogTitle>
+            <DialogTitle>{t('cancelRequest')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to cancel this request? This action cannot
-              be undone.
+              {t('cancelRequestConfirmation')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -635,7 +633,7 @@ export default function RequestDetailPage(): React.ReactElement {
               onClick={() => setShowCancelConfirm(false)}
               disabled={actionLoading}
             >
-              Keep Request
+              {t('keepRequest')}
             </Button>
             <Button
               variant="destructive"
@@ -645,7 +643,7 @@ export default function RequestDetailPage(): React.ReactElement {
               {actionLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
-                'Cancel Request'
+                t('cancelRequest')
               )}
             </Button>
           </DialogFooter>
@@ -686,7 +684,7 @@ export default function RequestDetailPage(): React.ReactElement {
                 setConfirmClauseChecked(false);
               }}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               variant="primary"
