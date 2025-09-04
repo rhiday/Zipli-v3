@@ -15,7 +15,8 @@ const compressImageSafely = async (file: File): Promise<string> => {
     console.warn('Compression failed, trying fallback:', error);
 
     // Check if it's a memory error
-    if (error.message.includes('memory') || error.message.includes('Memory')) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('memory') || errorMessage.includes('Memory')) {
       throw new Error('Image too large for available memory');
     }
 
