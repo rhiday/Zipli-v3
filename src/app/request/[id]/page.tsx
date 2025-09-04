@@ -424,7 +424,7 @@ export default function RequestDetailPage(): React.ReactElement {
           {requestInfo.allergens && requestInfo.allergens.length > 0 && (
             <div className="mt-4">
               <p className="text-sm font-medium text-gray-700 mb-1">
-                Allergies, Intolerances & Diets:
+                {t('allergiesIntolerancesDiets')}
               </p>
               <p className="text-gray-600 leading-relaxed">
                 {requestInfo.allergens.join(', ')}
