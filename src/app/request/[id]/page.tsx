@@ -622,10 +622,9 @@ export default function RequestDetailPage(): React.ReactElement {
       <Dialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Cancel Request</DialogTitle>
+            <DialogTitle>{t('cancelRequest')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to cancel this request? This action cannot
-              be undone.
+              {t('cancelRequestConfirmation')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -634,7 +633,7 @@ export default function RequestDetailPage(): React.ReactElement {
               onClick={() => setShowCancelConfirm(false)}
               disabled={actionLoading}
             >
-              Keep Request
+              {t('keepRequest')}
             </Button>
             <Button
               variant="destructive"
@@ -685,7 +684,7 @@ export default function RequestDetailPage(): React.ReactElement {
                 setConfirmClauseChecked(false);
               }}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               variant="primary"

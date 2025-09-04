@@ -622,6 +622,11 @@ export const fi = {
   donationSummaryFilename: 'zipli-lahjoitus.pdf',
   receiverSummaryFilename: 'zipli-vastaanottaja.pdf',
 
+  // Modal text (new keys added)
+  keepRequest: 'Säilytä pyyntö',
+  cancelRequestConfirmation:
+    'Haluatko varmasti peruuttaa tämän pyynnön? Tätä toimintoa ei voi kumota.',
+
   // Accessibility labels (new keys only)
   // noImage and editPickupTime already exist above
 } as const;
