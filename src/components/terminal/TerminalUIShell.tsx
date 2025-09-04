@@ -70,11 +70,7 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
                   size="sm"
                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
                 >
-                  <Avatar
-                    size="sm"
-                    initials={userInitials}
-                    className="w-8 h-8"
-                  />
+                  <Avatar fallback={userInitials} className="w-8 h-8" />
                   <span className="font-medium">
                     {currentUser?.full_name || currentUser?.email || 'User'}
                   </span>

@@ -184,8 +184,7 @@ export default function TerminalProfilePage(): React.ReactElement {
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <Avatar
-                  size="xl"
-                  initials={userInitials}
+                  fallback={userInitials}
                   className="w-24 h-24 text-2xl"
                 />
               </div>
@@ -356,7 +355,7 @@ export default function TerminalProfilePage(): React.ReactElement {
               {isEditing && (
                 <div className="flex justify-end space-x-3 pt-6 border-t">
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={handleCancel}
                     disabled={saving}
                   >

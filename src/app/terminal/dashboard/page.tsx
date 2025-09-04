@@ -67,6 +67,7 @@ type TerminalRequest = {
   location: string;
   delivery_window: string;
   is_recurring: boolean;
+  assigned_route?: string;
 };
 
 export default function TerminalDashboard() {
@@ -422,7 +423,7 @@ export default function TerminalDashboard() {
             </Select>
 
             {/* Export Button */}
-            <Button variant="outline" onClick={handlePrintExport}>
+            <Button variant="secondary" onClick={handlePrintExport}>
               <Download className="w-4 h-4 mr-2" />
               Export Data
             </Button>
