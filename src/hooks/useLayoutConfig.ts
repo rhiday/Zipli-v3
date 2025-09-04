@@ -15,9 +15,17 @@ export const useLayoutConfig = () => {
 
   const isFlowPage = flowRegex.test(pathname) || pathname === '/profile';
 
+  // Desktop dashboards should not show bottom navigation
+  const isDesktopDashboard =
+    pathname === '/city/dashboard' ||
+    pathname === '/terminal/dashboard' ||
+    pathname === '/terminal/profile';
+
+  const hideBottomNav = isFlowPage || isDesktopDashboard;
+
   return {
-    showBottomNav: !isFlowPage,
+    showBottomNav: !hideBottomNav,
     // For PageContainer footer spacing
-    needsBottomNavSpacing: !isFlowPage,
+    needsBottomNavSpacing: !hideBottomNav,
   };
 };

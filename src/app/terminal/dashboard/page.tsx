@@ -4,6 +4,9 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDatabase } from '@/store';
 import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import { supabase } from '@/lib/supabase/client';
+import { TerminalUIShell } from '@/components/terminal/TerminalUIShell';
+import { DatePicker } from '@/components/ui/DatePicker';
 import {
   Truck,
   Download,
@@ -63,13 +66,12 @@ type TerminalRequest = {
   urgency: 'low' | 'medium' | 'high';
   location: string;
   delivery_window: string;
-  assigned_route?: string;
+  is_recurring: boolean;
 };
 
 export default function TerminalDashboard() {
   const router = useRouter();
-  const { currentUser, isInitialized, getAllDonations, getAllRequests } =
-    useDatabase();
+  const { currentUser, isInitialized } = useDatabase();
   const { t } = useCommonTranslation();
 
   const [loading, setLoading] = useState(true);
@@ -77,7 +79,8 @@ export default function TerminalDashboard() {
   const [requests, setRequests] = useState<TerminalRequest[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [routeFilter, setRouteFilter] = useState('all');
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
   const [selectedDonation, setSelectedDonation] =
     useState<TerminalDonation | null>(null);
   const [selectedRequest, setSelectedRequest] =
@@ -120,11 +123,33 @@ export default function TerminalDashboard() {
 
     setLoading(true);
     try {
-      // Get data with simple optimization
-      const [donationsData, requestsData] = await Promise.all([
-        getAllDonations(),
-        getAllRequests(),
+      // Get real data from Supabase
+      const [donationsResponse, requestsResponse] = await Promise.all([
+        supabase.from('donations').select(`
+            *,
+            food_items (*),
+            profiles!donor_id (full_name, organization_name)
+          `),
+        supabase.from('requests').select(`
+            *,
+            profiles (full_name, organization_name)
+          `),
       ]);
+
+      if (donationsResponse.error) {
+        console.error('Error fetching donations:', donationsResponse.error);
+        setLoading(false);
+        return;
+      }
+
+      if (requestsResponse.error) {
+        console.error('Error fetching requests:', requestsResponse.error);
+        setLoading(false);
+        return;
+      }
+
+      const donationsData = donationsResponse.data || [];
+      const requestsData = requestsResponse.data || [];
 
       // Transform data for terminal operations display
       const transformedDonations: TerminalDonation[] = donationsData.map(
@@ -132,18 +157,24 @@ export default function TerminalDashboard() {
           id: d.id,
           created_at: d.created_at,
           organization_name:
-            d.donor?.organization_name || d.donor?.full_name || 'Unknown',
-          food_items: d.food_items || [],
-          total_weight:
-            d.food_items?.reduce(
-              (sum: number, item: any) => sum + (item.quantity || 0),
-              0
-            ) || 0,
+            d.profiles?.organization_name ||
+            d.profiles?.full_name ||
+            'Unknown Donor',
+          food_items: d.food_items
+            ? [
+                {
+                  name: d.food_items.name,
+                  quantity: parseFloat(d.quantity) || 0,
+                  unit: d.unit || 'kg',
+                },
+              ]
+            : [],
+          total_weight: parseFloat(d.quantity) || 0,
           status: d.status,
           processing_status:
-            d.status === 'completed'
+            d.status === 'picked_up'
               ? 'dispatched'
-              : d.status === 'active'
+              : d.status === 'claimed'
                 ? 'processing'
                 : 'received',
           pickup_time: d.pickup_slots?.[0]?.start_time || 'TBD',
@@ -160,9 +191,9 @@ export default function TerminalDashboard() {
           id: r.id,
           created_at: r.created_at,
           organization_name:
-            r.requester?.organization_name ||
-            r.requester?.full_name ||
-            'Unknown',
+            r.profiles?.organization_name ||
+            r.profiles?.full_name ||
+            'Unknown Receiver',
           description: r.description,
           people_count: r.people_count,
           status: r.status,
@@ -172,12 +203,7 @@ export default function TerminalDashboard() {
             r.pickup_start_time && r.pickup_end_time
               ? `${r.pickup_start_time}-${r.pickup_end_time}`
               : 'TBD',
-          assigned_route:
-            r.status === 'active'
-              ? `RT${Math.floor(Math.random() * 999)
-                  .toString()
-                  .padStart(3, '0')}`
-              : undefined,
+          is_recurring: r.is_recurring || false,
         })
       );
 
@@ -188,7 +214,7 @@ export default function TerminalDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [isInitialized, currentUser, getAllDonations, getAllRequests]);
+  }, [isInitialized, currentUser]);
 
   // Auto-refresh every 30 seconds for terminal operations
   useEffect(() => {
@@ -208,10 +234,17 @@ export default function TerminalDashboard() {
         );
       const matchesStatus =
         statusFilter === 'all' || d.processing_status === statusFilter;
-      const matchesRoute = routeFilter === 'all' || d.route_id === routeFilter;
-      return matchesSearch && matchesStatus && matchesRoute;
+
+      // Date filtering
+      const donationDate = new Date(d.created_at);
+      const matchesStartDate = !startDate || donationDate >= startDate;
+      const matchesEndDate = !endDate || donationDate <= endDate;
+
+      return (
+        matchesSearch && matchesStatus && matchesStartDate && matchesEndDate
+      );
     });
-  }, [donations, searchTerm, statusFilter, routeFilter]);
+  }, [donations, searchTerm, statusFilter, startDate, endDate]);
 
   const filteredRequests = useMemo(() => {
     return requests.filter((r) => {
@@ -220,11 +253,17 @@ export default function TerminalDashboard() {
         r.organization_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         r.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'all' || r.status === statusFilter;
-      const matchesRoute =
-        routeFilter === 'all' || r.assigned_route === routeFilter;
-      return matchesSearch && matchesStatus && matchesRoute;
+
+      // Date filtering
+      const requestDate = new Date(r.created_at);
+      const matchesStartDate = !startDate || requestDate >= startDate;
+      const matchesEndDate = !endDate || requestDate <= endDate;
+
+      return (
+        matchesSearch && matchesStatus && matchesStartDate && matchesEndDate
+      );
     });
-  }, [requests, searchTerm, statusFilter, routeFilter]);
+  }, [requests, searchTerm, statusFilter, startDate, endDate]);
 
   // PDF Export function (lightweight)
   const handlePrintExport = useCallback(() => {
@@ -245,23 +284,19 @@ export default function TerminalDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <TerminalUIShell>
+      {/* Operations Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Food Terminal Operations Dashboard
-            </h1>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Operations Overview
+            </h2>
             <p className="text-gray-600">
-              Real-time logistics and processing monitoring
+              Current status and real-time metrics
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="secondary" onClick={handlePrintExport}>
-              <Download className="w-4 h-4 mr-2" />
-              Export Report
-            </Button>
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Calendar className="w-4 h-4" />
               {new Date().toLocaleDateString('en-FI', {
@@ -273,7 +308,7 @@ export default function TerminalDashboard() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Analytics Cards */}
       <section className="px-6 py-6">
@@ -346,12 +381,29 @@ export default function TerminalDashboard() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  placeholder="Search organizations, routes, locations..."
+                  placeholder="Search organizations, food items, descriptions..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
+            </div>
+
+            {/* Date Range Filter */}
+            <div className="flex items-center gap-2">
+              <DatePicker
+                date={startDate}
+                onDateChange={setStartDate}
+                placeholder="Start date"
+                className="w-40"
+              />
+              <span className="text-gray-400">to</span>
+              <DatePicker
+                date={endDate}
+                onDateChange={setEndDate}
+                placeholder="End date"
+                className="w-40"
+              />
             </div>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -369,27 +421,11 @@ export default function TerminalDashboard() {
               </SelectContent>
             </Select>
 
-            <Select value={routeFilter} onValueChange={setRouteFilter}>
-              <SelectTrigger className="w-48">
-                <Truck className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="All Routes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Routes</SelectItem>
-                {Array.from(
-                  new Set(
-                    [
-                      ...donations.map((d) => d.route_id),
-                      ...requests.map((r) => r.assigned_route),
-                    ].filter(Boolean)
-                  )
-                ).map((route) => (
-                  <SelectItem key={route} value={route!}>
-                    {route}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Export Button */}
+            <Button variant="outline" onClick={handlePrintExport}>
+              <Download className="w-4 h-4 mr-2" />
+              Export Data
+            </Button>
           </div>
         </div>
       </section>
@@ -490,11 +526,15 @@ export default function TerminalDashboard() {
                           >
                             {request.urgency}
                           </span>
+                          {request.is_recurring && (
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              Recurring
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm text-gray-600 mb-2">
                           {request.people_count} people •{' '}
-                          {request.delivery_window} •{' '}
-                          {request.assigned_route || 'Unassigned'}
+                          {request.delivery_window}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-gray-500">
                           <span>
@@ -530,7 +570,7 @@ export default function TerminalDashboard() {
             <DialogTitle>Donation Processing Details</DialogTitle>
           </DialogHeader>
           {selectedDonation && (
-            <div className="space-y-4">
+            <div className="space-y-4 pb-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-gray-600">
@@ -617,7 +657,7 @@ export default function TerminalDashboard() {
             <DialogTitle>Delivery Request Details</DialogTitle>
           </DialogHeader>
           {selectedRequest && (
-            <div className="space-y-4">
+            <div className="space-y-4 pb-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-gray-600">
@@ -720,6 +760,6 @@ export default function TerminalDashboard() {
           }
         }
       `}</style>
-    </div>
+    </TerminalUIShell>
   );
 }

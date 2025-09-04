@@ -23,6 +23,8 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
   const isDocsRoute = pathname.startsWith('/docs');
+  const isDesktopDashboard =
+    pathname === '/city/dashboard' || pathname === '/terminal/dashboard';
 
   return (
     <AuthProvider>
@@ -32,8 +34,8 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
           {/* No shell for auth routes but still need store init */}
           {children}
         </>
-      ) : isDocsRoute ? (
-        /* Full-width layout for documentation pages */
+      ) : isDocsRoute || isDesktopDashboard ? (
+        /* Full-width layout for documentation pages and desktop dashboards */
         <div className="min-h-[100svh] bg-gray-50">{children}</div>
       ) : (
         /* Layout: A mobile-like container centered on all screen sizes */
