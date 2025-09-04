@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { ImageIcon, MapPinIcon, ShoppingBag } from 'lucide-react';
 import { DonationWithFoodItem, useDatabase } from '@/store';
 import { CardContent } from '@/components/ui/card';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 interface DonationCardProps {
   donation: DonationWithFoodItem;
@@ -18,7 +18,7 @@ interface DonationCardProps {
 
 const DonationCard: React.FC<DonationCardProps> = React.memo(
   ({ donation, donorName, pickupTime, className }) => {
-    const { t } = useLanguage();
+    const { t } = useCommonTranslation();
     // Use selector to only get what we need and prevent re-renders
     const users = useDatabase((state) => state.users);
 

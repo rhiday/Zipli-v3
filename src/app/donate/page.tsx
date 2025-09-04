@@ -3,26 +3,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import BottomNav from '@/components/BottomNav';
 import { ViewportContainer } from '@/components/layout/ViewportContainer';
-import {
-  ArrowRight,
-  Info,
-  PlusIcon,
-  PackageIcon,
-  Scale,
-  Utensils,
-  Euro,
-  Leaf,
-  FileDown,
-} from 'lucide-react';
+import { Scale, Utensils, Euro, Leaf, FileDown } from 'lucide-react';
 import Header from '@/components/layout/Header';
-import Link from 'next/link';
-import Image from 'next/image';
 import { loadJsPDF } from '@/lib/lazy-imports';
-import SummaryOverview from '@/components/SummaryOverview';
-import DonationCard from '@/components/donations/DonationCard';
 import { useDatabase, DonationWithFoodItem } from '@/store';
 import {
   DonationCardSkeleton,

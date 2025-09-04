@@ -32,12 +32,12 @@ import {
   RequestUpdate,
 } from '@/types/supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import { 
-  fetchOptimizedDonations, 
-  fetchOptimizedRequests, 
+import {
+  fetchOptimizedDonations,
+  fetchOptimizedRequests,
   batchFetchUserData,
   clearQueryCache,
-  getCacheStats 
+  getCacheStats,
 } from '@/lib/database/queryOptimizer';
 
 // Store state interface
@@ -175,18 +175,19 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           if (currentUser) {
             // Use optimized batch data fetching
             console.log('📦 Starting optimized batch data fetch...');
-            const { donations, requests } = await batchFetchUserData(currentUser);
-            
+            const { donations, requests } =
+              await batchFetchUserData(currentUser);
+
             // Update state with fetched data
-            set({ 
-              donations, 
+            set({
+              donations,
               requests,
               users: [currentUser], // Keep current user in users array for compatibility
               currentUser,
               isInitialized: true,
               loading: false,
             });
-            
+
             console.log('✅ Optimized data fetching completed');
           } else {
             // No user logged in - just set empty state
@@ -943,3 +944,6 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
     }
   )
 );
+
+// Default export for compatibility
+export default useSupabaseDatabase;

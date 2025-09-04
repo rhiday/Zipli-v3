@@ -47,6 +47,7 @@ export default function DonationSummaryPage() {
   const [updateInstructionsInProfile, setUpdateInstructionsInProfile] =
     useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [recurringSchedule, setRecurringSchedule] = useState<any>(null);
 
   const formatSlotDate = (date: Date | string | undefined) => {
@@ -109,6 +110,12 @@ export default function DonationSummaryPage() {
   };
 
   const handleConfirmDonation = async () => {
+    // Prevent multiple submissions
+    if (isSaving || isSubmitting) {
+      console.log('Already submitting, ignoring...');
+      return;
+    }
+
     const action = isEditMode ? 'updating' : 'creating';
     console.log(`🚀 Starting donation ${action}...`);
     console.log('📝 Current user:', currentUser?.full_name);
@@ -126,7 +133,9 @@ export default function DonationSummaryPage() {
       return;
     }
 
+    // Set loading states immediately to prevent any flicker
     setIsSaving(true);
+    setIsSubmitting(true);
 
     try {
       // Update profile data if checkboxes are checked
@@ -283,14 +292,8 @@ export default function DonationSummaryPage() {
         }
       }
 
-      // Navigate first, then clear store to prevent flash
+      // Navigate to thank you page first
       router.push('/donate/thank-you');
-
-      // Clear the donation store after navigation
-      setTimeout(() => {
-        const clearDonation = useDonationStore.getState().clearDonation;
-        clearDonation();
-      }, 100);
     } catch (error) {
       console.error(`Error ${action} donations:`, error);
       // Show error message to user
@@ -300,8 +303,18 @@ export default function DonationSummaryPage() {
     }
   };
 
-  // Show loading if no donation data (but not while saving)
-  if (donationItems.length === 0 && !isSaving) {
+  // Show loading screen while saving to prevent any glitches
+  if (isSaving || isSubmitting) {
+    return (
+      <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-positive"></div>
+        <p className="text-gray-600">{t('creatingDonation')}</p>
+      </div>
+    );
+  }
+
+  // Show loading if no donation data (but not if we're submitting)
+  if (donationItems.length === 0) {
     return (
       <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
         <p className="text-gray-600">{t('noDonationItemsFound')}</p>
@@ -331,7 +344,12 @@ export default function DonationSummaryPage() {
           <div className="flex justify-end">
             <Button
               onClick={handleConfirmDonation}
-              disabled={!address.trim() || pickupSlots.length === 0 || isSaving}
+              disabled={
+                !address.trim() ||
+                pickupSlots.length === 0 ||
+                isSaving ||
+                isSubmitting
+              }
             >
               {isSaving
                 ? t('continuing')
