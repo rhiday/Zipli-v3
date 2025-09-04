@@ -291,11 +291,9 @@ export default function TerminalDashboard() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
-              Operations Overview
+              {t('operationsOverview')}
             </h2>
-            <p className="text-gray-600">
-              Current status and real-time metrics
-            </p>
+            <p className="text-gray-600">{t('currentStatusAndMetrics')}</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -319,7 +317,7 @@ export default function TerminalDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Volume Processed
+                    {t('volumeProcessed')}
                   </p>
                   <p className="text-3xl font-bold text-blue-600">
                     {analytics.volumeProcessed}
@@ -333,7 +331,7 @@ export default function TerminalDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Storage Utilization
+                    {t('storageUtilization')}
                   </p>
                   <p className="text-3xl font-bold text-purple-600">
                     {analytics.storageUtilization}
@@ -347,7 +345,7 @@ export default function TerminalDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Processing Efficiency
+                    {t('processingEfficiency')}
                   </p>
                   <p className="text-3xl font-bold text-green-600">
                     {analytics.processingEfficiency}
@@ -361,7 +359,7 @@ export default function TerminalDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    Active Routes
+                    {t('activeRoutes')}
                   </p>
                   <p className="text-3xl font-bold text-orange-600">
                     {analytics.activeRoutes}
@@ -382,7 +380,7 @@ export default function TerminalDashboard() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  placeholder="Search organizations, food items, descriptions..."
+                  placeholder={t('searchOrganizations')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -410,22 +408,24 @@ export default function TerminalDashboard() {
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-48">
                 <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="All Status" />
+                <SelectValue placeholder={t('allStatus')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="received">Received</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="dispatched">Dispatched</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="fulfilled">Fulfilled</SelectItem>
+                <SelectItem value="all">{t('allStatus')}</SelectItem>
+                <SelectItem value="received">{t('received')}</SelectItem>
+                <SelectItem value="processing">{t('processing')}</SelectItem>
+                <SelectItem value="dispatched">{t('dispatched')}</SelectItem>
+                <SelectItem value="active">{t('active')}</SelectItem>
+                <SelectItem value="fulfilled">
+                  {t('terminalFulfilled')}
+                </SelectItem>
               </SelectContent>
             </Select>
 
             {/* Export Button */}
             <Button variant="secondary" onClick={handlePrintExport}>
               <Download className="w-4 h-4 mr-2" />
-              Export Data
+              {t('exportData')}
             </Button>
           </div>
         </div>
@@ -439,7 +439,7 @@ export default function TerminalDashboard() {
             <div className="p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center">
                 <Package className="w-5 h-5 mr-2 text-blue-600" />
-                Incoming Donations ({filteredDonations.length})
+                {t('incomingDonations')} ({filteredDonations.length})
               </h2>
             </div>
             <div className="max-h-96 overflow-y-auto">
@@ -469,7 +469,7 @@ export default function TerminalDashboard() {
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 mb-2">
-                          {donation.food_items.length} items •{' '}
+                          {donation.food_items.length} {t('items')} •{' '}
                           {donation.total_weight}kg • Route: {donation.route_id}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-gray-500">
@@ -487,7 +487,7 @@ export default function TerminalDashboard() {
                 ))}
                 {filteredDonations.length === 0 && (
                   <div className="text-center py-8 text-gray-500">
-                    No donations match your filters
+                    {t('noDonationsMatchFilters')}
                   </div>
                 )}
               </div>
@@ -499,7 +499,7 @@ export default function TerminalDashboard() {
             <div className="p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center">
                 <Truck className="w-5 h-5 mr-2 text-orange-600" />
-                Delivery Requests ({filteredRequests.length})
+                {t('deliveryRequests')} ({filteredRequests.length})
               </h2>
             </div>
             <div className="max-h-96 overflow-y-auto">
@@ -534,7 +534,7 @@ export default function TerminalDashboard() {
                           )}
                         </div>
                         <p className="text-sm text-gray-600 mb-2">
-                          {request.people_count} people •{' '}
+                          {request.people_count} {t('terminalPeople')} •{' '}
                           {request.delivery_window}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-gray-500">
@@ -552,7 +552,7 @@ export default function TerminalDashboard() {
                 ))}
                 {filteredRequests.length === 0 && (
                   <div className="text-center py-8 text-gray-500">
-                    No requests match your filters
+                    {t('noRequestsMatchFilters')}
                   </div>
                 )}
               </div>
@@ -568,7 +568,7 @@ export default function TerminalDashboard() {
       >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Donation Processing Details</DialogTitle>
+            <DialogTitle>{t('donationProcessingDetails')}</DialogTitle>
           </DialogHeader>
           {selectedDonation && (
             <div className="space-y-4 pb-6">
@@ -655,7 +655,7 @@ export default function TerminalDashboard() {
       >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Delivery Request Details</DialogTitle>
+            <DialogTitle>{t('deliveryRequestDetails')}</DialogTitle>
           </DialogHeader>
           {selectedRequest && (
             <div className="space-y-4 pb-6">
@@ -688,10 +688,10 @@ export default function TerminalDashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-gray-600">
-                    People Count
+                    {t('terminalPeopleCount')}
                   </label>
                   <p className="text-gray-900">
-                    {selectedRequest.people_count} people
+                    {selectedRequest.people_count} {t('terminalPeople')}
                   </p>
                 </div>
                 <div>
