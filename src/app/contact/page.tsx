@@ -3,9 +3,10 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
-import { Phone, Mail } from 'lucide-react';
+import { Phone, Mail, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { ViewportContainer } from '@/components/layout/ViewportContainer';
+import { Button } from '@/components/ui/button';
 
 export default function ContactPage(): React.ReactElement {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function ContactPage(): React.ReactElement {
         'Oletko huomannut sovelluksessa jotain hassua tai puuttuuko siitä mielestäsi jotain? Palaute on meille arvokasta, joten voit laittaa huomioitasi meille matalalla kynnykselkä.',
       phone: 'Puhelin',
       email: 'Sähköposti',
+      giveFeedbackButton: 'Anna palautetta',
     },
     en: {
       title: 'Contact',
@@ -31,6 +33,7 @@ export default function ContactPage(): React.ReactElement {
         'Have you noticed something strange in the app or is something missing? Feedback is valuable to us, so feel free to share your observations with us.',
       phone: 'Phone',
       email: 'Email',
+      giveFeedbackButton: 'Give Feedback',
     },
   };
 
@@ -72,7 +75,7 @@ export default function ContactPage(): React.ReactElement {
               {t.feedback}
             </h3>
             <p className="text-gray-600 mb-4">{t.feedbackDesc}</p>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-4">
               <Mail className="w-5 h-5 text-primary" />
               <div>
                 <p className="font-medium text-gray-900">{t.email}</p>
@@ -84,6 +87,17 @@ export default function ContactPage(): React.ReactElement {
                 </a>
               </div>
             </div>
+
+            {/* New feedback button */}
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => router.push('/feedback')}
+              className="w-full"
+            >
+              <MessageSquare className="w-5 h-5" />
+              {t.giveFeedbackButton}
+            </Button>
           </div>
         </div>
       </div>

@@ -13,7 +13,11 @@ export const useLayoutConfig = () => {
   const flowRegex =
     /^\/(donate|request)\/(new|manual|pickup-slot|schedule|summary|thank-you|success|detail|one-time-form|recurring-form|select-type|[^/]+\/handover-confirm)/;
 
-  const isFlowPage = flowRegex.test(pathname) || pathname === '/profile';
+  const isFlowPage =
+    flowRegex.test(pathname) ||
+    pathname === '/profile' ||
+    pathname === '/feedback' ||
+    pathname === '/contact';
 
   // Desktop dashboards should not show bottom navigation
   const isDesktopDashboard =
