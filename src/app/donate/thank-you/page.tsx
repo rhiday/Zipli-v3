@@ -18,10 +18,17 @@ export default function DonationThankYouPage() {
     if (isEditMode) {
       setEditMode(false);
     }
-  }, [isEditMode, setEditMode]);
+
+    // Clear the donation store when reaching thank you page
+    // This prevents any glitches during the donation creation flow
+    clearDonation();
+  }, [isEditMode, setEditMode, clearDonation]);
 
   return (
-    <ViewportContainer variant="fullscreen" className="flex flex-col items-center justify-center px-4 bg-white">
+    <ViewportContainer
+      variant="fullscreen"
+      className="flex flex-col items-center justify-center px-4 bg-white"
+    >
       <div className="mt-12 mb-8">
         <svg
           width="164"
