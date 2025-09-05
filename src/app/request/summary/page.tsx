@@ -113,17 +113,17 @@ export default function RequestSummaryPage() {
 
     if (!address.trim() || !currentUser) {
       console.error('Validation failed: missing address or user');
-      alert('Please enter your address');
+      alert(t('enterAddress'));
       return;
     }
 
     if (!requestData.description || !requestData.quantity) {
-      alert('Please complete your food request details');
+      alert(t('completeRequestDetails'));
       return;
     }
 
     if (pickupSlots.length === 0 && !recurringSchedule) {
-      alert('Please add at least one pickup slot');
+      alert(t('addPickupSlot'));
       return;
     }
 
@@ -307,12 +307,12 @@ export default function RequestSummaryPage() {
         }
       } else {
         console.error('❌ No data returned from request operation');
-        alert('Failed to submit request: No data returned');
+        alert(`${t('submissionFailed')}: ${t('noDataReturned')}`);
       }
     } catch (error) {
       console.error('Error submitting request:', error);
       alert(
-        `Failed to submit request: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `${t('submissionFailed')}: ${error instanceof Error ? error.message : t('unknownError')}`
       );
     } finally {
       setIsSaving(false);
@@ -323,9 +323,9 @@ export default function RequestSummaryPage() {
   if (!requestData.description) {
     return (
       <div className="flex flex-col min-h-dvh bg-white max-w-md mx-auto items-center justify-center gap-4">
-        <p className="text-gray-600">No request data found</p>
+        <p className="text-gray-600">{t('noRequestDataFound')}</p>
         <Button onClick={() => router.push('/request/select-type')}>
-          Start New Request
+          {t('startNewRequest')}
         </Button>
       </div>
     );
@@ -378,7 +378,7 @@ export default function RequestSummaryPage() {
               {isSaving
                 ? t('continuing')
                 : isEditMode
-                  ? 'Update Request'
+                  ? t('updateRequest')
                   : t('submitRequest')}
             </Button>
           </div>
@@ -394,7 +394,7 @@ export default function RequestSummaryPage() {
         <div className="flex items-start justify-between p-3 rounded-[12px] bg-[#F5F9EF] border border-[#D9DBD5]">
           <div className="space-y-1">
             <div className="font-semibold text-[#024209]">
-              {requestData.description || 'Food Request'}
+              {requestData.description || t('foodRequest')}
             </div>
             <div className="text-sm text-gray-600">
               {t('quantity')}: {requestData.quantity || '—'} kg
@@ -403,7 +403,7 @@ export default function RequestSummaryPage() {
               {t('requestDetails')}:{' '}
               {requestData.allergens && requestData.allergens.length > 0
                 ? requestData.allergens.join(', ')
-                : 'None specified'}
+                : t('noneSpecified')}
             </div>
           </div>
           <button
@@ -450,7 +450,7 @@ export default function RequestSummaryPage() {
             <button
               onClick={() => router.push('/request/schedule')}
               className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-              title="Edit request period"
+              title={t('editRequestPeriod')}
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path
@@ -468,7 +468,7 @@ export default function RequestSummaryPage() {
       {/* Pickup Schedule Section */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          {recurringSchedule ? 'Recurring Schedule' : 'Delivery Schedule'}
+          {recurringSchedule ? t('recurringSchedule') : t('deliverySchedule')}
         </h2>
         {recurringSchedule && Array.isArray(recurringSchedule) ? (
           // Multiple recurring schedules
@@ -484,7 +484,7 @@ export default function RequestSummaryPage() {
               <button
                 onClick={() => router.push('/request/schedule')}
                 className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-                title="Edit schedule"
+                title={t('editSchedule')}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path
@@ -512,7 +512,7 @@ export default function RequestSummaryPage() {
               <button
                 onClick={() => router.push('/request/pickup-slot')}
                 className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-                title="Edit delivery time"
+                title={t('editDeliveryTime')}
               >
                 <svg
                   width="20"
@@ -540,7 +540,7 @@ export default function RequestSummaryPage() {
             <button
               onClick={() => router.push('/request/pickup-slot')}
               className="flex items-center justify-center w-[42px] h-[32px] rounded-full border border-[#021d13] bg-white transition-colors hover:bg-black/5"
-              title="Edit delivery time"
+              title={t('editDeliveryTime')}
             >
               <svg
                 width="20"
@@ -564,7 +564,7 @@ export default function RequestSummaryPage() {
       {/* Address & Instructions Section */}
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-[#021d13] mt-6">
-          Address & Instructions
+          {t('addressAndInstructions')}
         </h2>
         <div>
           <label

@@ -92,7 +92,7 @@ export default function ReceiverDashboardPage(): React.ReactElement {
     const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text('Zipli Request Summary', 10, 10);
+    doc.text(t('requestSummaryTitle'), 10, 10);
     doc.setFontSize(12);
     doc.text(
       `Total food requested: ${formatWeight(stats.estimatedKg)}`,
@@ -103,13 +103,13 @@ export default function ReceiverDashboardPage(): React.ReactElement {
     doc.text(`Active requests: ${stats.activeRequests}`, 10, 40);
     doc.text(`Fulfilled requests: ${stats.fulfilledRequests}`, 10, 50);
     doc.text(`Fulfillment rate: ${stats.fulfillmentRate}%`, 10, 60);
-    doc.save('zipli-receiver-summary.pdf');
+    doc.save(t('receiverSummaryFilename'));
   }, [stats]);
 
   if (loading) {
     return (
       <ViewportContainer variant="page" className="pb-nav">
-        <Header title="Loading..." />
+        <Header title={t('loading')} />
 
         <main className="relative z-20 -mt-4 rounded-t-3xl bg-base p-4 space-y-6">
           <section>

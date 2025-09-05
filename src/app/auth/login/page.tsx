@@ -77,7 +77,10 @@ export default function LoginPage() {
             router.push('/receiver/dashboard');
             break;
           case 'city':
-            router.push('/dashboard');
+            router.push('/city/dashboard');
+            break;
+          case 'terminals':
+            router.push('/terminal/dashboard');
             break;
           default:
             console.warn(
@@ -87,7 +90,7 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('genericError'));
       setLoading(false);
     }
   };

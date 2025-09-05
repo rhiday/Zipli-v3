@@ -3,26 +3,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import BottomNav from '@/components/BottomNav';
 import { ViewportContainer } from '@/components/layout/ViewportContainer';
-import {
-  ArrowRight,
-  Info,
-  PlusIcon,
-  PackageIcon,
-  Scale,
-  Utensils,
-  Euro,
-  Leaf,
-  FileDown,
-} from 'lucide-react';
+import { Scale, Utensils, Euro, Leaf, FileDown } from 'lucide-react';
 import Header from '@/components/layout/Header';
-import Link from 'next/link';
-import Image from 'next/image';
 import { loadJsPDF } from '@/lib/lazy-imports';
-import SummaryOverview from '@/components/SummaryOverview';
-import DonationCard from '@/components/donations/DonationCard';
 import { useDatabase, DonationWithFoodItem } from '@/store';
 import {
   DonationCardSkeleton,
@@ -128,7 +112,7 @@ function DonorDashboardPage(): React.ReactElement {
     const jsPDF = await loadJsPDF();
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text('Zipli Donation Summary', 10, 10);
+    doc.text(t('donationSummaryTitle'), 10, 10);
     doc.setFontSize(12);
     doc.text(
       `Total food offered: ${formatWeight(metrics.totalWeight)}`,
@@ -143,7 +127,7 @@ function DonorDashboardPage(): React.ReactElement {
     );
     doc.text(`CO2 avoided: ${metrics.co2Avoided}kg`, 10, 50);
     doc.text(`Success rate: ${metrics.successRate}%`, 10, 60);
-    doc.save('zipli-summary.pdf');
+    doc.save(t('donationSummaryFilename'));
   }, [metrics]);
 
   if (loading) {

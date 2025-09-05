@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { ImageIcon, MapPinIcon, ShoppingBag } from 'lucide-react';
 import { DonationWithFoodItem, useDatabase } from '@/store';
 import { CardContent } from '@/components/ui/card';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 interface DonationCardProps {
   donation: DonationWithFoodItem;
@@ -18,7 +18,7 @@ interface DonationCardProps {
 
 const DonationCard: React.FC<DonationCardProps> = React.memo(
   ({ donation, donorName, pickupTime, className }) => {
-    const { t } = useLanguage();
+    const { t } = useCommonTranslation();
     // Use selector to only get what we need and prevent re-renders
     const users = useDatabase((state) => state.users);
 
@@ -127,7 +127,7 @@ const DonationCard: React.FC<DonationCardProps> = React.memo(
               <div className="flex h-full w-full items-center justify-center bg-gray-100">
                 <Image
                   src="/images/placeholder.svg"
-                  alt={'NoImage'}
+                  alt={t('noImage')}
                   fill
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   className="object-cover"

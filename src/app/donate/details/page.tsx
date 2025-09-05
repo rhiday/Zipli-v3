@@ -89,7 +89,9 @@ export default function DonationDetailsPage() {
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Item {currentItemIndex + 1} of {totalItems}
+            {t('itemProgress')
+              .replace('{current}', `${currentItemIndex + 1}`)
+              .replace('{total}', `${totalItems}`)}
           </p>
         </div>
 

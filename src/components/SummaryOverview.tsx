@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 interface Donation {
   status: string;
@@ -16,7 +16,7 @@ const SummaryOverview: React.FC<SummaryOverviewProps> = ({
   userId,
   donations,
 }) => {
-  const { t } = useLanguage();
+  const { t } = useCommonTranslation();
   // Since we don't have active requests in our mock data, we'll just hardcode it for now.
   const activeRequests = 0;
   const activeOffers = donations.filter(

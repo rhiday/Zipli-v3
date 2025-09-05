@@ -159,8 +159,8 @@ export default function RequestsListPage(): React.ReactElement {
             </h2>
             <p className="text-secondary mb-6">
               {searchQuery || statusFilter !== 'all'
-                ? 'Try adjusting your search or filters'
-                : "You haven't created any requests yet"}
+                ? t('adjustFilters')
+                : t('noRequestsYet')}
             </p>
             {!searchQuery && statusFilter === 'all' && (
               <Button
