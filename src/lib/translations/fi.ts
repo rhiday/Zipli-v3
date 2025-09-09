@@ -40,6 +40,12 @@ export const fi = {
   logout: 'Kirjaudu ulos',
   giveFeedback: 'Anna palautetta',
 
+  // Success confirmations
+  claimConfirmed: 'Varauksesi vahvistettu!',
+  claimConfirmedDescription: 'Varauksesi on vahvistettu onnistuneesti.',
+  deliveryConfirmed: 'Toimitus vahvistettu!',
+  deliveryConfirmedDescription: 'Toimituksesi on vahvistettu onnistuneesti.',
+
   // Food donation
   donate: 'Luo ilmoitus',
   createDonation: 'Luo uusi ilmoitus',

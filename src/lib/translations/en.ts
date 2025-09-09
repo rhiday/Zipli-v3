@@ -40,6 +40,13 @@ export const en = {
   logout: 'Logout',
   giveFeedback: 'Give feedback',
 
+  // Success confirmations
+  claimConfirmed: 'Claim Confirmed!',
+  claimConfirmedDescription: 'Your claim has been successfully confirmed.',
+  deliveryConfirmed: 'Delivery Confirmed!',
+  deliveryConfirmedDescription:
+    'Your delivery has been successfully confirmed.',
+
   // Food donation
   donate: 'Create listing',
   createDonation: 'Create new listing',
