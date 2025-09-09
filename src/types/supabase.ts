@@ -359,6 +359,7 @@ export type Database = {
         Row: {
           address: string | null;
           allergens: Json | null;
+          category: string | null;
           created_at: string;
           description: string;
           end_date: string | null;
@@ -382,6 +383,7 @@ export type Database = {
         Insert: {
           address?: string | null;
           allergens?: Json | null;
+          category?: string | null;
           created_at?: string;
           description: string;
           end_date?: string | null;
@@ -405,6 +407,7 @@ export type Database = {
         Update: {
           address?: string | null;
           allergens?: Json | null;
+          category?: string | null;
           created_at?: string;
           description?: string;
           end_date?: string | null;

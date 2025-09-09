@@ -30,11 +30,13 @@ export default function FeedbackPage(): React.ReactElement {
   const content = {
     fi: {
       feedbackTitle: 'Anna palautetta',
-      howWasExperience: 'Miltä käyttökokemus tuntui?',
+      // Updated copy
+      howWasExperience: 'Miltä sovelluksen käyttäminen on yleisesti tuntunut?',
       feedbackType: 'Mitä palautteesi koskee?',
       selectCategory: 'Valitse kategoria',
-      bug: 'Virhe',
-      featureRequest: 'Ominaisuuspyyntö',
+      // Updated option labels
+      bug: 'Virhe sovelluksessa',
+      featureRequest: 'Kehitysidea',
       general: 'Yleinen palaute',
       tellUsMore: 'Kerro lisää',
       feedbackPlaceholder: 'Kirjoita palautteesi tähän...',
@@ -49,12 +51,14 @@ export default function FeedbackPage(): React.ReactElement {
     },
     en: {
       feedbackTitle: 'Give Feedback',
-      howWasExperience: 'How was your experience?',
+      // Updated copy
+      howWasExperience: 'How was it overall using the app?',
       feedbackType: "What's your feedback about?",
       selectCategory: 'Select category',
-      bug: 'Bug',
-      featureRequest: 'Feature Request',
-      general: 'General',
+      // Updated option labels
+      bug: 'Bug in the application',
+      featureRequest: 'Development idea',
+      general: 'General feedback',
       tellUsMore: 'Tell us more',
       feedbackPlaceholder: 'Write your feedback here...',
       emailOptional: 'Email (optional)',
@@ -156,7 +160,39 @@ export default function FeedbackPage(): React.ReactElement {
 
       <div className="flex-grow overflow-y-auto p-4 pb-24">
         <div className="mx-auto max-w-lg space-y-6">
-          {/* Star Rating */}
+          {/* Category Selection (moved to top) */}
+          <div className="bg-white rounded-lg p-6">
+            <label className="text-bodyLg font-semibold text-primary mb-3 block">
+              {t.feedbackType}
+            </label>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder={t.selectCategory} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="general">{t.general}</SelectItem>
+                <SelectItem value="feature">{t.featureRequest}</SelectItem>
+                <SelectItem value="bug">{t.bug}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Comment Text Area (second) */}
+          <div className="bg-white rounded-lg p-6">
+            <label className="text-bodyLg font-semibold text-primary mb-3 block">
+              {t.tellUsMore}
+            </label>
+            <Textarea
+              placeholder={t.feedbackPlaceholder}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows={5}
+              className="w-full"
+            />
+            <p className="text-sm text-tertiary mt-2">{comment.length}/500</p>
+          </div>
+
+          {/* Star Rating (moved below text input) */}
           <div className="bg-white rounded-lg p-6">
             <label className="text-bodyLg font-semibold text-primary mb-3 block">
               {t.howWasExperience}
@@ -179,38 +215,6 @@ export default function FeedbackPage(): React.ReactElement {
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Category Selection */}
-          <div className="bg-white rounded-lg p-6">
-            <label className="text-bodyLg font-semibold text-primary mb-3 block">
-              {t.feedbackType}
-            </label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder={t.selectCategory} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bug">{t.bug}</SelectItem>
-                <SelectItem value="feature">{t.featureRequest}</SelectItem>
-                <SelectItem value="general">{t.general}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Comment Text Area */}
-          <div className="bg-white rounded-lg p-6">
-            <label className="text-bodyLg font-semibold text-primary mb-3 block">
-              {t.tellUsMore}
-            </label>
-            <Textarea
-              placeholder={t.feedbackPlaceholder}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows={5}
-              className="w-full"
-            />
-            <p className="text-sm text-tertiary mt-2">{comment.length}/500</p>
           </div>
 
           {/* Optional Email */}

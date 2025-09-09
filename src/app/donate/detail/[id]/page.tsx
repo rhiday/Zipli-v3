@@ -59,6 +59,7 @@ export default function DonationDetailPage() {
   const [showConfirmClaim, setShowConfirmClaim] = useState(false);
   const [confirmClauseChecked, setConfirmClauseChecked] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [showSuccessWithFeedback, setShowSuccessWithFeedback] = useState(false);
 
   useEffect(() => {
     const fetchDonation = async () => {
@@ -173,7 +174,8 @@ export default function DonationDetailPage() {
 
       // Refresh the donation data
       await fetchDonationById(donation.id);
-      router.push('/donate');
+      // Show success dialog with feedback option
+      setShowSuccessWithFeedback(true);
     } catch (error) {
       console.error('Unexpected error claiming donation:', error);
     } finally {
@@ -206,6 +208,23 @@ export default function DonationDetailPage() {
   }
 
   const donorName = donorDisplayName || 'Generous Donor';
+
+  // Helper function to translate category values to display text
+  const getCategoryDisplayText = (
+    category: string | null | undefined
+  ): string | null => {
+    if (!category) return null;
+
+    const categoryMap: { [key: string]: string } = {
+      main_protein: t('categoryMainProtein'),
+      energy_supplement: t('categoryEnergySupplement'),
+      soup: t('categorySoup'),
+      salad_ingredients: t('categorySaladIngredients'),
+      other: t('categoryOther'),
+    };
+
+    return categoryMap[category] || category;
+  };
 
   return (
     <div className="min-h-dvh pb-20">
@@ -240,6 +259,15 @@ export default function DonationDetailPage() {
           <h1 className="text-2xl font-bold text-gray-900">
             {donation.food_item.name}
           </h1>
+
+          {/* Food Category */}
+          {donation.food_item.category && (
+            <div className="mt-2 text-gray-600">
+              <span className="font-medium">{t('foodCategory')}: </span>
+              {getCategoryDisplayText(donation.food_item.category)}
+            </div>
+          )}
+
           <div className="mt-2 flex items-center gap-2 text-gray-600">
             <ShoppingBag className="h-5 w-5" />
             <span className="font-medium">{donation.quantity} kg</span>
@@ -433,6 +461,46 @@ export default function DonationDetailPage() {
               ) : (
                 t('confirmClaim')
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog with Feedback Option */}
+      <Dialog
+        open={showSuccessWithFeedback}
+        onOpenChange={setShowSuccessWithFeedback}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('claimConfirmed') || 'Claim Confirmed!'}
+            </DialogTitle>
+            <DialogDescription>
+              {t('claimConfirmedDescription') ||
+                'Your claim has been successfully confirmed.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col gap-3">
+            <Link href="/feedback" className="w-full">
+              <Button
+                variant="primary"
+                size="cta"
+                className="w-full"
+                onClick={() => setShowSuccessWithFeedback(false)}
+              >
+                {t('giveFeedback')}
+              </Button>
+            </Link>
+            <Button
+              variant="secondary"
+              size="cta"
+              onClick={() => {
+                setShowSuccessWithFeedback(false);
+                router.push('/donate');
+              }}
+            >
+              {t('backToDashboard')}
             </Button>
           </DialogFooter>
         </DialogContent>
