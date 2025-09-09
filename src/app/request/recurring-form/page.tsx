@@ -6,6 +6,13 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useCommonTranslation } from '@/hooks/useTranslations';
 import PageContainer from '@/components/layout/PageContainer';
 import BottomActionBar from '@/components/ui/BottomActionBar';
@@ -17,6 +24,7 @@ type RecurringFormInputs = {
   description: string;
   quantity: string;
   allergens: string;
+  category?: string;
 };
 
 export default function RecurringRequestForm() {
@@ -43,6 +51,7 @@ export default function RecurringRequestForm() {
       description: requestData.description || '',
       quantity: requestData.quantity ? requestData.quantity.toString() : '',
       allergens: allergenTextFromArray(requestData.allergens || []),
+      category: requestData.category || '',
     },
   });
 
@@ -71,6 +80,7 @@ export default function RecurringRequestForm() {
         description: data.description,
         quantity: Number(data.quantity),
         allergens: allergensArray,
+        category: data.category,
       });
 
       // Store in session storage for backward compatibility
@@ -79,6 +89,7 @@ export default function RecurringRequestForm() {
         description: data.description,
         quantity: Number(data.quantity),
         allergens: allergensArray,
+        category: data.category,
       };
       sessionStorage.setItem('pendingRequest', JSON.stringify(requestData));
 
@@ -150,6 +161,39 @@ export default function RecurringRequestForm() {
               {errors.description.message}
             </div>
           )}
+        </div>
+
+        {/* Food Category */}
+        <div>
+          <label className="block text-label font-semibold mb-2">
+            {t('foodCategory')}
+          </label>
+          <Select
+            value={watch('category') || ''}
+            onValueChange={(value) => {
+              const event = { target: { value } } as any;
+              register('category').onChange(event);
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={t('selectCategory') || 'Select category'}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="main_protein">
+                {t('categoryMainProtein')}
+              </SelectItem>
+              <SelectItem value="energy_supplement">
+                {t('categoryEnergySupplement')}
+              </SelectItem>
+              <SelectItem value="soup">{t('categorySoup')}</SelectItem>
+              <SelectItem value="salad_ingredients">
+                {t('categorySaladIngredients')}
+              </SelectItem>
+              <SelectItem value="other">{t('categoryOther')}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Quantity */}

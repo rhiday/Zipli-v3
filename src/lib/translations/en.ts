@@ -52,9 +52,18 @@ export const en = {
   createDonation: 'Create new listing',
   donationCreated: 'Listing created successfully!',
   nameOfFood: 'Name of food',
+  foodCategory: 'Food category',
   quantity: 'Quantity',
   description: 'Description',
   address: 'Address',
+
+  // Food categories
+  selectCategory: 'Select category',
+  categoryMainProtein: 'Main protein (stew, sauce, etc.)',
+  categoryEnergySupplement: 'Energy supplement (e.g. rice)',
+  categorySoup: 'Soup',
+  categorySaladIngredients: 'Salad ingredients',
+  categoryOther: 'Other',
 
   // Auth
   email: 'Email',

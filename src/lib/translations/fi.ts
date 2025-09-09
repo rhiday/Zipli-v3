@@ -51,9 +51,18 @@ export const fi = {
   createDonation: 'Luo uusi ilmoitus',
   donationCreated: 'Ilmoitus luotu onnistuneesti!',
   nameOfFood: 'Ruoan nimi',
+  foodCategory: 'Ruokakategoria',
   quantity: 'Määrä',
   description: 'Kuvaus',
   address: 'Osoite',
+
+  // Food categories
+  selectCategory: 'Valitse kategoria',
+  categoryMainProtein: 'Pääproteiini (muhennos, kastike, tms.)',
+  categoryEnergySupplement: 'Energialisäke (esim. riisi)',
+  categorySoup: 'Keitto',
+  categorySaladIngredients: 'Salaattiainekset',
+  categoryOther: 'Muu',
 
   // Auth
   email: 'Sähköposti',

@@ -16,6 +16,13 @@ import { Progress } from '@/components/ui/progress';
 import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import { EnhancedMultiplePhotoUpload } from '@/components/ui/EnhancedMultiplePhotoUpload';
 import { Textarea } from '@/components/ui/Textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useDatabase } from '@/store';
 import { useDonationStore } from '@/store/donation';
 import { PlusIcon } from 'lucide-react';
@@ -32,6 +39,7 @@ interface DonationItem {
   name: string;
   quantity: string;
   allergens: string[];
+  category?: string;
   description: string | null;
   imageUrl?: string; // Keep for backward compatibility
   imageUrls?: string[]; // New field for multiple images
@@ -64,6 +72,7 @@ function ManualDonationPageInner() {
     name: '',
     quantity: '',
     allergens: [],
+    category: undefined,
     description: null,
     imageUrl: undefined,
     imageUrls: [],
@@ -99,6 +108,7 @@ function ManualDonationPageInner() {
           name: food_item.name,
           quantity: String(quantity).replace(' kg', ''),
           allergens: parsedAllergens,
+          category: food_item.category || undefined,
           description: food_item.description,
           imageUrl: food_item.image_url || undefined, // Keep for backward compatibility
           imageUrls: food_item.image_urls
@@ -160,6 +170,7 @@ function ManualDonationPageInner() {
           name: food_item.name,
           quantity: String(quantity).replace(' kg', ''),
           allergens: parsedAllergens,
+          category: food_item.category || undefined,
           description: food_item.description,
           imageUrl: food_item.image_url || undefined, // Keep for backward compatibility
           imageUrls: food_item.image_urls
@@ -391,6 +402,7 @@ function ManualDonationPageInner() {
           name: '',
           quantity: '',
           allergens: [],
+          category: undefined,
           description: null,
           imageUrl: undefined,
           imageUrls: [],
@@ -412,6 +424,7 @@ function ManualDonationPageInner() {
       name: '',
       quantity: '',
       allergens: [],
+      category: undefined,
       description: null,
       imageUrl: undefined,
       imageUrls: [],
@@ -480,6 +493,35 @@ function ManualDonationPageInner() {
             hasAttemptedSave && !currentItem.name ? 'border-red-500' : ''
           }
         />
+      </div>
+
+      <div>
+        <label htmlFor="category" className="text-sm font-medium text-gray-700">
+          {t('foodCategory')}
+        </label>
+        <Select
+          value={currentItem.category || ''}
+          onValueChange={(value) => handleCurrentItemChange('category', value)}
+        >
+          <SelectTrigger id="category">
+            <SelectValue
+              placeholder={t('selectCategory') || 'Select category'}
+            />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="main_protein">
+              {t('categoryMainProtein')}
+            </SelectItem>
+            <SelectItem value="energy_supplement">
+              {t('categoryEnergySupplement')}
+            </SelectItem>
+            <SelectItem value="soup">{t('categorySoup')}</SelectItem>
+            <SelectItem value="salad_ingredients">
+              {t('categorySaladIngredients')}
+            </SelectItem>
+            <SelectItem value="other">{t('categoryOther')}</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div>
