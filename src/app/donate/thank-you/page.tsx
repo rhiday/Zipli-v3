@@ -1,6 +1,5 @@
 'use client';
 
-import { NextSteps } from '@/components/ui/NextSteps';
 import { useDonationStore } from '@/store/donation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -21,7 +20,10 @@ export default function DonationThankYouPage() {
   }, [isEditMode, setEditMode]);
 
   return (
-    <ViewportContainer variant="fullscreen" className="flex flex-col items-center justify-center px-4 bg-white">
+    <ViewportContainer
+      variant="fullscreen"
+      className="flex flex-col items-center justify-center px-4 bg-white"
+    >
       <div className="mt-12 mb-8">
         <svg
           width="164"
@@ -51,41 +53,12 @@ export default function DonationThankYouPage() {
         </p>
       )}
 
-      <div className="w-full max-w-md mb-8">
-        <NextSteps
-          heading={t('nextSteps')}
-          steps={
-            isEditMode
-              ? [
-                  {
-                    title: t('changesSaved'),
-                    description: t('changesSavedDesc'),
-                  },
-                  {
-                    title: t('matchingInProgress'),
-                    description: t('lookingForMatches'),
-                  },
-                  {
-                    title: t('getNotified'),
-                    description: t('receiveNotificationWhenMatch'),
-                  },
-                ]
-              : [
-                  {
-                    title: t('requestSubmitted'),
-                    description: t('requestAddedToSystem'),
-                  },
-                  {
-                    title: t('matchingInProgress'),
-                    description: t('lookingForMatches'),
-                  },
-                  {
-                    title: t('getNotified'),
-                    description: t('receiveNotificationWhenMatch'),
-                  },
-                ]
-          }
-        />
+      <div className="flex gap-4 mb-8">
+        <Link href="/feedback">
+          <button className="bg-white border-2 border-gray-300 text-gray-700 rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-gray-50 transition">
+            {t('giveFeedback')}
+          </button>
+        </Link>
       </div>
       <Link href="/donate">
         <button className="bg-lime text-primary rounded-full px-8 py-3 font-semibold text-base shadow-sm hover:bg-positive-hover transition">

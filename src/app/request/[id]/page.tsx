@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useRouter, useParams } from 'next/navigation';
 import { useDatabase } from '@/store';
@@ -61,6 +62,7 @@ export default function RequestDetailPage(): React.ReactElement {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showConfirmDelivery, setShowConfirmDelivery] = useState(false);
   const [confirmClauseChecked, setConfirmClauseChecked] = useState(false);
+  const [showSuccessWithFeedback, setShowSuccessWithFeedback] = useState(false);
 
   const { currentUser, getRequestById, updateRequest, users, isInitialized } =
     useDatabase();
@@ -123,7 +125,8 @@ export default function RequestDetailPage(): React.ReactElement {
     setShowConfirmDelivery(false);
     setConfirmClauseChecked(false);
     await handleStatusUpdate('fulfilled');
-    router.push('/receiver/dashboard');
+    // Show success dialog with feedback option
+    setShowSuccessWithFeedback(true);
   };
 
   const handleCancelRequest = () => {
@@ -696,6 +699,46 @@ export default function RequestDetailPage(): React.ReactElement {
               ) : (
                 t('confirmDelivery')
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog with Feedback Option */}
+      <Dialog
+        open={showSuccessWithFeedback}
+        onOpenChange={setShowSuccessWithFeedback}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('deliveryConfirmed') || 'Delivery Confirmed!'}
+            </DialogTitle>
+            <DialogDescription>
+              {t('deliveryConfirmedDescription') ||
+                'Your delivery has been successfully confirmed.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col gap-3">
+            <Link href="/feedback" className="w-full">
+              <Button
+                variant="primary"
+                size="cta"
+                className="w-full"
+                onClick={() => setShowSuccessWithFeedback(false)}
+              >
+                {t('giveFeedback')}
+              </Button>
+            </Link>
+            <Button
+              variant="secondary"
+              size="cta"
+              onClick={() => {
+                setShowSuccessWithFeedback(false);
+                router.push('/receiver/dashboard');
+              }}
+            >
+              {t('backToDashboard')}
             </Button>
           </DialogFooter>
         </DialogContent>

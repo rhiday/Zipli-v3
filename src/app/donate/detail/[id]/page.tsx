@@ -59,6 +59,7 @@ export default function DonationDetailPage() {
   const [showConfirmClaim, setShowConfirmClaim] = useState(false);
   const [confirmClauseChecked, setConfirmClauseChecked] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [showSuccessWithFeedback, setShowSuccessWithFeedback] = useState(false);
 
   useEffect(() => {
     const fetchDonation = async () => {
@@ -173,7 +174,8 @@ export default function DonationDetailPage() {
 
       // Refresh the donation data
       await fetchDonationById(donation.id);
-      router.push('/donate');
+      // Show success dialog with feedback option
+      setShowSuccessWithFeedback(true);
     } catch (error) {
       console.error('Unexpected error claiming donation:', error);
     } finally {
@@ -433,6 +435,46 @@ export default function DonationDetailPage() {
               ) : (
                 t('confirmClaim')
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog with Feedback Option */}
+      <Dialog
+        open={showSuccessWithFeedback}
+        onOpenChange={setShowSuccessWithFeedback}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('claimConfirmed') || 'Claim Confirmed!'}
+            </DialogTitle>
+            <DialogDescription>
+              {t('claimConfirmedDescription') ||
+                'Your claim has been successfully confirmed.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col gap-3">
+            <Link href="/feedback" className="w-full">
+              <Button
+                variant="primary"
+                size="cta"
+                className="w-full"
+                onClick={() => setShowSuccessWithFeedback(false)}
+              >
+                {t('giveFeedback')}
+              </Button>
+            </Link>
+            <Button
+              variant="secondary"
+              size="cta"
+              onClick={() => {
+                setShowSuccessWithFeedback(false);
+                router.push('/donate');
+              }}
+            >
+              {t('backToDashboard')}
             </Button>
           </DialogFooter>
         </DialogContent>

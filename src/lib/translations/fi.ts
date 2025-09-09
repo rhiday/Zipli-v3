@@ -38,6 +38,7 @@ export const fi = {
   // Navigation
   profile: 'Profiili',
   logout: 'Kirjaudu ulos',
+  giveFeedback: 'Anna palautetta',
 
   // Food donation
   donate: 'Luo ilmoitus',

@@ -38,6 +38,7 @@ export const en = {
   // Navigation
   profile: 'Profile',
   logout: 'Logout',
+  giveFeedback: 'Give feedback',
 
   // Food donation
   donate: 'Create listing',
