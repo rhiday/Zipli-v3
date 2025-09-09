@@ -578,6 +578,15 @@ export default function RequestDetailPage(): React.ReactElement {
                 {t('confirmDelivery')}
               </Button>
               <Button
+                variant="secondary"
+                size="cta"
+                className="w-full"
+                onClick={handleEditRequest}
+              >
+                <Edit className="h-5 w-5" />
+                {t('editListing')}
+              </Button>
+              <Button
                 variant="destructive-outline"
                 size="cta"
                 className="w-full"

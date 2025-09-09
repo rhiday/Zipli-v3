@@ -9,6 +9,7 @@ export const en = {
   continue: 'Continue',
   delete: 'Delete',
   edit: 'Edit',
+  editListing: 'Edit listing',
   save: 'Save',
   submit: 'Submit',
   loading: 'Loading...',

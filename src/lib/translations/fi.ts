@@ -9,6 +9,7 @@ export const fi = {
   continue: 'Jatka',
   delete: 'Poista',
   edit: 'Muokkaa',
+  editListing: 'Muokkaa ilmoitusta',
   save: 'Tallenna',
   submit: 'Lähetä',
   loading: 'Ladataan...',

@@ -311,6 +311,15 @@ export default function DonationDetailPage() {
                 <CheckIcon className="h-5 w-5" />
                 {t('confirmClaim')}
               </Button>
+              <Button
+                variant="secondary"
+                size="cta"
+                className="w-full"
+                onClick={handleEditListing}
+              >
+                <Edit className="h-5 w-5" />
+                {t('editListing')}
+              </Button>
               <Dialog
                 open={showDeleteConfirm}
                 onOpenChange={setShowDeleteConfirm}
