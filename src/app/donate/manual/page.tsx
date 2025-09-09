@@ -22,7 +22,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/Select';
 import { useDatabase } from '@/store';
 import { useDonationStore } from '@/store/donation';
 import { PlusIcon } from 'lucide-react';
