@@ -38,15 +38,32 @@ export const en = {
   // Navigation
   profile: 'Profile',
   logout: 'Logout',
+  giveFeedback: 'Give feedback',
+
+  // Success confirmations
+  claimConfirmed: 'Claim Confirmed!',
+  claimConfirmedDescription: 'Your claim has been successfully confirmed.',
+  deliveryConfirmed: 'Delivery Confirmed!',
+  deliveryConfirmedDescription:
+    'Your delivery has been successfully confirmed.',
 
   // Food donation
   donate: 'Create listing',
   createDonation: 'Create new listing',
   donationCreated: 'Listing created successfully!',
   nameOfFood: 'Name of food',
+  foodCategory: 'Food category',
   quantity: 'Quantity',
   description: 'Description',
   address: 'Address',
+
+  // Food categories
+  selectCategory: 'Select category',
+  categoryMainProtein: 'Main protein (stew, sauce, etc.)',
+  categoryEnergySupplement: 'Energy supplement (e.g. rice)',
+  categorySoup: 'Soup',
+  categorySaladIngredients: 'Salad ingredients',
+  categoryOther: 'Other',
 
   // Auth
   email: 'Email',

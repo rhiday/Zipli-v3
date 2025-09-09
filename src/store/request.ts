@@ -25,6 +25,7 @@ interface RequestFormData {
   description: string;
   quantity: number;
   allergens: string[];
+  category?: string; // Food category
   recurringInterval: string; // Keep for backward compatibility
   recurrencePattern: RecurrencePattern;
   startDate: string;

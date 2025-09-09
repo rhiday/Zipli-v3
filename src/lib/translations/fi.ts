@@ -38,15 +38,31 @@ export const fi = {
   // Navigation
   profile: 'Profiili',
   logout: 'Kirjaudu ulos',
+  giveFeedback: 'Anna palautetta',
+
+  // Success confirmations
+  claimConfirmed: 'Varauksesi vahvistettu!',
+  claimConfirmedDescription: 'Varauksesi on vahvistettu onnistuneesti.',
+  deliveryConfirmed: 'Toimitus vahvistettu!',
+  deliveryConfirmedDescription: 'Toimituksesi on vahvistettu onnistuneesti.',
 
   // Food donation
   donate: 'Luo ilmoitus',
   createDonation: 'Luo uusi ilmoitus',
   donationCreated: 'Ilmoitus luotu onnistuneesti!',
   nameOfFood: 'Ruoan nimi',
+  foodCategory: 'Ruokakategoria',
   quantity: 'Määrä',
   description: 'Kuvaus',
   address: 'Osoite',
+
+  // Food categories
+  selectCategory: 'Valitse kategoria',
+  categoryMainProtein: 'Pääproteiini (muhennos, kastike, tms.)',
+  categoryEnergySupplement: 'Energialisäke (esim. riisi)',
+  categorySoup: 'Keitto',
+  categorySaladIngredients: 'Salaattiainekset',
+  categoryOther: 'Muu',
 
   // Auth
   email: 'Sähköposti',

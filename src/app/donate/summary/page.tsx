@@ -248,7 +248,7 @@ export default function DonationSummaryPage() {
                 item.imageUrl || (item.imageUrls && item.imageUrls[0]) || null, // Use first image if imageUrl not set
               image_urls:
                 item.imageUrls || (item.imageUrl ? [item.imageUrl] : []), // Ensure array format
-              category: null,
+              category: item.category || null,
               expires_at: null,
               donor_id: currentUser?.id || null,
               food_type: null,

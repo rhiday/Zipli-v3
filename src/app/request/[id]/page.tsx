@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useRouter, useParams } from 'next/navigation';
 import { useDatabase } from '@/store';
@@ -39,6 +40,7 @@ type RequestDetail = {
   pickup_end_time: string;
   instructions: string | null;
   allergens: string[] | null;
+  category: string | null;
   status: 'active' | 'fulfilled' | 'cancelled';
   created_at: string;
   updated_at: string;
@@ -61,6 +63,7 @@ export default function RequestDetailPage(): React.ReactElement {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showConfirmDelivery, setShowConfirmDelivery] = useState(false);
   const [confirmClauseChecked, setConfirmClauseChecked] = useState(false);
+  const [showSuccessWithFeedback, setShowSuccessWithFeedback] = useState(false);
 
   const { currentUser, getRequestById, updateRequest, users, isInitialized } =
     useDatabase();
@@ -123,7 +126,8 @@ export default function RequestDetailPage(): React.ReactElement {
     setShowConfirmDelivery(false);
     setConfirmClauseChecked(false);
     await handleStatusUpdate('fulfilled');
-    router.push('/receiver/dashboard');
+    // Show success dialog with feedback option
+    setShowSuccessWithFeedback(true);
   };
 
   const handleCancelRequest = () => {
@@ -148,6 +152,7 @@ export default function RequestDetailPage(): React.ReactElement {
       description: request.description,
       quantity: request.people_count,
       allergens: request.allergens || [],
+      category: request.category || '',
       pickupDate: request.pickup_date,
       startTime: request.pickup_start_time,
       endTime: request.pickup_end_time,
@@ -326,6 +331,23 @@ export default function RequestDetailPage(): React.ReactElement {
 
   const { t } = useCommonTranslation();
 
+  // Helper function to translate category values to display text
+  const getCategoryDisplayText = (
+    category: string | null | undefined
+  ): string | null => {
+    if (!category) return null;
+
+    const categoryMap: { [key: string]: string } = {
+      main_protein: t('categoryMainProtein'),
+      energy_supplement: t('categoryEnergySupplement'),
+      soup: t('categorySoup'),
+      salad_ingredients: t('categorySaladIngredients'),
+      other: t('categoryOther'),
+    };
+
+    return categoryMap[category] || category;
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-cream">
@@ -401,6 +423,15 @@ export default function RequestDetailPage(): React.ReactElement {
             {requestInfo.requestName ||
               `Request for ${request.people_count} people`}
           </h1>
+
+          {/* Food Category */}
+          {request.category && (
+            <div className="mt-2 text-gray-600">
+              <span className="font-medium">{t('foodCategory')}: </span>
+              {getCategoryDisplayText(request.category)}
+            </div>
+          )}
+
           <div className="mt-2 flex items-center gap-2 text-gray-600">
             <Scale className="h-5 w-5" />
             <span className="font-medium">
@@ -696,6 +727,46 @@ export default function RequestDetailPage(): React.ReactElement {
               ) : (
                 t('confirmDelivery')
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog with Feedback Option */}
+      <Dialog
+        open={showSuccessWithFeedback}
+        onOpenChange={setShowSuccessWithFeedback}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('deliveryConfirmed') || 'Delivery Confirmed!'}
+            </DialogTitle>
+            <DialogDescription>
+              {t('deliveryConfirmedDescription') ||
+                'Your delivery has been successfully confirmed.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col gap-3">
+            <Link href="/feedback" className="w-full">
+              <Button
+                variant="primary"
+                size="cta"
+                className="w-full"
+                onClick={() => setShowSuccessWithFeedback(false)}
+              >
+                {t('giveFeedback')}
+              </Button>
+            </Link>
+            <Button
+              variant="secondary"
+              size="cta"
+              onClick={() => {
+                setShowSuccessWithFeedback(false);
+                router.push('/receiver/dashboard');
+              }}
+            >
+              {t('backToDashboard')}
             </Button>
           </DialogFooter>
         </DialogContent>

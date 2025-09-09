@@ -7,6 +7,7 @@ interface DonationItem {
   quantity: string;
   description: string | null;
   allergens: string[];
+  category?: string; // Food category
   imageUrl?: string; // Keep for backward compatibility
   imageUrls?: string[]; // New field for multiple images
 }
