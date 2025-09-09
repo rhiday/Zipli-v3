@@ -40,6 +40,7 @@ type RequestDetail = {
   pickup_end_time: string;
   instructions: string | null;
   allergens: string[] | null;
+  category: string | null;
   status: 'active' | 'fulfilled' | 'cancelled';
   created_at: string;
   updated_at: string;
@@ -151,6 +152,7 @@ export default function RequestDetailPage(): React.ReactElement {
       description: request.description,
       quantity: request.people_count,
       allergens: request.allergens || [],
+      category: request.category || '',
       pickupDate: request.pickup_date,
       startTime: request.pickup_start_time,
       endTime: request.pickup_end_time,
@@ -329,6 +331,23 @@ export default function RequestDetailPage(): React.ReactElement {
 
   const { t } = useCommonTranslation();
 
+  // Helper function to translate category values to display text
+  const getCategoryDisplayText = (
+    category: string | null | undefined
+  ): string | null => {
+    if (!category) return null;
+
+    const categoryMap: { [key: string]: string } = {
+      main_protein: t('categoryMainProtein'),
+      energy_supplement: t('categoryEnergySupplement'),
+      soup: t('categorySoup'),
+      salad_ingredients: t('categorySaladIngredients'),
+      other: t('categoryOther'),
+    };
+
+    return categoryMap[category] || category;
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-cream">
@@ -404,6 +423,15 @@ export default function RequestDetailPage(): React.ReactElement {
             {requestInfo.requestName ||
               `Request for ${request.people_count} people`}
           </h1>
+
+          {/* Food Category */}
+          {request.category && (
+            <div className="mt-2 text-gray-600">
+              <span className="font-medium">{t('foodCategory')}: </span>
+              {getCategoryDisplayText(request.category)}
+            </div>
+          )}
+
           <div className="mt-2 flex items-center gap-2 text-gray-600">
             <Scale className="h-5 w-5" />
             <span className="font-medium">

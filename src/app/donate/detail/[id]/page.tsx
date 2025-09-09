@@ -209,6 +209,23 @@ export default function DonationDetailPage() {
 
   const donorName = donorDisplayName || 'Generous Donor';
 
+  // Helper function to translate category values to display text
+  const getCategoryDisplayText = (
+    category: string | null | undefined
+  ): string | null => {
+    if (!category) return null;
+
+    const categoryMap: { [key: string]: string } = {
+      main_protein: t('categoryMainProtein'),
+      energy_supplement: t('categoryEnergySupplement'),
+      soup: t('categorySoup'),
+      salad_ingredients: t('categorySaladIngredients'),
+      other: t('categoryOther'),
+    };
+
+    return categoryMap[category] || category;
+  };
+
   return (
     <div className="min-h-dvh pb-20">
       {/* Header with Image Carousel and Back Arrow */}
@@ -242,6 +259,15 @@ export default function DonationDetailPage() {
           <h1 className="text-2xl font-bold text-gray-900">
             {donation.food_item.name}
           </h1>
+
+          {/* Food Category */}
+          {donation.food_item.category && (
+            <div className="mt-2 text-gray-600">
+              <span className="font-medium">{t('foodCategory')}: </span>
+              {getCategoryDisplayText(donation.food_item.category)}
+            </div>
+          )}
+
           <div className="mt-2 flex items-center gap-2 text-gray-600">
             <ShoppingBag className="h-5 w-5" />
             <span className="font-medium">{donation.quantity} kg</span>
