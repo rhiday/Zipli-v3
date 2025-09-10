@@ -20,7 +20,11 @@ const nextConfig = {
   },
 
   // Configure webpack for better tree shaking
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
+    // Prevent module caching issues in development
+    if (dev) {
+      config.cache = false;
+    }
     // Enable bundle analyzer when ANALYZE=true
     if (process.env.ANALYZE === 'true' && !isServer) {
       const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
@@ -112,7 +116,7 @@ const nextConfig = {
 
   // Asset optimization
   assetPrefix: process.env.ASSET_PREFIX || '',
-  
+
   images: {
     remotePatterns: [
       {

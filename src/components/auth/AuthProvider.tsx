@@ -6,8 +6,7 @@
  */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useDatabase } from '@/store';
-import type { User } from '@/store';
+import { useDatabase, type User } from '@/store';
 
 // We can keep the Supabase types for compatibility if needed, or create our own
 import { Session } from '@supabase/supabase-js';
@@ -25,12 +24,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({
-  children,
-}) => {
-  const currentUser = useDatabase(state => state.currentUser);
-  const isInitialized = useDatabase(state => state.isInitialized);
-  const logout = useDatabase(state => state.logout);
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const currentUser = useDatabase((state) => state.currentUser);
+  const isInitialized = useDatabase((state) => state.isInitialized);
+  const logout = useDatabase((state) => state.logout);
   const pathname = usePathname();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
