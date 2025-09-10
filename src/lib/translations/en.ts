@@ -65,6 +65,12 @@ export const en = {
   categorySaladIngredients: 'Salad ingredients',
   categoryOther: 'Other',
 
+  // Receiver-specific food categories
+  receiverCategoryReadyMeal: 'Valmis ateria',
+  receiverCategoryRawIngredients: 'Raaka-aineet',
+  receiverCategoryOtherFood: 'Muu ruoka',
+  receiverCategoryOtherProducts: 'Muut tuotteet (ei ruoka)',
+
   // Auth
   email: 'Email',
   password: 'Password',

@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import PageContainer from '@/components/layout/PageContainer';
+import BottomActionBar from '@/components/ui/BottomActionBar';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/Textarea';
 import { Input } from '@/components/ui/Input';
+import { Progress } from '@/components/ui/progress';
+import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
 import {
   Select,
   SelectContent,
@@ -13,12 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
 import { useCommonTranslation } from '@/hooks/useTranslations';
-import PageContainer from '@/components/layout/PageContainer';
-import BottomActionBar from '@/components/ui/BottomActionBar';
-import { SecondaryNavbar } from '@/components/ui/SecondaryNavbar';
-import { Progress } from '@/components/ui/progress';
 import { useRequestStore } from '@/store/request';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 type OneTimeFormInputs = {
   description: string;
@@ -180,17 +180,18 @@ export default function OneTimeRequestForm() {
               />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="main_protein">
-                {t('categoryMainProtein')}
+              <SelectItem value="ready_meal">
+                {t('receiverCategoryReadyMeal')}
               </SelectItem>
-              <SelectItem value="energy_supplement">
-                {t('categoryEnergySupplement')}
+              <SelectItem value="raw_ingredients">
+                {t('receiverCategoryRawIngredients')}
               </SelectItem>
-              <SelectItem value="soup">{t('categorySoup')}</SelectItem>
-              <SelectItem value="salad_ingredients">
-                {t('categorySaladIngredients')}
+              <SelectItem value="other_food">
+                {t('receiverCategoryOtherFood')}
               </SelectItem>
-              <SelectItem value="other">{t('categoryOther')}</SelectItem>
+              <SelectItem value="other_products">
+                {t('receiverCategoryOtherProducts')}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
