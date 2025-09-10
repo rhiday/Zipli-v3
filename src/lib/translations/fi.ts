@@ -64,6 +64,12 @@ export const fi = {
   categorySaladIngredients: 'Salaattiainekset',
   categoryOther: 'Muu',
 
+  // Receiver-specific food categories
+  receiverCategoryReadyMeal: 'Valmis ateria',
+  receiverCategoryRawIngredients: 'Raaka-aineet',
+  receiverCategoryOtherFood: 'Muu ruoka',
+  receiverCategoryOtherProducts: 'Muut tuotteet (ei ruoka)',
+
   // Auth
   email: 'Sähköposti',
   password: 'Salasana',
