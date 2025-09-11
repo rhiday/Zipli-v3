@@ -1,7 +1,7 @@
 /**
  * Query Optimizer for Supabase Database Calls
  * Reduces over-fetching and implements request deduplication
- * 
+ *
  * Based on network analysis findings:
  * - Reduce profile field over-fetching (from ~2.4kB to ~0.5kB per donation)
  * - Implement request caching to prevent duplicate API calls
@@ -15,13 +15,16 @@ import type { Database } from '@/types/supabase';
 import type { DonationWithFoodItem } from '@/types/supabase';
 
 // Cache for request deduplication
-const queryCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+const queryCache = new Map<
+  string,
+  { data: any; timestamp: number; ttl: number }
+>();
 
 // Cache TTL configurations (in milliseconds)
 const CACHE_CONFIGS = {
-  donations: 30000,    // 30 seconds - frequently updated
-  requests: 60000,     // 1 minute - moderately updated  
-  profiles: 300000,    // 5 minutes - rarely updated
+  donations: 30000, // 30 seconds - frequently updated
+  requests: 60000, // 1 minute - moderately updated
+  profiles: 300000, // 5 minutes - rarely updated
 };
 
 /**
@@ -55,14 +58,18 @@ export async function fetchOptimizedDonations(
   }
 
   const cacheKey = `donations:${currentUser.id}:${currentUser.role}:${limit}`;
-  
+
   // Check cache first
-  const cached = getCachedResult<DonationWithFoodItem[]>(cacheKey, CACHE_CONFIGS.donations);
+  const cached = getCachedResult<DonationWithFoodItem[]>(
+    cacheKey,
+    CACHE_CONFIGS.donations
+  );
   if (cached) return cached;
 
   let query = supabase
     .from('donations')
-    .select(`
+    .select(
+      `
       *,
       food_item:food_items(*),
       donor:profiles!donations_donor_id_fkey(
@@ -70,7 +77,8 @@ export async function fetchOptimizedDonations(
         full_name,
         role
       )
-    `)
+    `
+    )
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -96,8 +104,10 @@ export async function fetchOptimizedDonations(
 
   // Cache the result
   setCachedResult(cacheKey, donations, CACHE_CONFIGS.donations);
-  
-  console.log(`📊 Fetched ${donations.length} donations with optimized queries`);
+
+  console.log(
+    `📊 Fetched ${donations.length} donations with optimized queries`
+  );
   return donations;
 }
 
@@ -114,9 +124,11 @@ export async function fetchOptimizedRequests(
   }
 
   const cacheKey = `requests:${currentUser.id}:${currentUser.role}`;
-  
+
   // Check cache first
-  const cached = getCachedResult<Database['public']['Tables']['requests']['Row'][]>(cacheKey, CACHE_CONFIGS.requests);
+  const cached = getCachedResult<
+    Database['public']['Tables']['requests']['Row'][]
+  >(cacheKey, CACHE_CONFIGS.requests);
   if (cached) return cached;
 
   let query = supabase
@@ -139,10 +151,10 @@ export async function fetchOptimizedRequests(
   }
 
   const requests = data || [];
-  
+
   // Cache the result
   setCachedResult(cacheKey, requests, CACHE_CONFIGS.requests);
-  
+
   console.log(`📊 Fetched ${requests.length} requests with caching`);
   return requests;
 }
@@ -158,7 +170,7 @@ export async function batchFetchUserData(
   requests: Database['public']['Tables']['requests']['Row'][];
 }> {
   console.log('🚀 Starting batch data fetch...');
-  
+
   // Return empty arrays if no user is logged in
   if (!currentUser) {
     console.log('📊 No user logged in, returning empty data arrays');
@@ -167,18 +179,18 @@ export async function batchFetchUserData(
       requests: [],
     };
   }
-  
+
   // Fetch donations
   const donations = await fetchOptimizedDonations(currentUser);
-  
+
   // Fetch requests if user is not a food_donor
   let requests: Database['public']['Tables']['requests']['Row'][] = [];
   if (currentUser.role !== 'food_donor') {
     requests = await fetchOptimizedRequests(currentUser);
   }
-  
+
   console.log('✅ Batch data fetch completed');
-  
+
   return {
     donations,
     requests,
@@ -200,7 +212,9 @@ export function clearQueryCache(pattern?: string): void {
     // Clear all cache
     queryCache.clear();
   }
-  console.log(`🗑️ Cleared query cache${pattern ? ` (pattern: ${pattern})` : ''}`);
+  console.log(
+    `🗑️ Cleared query cache${pattern ? ` (pattern: ${pattern})` : ''}`
+  );
 }
 
 /**

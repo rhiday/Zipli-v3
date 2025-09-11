@@ -35,17 +35,13 @@ const DevLoginSwitcher: React.FC = React.memo(() => {
         try {
           const result = await login(user.email, 'password');
           if (result.error) {
-            console.error('Translation key error',
-              result.error
-            );
+            console.error('Translation key error', result.error);
           } else {
             console.log('DevLoginSwitcher: Fallback login successful');
             window.location.href = '/';
           }
         } catch (fallbackError) {
-          console.error('Translation key error',
-            fallbackError
-          );
+          console.error('Translation key error', fallbackError);
         }
       }
     },

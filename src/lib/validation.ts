@@ -2,9 +2,17 @@ import { z } from 'zod';
 
 // Common validation schemas
 export const emailSchema = z.string().email('Invalid email address');
-export const passwordSchema = z.string().min(8, 'Password must be at least 8 characters');
-export const nameSchema = z.string().min(1, 'Name is required').max(100, 'Name is too long');
-export const quantitySchema = z.string().min(1, 'Quantity is required').max(50, 'Quantity description is too long');
+export const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters');
+export const nameSchema = z
+  .string()
+  .min(1, 'Name is required')
+  .max(100, 'Name is too long');
+export const quantitySchema = z
+  .string()
+  .min(1, 'Quantity is required')
+  .max(50, 'Quantity description is too long');
 export const descriptionSchema = z.string().max(500, 'Description is too long');
 
 // API request validation schemas
@@ -39,9 +47,9 @@ export function validateRequestBody<T>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const firstError = error.errors[0];
-      return { 
-        success: false, 
-        error: firstError?.message  || 'Validation_failed' 
+      return {
+        success: false,
+        error: firstError?.message || 'Validation_failed',
       };
     }
     return { success: false, error: 'Invalid request format' };
@@ -66,33 +74,37 @@ export function sanitizeHtml(str: string): string {
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
 export function checkRateLimit(
-  identifier: string, 
-  limit: number = 10, 
+  identifier: string,
+  limit: number = 10,
   windowMs: number = 60000
 ): { allowed: boolean; remainingRequests: number; resetTime: number } {
   const now = Date.now();
   const key = identifier;
-  
+
   const existing = rateLimitStore.get(key);
-  
+
   if (!existing || now > existing.resetTime) {
     // New window or expired
     const resetTime = now + windowMs;
     rateLimitStore.set(key, { count: 1, resetTime });
     return { allowed: true, remainingRequests: limit - 1, resetTime };
   }
-  
+
   if (existing.count >= limit) {
-    return { allowed: false, remainingRequests: 0, resetTime: existing.resetTime };
+    return {
+      allowed: false,
+      remainingRequests: 0,
+      resetTime: existing.resetTime,
+    };
   }
-  
+
   existing.count++;
   rateLimitStore.set(key, existing);
-  
-  return { 
-    allowed: true, 
-    remainingRequests: limit - existing.count, 
-    resetTime: existing.resetTime 
+
+  return {
+    allowed: true,
+    remainingRequests: limit - existing.count,
+    resetTime: existing.resetTime,
   };
 }
 
@@ -102,11 +114,11 @@ export function getClientIP(request: Request): string {
   if (forwarded) {
     return forwarded.split(',')[0].trim();
   }
-  
+
   const realIP = request.headers.get('x-real-ip');
   if (realIP) {
     return realIP;
   }
-  
+
   return 'unknown';
 }

@@ -18,4 +18,4 @@ export const BackArrowIcon = (props: React.SVGProps<SVGSVGElement>) => (
       fill="currentColor"
     />
   </svg>
-); 
+);

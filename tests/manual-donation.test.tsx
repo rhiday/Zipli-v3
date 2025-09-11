@@ -8,4 +8,4 @@ describe('ManualDonationPage UI', () => {
     const { container } = render(<ManualDonationPage />);
     expect(container).toMatchSnapshot();
   });
-}); 
+});

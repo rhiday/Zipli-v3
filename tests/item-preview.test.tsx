@@ -11,11 +11,11 @@ describe('ItemPreview UI', () => {
         quantity="2 kg"
         description="A tasty test item"
         imageUrl="/images/placeholder.svg"
-        allergens={["Milk", "Eggs"]}
+        allergens={['Milk', 'Eggs']}
         onEdit={() => {}}
         onDelete={() => {}}
       />
     );
     expect(container).toMatchSnapshot();
   });
-}); 
+});

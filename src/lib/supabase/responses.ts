@@ -13,12 +13,18 @@ export interface BaseResponse<T> {
 
 export interface DonationResponse extends BaseResponse<DonationRow> {}
 
-export interface DonationWithFoodItemResponse extends BaseResponse<DonationRow & {
-  food_item: FoodItemRow;
-}> {}
+export interface DonationWithFoodItemResponse
+  extends BaseResponse<
+    DonationRow & {
+      food_item: FoodItemRow;
+    }
+  > {}
 
-export interface DonationsListResponse extends BaseResponse<(DonationRow & {
-  food_item: FoodItemRow;
-})[]> {}
+export interface DonationsListResponse
+  extends BaseResponse<
+    (DonationRow & {
+      food_item: FoodItemRow;
+    })[]
+  > {}
 
-export interface ProfileResponse extends BaseResponse<ProfileRow> {} 
+export interface ProfileResponse extends BaseResponse<ProfileRow> {}

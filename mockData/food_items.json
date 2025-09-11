@@ -1,9 +1,44 @@
 [
-  {"name": "Pasta Bolognese", "description": "Classic pasta with meat sauce", "image_url": "/images/pasta.jpg", "allergens": ["Wheat", "Milk"]},
-  {"name": "Salmon Soup", "description": "Traditional creamy salmon soup", "image_url": "/images/salmon_soup.jpg", "allergens": ["Fish", "Milk"]},
-  {"name": "Vegan Stew", "description": "Root vegetables and beans in rich tomato sauce", "image_url": "/images/vegan_stew.jpg", "allergens": []},
-  {"name": "Chicken Curry", "description": "Mild curry with chicken and rice", "image_url": "/images/chicken_curry.jpg", "allergens": []},
-  {"name": "Karelian Pie", "description": "Finnish rice pie with egg butter", "image_url": "/images/karelian_pie.jpg", "allergens": ["Eggs", "Milk"]},
-  {"name": "Meatballs & Mashed Potatoes", "description": "Classic Finnish meatballs with creamy mash", "image_url": "/images/meatballs.jpg", "allergens": ["Eggs", "Wheat", "Milk"]},
-  {"name": "Fresh Salad", "description": "Mixed greens with seasonal vegetables", "image_url": "/images/salad.jpg", "allergens": []}
+  {
+    "name": "Pasta Bolognese",
+    "description": "Classic pasta with meat sauce",
+    "image_url": "/images/pasta.jpg",
+    "allergens": ["Wheat", "Milk"]
+  },
+  {
+    "name": "Salmon Soup",
+    "description": "Traditional creamy salmon soup",
+    "image_url": "/images/salmon_soup.jpg",
+    "allergens": ["Fish", "Milk"]
+  },
+  {
+    "name": "Vegan Stew",
+    "description": "Root vegetables and beans in rich tomato sauce",
+    "image_url": "/images/vegan_stew.jpg",
+    "allergens": []
+  },
+  {
+    "name": "Chicken Curry",
+    "description": "Mild curry with chicken and rice",
+    "image_url": "/images/chicken_curry.jpg",
+    "allergens": []
+  },
+  {
+    "name": "Karelian Pie",
+    "description": "Finnish rice pie with egg butter",
+    "image_url": "/images/karelian_pie.jpg",
+    "allergens": ["Eggs", "Milk"]
+  },
+  {
+    "name": "Meatballs & Mashed Potatoes",
+    "description": "Classic Finnish meatballs with creamy mash",
+    "image_url": "/images/meatballs.jpg",
+    "allergens": ["Eggs", "Wheat", "Milk"]
+  },
+  {
+    "name": "Fresh Salad",
+    "description": "Mixed greens with seasonal vegetables",
+    "image_url": "/images/salad.jpg",
+    "allergens": []
+  }
 ]

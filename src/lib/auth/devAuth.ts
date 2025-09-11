@@ -1,6 +1,6 @@
 /**
  * Development Authentication Helper
- * 
+ *
  * This bypasses Supabase authentication entirely for local development.
  * DO NOT USE IN PRODUCTION!
  */
@@ -14,24 +14,27 @@ export const devAuth = {
    */
   quickLogin: (user: Profile) => {
     console.log('🔑 DevAuth: Quick login for', user.full_name);
-    
+
     // Use localStorage approach - this is the most reliable for development
     const storeData = {
       currentUser: user,
       isInitialized: true,
       loading: false,
-      error: null
+      error: null,
     };
-    
-    localStorage.setItem('supabase-database-storage', JSON.stringify({
-      state: storeData,
-      version: 0
-    }));
-    
+
+    localStorage.setItem(
+      'supabase-database-storage',
+      JSON.stringify({
+        state: storeData,
+        version: 0,
+      })
+    );
+
     console.log('✅ DevAuth: User logged in successfully');
     return true;
   },
-  
+
   /**
    * Quick logout for development
    */
@@ -41,7 +44,7 @@ export const devAuth = {
     console.log('✅ DevAuth: User logged out');
     return true;
   },
-  
+
   /**
    * Get current user
    */
@@ -49,14 +52,14 @@ export const devAuth = {
     const store = useDatabase.getState();
     return store.currentUser;
   },
-  
+
   /**
    * Check if user is logged in
    */
   isLoggedIn: () => {
     const store = useDatabase.getState();
     return !!store.currentUser;
-  }
+  },
 };
 
 // Make it available globally for debugging

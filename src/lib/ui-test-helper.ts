@@ -1,6 +1,6 @@
 /**
  * UI TESTING HELPER
- * 
+ *
  * Helper functions to test UI components for consistency and prevent breakage.
  * Use these before making any UI changes.
  */

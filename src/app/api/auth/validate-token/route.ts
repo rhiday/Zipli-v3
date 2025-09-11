@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { tokens, saveTokens } from "@/lib/tokens";
-import { checkRateLimit, getClientIP } from "@/lib/validation";
+import { NextResponse } from 'next/server';
+import { tokens, saveTokens } from '@/lib/tokens';
+import { checkRateLimit, getClientIP } from '@/lib/validation';
 
 // Secure CORS configuration - only allow specific origins
 const getAllowedOrigin = (origin: string | null) => {
@@ -8,9 +8,9 @@ const getAllowedOrigin = (origin: string | null) => {
     process.env.NEXT_PUBLIC_APP_URL,
     'http://localhost:3000',
     'http://localhost:3001',
-    'https://zipli-v3.vercel.app'
+    'https://zipli-v3.vercel.app',
   ].filter(Boolean);
-  
+
   return origin && allowedOrigins.includes(origin) ? origin : 'null';
 };
 
@@ -18,16 +18,22 @@ export async function GET(request: Request) {
   try {
     // Rate limiting for token validation
     const clientIP = getClientIP(request);
-    const rateLimitResult = checkRateLimit(`validate-token-${clientIP}`, 30, 60000); // 30 requests per minute
-    
+    const rateLimitResult = checkRateLimit(
+      `validate-token-${clientIP}`,
+      30,
+      60000
+    ); // 30 requests per minute
+
     if (!rateLimitResult.allowed) {
       return new NextResponse(
-        JSON.stringify({ valid: false, message: "Rate limit exceeded" }),
+        JSON.stringify({ valid: false, message: 'Rate limit exceeded' }),
         {
           status: 429,
           headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': getAllowedOrigin(
+              request.headers.get('origin')
+            ),
             'X-RateLimit-Limit': '30',
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
@@ -38,19 +44,21 @@ export async function GET(request: Request) {
 
     // Get token from URL
     const url = new URL(request.url);
-    const token = url.searchParams.get("token");
+    const token = url.searchParams.get('token');
 
     // Validation request received
 
     if (!token) {
       // No token provided in request
       return new NextResponse(
-        JSON.stringify({ valid: false, message: "Token is required" }),
+        JSON.stringify({ valid: false, message: 'Token is required' }),
         {
           status: 400,
           headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': getAllowedOrigin(
+              request.headers.get('origin')
+            ),
           },
         }
       );
@@ -64,8 +72,10 @@ export async function GET(request: Request) {
         {
           status: 404,
           headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': getAllowedOrigin(
+              request.headers.get('origin')
+            ),
           },
         }
       );
@@ -81,14 +91,16 @@ export async function GET(request: Request) {
       return new NextResponse(
         JSON.stringify({
           valid: false,
-          message: "Token has already been used",
+          message: 'Token has already been used',
           user_email: tokenData.user_email, // Always include email in the response
         }),
         {
           status: 403,
           headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': getAllowedOrigin(
+              request.headers.get('origin')
+            ),
           },
         }
       );
@@ -105,14 +117,16 @@ export async function GET(request: Request) {
       return new NextResponse(
         JSON.stringify({
           valid: false,
-          message: "Token has expired",
+          message: 'Token has expired',
           user_email: tokenData.user_email, // Add user email here as well
         }),
         {
           status: 403,
           headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': getAllowedOrigin(
+              request.headers.get('origin')
+            ),
           },
         }
       );
@@ -134,8 +148,8 @@ export async function GET(request: Request) {
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
       }
     );
@@ -146,8 +160,8 @@ export async function GET(request: Request) {
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
       }
     );
@@ -159,10 +173,12 @@ export async function OPTIONS(request: Request) {
   return new NextResponse(null, {
     status: 204,
     headers: {
-      "Access-Control-Allow-Origin": getAllowedOrigin(request.headers.get('origin')),
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      "Access-Control-Max-Age": "86400",
+      'Access-Control-Allow-Origin': getAllowedOrigin(
+        request.headers.get('origin')
+      ),
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
     },
   });
 }

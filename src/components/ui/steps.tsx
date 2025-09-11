@@ -9,11 +9,7 @@ interface StepsProps extends React.HTMLAttributes<HTMLDivElement> {
 const Steps = React.forwardRef<HTMLDivElement, StepsProps>(
   ({ className, totalSteps, currentStep, ...props }, ref) => {
     return (
-      <div
-        ref={ref}
-        className="flex w-full items-center gap-1.5"
-        {...props}
-      >
+      <div ref={ref} className="flex w-full items-center gap-1.5" {...props}>
         {Array.from({ length: totalSteps }).map((_, index) => (
           <div
             key={index}
@@ -29,4 +25,4 @@ const Steps = React.forwardRef<HTMLDivElement, StepsProps>(
 
 Steps.displayName = 'Steps';
 
-export { Steps }; 
+export { Steps };

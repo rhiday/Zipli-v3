@@ -8,4 +8,4 @@ describe('SummaryPage UI', () => {
     const { container } = render(<SummaryPage />);
     expect(container).toMatchSnapshot();
   });
-}); 
+});

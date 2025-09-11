@@ -26,17 +26,21 @@ export const LineChart: React.FC<LineChartProps> = ({
   width = 500,
   lineColor = '#10B981',
   className = '',
-  showLabels = true
+  showLabels = true,
 }) => {
   if (data.length < 2) {
-    return <div className="p-4 text-sm text-gray-500">Not enough data points for a line chart</div>;
+    return (
+      <div className="p-4 text-sm text-gray-500">
+        Not enough data points for a line chart
+      </div>
+    );
   }
 
-  const values = data.map(item => item.value);
+  const values = data.map((item) => item.value);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
   const range = maxValue - minValue;
-  
+
   // Add 10% padding to the top and bottom
   const paddingFactor = 0.1;
   const effectiveMinValue = minValue - range * paddingFactor;
@@ -47,26 +51,24 @@ export const LineChart: React.FC<LineChartProps> = ({
   const pointSpacing = width / (data.length - 1);
   const points = data.map((item, index) => {
     const x = index * pointSpacing;
-    const y = height - ((item.value - effectiveMinValue) / effectiveRange) * height;
+    const y =
+      height - ((item.value - effectiveMinValue) / effectiveRange) * height;
     return { x, y, label: item.label, value: item.value };
   });
 
   // Create the SVG path
   const pathData = points
-    .map((point, index) => (index === 0 ? `M ${point.x},${point.y}` : `L ${point.x},${point.y}`))
+    .map((point, index) =>
+      index === 0 ? `M ${point.x},${point.y}` : `L ${point.x},${point.y}`
+    )
     .join(' ');
 
   return (
     <div className={className}>
       <svg width={width} height={height} className="overflow-visible">
         {/* The line */}
-        <path
-          d={pathData}
-          fill="none"
-          stroke={lineColor}
-          strokeWidth="2"
-        />
-        
+        <path d={pathData} fill="none" stroke={lineColor} strokeWidth="2" />
+
         {/* Data points */}
         {points.map((point, index) => (
           <g key={index}>
@@ -78,7 +80,7 @@ export const LineChart: React.FC<LineChartProps> = ({
               stroke={lineColor}
               strokeWidth="2"
             />
-            
+
             {/* Value labels */}
             {showLabels && (
               <>
@@ -91,7 +93,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                 >
                   {point.value}
                 </text>
-                
+
                 {/* X-axis labels */}
                 <text
                   x={point.x}

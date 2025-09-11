@@ -42,16 +42,33 @@ const ActionButton = ({
   const isDisabled = disabled === true;
   const content = (
     <div className={cn(actionButtonVariants({ variant, disabled }), className)}>
-      {icon && <div className={cn('mr-4 h-7 w-7', { 'text-inactive': isDisabled })}>{icon}</div>}
+      {icon && (
+        <div className={cn('mr-4 h-7 w-7', { 'text-inactive': isDisabled })}>
+          {icon}
+        </div>
+      )}
       <div className="flex-1">
-        <p className={cn('font-semibold text-primary', { 'text-inactive': isDisabled })}>
+        <p
+          className={cn('font-semibold text-primary', {
+            'text-inactive': isDisabled,
+          })}
+        >
           {title}
         </p>
-        <p className={cn('text-sm text-secondary', { 'text-inactive': isDisabled })}>
+        <p
+          className={cn('text-sm text-secondary', {
+            'text-inactive': isDisabled,
+          })}
+        >
           {description}
         </p>
       </div>
-      <ChevronRight className={cn('h-5 w-5 ml-4 text-primary group-hover:translate-x-1 transition-transform', { 'text-inactive': isDisabled })} />
+      <ChevronRight
+        className={cn(
+          'h-5 w-5 ml-4 text-primary group-hover:translate-x-1 transition-transform',
+          { 'text-inactive': isDisabled }
+        )}
+      />
     </div>
   );
 
@@ -60,7 +77,10 @@ const ActionButton = ({
   }
 
   return (
-    <Link href={href} className="focus:outline-none focus:ring-2 focus:ring-interactive rounded-lg">
+    <Link
+      href={href}
+      className="focus:outline-none focus:ring-2 focus:ring-interactive rounded-lg"
+    >
       {content}
     </Link>
   );
@@ -68,4 +88,4 @@ const ActionButton = ({
 
 ActionButton.displayName = 'ActionButton';
 
-export { ActionButton }; 
+export { ActionButton };

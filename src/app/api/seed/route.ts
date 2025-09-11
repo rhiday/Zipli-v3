@@ -8,10 +8,12 @@ const mockUsersPath = path.join(process.cwd(), 'mockData', 'users.json');
 const mockUsers = JSON.parse(fs.readFileSync(mockUsersPath, 'utf8'));
 
 export async function GET() {
-
   // Only run in development
   if (process.env.NODE_ENV !== 'development') {
-    return NextResponse.json({ error: 'This route is only available in development' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'This route is only available in development' },
+      { status: 403 }
+    );
   }
 
   try {
@@ -22,14 +24,14 @@ export async function GET() {
         password: 'testpass123',
         role: 'food_donor' as const,
         full_name: 'Alice Restaurant',
-        organization_name: 'Alice\'s Restaurant',
+        organization_name: "Alice's Restaurant",
       },
       {
         email: 'bob@example.com',
         password: 'testpass123',
         role: 'food_receiver' as const,
         full_name: 'Bob Charity',
-        organization_name: 'Bob\'s Food Bank',
+        organization_name: "Bob's Food Bank",
       },
       {
         email: 'helsinki@example.com',
@@ -42,7 +44,7 @@ export async function GET() {
 
     for (const user of users) {
       console.log(`Creating user ${user.email}...`);
-      
+
       // Create auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: user.email,
@@ -56,18 +58,19 @@ export async function GET() {
 
       if (authData.user) {
         // Create profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: user.email,
-            role: user.role,
-            full_name: user.full_name,
-            organization_name: user.organization_name,
-          });
+        const { error: profileError } = await supabase.from('profiles').insert({
+          id: authData.user.id,
+          email: user.email,
+          role: user.role,
+          full_name: user.full_name,
+          organization_name: user.organization_name,
+        });
 
         if (profileError) {
-          console.error(`Error creating profile for ${user.email}:`, profileError);
+          console.error(
+            `Error creating profile for ${user.email}:`,
+            profileError
+          );
           throw profileError;
         }
       }
@@ -78,4 +81,4 @@ export async function GET() {
     console.error('Seed error:', error);
     return NextResponse.json({ error: 'Seed failed' }, { status: 500 });
   }
-} 
+}

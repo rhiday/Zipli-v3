@@ -1,4 +1,3 @@
-
 # Cursor Development Rules for Zipli
 
 - Use `// cursor:` comments to scaffold.

@@ -1,13 +1,17 @@
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
+require('dotenv').config({
+  path: require('path').resolve(__dirname, '../.env.local'),
+});
 const { createClient } = require('@supabase/supabase-js');
 const { OpenAI } = require('openai');
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const fetch = (...args) =>
+  import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const path = require('path');
 const sharp = require('sharp');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const SUPABASE_STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || 'donations';
+const SUPABASE_STORAGE_BUCKET =
+  process.env.SUPABASE_STORAGE_BUCKET || 'donations';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !OPENAI_API_KEY) {
@@ -33,11 +37,11 @@ function makePrompt(item) {
 async function generateImage(promptString) {
   console.log(`Using DALL-E prompt: "${promptString}"`);
   const response = await openai.images.generate({
-    model: "dall-e-3",
+    model: 'dall-e-3',
     prompt: promptString,
     n: 1,
-    size: "1024x1024",
-    response_format: "url",
+    size: '1024x1024',
+    response_format: 'url',
   });
   return response.data[0].url;
 }
@@ -63,7 +67,9 @@ async function uploadToSupabase(itemId, buffer) {
 }
 
 async function getPublicUrl(filePath) {
-  const { data } = supabase.storage.from(SUPABASE_STORAGE_BUCKET).getPublicUrl(filePath);
+  const { data } = supabase.storage
+    .from(SUPABASE_STORAGE_BUCKET)
+    .getPublicUrl(filePath);
   return data.publicUrl;
 }
 
@@ -96,4 +102,4 @@ async function updateImageUrl(itemId, url) {
     console.error('Error:', err);
     process.exit(1);
   }
-})(); 
+})();

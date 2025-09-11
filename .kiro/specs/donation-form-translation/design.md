@@ -9,6 +9,7 @@ This design outlines the systematic translation of all donation-related forms an
 ### Translation System Integration
 
 The existing translation infrastructure consists of:
+
 - `src/lib/translations.ts` - Central translation dictionary
 - `src/hooks/useLanguage.tsx` - Translation hook providing `t()` function
 - `src/contexts/LanguageContext.tsx` - Language context provider
@@ -107,6 +108,7 @@ Each component will be updated to:
 ### Error Handling
 
 Translation fallbacks will be handled by the existing translation system:
+
 - Missing keys will display the key name as fallback
 - English will serve as the default language
 - Console warnings for missing translations in development
@@ -135,7 +137,7 @@ fi: {
   portionsOffered: 'Tarjotut annokset',
   savedInFoodDisposalCosts: 'Säästetty ruoan hävityskustannuksissa',
   co2Avoided: 'Vältetty CO2',
-  
+
   // Forms
   nameOfFood: 'Ruoan nimi',
   quantityKg: 'Määrä (kg)',
@@ -182,20 +184,24 @@ fi: {
 ## Implementation Phases
 
 ### Phase 1: Core Translation Infrastructure
+
 - Add all required translation keys to `translations.ts`
 - Verify existing translation system compatibility
 
 ### Phase 2: Component Updates
+
 - Update each donation component to use translation hooks
 - Replace hardcoded strings with translation function calls
 - Maintain existing component functionality
 
 ### Phase 3: Testing and Refinement
+
 - Manual testing of all donation workflows in both languages
 - Fix any layout or functionality issues
 - Refine Finnish translations for better user experience
 
 ### Phase 4: Quality Assurance
+
 - Comprehensive testing of donation flow end-to-end
 - Verify no regressions in existing functionality
 - Ensure consistent translation quality across all forms
