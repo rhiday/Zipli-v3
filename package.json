@@ -112,5 +112,9 @@
     "*.{js,jsx,ts,tsx,json,css,md}": [
       "prettier --write"
     ]
+  },
+  "resolutions": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   }
 }
