@@ -6,7 +6,7 @@ This guide tests the updated allergen display in request details to ensure consi
 
 ## 🔧 Prerequisites
 
-- Development server running (`pnpm dev`)
+- Development server running (`npm run dev`)
 - Browser with DevTools open
 
 ## 🧪 Test Scenario: Input/Display Consistency

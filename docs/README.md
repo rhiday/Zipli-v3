@@ -51,7 +51,7 @@ Welcome to the central documentation hub for the Zipli project. This directory c
 ### Component Library & Style Guide
 Interactive component documentation via Storybook:
 ```bash
-pnpm run storybook
+npm run storybook
 ```
 
 ### Configuration Documentation

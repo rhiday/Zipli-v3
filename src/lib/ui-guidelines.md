@@ -116,4 +116,4 @@ Before ANY UI change:
 - [ ] Forms submit correctly
 - [ ] Mobile responsive
 - [ ] No TypeScript errors
-- [ ] Build succeeds (`pnpm build`)
+- [ ] Build succeeds (`npm run build`)

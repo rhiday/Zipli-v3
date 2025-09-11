@@ -75,7 +75,7 @@ validateComponent(componentCode, 'ComponentName');
 - [ ] Works in Finnish and English
 - [ ] All user roles work
 - [ ] No console errors
-- [ ] Build succeeds (`pnpm build`)
+- [ ] Build succeeds (`npm run build`)
 
 ### **FORBIDDEN ACTIONS:**
 

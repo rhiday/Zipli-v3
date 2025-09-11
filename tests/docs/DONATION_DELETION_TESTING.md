@@ -6,7 +6,7 @@ This guide tests the fixed "Remove Listing" functionality for donations to ensur
 
 ## 🔧 Prerequisites
 
-- Development server running (`pnpm dev`)
+- Development server running (`npm run dev`)
 - Browser with DevTools open (to monitor console logs)
 - Access to Supabase dashboard
 - Donation created by your current user account

@@ -55,6 +55,7 @@
     "openai": "^4.98.0",
     "picocolors": "^1.1.1",
     "posthog-js": "^1.262.0",
+    "posthog-node": "^4.18.0",
     "react": "19.1.1",
     "react-day-picker": "8.10.1",
     "react-dom": "19.1.1",

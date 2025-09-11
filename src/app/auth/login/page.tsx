@@ -16,6 +16,7 @@ import {
   clearRememberedEmail,
 } from '@/lib/auth/sessionUtils';
 import { ViewportContainer } from '@/components/layout/ViewportContainer';
+import posthog from 'posthog-js';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -49,10 +50,21 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
+    // Track login attempt
+    posthog.capture('login_attempted', {
+      email_domain: email.split('@')[1],
+      remember_me: rememberMe,
+    });
+
     try {
       const response = await login(email, password);
 
       if (response.error) {
+        // Track failed login
+        posthog.capture('login_failed', {
+          error_message: response.error,
+          email_domain: email.split('@')[1],
+        });
         setError(response.error);
         setLoading(false);
         return;
@@ -64,6 +76,13 @@ export default function LoginPage() {
         // Store the remember me preference and email
         setRememberMePreference(rememberMe);
         setRememberedEmail(email, rememberMe);
+
+        // Track successful login and redirect
+        posthog.capture('login_successful', {
+          user_role: user.role,
+          organization_name: user.organization_name,
+          remember_me: rememberMe,
+        });
 
         // Small delay to ensure store state is updated before redirect
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -90,6 +109,11 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
+      // Track login error
+      posthog.capture('login_error', {
+        error_type: 'exception',
+        error_message: err instanceof Error ? err.message : 'Unknown error',
+      });
       setError(t('genericError'));
       setLoading(false);
     }

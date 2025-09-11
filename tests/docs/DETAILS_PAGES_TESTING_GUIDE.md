@@ -8,7 +8,7 @@ This guide provides comprehensive testing instructions to verify that the detail
 
 ## 🔧 Prerequisites
 
-- Development server running (`pnpm dev`)
+- Development server running (`npm run dev`)
 - Browser with DevTools open
 - Access to Supabase dashboard
 - Console logging enabled

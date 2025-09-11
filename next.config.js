@@ -95,6 +95,22 @@ const nextConfig = {
     return config;
   },
 
+  // This is required to support PostHog trailing slash API requests
+  skipTrailingSlashRedirect: true,
+
+  async rewrites() {
+    return [
+      {
+        source: '/ingest/static/:path*',
+        destination: 'https://eu-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/ingest/:path*',
+        destination: 'https://eu.i.posthog.com/:path*',
+      },
+    ];
+  },
+
   async redirects() {
     return [
       {
@@ -112,7 +128,7 @@ const nextConfig = {
 
   // Asset optimization
   assetPrefix: process.env.ASSET_PREFIX || '',
-  
+
   images: {
     remotePatterns: [
       {

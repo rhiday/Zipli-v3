@@ -56,9 +56,9 @@ test_branch() {
     git diff --name-only main...HEAD | head -10
     
     echo -e "\n${GREEN}Ready to test! Commands:${NC}"
-    echo "  pnpm install  # Install dependencies"
-    echo "  pnpm dev      # Start development server"
-    echo "  pnpm test     # Run tests"
+    echo "  npm install  # Install dependencies"
+    echo "  npm run dev  # Start development server"
+    echo "  npm test     # Run tests"
     echo -e "\n${YELLOW}Press any key to continue to next branch, or Ctrl+C to stop here...${NC}"
     read -n 1 -s
 }
