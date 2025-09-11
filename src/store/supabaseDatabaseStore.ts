@@ -564,6 +564,21 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
           if (error) return { data: null, error: error.message };
 
+          // Track donation creation
+          if (typeof window !== 'undefined' && data) {
+            const posthog = (await import('posthog-js')).default;
+            posthog.capture('donation_created', {
+              donation_id: data.id,
+              quantity: data.quantity,
+              status: data.status,
+              has_pickup_slots: !!data.pickup_slots,
+              pickup_slots_count: Array.isArray(data.pickup_slots)
+                ? data.pickup_slots.length
+                : 0,
+              has_instructions: !!data.instructions_for_driver,
+            });
+          }
+
           // Refresh donations to get the full data with relations
           await get().fetchDonations();
 
@@ -579,6 +594,10 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
 
       updateDonation: async (id: string, updates: DonationUpdate) => {
         try {
+          // Get the current donation to track status changes
+          const currentDonation = get().donations.find((d) => d.id === id);
+          const oldStatus = currentDonation?.status;
+
           const { data, error } = await supabase
             .from('donations')
             .update(updates)
@@ -587,6 +606,33 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
             .single();
 
           if (error) return { data: null, error: error.message };
+
+          // Track status changes - PostHog analytics
+          if (
+            typeof window !== 'undefined' &&
+            data &&
+            oldStatus !== data.status
+          ) {
+            const posthog = (await import('posthog-js')).default;
+
+            if (data.status === 'picked_up') {
+              posthog.capture('donation_completed', {
+                donation_id: data.id,
+                quantity: data.quantity,
+                previous_status: oldStatus,
+                new_status: data.status,
+                claimed_at: data.claimed_at,
+                picked_up_at: data.picked_up_at,
+              });
+            } else if (data.status === 'cancelled') {
+              posthog.capture('donation_cancelled', {
+                donation_id: data.id,
+                quantity: data.quantity,
+                previous_status: oldStatus,
+                new_status: data.status,
+              });
+            }
+          }
 
           // Refresh donations
           await get().fetchDonations();
@@ -609,6 +655,18 @@ export const useSupabaseDatabase = create<SupabaseDatabaseState>()(
           const donationToDelete = get().donations.find((d) => d.id === id);
           if (!donationToDelete) {
             return { error: 'Donation not found' };
+          }
+
+          // Track donation cancellation (deletion is treated as cancellation)
+          if (typeof window !== 'undefined') {
+            const posthog = (await import('posthog-js')).default;
+            posthog.capture('donation_cancelled', {
+              donation_id: donationToDelete.id,
+              quantity: donationToDelete.quantity,
+              previous_status: donationToDelete.status,
+              new_status: 'deleted',
+              cancellation_method: 'deletion',
+            });
           }
 
           // Delete the donation first (this is the main operation)

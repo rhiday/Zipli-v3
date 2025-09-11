@@ -30,6 +30,17 @@ export default function HandoverConfirmPage() {
         .update({ status: 'picked_up', updated_at: new Date().toISOString() })
         .eq('id', donationId);
       if (error) throw error;
+
+      // Track donation completion
+      if (typeof window !== 'undefined') {
+        const posthog = (await import('posthog-js')).default;
+        posthog.capture('donation_completed', {
+          donation_id: donationId,
+          new_status: 'picked_up',
+          completion_method: 'handover_confirmation',
+        });
+      }
+
       router.push('/donate');
     } catch (err: any) {
       setError(err.message || 'Failed to confirm handover.');
