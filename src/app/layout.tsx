@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import AppShell from '@/components/AppShell';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Manrope, Space_Grotesk } from 'next/font/google'; // Import fonts
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
 import DevSwitcherOverlay from '@/components/dev/DevSwitcherOverlay';
