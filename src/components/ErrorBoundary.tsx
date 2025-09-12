@@ -1,25 +1,25 @@
 'use client';
 
 import React from 'react';
-import { useLanguage } from '@/hooks/useLanguage';
+import posthog from 'posthog-js';
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
+  error?: Error;
 }
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
-  fallback?: React.ComponentType<{ error: Error; resetError: () => void }>;
+  fallback?: React.ComponentType<{ error?: Error; resetError: () => void }>;
 }
 
-class ErrorBoundary extends React.Component<
+export class ErrorBoundary extends React.Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -27,95 +27,70 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error to monitoring service in production
-    if (process.env.NODE_ENV === 'production') {
-      console.error('Error boundary caught an error:', error, errorInfo);
-    }
+    // Track React component errors
+    posthog.capture('react_error_boundary', {
+      error_message: error.message,
+      error_stack: error.stack,
+      component_stack: errorInfo.componentStack,
+      error_type: 'react_error_boundary',
+      url: window.location.href,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   resetError = () => {
-    this.setState({ hasError: false, error: null });
+    this.setState({ hasError: false, error: undefined });
   };
 
   render() {
-    if (this.state.hasError && this.state.error) {
-      const FallbackComponent = this.props.fallback || DefaultErrorFallback;
+    if (this.state.hasError) {
+      const FallbackComponent = this.props.fallback;
+      if (FallbackComponent) {
+        return (
+          <FallbackComponent
+            error={this.state.error}
+            resetError={this.resetError}
+          />
+        );
+      }
+
       return (
-        <FallbackComponent
-          error={this.state.error}
-          resetError={this.resetError}
-        />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+              <svg
+                className="w-6 h-6 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <div className="mt-4 text-center">
+              <h3 className="text-lg font-medium text-gray-900">
+                Something went wrong
+              </h3>
+              <p className="mt-2 text-sm text-gray-500">
+                We've been notified about this error and are working to fix it.
+              </p>
+              <button
+                onClick={this.resetError}
+                className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Try again
+              </button>
+            </div>
+          </div>
+        </div>
       );
     }
 
     return this.props.children;
   }
 }
-
-interface ErrorFallbackProps {
-  error: Error;
-  resetError: () => void;
-}
-
-const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({
-  error,
-  resetError,
-}) => {
-  const { t } = useLanguage();
-  return (
-    <div className="min-h-dvh flex items-center justify-center bg-cream p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
-        <div className="mb-4">
-          <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
-            <svg
-              className="w-8 h-8 text-red-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            {t('somethingWentWrong')}
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Something went wrong. Please try again.
-          </p>
-          {process.env.NODE_ENV === 'development' && (
-            <details className="mb-4 text-left">
-              <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-                Show Error Details
-              </summary>
-              <pre className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded overflow-auto">
-                {error.message}
-                {error.stack}
-              </pre>
-            </details>
-          )}
-        </div>
-        <div className="space-y-3">
-          <button
-            onClick={resetError}
-            className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Try Again
-          </button>
-          <button
-            onClick={() => (window.location.href = '/')}
-            className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            Go Home
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ErrorBoundary;

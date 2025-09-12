@@ -46,6 +46,18 @@ export const logger = {
   error: (...args: any[]): void => {
     if (canLog('ERROR')) {
       console.error('[ERROR]', ...args);
+
+      // Track errors with PostHog in browser environment
+      if (typeof window !== 'undefined') {
+        import('posthog-js').then(({ default: posthog }) => {
+          posthog.capture('logger_error', {
+            error_type: 'logger_error',
+            error_message: args.join(' '),
+            url: window.location.href,
+            timestamp: new Date().toISOString(),
+          });
+        });
+      }
     }
   },
   getCurrentLevel: (): LogLevelName => currentLogLevelName,
