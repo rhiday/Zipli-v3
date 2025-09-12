@@ -12,6 +12,7 @@ import {
   AuthResponse,
 } from '@/types/supabase';
 import type { User } from '@supabase/supabase-js';
+import posthog from 'posthog-js';
 
 export interface SignUpData {
   email: string;
@@ -91,6 +92,20 @@ class AuthService {
       }
 
       console.log('🔐 AuthService.signUp - Success! Profile:', profile);
+
+      // Track successful signup
+      posthog.identify(profile.id, {
+        email: profile.email,
+        full_name: profile.full_name,
+        role: profile.role,
+        organization_name: profile.organization_name,
+      });
+      posthog.capture('user_signed_up', {
+        user_role: profile.role,
+        organization_name: profile.organization_name,
+        signup_method: 'email',
+      });
+
       return { data: profile, error: null };
     } catch (error) {
       console.error('🔐 AuthService.signUp - Caught exception:', error);
@@ -128,6 +143,19 @@ class AuthService {
         return { data: null, error: 'User profile not found' };
       }
 
+      // Track successful signin
+      posthog.identify(profile.id, {
+        email: profile.email,
+        full_name: profile.full_name,
+        role: profile.role,
+        organization_name: profile.organization_name,
+      });
+      posthog.capture('user_signed_in', {
+        user_role: profile.role,
+        organization_name: profile.organization_name,
+        signin_method: 'email',
+      });
+
       return { data: profile, error: null };
     } catch (error) {
       return {
@@ -143,7 +171,14 @@ class AuthService {
    */
   async signOut(): Promise<{ error: string | null }> {
     try {
+      // Track signout before actually signing out
+      posthog.capture('user_signed_out');
+
       const { error } = await supabase.auth.signOut();
+
+      // Reset PostHog identity
+      posthog.reset();
+
       return { error: error?.message || null };
     } catch (error) {
       return {

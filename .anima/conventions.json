@@ -1,1 +1,14 @@
-{"assetsPath":"public/images/","componentLibrary":"none","componentsPath":"src/components","defaultConfigPath":"/Users/rhiday/.anima","framework":"react","language":"typescript","nextRouterType":"app-router","projectRoot":"/Users/rhiday/Desktop/Zipli_v3","styleguidePath":"","styling":"tailwind","tailwindConfigPath":"tailwind.config.js","tailwindConfigReuseEnabled":false}
+{
+  "assetsPath": "public/images/",
+  "componentLibrary": "none",
+  "componentsPath": "src/components",
+  "defaultConfigPath": "/Users/rhiday/.anima",
+  "framework": "react",
+  "language": "typescript",
+  "nextRouterType": "app-router",
+  "projectRoot": "/Users/rhiday/Desktop/Zipli_v3",
+  "styleguidePath": "",
+  "styling": "tailwind",
+  "tailwindConfigPath": "tailwind.config.js",
+  "tailwindConfigReuseEnabled": false
+}

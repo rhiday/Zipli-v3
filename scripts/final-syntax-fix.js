@@ -12,44 +12,44 @@ const filesToFix = [
     fixes: [
       {
         from: /console\.error\(t\([^)]+\), "Raw" content:', content\);/g,
-        to: 'console.error("Error parsing OpenAI JSON response. Raw content:", content);'
-      }
-    ]
+        to: 'console.error("Error parsing OpenAI JSON response. Raw content:", content);',
+      },
+    ],
   },
   {
     path: 'src/app/auth/callback/page.tsx',
     fixes: [
       {
         from: /const role = profile\.role as Database\['public'\]\[\{t\('pages\.auth\.enums'\)\}\]\['user_role'\];/g,
-        to: "const role = profile.role as Database['public']['Enums']['user_role'];"
-      }
-    ]
+        to: "const role = profile.role as Database['public']['Enums']['user_role'];",
+      },
+    ],
   },
   {
     path: 'src/app/dashboard/city/page.tsx',
     fixes: [
       {
         from: /\{ name: t\('pages\.dashboard\.alice'\)s Restaurant", donations: 32, category: t\('pages\.dashboard\.restaurant'\) \},/g,
-        to: '{ name: "Alice\'s Restaurant", donations: 32, category: "Restaurant" },'
-      }
-    ]
+        to: '{ name: "Alice\'s Restaurant", donations: 32, category: "Restaurant" },',
+      },
+    ],
   },
   {
     path: 'src/app/donate/all-offers/page.tsx',
     fixes: [
       {
         from: /type RequestItem = Database\['public'\]\[\{t\('pages\.donations\.tables'\)\}\]\['requests'\]\[\{t\('pages\.donations\.row'\)\}\] & \{/g,
-        to: "type RequestItem = Database['public']['Tables']['requests']['Row'] & {"
-      }
-    ]
-  }
+        to: "type RequestItem = Database['public']['Tables']['requests']['Row'] & {",
+      },
+    ],
+  },
 ];
 
 const baseDir = '/Users/rhiday/Desktop/Zipli/zipli v3';
 
 filesToFix.forEach(({ path: filePath, fixes }) => {
   const fullPath = `${baseDir}/${filePath}`;
-  
+
   if (!fs.existsSync(fullPath)) {
     console.log(`⚠️  File not found: ${filePath}`);
     return;

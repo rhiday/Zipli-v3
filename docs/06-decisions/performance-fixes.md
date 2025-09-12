@@ -230,7 +230,6 @@ const token = randomUUID() + randomUUID().replace(/-/g, '');
     <div class="after">
       <h4>✅ After: Optimized</h4>
 
-
 ```typescript
 // Stable channel names
 .channel('donations_realtime')

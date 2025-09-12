@@ -162,7 +162,10 @@ export default function ProfilePage(): React.ReactElement {
 
   if (loading) {
     return (
-      <ViewportContainer variant="fullscreen" className="flex items-center justify-center bg-cream">
+      <ViewportContainer
+        variant="fullscreen"
+        className="flex items-center justify-center bg-cream"
+      >
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </ViewportContainer>
     );

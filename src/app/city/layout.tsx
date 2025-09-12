@@ -18,4 +18,4 @@ export default function CityLayout({
   }, [router]);
 
   return <>{children}</>;
-} 
+}

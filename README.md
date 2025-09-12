@@ -282,7 +282,7 @@ To bulk-generate images for food items using OpenAI DALL·E and upload to Supaba
 2. Install dependencies:
 
    ```bash
-   pnpm install openai @supabase/supabase-js dotenv node-fetch
+   npm install openai @supabase/supabase-js dotenv node-fetch
    ```
 
 3. Run the script:

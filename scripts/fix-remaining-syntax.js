@@ -12,30 +12,30 @@ const fixPatterns = [
   {
     pattern: /(\w+)\s*=\s*t\(([^)]+)\)(?!\s*[,;}])/g,
     replacement: '$1={t($2)}',
-    description: 'JSX attribute syntax'
+    description: 'JSX attribute syntax',
   },
-  
+
   // Fix broken string interpolation: t('common.you')ll -> "You'll"
   {
     pattern: /t\('common\.you'\)ll receive/g,
     replacement: "You'll receive",
-    description: 'Broken string interpolation'
+    description: 'Broken string interpolation',
   },
-  
+
   // Fix broken console statements: console.error(t('key')Raw -> console.error(t('key'), 'Raw'
   {
     pattern: /console\.(log|error|warn)\(([^)]+)\)Raw/g,
     replacement: 'console.$1($2, "Raw"',
-    description: 'Broken console statements'
+    description: 'Broken console statements',
   },
-  
+
   // Fix status object values: status: {t('key')} -> status: 'error'
   {
     pattern: /status:\s*\{t\('common\.status\.error'\)\}/g,
     replacement: "status: 'error'",
-    description: 'Status object values'
+    description: 'Status object values',
   },
-  
+
   // Fix remaining {t('key')} in object contexts
   {
     pattern: /:\s*\{t\([^}]+\)\}/g,
@@ -57,20 +57,20 @@ const fixPatterns = [
       }
       return match;
     },
-    description: 'Remaining object context translations'
-  }
+    description: 'Remaining object context translations',
+  },
 ];
 
 // Get all TypeScript/JavaScript files
-const files = glob.sync('src/**/*.{ts,tsx,js,jsx}', { 
+const files = glob.sync('src/**/*.{ts,tsx,js,jsx}', {
   cwd: '/Users/rhiday/Desktop/Zipli/zipli v3',
-  absolute: true 
+  absolute: true,
 });
 
 let totalReplacements = 0;
 let filesModified = 0;
 
-files.forEach(filePath => {
+files.forEach((filePath) => {
   let content = fs.readFileSync(filePath, 'utf8');
   let modifiedContent = content;
   let fileReplacements = 0;
@@ -97,18 +97,31 @@ files.forEach(filePath => {
   // Specific fixes for translation.ts
   if (filePath.includes('translations.ts')) {
     // Fix remaining template literal issues
-    modifiedContent = modifiedContent.replace(/add: t\('common\.actions\.add'\),/g, "add: 'Add',");
-    modifiedContent = modifiedContent.replace(/edit: t\('common\.actions\.edit'\),/g, "edit: 'Edit',");
-    modifiedContent = modifiedContent.replace(/delete: t\('common\.actions\.delete'\),/g, "delete: 'Delete',");
+    modifiedContent = modifiedContent.replace(
+      /add: t\('common\.actions\.add'\),/g,
+      "add: 'Add',"
+    );
+    modifiedContent = modifiedContent.replace(
+      /edit: t\('common\.actions\.edit'\),/g,
+      "edit: 'Edit',"
+    );
+    modifiedContent = modifiedContent.replace(
+      /delete: t\('common\.actions\.delete'\),/g,
+      "delete: 'Delete',"
+    );
   }
 
   if (fileReplacements > 0) {
     fs.writeFileSync(filePath, modifiedContent);
-    console.log(`✅ Fixed ${fileReplacements} issues in ${path.relative('/Users/rhiday/Desktop/Zipli/zipli v3', filePath)}`);
+    console.log(
+      `✅ Fixed ${fileReplacements} issues in ${path.relative('/Users/rhiday/Desktop/Zipli/zipli v3', filePath)}`
+    );
     totalReplacements += fileReplacements;
     filesModified++;
   }
 });
 
 console.log(`\n🎉 Additional syntax fix completed!`);
-console.log(`📊 Fixed ${totalReplacements} syntax issues in ${filesModified} files\n`);
+console.log(
+  `📊 Fixed ${totalReplacements} syntax issues in ${filesModified} files\n`
+);

@@ -35,7 +35,7 @@ export function middleware(request: NextRequest) {
   ) {
     // Cache JS/CSS for 1 year but allow revalidation
     response.headers.set(
-      'Cache-Control', 
+      'Cache-Control',
       'public, max-age=31536000, stale-while-revalidate=31536000'
     );
   }
@@ -50,14 +50,16 @@ export function middleware(request: NextRequest) {
 
   // Font optimization headers
   if (pathname.match(/\.(woff|woff2|ttf|otf|eot)$/)) {
-    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    response.headers.set(
+      'Cache-Control',
+      'public, max-age=31536000, immutable'
+    );
     response.headers.set('Access-Control-Allow-Origin', '*');
     response.headers.set('Cross-Origin-Resource-Policy', 'cross-origin');
   }
 
   // Security headers for better performance
   response.headers.set('X-DNS-Prefetch-Control', 'on');
-  
 
   return response;
 }

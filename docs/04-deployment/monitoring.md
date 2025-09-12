@@ -99,7 +99,6 @@ rollbar.error('Something went wrong', error);
 
   <div class="tab-content">
 
-
 ### Bugsnag - Free Tier
 
 **Free Tier:** 7,500 errors/month, 1 user
@@ -142,7 +141,6 @@ export default Bugsnag;
   </div>
 
   <div class="tab-content">
-
 
 ### GlitchTip - Self-Hosted (Free Forever)
 
@@ -203,7 +201,6 @@ volumes:
   </div>
 
   <div class="tab-content">
-
 
 ### Built-in Monitoring Solution
 

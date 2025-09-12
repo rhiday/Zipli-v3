@@ -5,9 +5,13 @@ interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'secondary';
 }
 
-const Tag: React.FC<TagProps> = ({ className, variant = 'default', ...props }) => {
+const Tag: React.FC<TagProps> = ({
+  className,
+  variant = 'default',
+  ...props
+}) => {
   const baseClasses = 'rounded-full px-4 py-1.5 text-sm font-medium';
-  
+
   const variantClasses = {
     default: 'bg-gray-100 text-gray-700',
     secondary: 'bg-green-100 text-green-800',
@@ -21,4 +25,4 @@ const Tag: React.FC<TagProps> = ({ className, variant = 'default', ...props }) =
   );
 };
 
-export default Tag; 
+export default Tag;

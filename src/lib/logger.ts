@@ -12,7 +12,8 @@ type LogLevelName = keyof typeof LOG_LEVELS;
 // Determine the current log level.
 // Default to 'DEBUG' in development, 'INFO' in production if NEXT_PUBLIC_LOG_LEVEL is not set.
 const getCurrentLogLevel = (): LogLevelName => {
-  const envLogLevel = process.env.NEXT_PUBLIC_LOG_LEVEL?.toUpperCase() as LogLevelName;
+  const envLogLevel =
+    process.env.NEXT_PUBLIC_LOG_LEVEL?.toUpperCase() as LogLevelName;
   if (envLogLevel && LOG_LEVELS[envLogLevel] !== undefined) {
     return envLogLevel;
   }
@@ -53,4 +54,4 @@ export const logger = {
 // Log the current effective log level once when the module is loaded
 if (process.env.NODE_ENV !== 'production') {
   console.log(`[LOGGER] Effective log level: ${currentLogLevelName}`);
-} 
+}

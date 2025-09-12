@@ -102,7 +102,6 @@ Follow these steps to get started:
 
   <div class="tab-content">
 
-
 ### Local Development Setup
 
 <div class="step-indicator">
@@ -160,7 +159,6 @@ Check these endpoints:
   </div>
 
   <div class="tab-content">
-
 
 ### Production Deployment
 

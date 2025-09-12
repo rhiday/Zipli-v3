@@ -3,9 +3,9 @@ const StyleDictionary = require('style-dictionary');
 // Custom format for Tailwind colors
 StyleDictionary.registerFormat({
   name: 'tailwind/colors',
-  formatter: function({ dictionary }) {
+  formatter: function ({ dictionary }) {
     const colors = {};
-    dictionary.allProperties.forEach(token => {
+    dictionary.allProperties.forEach((token) => {
       if (token.attributes && token.attributes.category === 'color') {
         // Flatten token name, e.g. zipli-brand-primary-black -> primary_black
         const name = token.name.replace(/^zipli-brand-/, '').replace(/-/g, '_');
@@ -13,7 +13,7 @@ StyleDictionary.registerFormat({
       }
     });
     return `module.exports = ${JSON.stringify(colors, null, 2)};`;
-  }
+  },
 });
 
 module.exports = {
@@ -43,4 +43,4 @@ module.exports = {
       ],
     },
   },
-}; 
+};

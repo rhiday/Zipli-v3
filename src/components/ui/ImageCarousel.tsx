@@ -31,7 +31,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   const touchStartX = useRef<number>(0);
   const touchEndX = useRef<number>(0);
-  const autoPlayRef = useRef<NodeJS.Timeout>();
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
   // Filter out invalid images
   const validImages = images.filter((img) => img && img.trim() !== '');

@@ -125,6 +125,17 @@ export default function RequestDetailPage(): React.ReactElement {
 
     setShowConfirmDelivery(false);
     setConfirmClauseChecked(false);
+
+    // Track delivery confirmation
+    if (typeof window !== 'undefined') {
+      const posthog = (await import('posthog-js')).default;
+      posthog.capture('request_completed', {
+        request_id: id,
+        new_status: 'fulfilled',
+        completion_method: 'delivery_confirmation',
+      });
+    }
+
     await handleStatusUpdate('fulfilled');
     // Show success dialog with feedback option
     setShowSuccessWithFeedback(true);

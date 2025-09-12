@@ -171,7 +171,7 @@ git diff origin/staging main
 
 # Or manually:
 git checkout test-save-wip
-pnpm dev
+npm run dev
 # Test donation flow, image upload, dev switcher
 ```
 

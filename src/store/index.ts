@@ -7,11 +7,11 @@
 export { useSupabaseDatabase as useDatabase } from './supabaseDatabaseStore';
 
 // Export types for compatibility
-export type { 
+export type {
   Profile as User,
   DonationWithFoodItem,
   UserRole,
-  AuthResponse 
+  AuthResponse,
 } from '@/types/supabase';
 
 // Re-export for backward compatibility with existing components

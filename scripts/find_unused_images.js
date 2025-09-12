@@ -8,14 +8,15 @@ const IMAGE_DIRS = [
 const exts = ['.jpg', '.jpeg', '.png', '.svg', '.gif', '.bmp', '.webp', '.ico'];
 
 function getAllImages(dir) {
-  return fs.readdirSync(dir)
-    .filter(f => exts.includes(path.extname(f).toLowerCase()))
-    .map(f => path.join(dir, f));
+  return fs
+    .readdirSync(dir)
+    .filter((f) => exts.includes(path.extname(f).toLowerCase()))
+    .map((f) => path.join(dir, f));
 }
 
 function isImageUsed(imagePath, codeFiles) {
   const relPath = imagePath.split('public')[1].replace(/\\/g, '/');
-  return codeFiles.some(file => {
+  return codeFiles.some((file) => {
     const content = fs.readFileSync(file, 'utf8');
     return content.includes(relPath);
   });
@@ -24,7 +25,7 @@ function isImageUsed(imagePath, codeFiles) {
 function getAllCodeFiles(dir) {
   let results = [];
   const list = fs.readdirSync(dir);
-  list.forEach(file => {
+  list.forEach((file) => {
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
     if (stat && stat.isDirectory()) {
@@ -52,7 +53,7 @@ function getAllCodeFiles(dir) {
     console.log('No unused images found!');
   } else {
     console.log('Unused images:');
-    unused.forEach(img => console.log(img));
-    unused.forEach(img => fs.unlinkSync(img));
+    unused.forEach((img) => console.log(img));
+    unused.forEach((img) => fs.unlinkSync(img));
   }
-})(); 
+})();

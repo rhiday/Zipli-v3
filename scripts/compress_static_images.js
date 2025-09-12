@@ -10,9 +10,10 @@ const IMAGE_DIRS = [
 const exts = ['.jpg', '.jpeg', '.png'];
 
 function getAllImages(dir) {
-  return fs.readdirSync(dir)
-    .filter(f => exts.includes(path.extname(f).toLowerCase()))
-    .map(f => path.join(dir, f));
+  return fs
+    .readdirSync(dir)
+    .filter((f) => exts.includes(path.extname(f).toLowerCase()))
+    .map((f) => path.join(dir, f));
 }
 
 async function compressImage(file) {
@@ -40,4 +41,4 @@ async function compressImage(file) {
     }
   }
   console.log('All images compressed!');
-})(); 
+})();

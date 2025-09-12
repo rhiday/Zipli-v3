@@ -18,7 +18,6 @@ module.exports = [
       '*.min.js',
       '*.min.css',
       'package-lock.json',
-      'pnpm-lock.yaml',
       'yarn.lock',
     ],
   },

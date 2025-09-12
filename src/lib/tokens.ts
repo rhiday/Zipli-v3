@@ -20,7 +20,7 @@ if (typeof global !== 'undefined' && !global.tokens) {
 const getClientStorage = () => {
   // Only run in browser environment
   if (typeof window === 'undefined') return {};
-  
+
   try {
     // Try to get tokens from localStorage
     const storedTokens = localStorage.getItem('qr_login_tokens');
@@ -42,7 +42,7 @@ export const getTokens = () => {
     // @ts-ignore
     return global.tokens;
   }
-  
+
   // Client-side - try localStorage first, then fallback to in-memory
   return getClientStorage() || localTokens;
 };
@@ -59,4 +59,4 @@ export const saveTokens = (tokens: Record<string, TokenData>) => {
 };
 
 // Export a singleton instance of the tokens object
-export const tokens: Record<string, TokenData> = getTokens(); 
+export const tokens: Record<string, TokenData> = getTokens();

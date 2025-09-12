@@ -33,7 +33,7 @@ This document provides a comprehensive guide to the professional deployment pipe
 - **Pre-commit Hooks**: Husky + lint-staged
 - **Code Quality**: TypeScript, ESLint, Prettier
 - **Testing**: Jest with React Testing Library
-- **Package Manager**: npm/pnpm compatible
+- **Package Manager**: npm
 
 ---
 
@@ -264,19 +264,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run type checking
         run: npx tsc --noEmit
@@ -285,10 +280,10 @@ jobs:
         run: npx eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0
 
       - name: Run tests
-        run: pnpm test
+        run: npm test
 
       - name: Build application
-        run: pnpm build
+        run: npm run build
 
   security:
     name: Security Audit
@@ -299,22 +294,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run security audit
-        run: pnpm audit --audit-level moderate
+        run: npm audit --audit-level moderate
 
   deploy-preview:
     name: Deploy Preview
@@ -373,9 +363,9 @@ TEAM_ID             # Get from Vercel team settings (if applicable)
 2. Import Git Repository
 3. Configure Build Settings:
    - Framework Preset: Next.js
-   - Build Command: `npm run build` or `pnpm build`
+   - Build Command: `npm run build`
    - Output Directory: `.next`
-   - Install Command: `npm install` or `pnpm install`
+   - Install Command: `npm install`
 
 #### Step 5.2: Environment Variables
 
@@ -543,7 +533,6 @@ coverage
 *.min.js
 *.min.css
 package-lock.json
-pnpm-lock.yaml
 yarn.lock
 ```
 
@@ -625,7 +614,7 @@ npm install --save-dev @eslint/eslintrc @eslint/js
 **Solution**:
 
 1. Check GitHub Secrets are set correctly
-2. Ensure package-lock.json or pnpm-lock.yaml is committed
+2. Ensure package-lock.json is committed
 3. Verify Node version compatibility
 4. Check for environment variable requirements
 

@@ -25,12 +25,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({
-  children,
-}) => {
-  const currentUser = useDatabase(state => state.currentUser);
-  const isInitialized = useDatabase(state => state.isInitialized);
-  const logout = useDatabase(state => state.logout);
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const currentUser = useDatabase((state) => state.currentUser);
+  const isInitialized = useDatabase((state) => state.isInitialized);
+  const logout = useDatabase((state) => state.logout);
   const pathname = usePathname();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
