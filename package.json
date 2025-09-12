@@ -20,8 +20,6 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "validate": "pnpm run type-check && pnpm run lint",
-    "test:deploy": "./test-before-deploy.sh",
-    "test:quick": "pnpm run type-check && pnpm run build",
     "build:analyze": "ANALYZE=true pnpm run build",
     "build:check": "pnpm run build && pnpm run start",
     "clean": "rm -rf .next node_modules/.cache"
