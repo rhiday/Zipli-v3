@@ -82,7 +82,8 @@ function Calendar({
           '!bg-blue-100 !text-blue-900 !font-semibold !border-2 !border-blue-300 hover:!bg-blue-200 hover:!border-blue-400 !rounded-md !shadow-sm',
         day_outside:
           'day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground',
-        day_disabled: 'text-muted-foreground opacity-50',
+        day_disabled:
+          'text-muted-foreground opacity-50 bg-gray-100 line-through',
         day_range_middle:
           'aria-selected:bg-accent aria-selected:text-accent-foreground',
         day_hidden: 'invisible',

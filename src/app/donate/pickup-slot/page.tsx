@@ -147,6 +147,45 @@ export default function PickupSlotPage() {
     router.push('/donate/summary');
   };
 
+  // Helper function to check if a time slot conflicts with existing slots
+  const isTimeSlotConflicting = (time: string, isStartTime: boolean = true) => {
+    if (!currentSlot.date) return false;
+
+    const currentDateString = currentSlot.date.toDateString();
+
+    // Find existing slots on the same date (excluding current slot being edited)
+    const conflictingSlots = pickupSlots.filter((slot) => {
+      if (slot.id === currentSlot.id) return false; // Exclude current slot being edited
+      if (!slot.date) return false;
+      const slotDate =
+        slot.date instanceof Date ? slot.date : new Date(slot.date);
+      return slotDate.toDateString() === currentDateString;
+    });
+
+    // Check if the time conflicts with any existing slot
+    return conflictingSlots.some((slot) => {
+      if (isStartTime) {
+        // For start time, check if it falls within any existing slot's time range
+        // or if it would make the current slot overlap with existing slots
+        return (
+          (time >= slot.startTime && time < slot.endTime) ||
+          (currentSlot.endTime &&
+            time < currentSlot.endTime &&
+            currentSlot.endTime > slot.startTime)
+        );
+      } else {
+        // For end time, check if it falls within any existing slot's time range
+        // or if it would make the current slot overlap with existing slots
+        return (
+          (time > slot.startTime && time <= slot.endTime) ||
+          (currentSlot.startTime &&
+            time > currentSlot.startTime &&
+            currentSlot.startTime < slot.endTime)
+        );
+      }
+    });
+  };
+
   const isFormValid =
     currentSlot.date && currentSlot.startTime && currentSlot.endTime;
 
@@ -309,13 +348,58 @@ export default function PickupSlotPage() {
                       setIsCalendarOpen(false);
                     }}
                     initialFocus
-                    disabled={(date) =>
-                      date < new Date(new Date().setHours(0, 0, 0, 0))
-                    }
+                    disabled={(date) => {
+                      // Disable past dates
+                      if (date < new Date(new Date().setHours(0, 0, 0, 0))) {
+                        return true;
+                      }
+
+                      // Don't disable dates just because they're used - allow same date with different times
+                      // The time conflict prevention will handle overlapping times
+                      return false;
+                    }}
                   />
                 </PopoverContent>
               </Popover>
             </div>
+
+            {/* Show existing slots for the selected date - only if there are existing slots */}
+            {currentSlot.date &&
+              pickupSlots.filter((slot) => {
+                if (slot.id === currentSlot.id) return false; // Exclude current slot being edited
+                if (!slot.date) return false;
+                const slotDate =
+                  slot.date instanceof Date ? slot.date : new Date(slot.date);
+                return (
+                  slotDate.toDateString() === currentSlot.date!.toDateString()
+                );
+              }).length > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <h4 className="text-sm font-semibold text-blue-800 mb-2">
+                    Existing pickup slots on{' '}
+                    {format(currentSlot.date, 'dd.M.yyyy')}:
+                  </h4>
+                  {pickupSlots
+                    .filter((slot) => {
+                      if (slot.id === currentSlot.id) return false; // Exclude current slot being edited
+                      if (!slot.date) return false;
+                      const slotDate =
+                        slot.date instanceof Date
+                          ? slot.date
+                          : new Date(slot.date);
+                      return (
+                        slotDate.toDateString() ===
+                        currentSlot.date!.toDateString()
+                      );
+                    })
+                    .map((slot, index) => (
+                      <div key={slot.id} className="text-sm text-blue-700 mb-1">
+                        {index + 1}. {slot.startTime} - {slot.endTime}
+                      </div>
+                    ))}
+                </div>
+              )}
+
             {/* Time Pickers */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -348,22 +432,40 @@ export default function PickupSlotPage() {
                     align="start"
                   >
                     <div className="max-h-60 overflow-y-auto">
-                      {timeOptions.map((option) => (
-                        <div
-                          key={option}
-                          className={cn(
-                            'px-4 py-2 cursor-pointer hover:bg-[#eafcd6] text-black',
-                            currentSlot.startTime === option &&
-                              'bg-[#eafcd6] font-semibold'
-                          )}
-                          onClick={() => {
-                            handleCurrentSlotChange('startTime', option);
-                            setOpenPopover(null);
-                          }}
-                        >
-                          {option}
-                        </div>
-                      ))}
+                      {timeOptions.map((option) => {
+                        const isConflicting = isTimeSlotConflicting(
+                          option,
+                          true
+                        );
+                        const isSelected = currentSlot.startTime === option;
+                        return (
+                          <div
+                            key={option}
+                            className={cn(
+                              'px-4 py-2 text-black',
+                              isConflicting
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed line-through'
+                                : 'cursor-pointer hover:bg-[#eafcd6]',
+                              isSelected &&
+                                !isConflicting &&
+                                'bg-[#eafcd6] font-semibold'
+                            )}
+                            onClick={() => {
+                              if (!isConflicting) {
+                                handleCurrentSlotChange('startTime', option);
+                                setOpenPopover(null);
+                              }
+                            }}
+                          >
+                            {option}
+                            {isConflicting && (
+                              <span className="text-xs ml-2">
+                                (Already selected)
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -396,22 +498,40 @@ export default function PickupSlotPage() {
                     align="start"
                   >
                     <div className="max-h-60 overflow-y-auto">
-                      {timeOptions.map((option) => (
-                        <div
-                          key={option}
-                          className={cn(
-                            'px-4 py-2 cursor-pointer hover:bg-[#eafcd6] text-black',
-                            currentSlot.endTime === option &&
-                              'bg-[#eafcd6] font-semibold'
-                          )}
-                          onClick={() => {
-                            handleCurrentSlotChange('endTime', option);
-                            setOpenPopover(null);
-                          }}
-                        >
-                          {option}
-                        </div>
-                      ))}
+                      {timeOptions.map((option) => {
+                        const isConflicting = isTimeSlotConflicting(
+                          option,
+                          false
+                        );
+                        const isSelected = currentSlot.endTime === option;
+                        return (
+                          <div
+                            key={option}
+                            className={cn(
+                              'px-4 py-2 text-black',
+                              isConflicting
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed line-through'
+                                : 'cursor-pointer hover:bg-[#eafcd6]',
+                              isSelected &&
+                                !isConflicting &&
+                                'bg-[#eafcd6] font-semibold'
+                            )}
+                            onClick={() => {
+                              if (!isConflicting) {
+                                handleCurrentSlotChange('endTime', option);
+                                setOpenPopover(null);
+                              }
+                            }}
+                          >
+                            {option}
+                            {isConflicting && (
+                              <span className="text-xs ml-2">
+                                (Already selected)
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </PopoverContent>
                 </Popover>
