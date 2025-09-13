@@ -150,11 +150,11 @@ class DeviceCapabilityDetector {
     const isMobile = this.detectMobile();
 
     if (memory < 2 || this.detectLowEndDevice()) {
-      return 2 * 1024 * 1024; // 2MB for low-end devices
+      return 3 * 1024 * 1024; // 3MB for low-end devices
     } else if (memory < 4 || isMobile) {
-      return 5 * 1024 * 1024; // 5MB for mid-range devices
+      return 8 * 1024 * 1024; // 8MB for mid-range devices
     } else {
-      return 10 * 1024 * 1024; // 10MB for high-end devices
+      return 15 * 1024 * 1024; // 15MB for high-end devices
     }
   }
 
@@ -168,20 +168,20 @@ class DeviceCapabilityDetector {
 
     if (isLowEnd || memory < 2) {
       return {
-        maxWidth: 600,
-        quality: 0.6,
+        maxWidth: 800, // Increased from 600
+        quality: 0.7, // Increased from 0.6
         useWorker: false, // Avoid worker overhead on low-end devices
       };
     } else if (memory < 4 || isMobile) {
       return {
-        maxWidth: 800,
-        quality: 0.7,
+        maxWidth: 1200, // Increased from 800
+        quality: 0.8, // Increased from 0.7
         useWorker: true,
       };
     } else {
       return {
-        maxWidth: 1200,
-        quality: 0.8,
+        maxWidth: 1600, // Increased from 1200
+        quality: 0.85, // Increased from 0.8
         useWorker: true,
       };
     }
