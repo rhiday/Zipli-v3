@@ -39,6 +39,9 @@ export const fi = {
   profile: 'Profiili',
   logout: 'Kirjaudu ulos',
   giveFeedback: 'Anna palautetta',
+  activities: 'Toiminnot',
+  routes: 'Reitit',
+  help: 'Ohjeet',
 
   // Success confirmations
   claimConfirmed: 'Varauksesi vahvistettu!',
@@ -121,6 +124,14 @@ export const fi = {
   exportImpactReport: 'Täältä näet lisää vaikuttavuusdataa',
   requestHistoryAndImpactData:
     'Siirry tarkastelemaan lisää sosiaalisen ja ympäristövaikutuksen dataa raportointia ja suunnittelua varten',
+  date: 'Noutopäivä',
+  sortBy: 'Järjestä',
+  sortByDate: 'Päivä (uusin ensin)',
+  sortByItemName: 'Tuotenimi (A–Ö)',
+  sortByOrganization: 'Organisaatio (A–Ö)',
+  sortByQuantity: 'Määrä (suurin → pienin)',
+  allTypes: 'Kaikki tyypit',
+  requests: 'Pyynnöt',
   exportToPdf: 'Vie PDF:ksi',
   environmentalAndSocialImpactData:
     'Keräämämme vaikuttavuusdata auttaa raportoimaan, viestimään ja suunnittelemaan toimintaa entistä paremmin.',
@@ -653,6 +664,10 @@ export const fi = {
   storageUtilization: 'Varastotason käyttö',
   processingEfficiency: 'Käsittelyn tehokkuus',
   activeRoutes: 'Aktiiviset reitit',
+  upcoming: 'Tulevat',
+  nextPickupsDeliveries: 'Seuraavat noudot ja toimitukset',
+  noUpcomingItems: 'Ei tulevia kohteita.',
+  terminalOverviewSubtitle: 'Nopea yleiskatsaus terminaalille.',
   incomingDonations: 'Saapuvat lahjoitukset',
   deliveryRequests: 'Toimituspyynnöt',
   searchOrganizations: 'Hae organisaatioita, ruoka-aineita, kuvauksia...',
