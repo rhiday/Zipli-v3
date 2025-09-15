@@ -211,6 +211,7 @@ export default function DonationSummaryPage() {
           quantity: parseInt(item.quantity) || 1,
           pickup_slots: formattedSlots,
           instructions_for_driver: instructions || null,
+          address: address || null,
         });
 
         console.log('✅ Donation updated successfully');
@@ -278,6 +279,7 @@ export default function DonationSummaryPage() {
             pickup_slots: formattedSlots,
             pickup_time: null,
             instructions_for_driver: instructions || null,
+            address: address || null,
           };
 
           console.log('💾 Creating donation with data:', donationData);

@@ -119,6 +119,7 @@ export type Database = {
       };
       donations: {
         Row: {
+          address: string | null;
           claimed_at: string | null;
           created_at: string;
           donor_id: string;
@@ -126,8 +127,6 @@ export type Database = {
           food_item_id: string;
           id: string;
           instructions_for_driver: string | null;
-          latitude: number | null;
-          longitude: number | null;
           picked_up_at: string | null;
           pickup_slots: Json | null;
           pickup_time: string | null;
@@ -141,6 +140,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          address?: string | null;
           claimed_at?: string | null;
           created_at?: string;
           donor_id: string;
@@ -148,8 +148,6 @@ export type Database = {
           food_item_id: string;
           id?: string;
           instructions_for_driver?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           picked_up_at?: string | null;
           pickup_slots?: Json | null;
           pickup_time?: string | null;
@@ -163,6 +161,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          address?: string | null;
           claimed_at?: string | null;
           created_at?: string;
           donor_id?: string;
@@ -170,8 +169,6 @@ export type Database = {
           food_item_id?: string;
           id?: string;
           instructions_for_driver?: string | null;
-          latitude?: number | null;
-          longitude?: number | null;
           picked_up_at?: string | null;
           pickup_slots?: Json | null;
           pickup_time?: string | null;
@@ -365,8 +362,6 @@ export type Database = {
           id: string;
           instructions: string | null;
           is_recurring: boolean;
-          latitude: number | null;
-          longitude: number | null;
           people_count: number;
           pickup_date: string;
           pickup_end_time: string;
@@ -388,8 +383,6 @@ export type Database = {
           id?: string;
           instructions?: string | null;
           is_recurring?: boolean;
-          latitude?: number | null;
-          longitude?: number | null;
           people_count?: number;
           pickup_date: string;
           pickup_end_time: string;
@@ -411,8 +404,6 @@ export type Database = {
           id?: string;
           instructions?: string | null;
           is_recurring?: boolean;
-          latitude?: number | null;
-          longitude?: number | null;
           people_count?: number;
           pickup_date?: string;
           pickup_end_time?: string;
