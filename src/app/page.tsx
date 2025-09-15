@@ -17,7 +17,7 @@ export default function HomePage() {
         // Redirect based on user role
         switch (currentUser.role) {
           case 'food_donor':
-            router.push('/donor/dashboard');
+            router.push('/donate');
             break;
           case 'food_receiver':
             router.push('/receiver/dashboard');

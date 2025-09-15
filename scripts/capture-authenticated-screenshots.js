@@ -30,7 +30,7 @@ const AUTH_PAGES = [
   },
   {
     name: 'donor-dashboard',
-    path: '/donor/dashboard',
+    path: '/donate',
     title: 'Donor Dashboard',
     description: 'Dashboard for food donors showing donations and impact',
     states: ['default'],
