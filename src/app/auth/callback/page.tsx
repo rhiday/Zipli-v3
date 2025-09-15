@@ -40,7 +40,7 @@ export default function AuthCallback() {
           const role = profile.role as Database['public']['Enums']['user_role'];
           switch (role) {
             case 'food_donor':
-              router.push('/donor/dashboard');
+              router.push('/donate');
               break;
             case 'food_receiver':
               router.push('/receiver/dashboard');
