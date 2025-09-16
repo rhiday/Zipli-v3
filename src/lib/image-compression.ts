@@ -102,7 +102,7 @@ class ImageCompressor {
     const {
       maxWidth = 800,
       quality = 0.8,
-      maxMemoryUsage = 50 * 1024 * 1024, // 50MB
+      maxMemoryUsage = 200 * 1024 * 1024, // 200MB
       useWorker = true,
     } = options;
 
@@ -158,6 +158,16 @@ class ImageCompressor {
 
       img.onload = () => {
         try {
+          // Check memory usage before processing
+          const estimatedMemory = img.width * img.height * 4; // 4 bytes per pixel
+          const maxMemoryUsage = 200 * 1024 * 1024; // 200MB
+
+          if (estimatedMemory > maxMemoryUsage) {
+            console.warn(
+              `Large image detected: ${(estimatedMemory / 1024 / 1024).toFixed(1)}MB memory required`
+            );
+          }
+
           // Calculate new dimensions
           const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
           canvas.width = img.width * ratio;

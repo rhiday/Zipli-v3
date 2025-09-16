@@ -463,7 +463,7 @@ function ManualDonationPageInner() {
 
   const handleBackClick = () => {
     if (isEditMode) {
-      router.push('/donor/dashboard');
+      router.push('/donate');
     } else {
       // Go to donate main page instead of using browser back
       router.push('/donate');

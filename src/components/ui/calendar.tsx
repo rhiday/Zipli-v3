@@ -27,6 +27,24 @@ function Calendar({
       weekStartsOn={1}
       showOutsideDays={showOutsideDays}
       className={cn('p-3', className)}
+      modifiers={{
+        today: new Date(),
+      }}
+      modifiersStyles={{
+        today: {
+          backgroundColor: '#dbeafe',
+          color: '#1e3a8a',
+          fontWeight: 'bold',
+          border: '2px solid #93c5fd',
+          borderRadius: '6px',
+        },
+        selected: {
+          backgroundColor: '#16a34a',
+          color: 'white',
+          fontWeight: 'bold',
+          borderRadius: '6px',
+        },
+      }}
       classNames={{
         months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
         month: 'space-y-4',
@@ -53,16 +71,19 @@ function Calendar({
         day: cn(
           'inline-flex items-center justify-center rounded-md text-sm font-medium',
           'bg-transparent hover:bg-accent hover:text-accent-foreground',
-          'h-8 w-8 p-0 font-normal aria-selected:opacity-100'
+          'h-8 w-8 p-0 font-normal aria-selected:opacity-100',
+          'transition-colors duration-200'
         ),
         day_range_start: 'day-range-start',
         day_range_end: 'day-range-end',
         day_selected:
-          'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground',
-        day_today: 'bg-accent text-accent-foreground',
+          '!bg-green-600 !text-white hover:!bg-green-700 hover:!text-white focus:!bg-green-700 focus:!text-white !font-semibold',
+        day_today:
+          '!bg-blue-100 !text-blue-900 !font-semibold !border-2 !border-blue-300 hover:!bg-blue-200 hover:!border-blue-400 !rounded-md !shadow-sm',
         day_outside:
           'day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground',
-        day_disabled: 'text-muted-foreground opacity-50',
+        day_disabled:
+          'text-muted-foreground opacity-50 bg-gray-100 line-through',
         day_range_middle:
           'aria-selected:bg-accent aria-selected:text-accent-foreground',
         day_hidden: 'invisible',

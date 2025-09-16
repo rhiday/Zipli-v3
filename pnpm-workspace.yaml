@@ -1,0 +1,6 @@
+ignoredBuiltDependencies:
+  - '@bundled-es-modules/glob'
+  - core-js
+  - sharp
+  - style-dictionary
+  - unrs-resolver

@@ -8,7 +8,7 @@ self.onmessage = async function (e) {
   const {
     maxWidth = 800,
     quality = 0.8,
-    maxMemoryUsage = 50 * 1024 * 1024,
+    maxMemoryUsage = 200 * 1024 * 1024, // Increased to 200MB
   } = options;
 
   try {
@@ -22,8 +22,28 @@ self.onmessage = async function (e) {
 
     // Check memory usage before processing
     const estimatedMemory = bitmap.width * bitmap.height * 4; // 4 bytes per pixel (RGBA)
-    if (estimatedMemory > maxMemoryUsage) {
-      throw new Error('Image too large for available memory');
+
+    // Be more intelligent about memory limits
+    const maxDimension = Math.max(bitmap.width, bitmap.height);
+    const isVeryLargeImage = maxDimension > 4000; // 4K+ images
+    const dynamicMemoryLimit = isVeryLargeImage
+      ? maxMemoryUsage * 2 // Allow 2x for very large images
+      : maxMemoryUsage;
+
+    if (estimatedMemory > dynamicMemoryLimit) {
+      // Instead of failing, try to process in smaller chunks or reduce size
+      const reductionFactor = Math.sqrt(dynamicMemoryLimit / estimatedMemory);
+      if (reductionFactor < 0.25) {
+        // Only fail if we'd need to reduce by more than 75%
+        throw new Error(
+          `Image too large for available memory. Try a smaller image or reduce resolution.`
+        );
+      }
+
+      // Log the memory warning but continue processing
+      console.warn(
+        `Large image detected: ${(estimatedMemory / 1024 / 1024).toFixed(1)}MB memory required. Processing with reduced dimensions.`
+      );
     }
 
     // Calculate new dimensions

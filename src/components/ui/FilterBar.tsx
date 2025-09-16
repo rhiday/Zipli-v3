@@ -4,7 +4,7 @@ import { Button } from './button';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { Dialog, DialogContent, DialogTrigger } from './dialog';
 import { FilterIcon } from 'lucide-react';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import { useCommonTranslation } from '@/hooks/useTranslations';
 
 const TYPE_OPTIONS = [
   { label: 'Donations', value: 'donations' },
