@@ -390,11 +390,11 @@ export default function TerminalMatching() {
                 </p>
               </div>
               <div className="flex items-center gap-4">
-                <Button variant="outline">
+                <Button variant="secondary">
                   <Package className="w-4 h-4 mr-2" />
                   Näytä kaikki lahjoitukset
                 </Button>
-                <Button variant="outline">
+                <Button variant="secondary">
                   <Truck className="w-4 h-4 mr-2" />
                   Näytä kaikki pyynnöt
                 </Button>
