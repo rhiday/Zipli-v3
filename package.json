@@ -22,7 +22,10 @@
     "validate": "npm run type-check && npm run lint",
     "build:analyze": "ANALYZE=true npm run build",
     "build:check": "npm run build && npm run start",
-    "clean": "rm -rf .next node_modules/.cache"
+    "clean": "rm -rf .next node_modules/.cache",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -67,6 +70,7 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "@shadcn/ui": "^0.0.4",
     "@types/node": "^22.15.3",
     "@types/react": "18.2.79",
@@ -77,6 +81,7 @@
     "eslint-config-next": "15.5.3",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
+    "playwright": "^1.55.0",
     "prettier": "^3.6.2",
     "tailwind-merge": "^3.2.0",
     "tailwindcss-animate": "^1.0.7",
