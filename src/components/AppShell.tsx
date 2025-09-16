@@ -24,7 +24,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
   const isDocsRoute = pathname.startsWith('/docs');
   const isDesktopDashboard =
-    pathname === '/city/dashboard' || pathname === '/terminal/dashboard';
+    pathname === '/city/dashboard' || pathname.startsWith('/terminal');
 
   return (
     <AuthProvider>
@@ -35,7 +35,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
           {children}
         </>
       ) : isDocsRoute || isDesktopDashboard ? (
-        /* Full-width layout for documentation pages and desktop dashboards */
+        /* Full-width layout for documentation pages and terminal desktop views */
         <div className="min-h-[100svh] bg-gray-50">{children}</div>
       ) : (
         /* Layout: A mobile-like container centered on all screen sizes */
