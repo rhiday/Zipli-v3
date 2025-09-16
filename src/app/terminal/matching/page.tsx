@@ -15,8 +15,19 @@ import {
   Eye,
   Calendar,
   ArrowRight,
+  User,
+  Phone,
+  AlertCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { ImageCarousel } from '@/components/ui/ImageCarousel';
+import { parseAllergens } from '@/lib/allergenUtils';
 
 type DonationItem = {
   id: string;
@@ -54,6 +65,12 @@ export default function TerminalMatching() {
   const [loading, setLoading] = useState(true);
   const [donations, setDonations] = useState<DonationItem[]>([]);
   const [requests, setRequests] = useState<RequestItem[]>([]);
+  const [selectedDonation, setSelectedDonation] = useState<DonationItem | null>(
+    null
+  );
+  const [selectedRequest, setSelectedRequest] = useState<RequestItem | null>(
+    null
+  );
 
   // Load data for matching
   const loadMatchingData = useCallback(async () => {
@@ -152,8 +169,8 @@ export default function TerminalMatching() {
         })
       );
 
-      setDonations(transformedDonations.slice(0, 10)); // Limit to recent items
-      setRequests(transformedRequests.slice(0, 10)); // Limit to recent items
+      setDonations(transformedDonations); // Show all available donations
+      setRequests(transformedRequests); // Show all available requests
     } catch (error) {
       console.error('Failed to load matching data:', error);
     } finally {
@@ -266,7 +283,11 @@ export default function TerminalMatching() {
                             {donation.status}
                           </span>
 
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedDonation(donation)}
+                          >
                             <Eye className="w-4 h-4" />
                           </Button>
                         </div>
@@ -365,7 +386,11 @@ export default function TerminalMatching() {
                             </span>
                           </div>
 
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedRequest(request)}
+                          >
                             <Eye className="w-4 h-4" />
                           </Button>
                         </div>
@@ -407,6 +432,371 @@ export default function TerminalMatching() {
           </div>
         </div>
       </div>
+
+      {/* Donation Details Modal */}
+      <Dialog
+        open={!!selectedDonation}
+        onOpenChange={() => setSelectedDonation(null)}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Lahjoituksen yksityiskohdat</DialogTitle>
+          </DialogHeader>
+          {selectedDonation && (
+            <div className="space-y-6 pb-6">
+              {/* Images Section */}
+              {selectedDonation.raw_data?.food_items &&
+                (selectedDonation.raw_data.food_items.image_urls ||
+                  selectedDonation.raw_data.food_items.image_url) && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-2">
+                      Kuvat
+                    </h3>
+                    <ImageCarousel
+                      images={
+                        selectedDonation.raw_data.food_items.image_urls
+                          ? Array.isArray(
+                              selectedDonation.raw_data.food_items.image_urls
+                            )
+                            ? (selectedDonation.raw_data.food_items
+                                .image_urls as string[])
+                            : [selectedDonation.raw_data.food_items.image_urls]
+                          : selectedDonation.raw_data.food_items.image_url
+                            ? [selectedDonation.raw_data.food_items.image_url]
+                            : []
+                      }
+                      alt={selectedDonation.item_name}
+                      className="rounded-lg"
+                    />
+                  </div>
+                )}
+
+              {/* Basic Information */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Tuotteen nimi
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {selectedDonation.item_name}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Kategoria
+                  </label>
+                  <p className="text-gray-900">
+                    {selectedDonation.food_category}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Määrä
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {selectedDonation.quantity}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Tila
+                  </label>
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedDonation.status === 'available'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {selectedDonation.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Description */}
+              {selectedDonation.raw_data?.food_items?.description && (
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Kuvaus
+                  </label>
+                  <p className="text-gray-900 mt-1">
+                    {selectedDonation.raw_data.food_items.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Donor Information */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <User className="w-4 h-4 mr-2" />
+                  Lahjoittajan tiedot
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Organisaatio
+                    </label>
+                    <p className="text-gray-900">
+                      {selectedDonation.organization_name}
+                    </p>
+                  </div>
+                  {selectedDonation.raw_data?.profiles?.contact_number && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">
+                        Puhelin
+                      </label>
+                      <p className="text-gray-900 flex items-center">
+                        <Phone className="w-3 h-3 mr-1" />
+                        {selectedDonation.raw_data.profiles.contact_number}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Pickup Information */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <Truck className="w-4 h-4 mr-2" />
+                  Noutoajankohta
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Sijainti
+                    </label>
+                    <p className="text-gray-900 flex items-center">
+                      <MapPin className="w-3 h-3 mr-1" />
+                      {selectedDonation.location}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Aika
+                    </label>
+                    <p className="text-gray-900 flex items-center">
+                      <Clock className="w-3 h-3 mr-1" />
+                      {selectedDonation.pickup_time}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedDonation.raw_data?.instructions_for_driver && (
+                  <div className="mt-3">
+                    <label className="text-sm font-medium text-gray-600">
+                      Ohjeet kuljettajalle
+                    </label>
+                    <p className="text-gray-900 mt-1 text-sm bg-blue-50 p-2 rounded">
+                      {selectedDonation.raw_data.instructions_for_driver}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Allergens */}
+              {selectedDonation.raw_data?.food_items?.allergens && (
+                <div className="border-t pt-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    Allergeenit
+                  </h3>
+                  <div className="flex flex-wrap gap-1">
+                    {parseAllergens(
+                      selectedDonation.raw_data.food_items.allergens
+                    ).map((allergen) => (
+                      <span
+                        key={allergen}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                      >
+                        {allergen}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Expiry Date */}
+              {selectedDonation.raw_data?.food_items?.expires_at && (
+                <div className="border-t pt-4">
+                  <label className="text-sm font-medium text-gray-600">
+                    Viimeinen käyttöpäivä
+                  </label>
+                  <p className="text-gray-900">
+                    {new Date(
+                      selectedDonation.raw_data.food_items.expires_at
+                    ).toLocaleDateString('fi-FI')}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Request Details Modal */}
+      <Dialog
+        open={!!selectedRequest}
+        onOpenChange={() => setSelectedRequest(null)}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Pyynnön yksityiskohdat</DialogTitle>
+          </DialogHeader>
+          {selectedRequest && (
+            <div className="space-y-6 pb-6">
+              {/* Basic Information */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Kuvaus
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {selectedRequest.description}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Henkilömäärä
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {selectedRequest.people_count} henkilöä
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Tila
+                  </label>
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedRequest.status === 'active'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {selectedRequest.status}
+                  </span>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Kiireellisyys
+                  </label>
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedRequest.urgency === 'high'
+                        ? 'bg-red-100 text-red-800'
+                        : selectedRequest.urgency === 'medium'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {selectedRequest.urgency}
+                  </span>
+                </div>
+              </div>
+
+              {/* Organization Information */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <User className="w-4 h-4 mr-2" />
+                  Vastaanottajan tiedot
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Organisaatio
+                    </label>
+                    <p className="text-gray-900">
+                      {selectedRequest.organization_name}
+                    </p>
+                  </div>
+                  {selectedRequest.raw_data?.profiles?.contact_number && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">
+                        Puhelin
+                      </label>
+                      <p className="text-gray-900 flex items-center">
+                        <Phone className="w-3 h-3 mr-1" />
+                        {selectedRequest.raw_data.profiles.contact_number}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Delivery Information */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <Truck className="w-4 h-4 mr-2" />
+                  Toimitustiedot
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Sijainti
+                    </label>
+                    <p className="text-gray-900 flex items-center">
+                      <MapPin className="w-3 h-3 mr-1" />
+                      {selectedRequest.location}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Toimitusaika
+                    </label>
+                    <p className="text-gray-900 flex items-center">
+                      <Clock className="w-3 h-3 mr-1" />
+                      {selectedRequest.delivery_time}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedRequest.raw_data?.driver_instructions && (
+                  <div className="mt-3">
+                    <label className="text-sm font-medium text-gray-600">
+                      Ohjeet kuljettajalle
+                    </label>
+                    <p className="text-gray-900 mt-1 text-sm bg-blue-50 p-2 rounded">
+                      {selectedRequest.raw_data.driver_instructions}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Recurring Information */}
+              {selectedRequest.is_recurring && (
+                <div className="border-t pt-4">
+                  <label className="text-sm font-medium text-gray-600">
+                    Toistuva pyyntö
+                  </label>
+                  <p className="text-gray-900 mt-1 text-sm bg-purple-50 p-2 rounded flex items-center">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    Tämä on toistuva pyyntö
+                  </p>
+                </div>
+              )}
+
+              {/* Dietary Requirements */}
+              {selectedRequest.raw_data?.allergies_intolerances && (
+                <div className="border-t pt-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                    <AlertCircle className="w-4 h-4 mr-2" />
+                    Ruokavaliovaatimukset
+                  </h3>
+                  <p className="text-gray-900 text-sm bg-yellow-50 p-2 rounded">
+                    {selectedRequest.raw_data.allergies_intolerances}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </TerminalUIShell>
   );
 }

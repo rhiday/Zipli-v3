@@ -33,6 +33,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ImageCarousel } from '@/components/ui/ImageCarousel';
+import { parseAllergens } from '@/lib/allergenUtils';
 
 // Unified type for terminal operations
 type TerminalItem = {
@@ -645,6 +647,34 @@ export default function TerminalOverview() {
           </DialogHeader>
           {selectedItem && (
             <div className="space-y-4 pb-6">
+              {/* Images Section - only for donations */}
+              {selectedItem.type === 'donation' &&
+                selectedItem.raw_data?.food_items &&
+                (selectedItem.raw_data.food_items.image_urls ||
+                  selectedItem.raw_data.food_items.image_url) && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-2">
+                      Images
+                    </h3>
+                    <ImageCarousel
+                      images={
+                        selectedItem.raw_data.food_items.image_urls
+                          ? Array.isArray(
+                              selectedItem.raw_data.food_items.image_urls
+                            )
+                            ? (selectedItem.raw_data.food_items
+                                .image_urls as string[])
+                            : [selectedItem.raw_data.food_items.image_urls]
+                          : selectedItem.raw_data.food_items.image_url
+                            ? [selectedItem.raw_data.food_items.image_url]
+                            : []
+                      }
+                      alt={selectedItem.item_name}
+                      className="rounded-lg"
+                    />
+                  </div>
+                )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-gray-600">
