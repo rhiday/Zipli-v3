@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
 
-// Environment variables with fallbacks to prevent webpack errors
+// Environment variables with fallbacks to prevent bundler errors
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
   'https://vqtfcdnrgotgrnwwuryo.supabase.co';
