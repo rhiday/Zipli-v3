@@ -1,23 +1,22 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { useRouter, usePathname } from 'next/navigation';
-import { useDatabase } from '@/store';
-import { useAuth } from '@/components/auth/AuthProvider';
+import { Avatar } from '@/components/ui/Avatar';
 import { useCommonTranslation } from '@/hooks/useTranslations';
+import { cn, getInitials } from '@/lib/utils';
+import { useDatabase } from '@/store';
 import {
+  Activity,
   Building2,
-  MessageSquare,
   LayoutGrid,
   LifeBuoy,
+  MessageSquare,
   Route as RouteIcon,
-  Activity,
 } from 'lucide-react';
-import { Avatar } from '@/components/ui/Avatar';
-import { cn, getInitials } from '@/lib/utils';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import React from 'react';
 
 interface TerminalUIShellProps {
   children: React.ReactNode;
@@ -44,7 +43,7 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
     : 'U';
 
   return (
-    <div className="min-h-screen bg-cloud flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-cloud flex flex-col">
       {/* Desktop Header */}
       {/* Header spans full width; logo sits flush to the far left */}
       <header className="bg-earth text-white">

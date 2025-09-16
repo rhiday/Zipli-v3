@@ -519,13 +519,13 @@ export default function TerminalOverview() {
 
             {/* Table */}
             <div className="overflow-x-auto">
-              <table className="w-full min-w-full table-fixed">
+              <table className="w-full min-w-full">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28 sticky left-0 bg-gray-50 z-10">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
                       {t('date') || 'Date'}
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-[420px] sticky left-28 bg-gray-50 z-10">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-[420px]">
                       Item
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-32">
@@ -557,7 +557,7 @@ export default function TerminalOverview() {
                       key={item.id}
                       className="hover:bg-gray-50 transition-colors"
                     >
-                      <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap sticky left-0 bg-white">
+                      <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
                         {item.date_info ||
                           new Date(item.created_at).toLocaleDateString(
                             'en-FI',
@@ -568,7 +568,7 @@ export default function TerminalOverview() {
                             }
                           )}
                       </td>
-                      <td className="px-4 py-3 sticky left-28 bg-white">
+                      <td className="px-4 py-3">
                         <div className="flex items-start gap-2">
                           <span
                             className={`mt-0.5 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
