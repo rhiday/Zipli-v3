@@ -31,6 +31,8 @@ import {
   Filter,
   Package,
   Truck,
+  Leaf,
+  Building2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -79,43 +81,27 @@ export default function TerminalOverview() {
   );
   const [selectedItem, setSelectedItem] = useState<TerminalItem | null>(null);
 
-  // Terminal-specific analytics
+  // Terminal-specific analytics (from real data)
   const analytics = useMemo(() => {
     const donations = terminalItems.filter((item) => item.type === 'donation');
-    const requests = terminalItems.filter((item) => item.type === 'request');
 
-    const totalVolume = donations.reduce((sum, d) => {
-      const quantity = parseFloat(d.quantity.replace(/[^\d.]/g, '')) || 0;
+    const totalKg = donations.reduce((sum, d) => {
+      const quantity =
+        parseFloat(String(d.quantity).replace(/[^\d.]/g, '')) || 0;
       return sum + quantity;
     }, 0);
 
-    const processingItems = donations.filter(
-      (d) => d.processing_status === 'processing'
-    ).length;
-
-    const dispatchedItems = donations.filter(
-      (d) => d.processing_status === 'dispatched'
-    ).length;
-
-    const activeRoutes = new Set(
-      terminalItems.map((item) => item.route_id).filter(Boolean)
+    const activeOrganizations = new Set(
+      terminalItems.map((i) => i.organization_name).filter(Boolean)
     ).size;
 
-    // Calculate utilization percentage based on daily processing capacity
-    const maxCapacity = 500; // kg per day - realistic terminal capacity
-    const utilization =
-      totalVolume > 0
-        ? Math.min(100, Math.round((totalVolume / maxCapacity) * 100))
-        : 0;
+    const CO2_PER_KG = 2.5; // kg CO2e avoided per kg rescued
+    const co2SavedKg = Math.round(totalKg * CO2_PER_KG);
 
     return {
-      volumeProcessed: `${totalVolume.toFixed(1)}kg`,
-      storageUtilization: `${utilization}%`,
-      processingEfficiency:
-        donations.length > 0
-          ? `${Math.round((dispatchedItems / donations.length) * 100)}%`
-          : '0%',
-      activeRoutes,
+      totalKg: `${totalKg.toFixed(1)}kg`,
+      activeOrganizations,
+      co2Saved: `${co2SavedKg.toLocaleString()}kg CO₂e`,
     };
   }, [terminalItems]);
 
@@ -371,15 +357,15 @@ export default function TerminalOverview() {
       {/* Analytics Cards */}
       <section className="px-6 py-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg p-6 shadow-sm border">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    {t('volumeProcessed')}
+                    {t('totalKilos')}
                   </p>
                   <p className="text-3xl font-bold text-blue-600">
-                    {analytics.volumeProcessed}
+                    {analytics.totalKg}
                   </p>
                 </div>
                 <Package className="w-8 h-8 text-blue-600" />
@@ -390,13 +376,13 @@ export default function TerminalOverview() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    {t('storageUtilization')}
+                    {t('activeOrganizations')}
                   </p>
                   <p className="text-3xl font-bold text-purple-600">
-                    {analytics.storageUtilization}
+                    {analytics.activeOrganizations}
                   </p>
                 </div>
-                <BarChart3 className="w-8 h-8 text-purple-600" />
+                <Building2 className="w-8 h-8 text-purple-600" />
               </div>
             </div>
 
@@ -404,27 +390,13 @@ export default function TerminalOverview() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    {t('processingEfficiency')}
+                    {t('estimatedCO2')}
                   </p>
                   <p className="text-3xl font-bold text-green-600">
-                    {analytics.processingEfficiency}
+                    {analytics.co2Saved}
                   </p>
                 </div>
-                <Activity className="w-8 h-8 text-green-600" />
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    {t('activeRoutes')}
-                  </p>
-                  <p className="text-3xl font-bold text-orange-600">
-                    {analytics.activeRoutes}
-                  </p>
-                </div>
-                <Truck className="w-8 h-8 text-orange-600" />
+                <Leaf className="w-8 h-8 text-green-600" />
               </div>
             </div>
           </div>
