@@ -39,6 +39,9 @@ export const en = {
   profile: 'Profile',
   logout: 'Logout',
   giveFeedback: 'Give feedback',
+  activities: 'Activities',
+  routes: 'Routes',
+  help: 'Help',
 
   // Success confirmations
   claimConfirmed: 'Claim Confirmed!',
@@ -118,6 +121,14 @@ export const en = {
   exportImpactReport: 'Check out more impact data',
   requestHistoryAndImpactData:
     'Access more data on your social and environmental impact for reporting and planning',
+  date: 'Date',
+  sortBy: 'Sort by',
+  sortByDate: 'Date (newest first)',
+  sortByItemName: 'Item name (A–Z)',
+  sortByOrganization: 'Organization (A–Z)',
+  sortByQuantity: 'Quantity (high → low)',
+  allTypes: 'All Types',
+  requests: 'Requests',
   exportToPdf: 'Export to PDF',
   environmentalAndSocialImpactData:
     'Data on your financial, social and environmental impact helps with reporting, communicating and operation planning.',
@@ -532,6 +543,10 @@ export const en = {
   storageUtilization: 'Storage Utilization',
   processingEfficiency: 'Processing Efficiency',
   activeRoutes: 'Active Routes',
+  upcoming: 'Upcoming',
+  nextPickupsDeliveries: 'Next pickups and deliveries',
+  noUpcomingItems: 'No upcoming items.',
+  terminalOverviewSubtitle: 'Quick overview for the terminal.',
   incomingDonations: 'Incoming Donations',
   deliveryRequests: 'Delivery Requests',
   searchOrganizations: 'Search organizations, food items, descriptions...',

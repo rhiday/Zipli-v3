@@ -8,19 +8,22 @@ const nextConfig = {
   },
 
   // Optimize for production
-  experimental: {
-    optimizePackageImports: [
-      'lucide-react',
-      'framer-motion',
-      'recharts',
-      '@supabase/supabase-js',
-      'date-fns',
-      'react-hook-form',
-    ],
-  },
+  experimental:
+    process.env.NODE_ENV === 'production'
+      ? {
+          optimizePackageImports: [
+            'lucide-react',
+            'framer-motion',
+            'recharts',
+            '@supabase/supabase-js',
+            'date-fns',
+            'react-hook-form',
+          ],
+        }
+      : {},
 
   // Configure webpack for better tree shaking
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
     // Enable bundle analyzer when ANALYZE=true
     if (process.env.ANALYZE === 'true' && !isServer) {
       const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
@@ -31,7 +34,8 @@ const nextConfig = {
         })
       );
     }
-    if (!isServer) {
+    // Apply aggressive chunk splitting only in production client builds
+    if (!isServer && !dev) {
       // Replace react with preact in production for smaller bundle
       config.resolve.alias = {
         ...config.resolve.alias,
@@ -112,7 +116,7 @@ const nextConfig = {
 
   // Asset optimization
   assetPrefix: process.env.ASSET_PREFIX || '',
-  
+
   images: {
     remotePatterns: [
       {
