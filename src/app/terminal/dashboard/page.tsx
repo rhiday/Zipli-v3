@@ -525,31 +525,28 @@ export default function TerminalOverview() {
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
                       {t('date') || 'Date'}
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-[460px]">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-[420px]">
                       Item
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-40">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-32">
                       Pickup place
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-40">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-32">
                       Delivery place
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-32">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
                       Delivery status
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-56">
-                      Request description
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-20">
                       Requested qty
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-24">
                       Food category
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-32">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-20">
+                    <th className="px-2 py-3 text-left text-sm font-medium text-gray-900 min-w-14">
                       Actions
                     </th>
                   </tr>
@@ -594,7 +591,13 @@ export default function TerminalOverview() {
                                 : 'Request'}
                           </span>
                           <div className="text-sm text-gray-900">
-                            <div className="font-medium truncate max-w-[560px]">
+                            <div
+                              className={`font-medium max-w-[560px] ${
+                                item.type === 'request'
+                                  ? 'whitespace-normal break-words'
+                                  : 'truncate'
+                              }`}
+                            >
                               {item.organization_name} · {item.item_name} ·{' '}
                               {item.quantity}
                             </div>
@@ -622,9 +625,6 @@ export default function TerminalOverview() {
                         >
                           {item.delivery_status || '—'}
                         </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 truncate max-w-[16rem]">
-                        {item.request_description || '—'}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {item.requested_quantity ?? '—'}
@@ -671,7 +671,9 @@ export default function TerminalOverview() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          className="hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600"
                           onClick={() => setSelectedItem(item)}
+                          aria-label="Preview details"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -694,7 +696,7 @@ export default function TerminalOverview() {
 
       {/* Item Detail Modal */}
       <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl sm:max-w-3xl md:max-w-4xl">
           <DialogHeader>
             <DialogTitle>
               {selectedItem?.type === 'donation'
