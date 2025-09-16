@@ -44,7 +44,7 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
     : 'U';
 
   return (
-    <div className="min-h-screen bg-cloud flex flex-col">
+    <div className="min-h-screen bg-cloud flex flex-col overflow-x-hidden">
       {/* Desktop Header */}
       {/* Header spans full width; logo sits flush to the far left */}
       <header className="bg-earth text-white">
