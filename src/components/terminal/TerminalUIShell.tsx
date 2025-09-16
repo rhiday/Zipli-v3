@@ -111,16 +111,16 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
               </li>
               <li>
                 <Link
-                  href="/terminal/activities"
+                  href="/terminal/matching"
                   className={cn(
                     'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
-                    pathname === '/terminal/activities'
+                    pathname === '/terminal/matching'
                       ? 'bg-lime text-green-900 font-medium'
                       : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
                   )}
                 >
                   <Activity className="w-5 h-5" />
-                  <span>{t('activities')}</span>
+                  <span>{t('matching')}</span>
                 </Link>
               </li>
               <li>

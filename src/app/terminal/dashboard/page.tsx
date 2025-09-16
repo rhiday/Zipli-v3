@@ -1,192 +1,314 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { TerminalUIShell } from '@/components/terminal/TerminalUIShell';
 import { useDatabase } from '@/store';
 import { useCommonTranslation } from '@/lib/i18n-enhanced';
 import { supabase } from '@/lib/supabase/client';
+import { TerminalUIShell } from '@/components/terminal/TerminalUIShell';
 import { isTestData } from '@/lib/data-filters';
-import { Calendar, Package, Truck } from 'lucide-react';
+import { DatePicker } from '@/components/ui/DatePicker';
+import {
+  Truck,
+  Download,
+  Filter,
+  Calendar,
+  Package,
+  FileText,
+  Eye,
+  Activity,
+  BarChart3,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
-type UpcomingEvent = {
+// Unified type for terminal operations
+type TerminalItem = {
   id: string;
+  created_at: string;
   type: 'donation' | 'request';
-  title: string;
-  organization: string;
-  when: string; // ISO string
-  pickupDate: string | null; // ISO string for delivery pickup date
-  requestDate: string | null; // ISO string for request date
+  item_name: string;
+  organization_name: string;
+  category: string;
+  food_category?: string; // Food category like "Bakery", "Produce", etc.
+  quantity: string;
   status: string;
+  processing_status?: 'received' | 'processing' | 'dispatched';
+  urgency?: 'low' | 'medium' | 'high';
+  location: string;
+  time_info: string;
+  date_info?: string;
+  route_id?: string;
+  is_recurring?: boolean;
+  raw_data: any; // Keep original data for modals
 };
 
 export default function TerminalOverview() {
   const router = useRouter();
   const { currentUser, isInitialized } = useDatabase();
   const { t } = useCommonTranslation();
-  const [loading, setLoading] = useState(true);
-  const [events, setEvents] = useState<UpcomingEvent[]>([]);
 
-  const loadUpcoming = useCallback(async () => {
+  const [loading, setLoading] = useState(true);
+  const [terminalItems, setTerminalItems] = useState<TerminalItem[]>([]);
+  // Search removed per design change
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [sortKey, setSortKey] = useState<'date' | 'name' | 'org' | 'qty'>(
+    'date'
+  );
+  const [selectedItem, setSelectedItem] = useState<TerminalItem | null>(null);
+
+  // Terminal-specific analytics
+  const analytics = useMemo(() => {
+    const donations = terminalItems.filter((item) => item.type === 'donation');
+    const requests = terminalItems.filter((item) => item.type === 'request');
+
+    const totalVolume = donations.reduce((sum, d) => {
+      const quantity = parseFloat(d.quantity.replace(/[^\d.]/g, '')) || 0;
+      return sum + quantity;
+    }, 0);
+
+    const processingItems = donations.filter(
+      (d) => d.processing_status === 'processing'
+    ).length;
+
+    const dispatchedItems = donations.filter(
+      (d) => d.processing_status === 'dispatched'
+    ).length;
+
+    const activeRoutes = new Set(
+      terminalItems.map((item) => item.route_id).filter(Boolean)
+    ).size;
+
+    // Calculate utilization percentage based on daily processing capacity
+    const maxCapacity = 500; // kg per day - realistic terminal capacity
+    const utilization =
+      totalVolume > 0
+        ? Math.min(100, Math.round((totalVolume / maxCapacity) * 100))
+        : 0;
+
+    return {
+      volumeProcessed: `${totalVolume.toFixed(1)}kg`,
+      storageUtilization: `${utilization}%`,
+      processingEfficiency:
+        donations.length > 0
+          ? `${Math.round((dispatchedItems / donations.length) * 100)}%`
+          : '0%',
+      activeRoutes,
+    };
+  }, [terminalItems]);
+
+  // Load data with network optimization
+  const loadData = useCallback(async () => {
     if (!isInitialized || !currentUser) return;
+
     setLoading(true);
     try {
+      // Get real data from Supabase
       const [donationsResponse, requestsResponse] = await Promise.all([
-        supabase
-          .from('donations')
-          .select(
-            `*, food_items (*), profiles!donor_id (full_name, organization_name, email)`
-          ),
-        supabase
-          .from('requests')
-          .select(`*, profiles (full_name, organization_name, email)`),
+        supabase.from('donations').select(`
+            *,
+            food_items (*),
+            profiles!donor_id (full_name, organization_name, email)
+          `),
+        supabase.from('requests').select(`
+            *,
+            profiles (full_name, organization_name, email)
+          `),
       ]);
 
-      const donations = (donationsResponse.data || []).filter(
+      if (donationsResponse.error) {
+        console.error('Error fetching donations:', donationsResponse.error);
+        setLoading(false);
+        return;
+      }
+
+      if (requestsResponse.error) {
+        console.error('Error fetching requests:', requestsResponse.error);
+        setLoading(false);
+        return;
+      }
+
+      const donationsData = donationsResponse.data || [];
+      const requestsData = requestsResponse.data || [];
+
+      // Filter out test data before transformation
+      const filteredDonations = donationsData.filter(
         (d: any) =>
           !isTestData(d.profiles?.email, d.profiles?.organization_name)
       );
-      const requests = (requestsResponse.data || []).filter(
+      const filteredRequests = requestsData.filter(
         (r: any) =>
           !isTestData(r.profiles?.email, r.profiles?.organization_name)
       );
 
-      const toDate = (value?: string | null) =>
-        value ? new Date(value) : null;
+      // Transform data into unified structure
+      const transformedDonations: TerminalItem[] = filteredDonations.map(
+        (d: any) => {
+          const processing_status =
+            d.status === 'picked_up' || d.status === 'completed'
+              ? 'dispatched'
+              : d.status === 'claimed' || d.status === 'in_progress'
+                ? 'processing'
+                : d.status === 'available' || d.status === 'posted'
+                  ? 'received'
+                  : 'received';
 
-      const combineDateTime = (
-        dateStr?: string | null,
-        timeStr?: string | null
-      ) => {
-        if (!dateStr || !timeStr) return null;
-        try {
-          const [h, m] = (timeStr as string)
-            .split(':')
-            .map((v) => parseInt(v, 10));
-          const d = new Date(dateStr as string);
-          if (isNaN(d.getTime())) return null;
-          d.setHours(h || 0, m || 0, 0, 0);
-          return d;
-        } catch {
-          return null;
-        }
-      };
-
-      const readSlot = (slot: any): Date | null => {
-        if (!slot) return null;
-        // Support different shapes: {date, start_time} or {date, start}
-        if (slot.date && (slot.start_time || slot.start)) {
-          return combineDateTime(slot.date, slot.start_time || slot.start);
-        }
-        // Sometimes donation has a single ISO datetime under slot.start
-        if (
-          slot.start &&
-          typeof slot.start === 'string' &&
-          slot.start.includes('T')
-        ) {
-          const d = new Date(slot.start);
-          return isNaN(d.getTime()) ? null : d;
-        }
-        return null;
-      };
-
-      const donationEvents: UpcomingEvent[] = donations
-        .map((d: any) => {
-          const slot0 = Array.isArray(d.pickup_slots)
-            ? d.pickup_slots[0]
-            : null;
-          const whenDate: Date | null =
-            // Explicit datetime
-            (d.pickup_time ? toDate(d.pickup_time) : null) ||
-            // Slot-based
-            readSlot(slot0) ||
-            // Fallback: created time (acts as last resort)
-            toDate(d.created_at);
-          const when = whenDate ? whenDate.toISOString() : d.created_at;
-
-          // Extract pickup date (for donations, this is the delivery pickup date)
-          const pickupDate = whenDate
-            ? whenDate.toISOString()
-            : d.pickup_time || null;
-
-          // Request date is when the donation was created
-          const requestDate = d.created_at;
+          const dateInfo =
+            d.pickup_slots?.[0]?.date ||
+            d.pickup_date ||
+            new Date(d.created_at).toISOString();
 
           return {
             id: d.id,
+            created_at: d.created_at,
             type: 'donation' as const,
-            title: d.food_items?.name || 'Food Donation',
-            organization:
+            item_name: d.food_items?.name || 'Food Donation',
+            organization_name:
               d.profiles?.organization_name ||
               d.profiles?.full_name ||
-              'Unknown',
-            when,
-            pickupDate,
-            requestDate,
-            status: d.status || 'available',
+              'Unknown Donor',
+            category: 'Donation',
+            food_category: d.food_items?.category || 'Other',
+            quantity: `${parseFloat(d.quantity) || 0}${d.unit || 'kg'}`,
+            status: d.status,
+            processing_status,
+            location:
+              d.address ||
+              `${d.profiles?.organization_name || 'Unknown'} Location`,
+            time_info:
+              d.pickup_slots?.[0]?.start_time ||
+              d.pickup_start_time ||
+              new Date(d.created_at).toLocaleTimeString('en-FI', {
+                hour: '2-digit',
+                minute: '2-digit',
+              }),
+            date_info: new Date(dateInfo).toLocaleDateString('en-FI', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            }),
+            route_id: d.id.slice(-8),
+            raw_data: d,
           };
+        }
+      );
+
+      const transformedRequests: TerminalItem[] = filteredRequests.map(
+        (r: any) => ({
+          id: r.id,
+          created_at: r.created_at,
+          type: 'request' as const,
+          item_name: r.description || 'Food Request',
+          organization_name:
+            r.profiles?.organization_name ||
+            r.profiles?.full_name ||
+            'Unknown Receiver',
+          category: 'Request',
+          quantity: `${r.people_count || 0} people`,
+          status: r.status,
+          urgency: r.priority || 'medium',
+          location:
+            r.address ||
+            `${r.profiles?.organization_name || 'Unknown'} Location`,
+          time_info:
+            r.pickup_start_time && r.pickup_end_time
+              ? `${r.pickup_start_time}-${r.pickup_end_time}`
+              : new Date(r.created_at).toLocaleTimeString('en-FI', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                }),
+          date_info: new Date(r.pickup_date || r.created_at).toLocaleDateString(
+            'en-FI',
+            {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            }
+          ),
+          is_recurring: r.is_recurring || false,
+          raw_data: r,
         })
-        .filter((e) => !!e.when);
+      );
 
-      const requestEvents: UpcomingEvent[] = requests
-        .map((r: any) => {
-          const whenDate: Date | null =
-            // Combine pickup_date + start_time when available
-            (r.pickup_date && r.pickup_start_time
-              ? combineDateTime(r.pickup_date, r.pickup_start_time)
-              : null) || toDate(r.created_at);
-          const when = whenDate ? whenDate.toISOString() : r.created_at;
+      // Combine and sort by creation date (most recent first)
+      const allItems = [...transformedDonations, ...transformedRequests].sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
 
-          // For requests, pickup date is the scheduled pickup date
-          const pickupDate =
-            r.pickup_date && r.pickup_start_time
-              ? combineDateTime(
-                  r.pickup_date,
-                  r.pickup_start_time
-                )?.toISOString() || null
-              : null;
-
-          // Request date is when the request was created
-          const requestDate = r.created_at;
-
-          return {
-            id: r.id,
-            type: 'request' as const,
-            title: r.description?.split(' | ')[0] || 'Food Request',
-            organization:
-              r.profiles?.organization_name ||
-              r.profiles?.full_name ||
-              'Unknown',
-            when,
-            pickupDate,
-            requestDate,
-            status: r.status || 'active',
-          };
-        })
-        .filter((e) => !!e.when);
-
-      const now = Date.now();
-      const combined = [...donationEvents, ...requestEvents]
-        .filter((e) => {
-          const d = toDate(e.when);
-          return d ? d.getTime() >= now - 24 * 60 * 60 * 1000 : false; // allow up to 24h past for visibility
-        })
-        .sort((a, b) => new Date(a.when).getTime() - new Date(b.when).getTime())
-        .slice(0, 10);
-
-      setEvents(combined);
-    } catch (err) {
-      console.error('Failed to load upcoming events', err);
+      setTerminalItems(allItems);
+    } catch (error) {
+      console.error('Failed to load terminal dashboard data:', error);
     } finally {
       setLoading(false);
     }
   }, [isInitialized, currentUser]);
 
+  // Auto-refresh every 30 seconds for terminal operations
   useEffect(() => {
-    loadUpcoming();
-    const id = setInterval(loadUpcoming, 30000);
-    return () => clearInterval(id);
-  }, [loadUpcoming]);
+    loadData();
+    const interval = setInterval(loadData, 30000);
+    return () => clearInterval(interval);
+  }, [loadData]);
+
+  // Filter function for unified items
+  const filteredItems = useMemo(() => {
+    return terminalItems
+      .filter((item) => {
+        const matchesType = typeFilter === 'all' || item.type === typeFilter;
+
+        const matchesStatus =
+          statusFilter === 'all' ||
+          item.status === statusFilter ||
+          (item.processing_status && item.processing_status === statusFilter);
+
+        // Date filtering
+        const itemDate = new Date(item.created_at);
+        const matchesStartDate = !startDate || itemDate >= startDate;
+        const matchesEndDate = !endDate || itemDate <= endDate;
+
+        const pass =
+          matchesType && matchesStatus && matchesStartDate && matchesEndDate;
+        return pass;
+      })
+      .sort((a, b) => {
+        if (sortKey === 'name') {
+          return a.item_name.localeCompare(b.item_name);
+        }
+        if (sortKey === 'org') {
+          return a.organization_name.localeCompare(b.organization_name);
+        }
+        if (sortKey === 'qty') {
+          const qa = parseFloat(String(a.quantity).replace(/[^\d.]/g, '')) || 0;
+          const qb = parseFloat(String(b.quantity).replace(/[^\d.]/g, '')) || 0;
+          return qb - qa; // larger first
+        }
+        // date
+        const da = new Date(a.created_at).getTime();
+        const db = new Date(b.created_at).getTime();
+        return db - da; // newest first
+      });
+  }, [terminalItems, typeFilter, statusFilter, startDate, endDate, sortKey]);
+
+  // PDF Export function (lightweight)
+  const handlePrintExport = useCallback(() => {
+    window.print();
+  }, []);
 
   if (!isInitialized || loading) {
     return (
@@ -203,135 +325,438 @@ export default function TerminalOverview() {
 
   return (
     <TerminalUIShell>
-      {/* Page Header */}
+      {/* Page Header: Welcome below the navbar */}
       <div className="bg-white border-b border-gray-200 px-6 py-5">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-xl font-semibold text-gray-900">
-            {t('dashboard')}
-          </h1>
-          <p className="text-gray-600">{t('terminalOverviewSubtitle')}</p>
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">
+              {t('welcomeBack')},{' '}
+              {currentUser?.organization_name ||
+                currentUser?.full_name ||
+                'Terminal'}
+            </h1>
+            <p className="text-gray-600">{t('currentStatusAndMetrics')}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Calendar className="w-4 h-4" />
+              {new Date().toLocaleDateString('en-FI', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Upcoming */}
+      {/* Analytics Cards */}
       <section className="px-6 py-6">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-lg shadow-sm border">
-            <div className="p-4 border-b">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {t('upcoming')}
-              </h2>
-              <p className="text-gray-600 text-sm">
-                {t('nextPickupsDeliveries')}
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg p-6 shadow-sm border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    {t('volumeProcessed')}
+                  </p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    {analytics.volumeProcessed}
+                  </p>
+                </div>
+                <Package className="w-8 h-8 text-blue-600" />
+              </div>
             </div>
 
-            {events.length === 0 ? (
-              <div className="py-10 text-center text-gray-500">
-                {t('noUpcomingItems')}
+            <div className="bg-white rounded-lg p-6 shadow-sm border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    {t('storageUtilization')}
+                  </p>
+                  <p className="text-3xl font-bold text-purple-600">
+                    {analytics.storageUtilization}
+                  </p>
+                </div>
+                <BarChart3 className="w-8 h-8 text-purple-600" />
               </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Type
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Title
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Organization
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Pickup Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Request Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {events.map((e) => {
-                      const formatDate = (dateStr: string | null) => {
-                        if (!dateStr) return '-';
-                        const d = new Date(dateStr);
-                        if (isNaN(d.getTime())) return '-';
-                        return (
-                          d.toLocaleDateString('en-FI', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: '2-digit',
-                          }) +
-                          ' ' +
-                          d.toLocaleTimeString('en-FI', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        );
-                      };
+            </div>
 
-                      return (
-                        <tr key={e.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div
-                                className={`h-8 w-8 rounded-lg flex items-center justify-center ${
-                                  e.type === 'donation'
-                                    ? 'bg-blue-100 text-blue-700'
-                                    : 'bg-orange-100 text-orange-700'
-                                }`}
-                              >
-                                {e.type === 'donation' ? (
-                                  <Package className="w-4 h-4" />
-                                ) : (
-                                  <Truck className="w-4 h-4" />
-                                )}
-                              </div>
-                              <span className="ml-2 text-sm font-medium text-gray-900 capitalize">
-                                {e.type}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
-                              {e.title}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-600">
-                              {e.organization}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {formatDate(e.pickupDate)}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {formatDate(e.requestDate)}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 capitalize">
-                              {e.status}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            <div className="bg-white rounded-lg p-6 shadow-sm border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    {t('processingEfficiency')}
+                  </p>
+                  <p className="text-3xl font-bold text-green-600">
+                    {analytics.processingEfficiency}
+                  </p>
+                </div>
+                <Activity className="w-8 h-8 text-green-600" />
               </div>
-            )}
+            </div>
+
+            <div className="bg-white rounded-lg p-6 shadow-sm border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    {t('activeRoutes')}
+                  </p>
+                  <p className="text-3xl font-bold text-orange-600">
+                    {analytics.activeRoutes}
+                  </p>
+                </div>
+                <Truck className="w-8 h-8 text-orange-600" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Filters (search removed) */}
+      <section className="px-6 pb-6">
+        <div className="max-w-7xl mx-auto bg-white rounded-lg p-4 shadow-sm border">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Search removed */}
+
+            {/* Date Range Filter */}
+            <div className="flex items-center gap-2">
+              <DatePicker
+                date={startDate}
+                onDateChange={setStartDate}
+                placeholder="Start date"
+                className="w-40"
+              />
+              <span className="text-gray-400">to</span>
+              <DatePicker
+                date={endDate}
+                onDateChange={setEndDate}
+                placeholder="End date"
+                className="w-40"
+              />
+            </div>
+
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder={t('allTypes')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('allTypes')}</SelectItem>
+                <SelectItem value="donation">
+                  {t('donations') || 'Donations'}
+                </SelectItem>
+                <SelectItem value="request">{t('requests')}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-48">
+                <Filter className="w-4 h-4 mr-2" />
+                <SelectValue placeholder={t('allStatus')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('allStatus')}</SelectItem>
+                <SelectItem value="received">{t('received')}</SelectItem>
+                <SelectItem value="processing">{t('processing')}</SelectItem>
+                <SelectItem value="dispatched">{t('dispatched')}</SelectItem>
+                <SelectItem value="active">{t('active')}</SelectItem>
+                <SelectItem value="fulfilled">
+                  {t('terminalFulfilled')}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Sort by */}
+            <Select value={sortKey} onValueChange={(v) => setSortKey(v as any)}>
+              <SelectTrigger className="w-56">
+                <SelectValue placeholder={t('sortBy')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">{t('sortByDate')}</SelectItem>
+                <SelectItem value="name">{t('sortByItemName')}</SelectItem>
+                <SelectItem value="org">{t('sortByOrganization')}</SelectItem>
+                <SelectItem value="qty">{t('sortByQuantity')}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Export Button */}
+            <Button variant="secondary" onClick={handlePrintExport}>
+              <Download className="w-4 h-4 mr-2" />
+              {t('exportData')}
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content - Table Layout */}
+      <section className="px-6 pb-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm border">
+            <div className="p-4 border-b">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-gray-600" />
+                Terminal Operations ({filteredItems.length} items)
+              </h2>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-full">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
+                      {t('date') || 'Date'}
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-48">
+                      Item Name
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-24">
+                      Category
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-24">
+                      Quantity
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-40">
+                      Organization
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-32">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-20">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredItems.map((item) => (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
+                        {item.date_info ||
+                          new Date(item.created_at).toLocaleDateString(
+                            'en-FI',
+                            {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                            }
+                          )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-gray-900">
+                          {item.item_name}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            item.type === 'donation'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-orange-100 text-orange-800'
+                          }`}
+                        >
+                          {item.type === 'donation' ? (
+                            <Package className="w-3 h-3 mr-1" />
+                          ) : (
+                            <Truck className="w-3 h-3 mr-1" />
+                          )}
+                          {item.category}
+                        </span>
+                      </td>
+                      {/* Ruoka Category column removed as requested */}
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {item.quantity}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {item.organization_name}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col gap-1">
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              item.processing_status === 'dispatched' ||
+                              item.status === 'completed'
+                                ? 'bg-green-100 text-green-800'
+                                : item.processing_status === 'processing' ||
+                                    item.status === 'in_progress'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {item.processing_status || item.status}
+                          </span>
+                          {item.urgency && (
+                            <span
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                item.urgency === 'high'
+                                  ? 'bg-red-100 text-red-800'
+                                  : item.urgency === 'medium'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {item.urgency}
+                            </span>
+                          )}
+                          {item.is_recurring && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                              Recurring
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedItem(item)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {filteredItems.length === 0 && (
+                <div className="text-center py-12 text-gray-500">
+                  <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                  <p>No items match your current filters</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Item Detail Modal */}
+      <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedItem?.type === 'donation'
+                ? 'Donation Details'
+                : 'Request Details'}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedItem && (
+            <div className="space-y-4 pb-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Item Name
+                  </label>
+                  <p className="text-gray-900">{selectedItem.item_name}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Category
+                  </label>
+                  <p className="text-gray-900">{selectedItem.category}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Organization
+                  </label>
+                  <p className="text-gray-900">
+                    {selectedItem.organization_name}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Quantity
+                  </label>
+                  <p className="text-gray-900">{selectedItem.quantity}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Status
+                  </label>
+                  <p className="text-gray-900 capitalize">
+                    {selectedItem.status}
+                  </p>
+                </div>
+                {selectedItem.processing_status && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Processing Status
+                    </label>
+                    <p className="text-gray-900 capitalize">
+                      {selectedItem.processing_status}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {selectedItem.urgency && (
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Urgency
+                  </label>
+                  <p
+                    className={`capitalize font-medium ${
+                      selectedItem.urgency === 'high'
+                        ? 'text-red-600'
+                        : selectedItem.urgency === 'medium'
+                          ? 'text-yellow-600'
+                          : 'text-gray-600'
+                    }`}
+                  >
+                    {selectedItem.urgency}
+                  </p>
+                </div>
+              )}
+
+              {/* Location and time are not shown in terminal modal per design */}
+              {selectedItem.route_id && (
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Route ID
+                  </label>
+                  <p className="text-gray-900">{selectedItem.route_id}</p>
+                </div>
+              )}
+
+              {selectedItem.is_recurring && (
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Recurring
+                  </label>
+                  <p className="text-gray-900">Yes, this is a recurring item</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Print Styles */}
+      <style jsx global>{`
+        @media print {
+          body {
+            -webkit-print-color-adjust: exact;
+          }
+          .no-print {
+            display: none !important;
+          }
+          .print-only {
+            display: block !important;
+          }
+          .print-break {
+            page-break-after: always;
+          }
+        }
+      `}</style>
     </TerminalUIShell>
   );
 }

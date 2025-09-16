@@ -39,7 +39,7 @@ export const fi = {
   profile: 'Profiili',
   logout: 'Kirjaudu ulos',
   giveFeedback: 'Anna palautetta',
-  activities: 'Toiminnot',
+  matching: 'Sovittaminen',
   routes: 'Reitit',
   help: 'Ohjeet',
 
