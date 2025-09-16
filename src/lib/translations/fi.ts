@@ -42,6 +42,8 @@ export const fi = {
   matching: 'Kohtaanto',
   routes: 'Reitit',
   help: 'Ohjeet',
+  crm: 'CRM',
+  messages: 'Viesti',
 
   // Success confirmations
   claimConfirmed: 'Varauksesi vahvistettu!',

@@ -42,6 +42,8 @@ export const en = {
   activities: 'Activities',
   routes: 'Routes',
   help: 'Help',
+  crm: 'CRM',
+  messages: 'Messages',
 
   // Success confirmations
   claimConfirmed: 'Claim Confirmed!',

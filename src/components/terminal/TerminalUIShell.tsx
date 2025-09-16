@@ -139,6 +139,34 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
               </li>
               <li>
                 <Link
+                  href="/terminal/crm"
+                  className={cn(
+                    'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
+                    pathname === '/terminal/crm'
+                      ? 'bg-lime text-green-900 font-medium'
+                      : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
+                  )}
+                >
+                  <Building2 className="w-5 h-5" />
+                  <span>CRM</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terminal/viesti"
+                  className={cn(
+                    'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
+                    pathname === '/terminal/viesti'
+                      ? 'bg-lime text-green-900 font-medium'
+                      : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
+                  )}
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  <span>Viesti</span>
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/terminal/help"
                   className={cn(
                     'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
