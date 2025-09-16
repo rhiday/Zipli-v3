@@ -1,32 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { useDatabase } from '@/store';
-import { useCommonTranslation } from '@/lib/i18n-enhanced';
-import { supabase } from '@/lib/supabase/client';
 import { TerminalUIShell } from '@/components/terminal/TerminalUIShell';
-import { isTestData } from '@/lib/data-filters';
-import { DatePicker } from '@/components/ui/DatePicker';
-import {
-  Truck,
-  Download,
-  Filter,
-  Calendar,
-  Package,
-  FileText,
-  Eye,
-  Activity,
-  BarChart3,
-} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/Select';
+import { DatePicker } from '@/components/ui/DatePicker';
 import {
   Dialog,
   DialogContent,
@@ -34,7 +10,30 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ImageCarousel } from '@/components/ui/ImageCarousel';
-import { parseAllergens } from '@/lib/allergenUtils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
+import { isTestData } from '@/lib/data-filters';
+import { useCommonTranslation } from '@/lib/i18n-enhanced';
+import { supabase } from '@/lib/supabase/client';
+import { useDatabase } from '@/store';
+import {
+  Activity,
+  BarChart3,
+  Calendar,
+  Download,
+  Eye,
+  FileText,
+  Filter,
+  Package,
+  Truck,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 // Unified type for terminal operations
 type TerminalItem = {
@@ -54,6 +53,12 @@ type TerminalItem = {
   date_info?: string;
   route_id?: string;
   is_recurring?: boolean;
+  // NEW optional fields for extended columns
+  pickup_place?: string | null;
+  delivery_place?: string | null;
+  delivery_status?: string | null;
+  request_description?: string | null;
+  requested_quantity?: number | null;
   raw_data: any; // Keep original data for modals
 };
 
@@ -125,11 +130,12 @@ export default function TerminalOverview() {
         supabase.from('donations').select(`
             *,
             food_items (*),
-            profiles!donor_id (full_name, organization_name, email)
+            donor:profiles!donor_id (full_name, organization_name, email, address),
+            receiver:profiles!receiver_id (organization_name, address)
           `),
         supabase.from('requests').select(`
             *,
-            profiles (full_name, organization_name, email)
+            requester:profiles (full_name, organization_name, email, address)
           `),
       ]);
 
@@ -150,12 +156,11 @@ export default function TerminalOverview() {
 
       // Filter out test data before transformation
       const filteredDonations = donationsData.filter(
-        (d: any) =>
-          !isTestData(d.profiles?.email, d.profiles?.organization_name)
+        (d: any) => !isTestData(d.donor?.email, d.donor?.organization_name)
       );
       const filteredRequests = requestsData.filter(
         (r: any) =>
-          !isTestData(r.profiles?.email, r.profiles?.organization_name)
+          !isTestData(r.requester?.email, r.requester?.organization_name)
       );
 
       // Transform data into unified structure
@@ -181,17 +186,17 @@ export default function TerminalOverview() {
             type: 'donation' as const,
             item_name: d.food_items?.name || 'Food Donation',
             organization_name:
-              d.profiles?.organization_name ||
-              d.profiles?.full_name ||
+              d.donor?.organization_name ||
+              d.donor?.full_name ||
               'Unknown Donor',
             category: 'Donation',
-            food_category: d.food_items?.category || 'Other',
+            food_category: d.food_items?.food_type || 'Other',
             quantity: `${parseFloat(d.quantity) || 0}${d.unit || 'kg'}`,
             status: d.status,
             processing_status,
             location:
               d.address ||
-              `${d.profiles?.organization_name || 'Unknown'} Location`,
+              `${d.donor?.organization_name || 'Unknown'} Location`,
             time_info:
               d.pickup_slots?.[0]?.start_time ||
               d.pickup_start_time ||
@@ -205,6 +210,10 @@ export default function TerminalOverview() {
               year: 'numeric',
             }),
             route_id: d.id.slice(-8),
+            // NEW enriched fields
+            pickup_place: d.donor?.address ?? null,
+            delivery_place: d.receiver?.address ?? null,
+            delivery_status: processing_status || d.status || null,
             raw_data: d,
           };
         }
@@ -217,8 +226,8 @@ export default function TerminalOverview() {
           type: 'request' as const,
           item_name: r.description || 'Food Request',
           organization_name:
-            r.profiles?.organization_name ||
-            r.profiles?.full_name ||
+            r.requester?.organization_name ||
+            r.requester?.full_name ||
             'Unknown Receiver',
           category: 'Request',
           quantity: `${r.people_count || 0} people`,
@@ -226,7 +235,7 @@ export default function TerminalOverview() {
           urgency: r.priority || 'medium',
           location:
             r.address ||
-            `${r.profiles?.organization_name || 'Unknown'} Location`,
+            `${r.requester?.organization_name || 'Unknown'} Location`,
           time_info:
             r.pickup_start_time && r.pickup_end_time
               ? `${r.pickup_start_time}-${r.pickup_end_time}`
@@ -243,6 +252,12 @@ export default function TerminalOverview() {
             }
           ),
           is_recurring: r.is_recurring || false,
+          // NEW enriched fields
+          pickup_place: null,
+          delivery_place: r.requester?.address ?? null,
+          delivery_status: r.status || null,
+          request_description: r.description ?? null,
+          requested_quantity: r.people_count ?? null,
           raw_data: r,
         })
       );
@@ -522,6 +537,24 @@ export default function TerminalOverview() {
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-40">
                       Organization
                     </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-40">
+                      Pickup place
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-40">
+                      Delivery place
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-32">
+                      Delivery status
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-56">
+                      Request description
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
+                      Requested qty
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
+                      Food category
+                    </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-32">
                       Status
                     </th>
@@ -574,6 +607,37 @@ export default function TerminalOverview() {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-900">
                         {item.organization_name}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {item.pickup_place || '—'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {item.delivery_place || '—'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            item.delivery_status === 'dispatched' ||
+                            item.status === 'completed'
+                              ? 'bg-green-100 text-green-800'
+                              : item.delivery_status === 'processing' ||
+                                  item.status === 'in_progress' ||
+                                  item.status === 'active'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {item.delivery_status || '—'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600 truncate max-w-[16rem]">
+                        {item.request_description || '—'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {item.requested_quantity ?? '—'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {item.food_category || '—'}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-col gap-1">
