@@ -65,7 +65,7 @@ type TerminalItem = {
 export default function TerminalOverview() {
   const router = useRouter();
   const { currentUser, isInitialized } = useDatabase();
-  const { t } = useCommonTranslation();
+  const { t, language } = useCommonTranslation();
 
   const [loading, setLoading] = useState(true);
   const [terminalItems, setTerminalItems] = useState<TerminalItem[]>([]);
@@ -525,17 +525,8 @@ export default function TerminalOverview() {
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-28">
                       {t('date') || 'Date'}
                     </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-48">
-                      Item Name
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-24">
-                      Category
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-24">
-                      Quantity
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-40">
-                      Organization
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-[460px]">
+                      Item
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-900 min-w-40">
                       Pickup place
@@ -581,32 +572,34 @@ export default function TerminalOverview() {
                           )}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-gray-900">
-                          {item.item_name}
+                        <div className="flex items-start gap-2">
+                          <span
+                            className={`mt-0.5 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              item.type === 'donation'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-orange-100 text-orange-800'
+                            }`}
+                          >
+                            {item.type === 'donation' ? (
+                              <Package className="w-3 h-3 mr-1" />
+                            ) : (
+                              <Truck className="w-3 h-3 mr-1" />
+                            )}
+                            {item.type === 'donation'
+                              ? language === 'fi'
+                                ? 'Ilmoitus'
+                                : 'Listing'
+                              : language === 'fi'
+                                ? 'Pyyntö'
+                                : 'Request'}
+                          </span>
+                          <div className="text-sm text-gray-900">
+                            <div className="font-medium truncate max-w-[560px]">
+                              {item.organization_name} · {item.item_name} ·{' '}
+                              {item.quantity}
+                            </div>
+                          </div>
                         </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            item.type === 'donation'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-orange-100 text-orange-800'
-                          }`}
-                        >
-                          {item.type === 'donation' ? (
-                            <Package className="w-3 h-3 mr-1" />
-                          ) : (
-                            <Truck className="w-3 h-3 mr-1" />
-                          )}
-                          {item.category}
-                        </span>
-                      </td>
-                      {/* Ruoka Category column removed as requested */}
-                      <td className="px-4 py-3 text-sm text-gray-900">
-                        {item.quantity}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">
-                        {item.organization_name}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {item.pickup_place || '—'}
