@@ -1,9 +1,9 @@
+/* Import mobile performance optimizations */
+@import './mobile-performance.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import mobile performance optimizations */
-@import './mobile-performance.css';
 
 /* Shimmer animation for skeleton loading */
 @keyframes shimmer {
