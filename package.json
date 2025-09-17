@@ -19,7 +19,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "validate": "npm run type-check && npm run lint",
+    "validate": "pnpm run type-check && pnpm run lint",
     "build:analyze": "ANALYZE=true npm run build",
     "build:check": "npm run build && npm run start",
     "clean": "rm -rf .next node_modules/.cache",
