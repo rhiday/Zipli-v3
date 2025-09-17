@@ -5,7 +5,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { Manrope, Space_Grotesk } from 'next/font/google'; // Import fonts
 import DevLoginSwitcher from '@/components/dev/DevLoginSwitcher';
 import DevSwitcherOverlay from '@/components/dev/DevSwitcherOverlay';
-import LangSetter from '@/components/LangSetter';
+// import LangSetter from '@/components/LangSetter';
 import Script from 'next/script';
 
 // Configure fonts
@@ -55,7 +55,7 @@ export default function RootLayout({
         <meta name="google" content="notranslate" />
       </head>
       <body>
-        <LangSetter />
+        {/* <LangSetter /> */}
         <ErrorBoundary>
           <AppShell>{children}</AppShell>
           {isDev && <DevSwitcherOverlay />}

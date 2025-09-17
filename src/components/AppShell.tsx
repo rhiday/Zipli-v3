@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import React, { useEffect } from 'react';
 import BottomNav from './BottomNav';
 import { useLayoutConfig } from '@/hooks/useLayoutConfig';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -14,12 +15,20 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const pathname = usePathname();
   const init = useDatabase((state) => state.init);
   const { showBottomNav } = useLayoutConfig();
+  const { language } = useLanguage();
 
   // Initialize store for all routes (auth routes need it too for DevLoginSwitcher)
   useEffect(() => {
     console.log('🔧 AppShell initializing store...');
     init();
   }, [init]);
+
+  // Set document language
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+    }
+  }, [language]);
 
   const isAuthRoute = pathname === '/' || pathname.startsWith('/auth');
   const isDocsRoute = pathname.startsWith('/docs');
