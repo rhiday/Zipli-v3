@@ -12,6 +12,7 @@ import {
   LifeBuoy,
   MessageSquare,
   Route as RouteIcon,
+  GitMerge,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -91,7 +92,7 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
       {/* Main Content with Left Navigation */}
       <div className="flex-1 flex">
         {/* Sidebar - desktop */}
-        <aside className="hidden lg:block w-64 bg-white border-r border-gray-200">
+        <aside className="hidden lg:block w-48 bg-white border-r border-gray-200">
           <nav className="p-4">
             <ul className="space-y-2">
               <li>
@@ -110,6 +111,20 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
               </li>
               <li>
                 <Link
+                  href="/terminal/activity"
+                  className={cn(
+                    'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
+                    pathname === '/terminal/activity'
+                      ? 'bg-lime text-green-900 font-medium'
+                      : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
+                  )}
+                >
+                  <Activity className="w-5 h-5" />
+                  <span>{t('activities')}</span>
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/terminal/matching"
                   className={cn(
                     'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
@@ -118,7 +133,7 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
                       : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
                   )}
                 >
-                  <Activity className="w-5 h-5" />
+                  <GitMerge className="w-5 h-5" />
                   <span>{t('matching')}</span>
                 </Link>
               </li>
