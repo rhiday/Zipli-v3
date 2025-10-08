@@ -493,8 +493,8 @@ export default function TerminalOverview() {
                   <p className="text-sm font-medium text-gray-600">
                     Total value of food sold
                   </p>
-                  <p className="text-3xl font-bold text-blue-600">
-                    €24,875.50
+                  <p className="metric-value font-bold text-blue-600">
+                    €24,875
                   </p>
                   <p className="text-sm text-green-600 mt-1">
                     +8% from last month
@@ -510,7 +510,7 @@ export default function TerminalOverview() {
                   <p className="text-sm font-medium text-gray-600">
                     Total kg of food distributed
                   </p>
-                  <p className="text-3xl font-bold text-blue-600">
+                  <p className="metric-value font-bold text-blue-600">
                     1,245
                   </p>
                   <p className="text-sm text-green-600 mt-1">
@@ -527,7 +527,7 @@ export default function TerminalOverview() {
                   <p className="text-sm font-medium text-gray-600">
                     Organizations Reached
                   </p>
-                  <p className="text-3xl font-bold text-blue-600">
+                  <p className="metric-value font-bold text-blue-600">
                     28
                   </p>
                   <p className="text-sm text-green-600 mt-1">
@@ -544,7 +544,7 @@ export default function TerminalOverview() {
                   <p className="text-sm font-medium text-gray-600">
                     Waste Reduction
                   </p>
-                  <p className="text-3xl font-bold text-blue-600">
+                  <p className="metric-value font-bold text-blue-600">
                     875 kg
                   </p>
                   <p className="text-sm text-green-600 mt-1">
