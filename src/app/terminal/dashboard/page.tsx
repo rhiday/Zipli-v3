@@ -113,6 +113,9 @@ export default function TerminalOverview() {
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+
+  // Popup state
+  const [showPopup, setShowPopup] = useState(false);
   const chatMessagesRef = useCallback((node: HTMLDivElement | null) => {
     if (node) {
       node.scrollTop = node.scrollHeight;
@@ -178,11 +181,11 @@ export default function TerminalOverview() {
       { year: '2023', current: 200, target: 200, forecast: 200, euGoals: 200, ambitious: 200 }, // Starting point
       { year: '2024', current: 170, target: 170, forecast: 170, euGoals: 170, ambitious: 170 }, // Progress made
       { year: '2025', current: 126, target: 126, forecast: 126, euGoals: 126, ambitious: 126 }, // Today - current state
-      { year: '2026', current: 126, target: 118, forecast: 122, euGoals: 118, ambitious: 116 }, // Scenarios diverge
-      { year: '2027', current: 126, target: 110, forecast: 118, euGoals: 110, ambitious: 106 },
-      { year: '2028', current: 126, target: 102, forecast: 114, euGoals: 102, ambitious: 94 },
-      { year: '2029', current: 126, target: 95, forecast: 112, euGoals: 95, ambitious: 86 },
-      { year: '2030', current: 126, target: 88, forecast: 110, euGoals: 88, ambitious: 78 },  // Endpoints: Target 88kg (-30%), Forecast 110kg, Ambitious 78kg (-38%)
+      { year: '2026', current: 126, target: 110, forecast: 130, euGoals: 115, ambitious: 100 }, // Scenarios diverge with bigger gaps
+      { year: '2027', current: 126, target: 95, forecast: 135, euGoals: 105, ambitious: 80 },
+      { year: '2028', current: 126, target: 80, forecast: 140, euGoals: 95, ambitious: 65 },
+      { year: '2029', current: 126, target: 70, forecast: 145, euGoals: 85, ambitious: 55 },
+      { year: '2030', current: 126, target: 60, forecast: 150, euGoals: 75, ambitious: 45 },  // Endpoints: Target 60kg (-40%), Forecast 150kg, Ambitious 45kg (-50%)
     ];
     return data;
   }, []);
@@ -361,6 +364,15 @@ export default function TerminalOverview() {
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [chatCollapsed]);
+
+  // Show popup after 10 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowPopup(true);
+    }, 10000); // 10 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter function for unified items
   const filteredItems = useMemo(() => {
@@ -694,21 +706,21 @@ export default function TerminalOverview() {
                 id="forecast-toggle"
                 checked={showForecast}
                 onChange={setShowForecast}
-                label="Check forecast"
+                label="Nykyinen hävikki"
                 size="md"
               />
               <Toggle
                 id="eu-goals-toggle"
                 checked={showEUGoals}
                 onChange={setShowEUGoals}
-                label="Check EU goals"
+                label="EU-tavoite (-30%)"
                 size="md"
               />
               <Toggle
                 id="ambitious-toggle"
                 checked={showAmbitious}
                 onChange={setShowAmbitious}
-                label="Ambitious goal"
+                label="Ennuste (Ziplin avulla)"
                 size="md"
               />
             </div>
@@ -862,6 +874,25 @@ export default function TerminalOverview() {
           }
         }
       `}</style>
+
+      {/* Simple Popup */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4 relative">
+            <button
+              onClick={() => setShowPopup(false)}
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            >
+              ×
+            </button>
+            <img
+              src="/popup-image.png"
+              alt="Popup"
+              className="w-full h-auto rounded"
+            />
+          </div>
+        </div>
+      )}
     </TerminalUIShell>
   );
 }
