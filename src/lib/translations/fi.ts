@@ -77,7 +77,7 @@ export const fi = {
   register: 'Rekisteröidy',
   signIn: 'Kirjaudu sisään',
   signUp: 'Rekisteröidy',
-  welcomeBack: 'Tervetuloa takaisin',
+  welcomeBack: 'Tervetuloa takaisin, hyvikin haltija!',
   signInToAccount: 'Kirjaudu tilillesi',
   emailAddress: 'Sähköpostiosoite',
   dontHaveAccount: 'Eikö sinulla ole tiliä?',
@@ -662,7 +662,7 @@ export const fi = {
 
   // Terminal Dashboard specific
   operationsOverview: 'Toimintojen yleiskatsaus',
-  currentStatusAndMetrics: 'Nykyinen tila ja reaaliaikaiset mittarit',
+  currentStatusAndMetrics: 'Täällä pääset hyödyntämään dataa, mittareita ja tekoälyä optimoinnissa, raportoinnissa ja vaikuttavuusviestinnässä.',
   volumeProcessed: 'Käsitelty volyymi',
   storageUtilization: 'Varastotason käyttö',
   processingEfficiency: 'Käsittelyn tehokkuus',

@@ -105,7 +105,11 @@ export default function TerminalOverview() {
   // Chatbot state
   const [chatCollapsed, setChatCollapsed] = useState(false);
   const [chatMessages, setChatMessages] = useState<{role: 'user' | 'bot', message: string}[]>([
-    { role: 'bot', message: 'Hi! I can help explain your dashboard data. Ask me about your metrics, waste reduction goals, or anything else!' }
+    { role: 'bot', message: 'Moi! Voin auttaa sinua ymmärtämään ja hyödyntämään dataasi. Kysy ja saat ehdotuksia, vinkkejä ja apua!' },
+    { role: 'user', message: 'Mikä oli hävikin kokonaismäärä toukokuussa?' },
+    { role: 'bot', message: 'Toukokuussa toimipisteestänne kertyi hävikkiä 148 kiloa. Mutta ei hätää: saitte myytyä siitä 50% ja lahjoitettua 45%, joten vain 5% joutui roskikseen.' },
+    { role: 'user', message: 'Paljonko paransimme viime vuoteen verrattuna?' },
+    { role: 'bot', message: 'Toukokuussa 2024 hävikkiä syntyi 150 kiloa ja vain 20% meni hyötykäyttöön. Tuolloin ette vielä myyneet hävikkiä Ziplin kautta, mutta lahjoititte ruokaa läheisille ruoka-aputoimijoille, yhteensä 30 kiloa. Kuitenkin 120 kiloa ruokaa joutui roskikseen. Olette siis tehneet huiman hyvikkihypyn!' }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -463,22 +467,17 @@ export default function TerminalOverview() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold text-gray-900">
-              {t('welcomeBack')},{' '}
-              {currentUser?.organization_name ||
-                currentUser?.full_name ||
-                'Terminal'}
+              {t('welcomeBack')}
             </h1>
             <p className="text-gray-600">{t('currentStatusAndMetrics')}</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Calendar className="w-4 h-4" />
-              {new Date().toLocaleDateString('en-FI', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+            <div className="flex items-center">
+              <img 
+                src="/badge.png" 
+                alt="Badge" 
+                className="h-16 w-auto object-contain"
+              />
             </div>
           </div>
         </div>
@@ -487,74 +486,61 @@ export default function TerminalOverview() {
       {/* Analytics Cards */}
       <section className="px-6 py-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg p-6 shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
                   <p className="text-sm font-medium text-gray-600">
-                    Total value of food sold
+                    Linjastohävikki (kg)
                   </p>
-                  <p className="metric-value font-bold text-blue-600">
-                    €24,875
+                  <p className="text-xs text-gray-500 mb-1">
+                    01-09/2025
                   </p>
-                  <p className="text-sm text-green-600 mt-1">
-                    +8% from last month
+                  <p className="text-2xl font-bold text-blue-600 break-words">
+                    1134,0 kg
                   </p>
                 </div>
-                <Euro className="w-8 h-8 text-blue-600" />
+                <Package className="w-5 h-5 text-gray-300 mt-1" />
               </div>
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
                   <p className="text-sm font-medium text-gray-600">
-                    Total kg of food distributed
+                    Vastaanottajat
                   </p>
-                  <p className="metric-value font-bold text-blue-600">
-                    1,245
+                  <p className="text-xs text-gray-500 mb-1">
+                    01-09/2025
                   </p>
-                  <p className="text-sm text-green-600 mt-1">
-                    +7% from last month
+                  <p className="text-xs text-gray-600 mb-1">
+                    Organisaatiot
+                  </p>
+                  <p className="text-xl font-bold text-blue-600 break-words">
+                    64 toimijaa
                   </p>
                 </div>
-                <Package className="w-8 h-8 text-blue-600" />
+                <Building2 className="w-5 h-5 text-gray-300 mt-1" />
               </div>
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
                   <p className="text-sm font-medium text-gray-600">
-                    Organizations Reached
+                    Myyntitulot
                   </p>
-                  <p className="metric-value font-bold text-blue-600">
-                    28
+                  <p className="text-xs text-gray-500 mb-1">
+                    01-09/2025
                   </p>
-                  <p className="text-sm text-green-600 mt-1">
-                    4 new this month
+                  <p className="text-2xl font-bold text-blue-600 break-words">
+                    1040 €
                   </p>
                 </div>
-                <Building2 className="w-8 h-8 text-blue-600" />
+                <Euro className="w-5 h-5 text-gray-300 mt-1" />
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Waste Reduction
-                  </p>
-                  <p className="metric-value font-bold text-blue-600">
-                    875 kg
-                  </p>
-                  <p className="text-sm text-green-600 mt-1">
-                    15.2% from last month
-                  </p>
-                </div>
-                <Leaf className="w-8 h-8 text-blue-600" />
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -743,8 +729,7 @@ export default function TerminalOverview() {
             <div className="flex items-center gap-3">
               <Sparkles className="w-6 h-6 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-base">Dashboard Assistant</h3>
-                <p className="text-xs text-green-100">Ask me about your metrics</p>
+                <h3 className="font-semibold text-base">Hävikkitulkki</h3>
               </div>
             </div>
           )}
@@ -785,11 +770,18 @@ export default function TerminalOverview() {
                   <div
                     className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-sm ${
                       msg.role === 'user'
-                        ? 'bg-green-600 text-white'
+                        ? 'bg-gray-100 text-gray-900'
                         : 'bg-white text-gray-900 border border-gray-200'
                     }`}
                   >
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
+                    <div className="flex items-start gap-2">
+                      {msg.role === 'bot' ? (
+                        <Sparkles className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                      ) : (
+                        <Users className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                      )}
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
+                    </div>
                   </div>
                 </div>
               ))}

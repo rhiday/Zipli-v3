@@ -64,27 +64,27 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
             </div>
           </div>
 
-          {/* Right side - Language + Navigation Icons */}
+          {/* Right side - Text + Profile + Language */}
           <div className="flex items-center space-x-3">
-            <LanguageSwitcher compact />
-            {/* Contact Icon */}
-            <button
-              onClick={handleContactClick}
-              className="rounded-full border border-white/50 bg-white/10 hover:bg-white/20 focus:outline-none p-2"
-            >
-              <MessageSquare className="h-5 w-5 text-white" />
-            </button>
+            {/* Sodexo Vilppulantie Text */}
+            <span className="text-white text-base font-medium">
+              Sodexo Vilppulantie
+            </span>
 
             {/* Profile Icon */}
             <button
               onClick={handleProfileClick}
-              className="rounded-full border border-white/50 bg-white/10 hover:bg-white/20 focus:outline-none"
+              className="rounded-full border border-white/50 bg-white hover:bg-white/90 focus:outline-none"
             >
               <Avatar
+                src="/sodexo_logo.png"
+                alt="Sodexo Logo"
                 fallback={userInitials}
-                className="!h-9 !w-9 bg-transparent text-white"
+                className="!h-9 !w-9 bg-white text-white"
               />
             </button>
+
+            <LanguageSwitcher compact />
           </div>
         </div>
       </header>
@@ -106,7 +106,7 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
                   )}
                 >
                   <LayoutGrid className="w-5 h-5" />
-                  <span>{t('dashboard')}</span>
+                  <span>Kotinäkymä</span>
                 </Link>
               </li>
               <li>
@@ -120,49 +120,7 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
                   )}
                 >
                   <Activity className="w-5 h-5" />
-                  <span>{t('activities')}</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terminal/matching"
-                  className={cn(
-                    'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
-                    pathname === '/terminal/matching'
-                      ? 'bg-lime text-green-900 font-medium'
-                      : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
-                  )}
-                >
-                  <GitMerge className="w-5 h-5" />
-                  <span>{t('matching')}</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terminal/routes"
-                  className={cn(
-                    'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
-                    pathname === '/terminal/routes'
-                      ? 'bg-lime text-green-900 font-medium'
-                      : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
-                  )}
-                >
-                  <RouteIcon className="w-5 h-5" />
-                  <span>{t('routes')}</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terminal/crm"
-                  className={cn(
-                    'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
-                    pathname === '/terminal/crm'
-                      ? 'bg-lime text-green-900 font-medium'
-                      : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
-                  )}
-                >
-                  <Building2 className="w-5 h-5" />
-                  <span>CRM</span>
+                  <span>Reportit</span>
                 </Link>
               </li>
               <li>
@@ -176,7 +134,21 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
                   )}
                 >
                   <MessageSquare className="w-5 h-5" />
-                  <span>Viesti</span>
+                  <span>Viestit</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terminal/matching"
+                  className={cn(
+                    'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
+                    pathname === '/terminal/matching'
+                      ? 'bg-lime text-green-900 font-medium'
+                      : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
+                  )}
+                >
+                  <GitMerge className="w-5 h-5" />
+                  <span>Materiaalit</span>
                 </Link>
               </li>
               <li>
@@ -190,7 +162,7 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
                   )}
                 >
                   <LifeBuoy className="w-5 h-5" />
-                  <span>{t('help')}</span>
+                  <span>Ohjeet</span>
                 </Link>
               </li>
             </ul>
