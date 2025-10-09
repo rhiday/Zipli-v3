@@ -11,7 +11,7 @@ export default function SodexoDashboard() {
   useEffect(() => {
     if (!isInitialized) return;
 
-    if (!currentUser || currentUser.role !== 'sodexo_admin') {
+    if (!currentUser || !['terminals', 'sodexo_admin'].includes(currentUser.role as any)) {
       router.push('/auth/login');
       return;
     }

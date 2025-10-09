@@ -450,7 +450,7 @@ export default function TerminalOverview() {
     );
   }
 
-  if (!currentUser || !['terminals', 'sodexo_admin'].includes(currentUser.role)) {
+  if (!currentUser || !['terminals', 'sodexo_admin'].includes(currentUser.role as any)) {
     router.push('/auth/login');
     return null;
   }

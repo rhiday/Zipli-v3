@@ -66,7 +66,7 @@ export default function SodexoProfilePage(): React.ReactElement {
     }
 
     // Only allow sodexo_admin role users
-    if (currentUser.role !== 'sodexo_admin') {
+    if (!['terminals', 'sodexo_admin'].includes(currentUser.role as any)) {
       router.push('/auth/login');
       return;
     }
