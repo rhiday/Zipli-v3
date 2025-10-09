@@ -9,9 +9,7 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 // Basic Placeholder Avatar - Displays fallback content
 const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
-  ({ className, fallback, src: _src, alt: _alt, ...props }, ref) => {
-    // In a real implementation, would render an <img> if src is provided
-    // and handle loading/error states.
+  ({ className, fallback, src, alt, ...props }, ref) => {
     return (
       <span
         ref={ref}
@@ -21,7 +19,15 @@ const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
         )}
         {...props}
       >
-        {fallback || 'U'} {/* Simple fallback text */}
+        {src ? (
+          <img
+            src={src}
+            alt={alt || 'Avatar'}
+            className="h-full w-full object-contain"
+          />
+        ) : (
+          fallback || 'U'
+        )}
       </span>
     );
   }
