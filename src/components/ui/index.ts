@@ -6,3 +6,4 @@ export * from './Chip';
 export * from './Tabs';
 export * from './AllergensDropdown';
 export * from './RecurrenceScheduler';
+export * from './Toggle';

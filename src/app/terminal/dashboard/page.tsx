@@ -3,6 +3,7 @@
 import { TerminalUIShell } from '@/components/terminal/TerminalUIShell';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { Toggle } from '@/components/ui/Toggle';
 import {
   Dialog,
   DialogContent,
@@ -701,38 +702,29 @@ export default function TerminalOverview() {
             </ResponsiveContainer>
             </div>
 
-            {/* Scenario Toggle Buttons */}
-            <div className="mt-6 flex flex-wrap gap-3 justify-center">
-              <button
-                onClick={() => setShowForecast(!showForecast)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  showForecast
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
-                }`}
-              >
-                Check forecast
-              </button>
-              <button
-                onClick={() => setShowEUGoals(!showEUGoals)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  showEUGoals
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
-                }`}
-              >
-                Check EU goals
-              </button>
-              <button
-                onClick={() => setShowAmbitious(!showAmbitious)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  showAmbitious
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
-                }`}
-              >
-                Ambitious goal
-              </button>
+            {/* Scenario Toggle Switches */}
+            <div className="mt-6 flex flex-wrap gap-6 justify-center">
+              <Toggle
+                id="forecast-toggle"
+                checked={showForecast}
+                onChange={setShowForecast}
+                label="Check forecast"
+                size="md"
+              />
+              <Toggle
+                id="eu-goals-toggle"
+                checked={showEUGoals}
+                onChange={setShowEUGoals}
+                label="Check EU goals"
+                size="md"
+              />
+              <Toggle
+                id="ambitious-toggle"
+                checked={showAmbitious}
+                onChange={setShowAmbitious}
+                label="Ambitious goal"
+                size="md"
+              />
             </div>
           </div>
         </div>
