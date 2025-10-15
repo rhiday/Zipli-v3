@@ -1,0 +1,31 @@
+{
+"type": "FeatureCollection",
+"name": "sodexo_helsinki",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "Stadin AO Vilppulantie", "isDonor": "True" }, "geometry": { "type": "Point", "coordinates": [ 25.017624934595379, 60.250036957753693 ] } },
+{ "type": "Feature", "properties": { "name": "Helsingin yliopisto Päärakennus", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.949473382837979, 60.169513931192249 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Atomitie 5", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.872420889206527, 60.222328330671672 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Gatehouse", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 25.174668996133022, 60.222780045618407 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola HDL Alppikortteli", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.940705847683105, 60.184894079585014 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Hiekkis", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 25.017592301942724, 60.24046753468776 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola K-Auto Helsinki", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 25.042771853866292, 60.202697197545014 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Ladonlukko", "isDonor": "True" }, "geometry": { "type": "Point", "coordinates": [ 25.018715898120931, 60.228959222392042 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Saint-Gobain Pitäjänmäki", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.862717162284266, 60.221601887842695 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Sisäpiha", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.932215415861236, 60.166416664005162 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Stadin AO Ilkantie", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.905161685409464, 60.220965202334675 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Valaja", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.878388915435963, 60.219540650367868 ] } },
+{ "type": "Feature", "properties": { "name": "Stadin AO Meritalo", "isDonor": "True" }, "geometry": { "type": "Point", "coordinates": [ 24.960151577153194, 60.17988801088741 ] } },
+{ "type": "Feature", "properties": { "name": "Stadin AO Savonkatu", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.93533218166338, 60.19503351124164 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola HDL Kotikallio", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.841985557021722, 60.22283363679211 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola HDL Viikki", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 25.034634008296063, 60.232965408860927 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Ankkuri", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.928679763150722, 60.19563441926686 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola Kiltakellari", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.931806884992952, 60.161748553207424 ] } },
+{ "type": "Feature", "properties": { "name": "Finnsteve", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 25.173526698774864, 60.223702281278896 ] } },
+{ "type": "Feature", "properties": { "name": "Metropolia Myllypuro", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 25.079332802828102, 60.223598677973825 ] } },
+{ "type": "Feature", "properties": { "name": "Ravintola TK21", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.948363791311568, 60.194371516197535 ] } },
+{ "type": "Feature", "properties": { "name": "Stadin AO - Hattulantie 2", "isDonor": "False" }, "geometry": { "type": "Point", "coordinates": [ 24.956027806581705, 60.196625958162159 ] } },
+{ "type": "Feature", "properties": { "name": "Stadin AO Kullervonkatu", "isDonor": "True" }, "geometry": { "type": "Point", "coordinates": [ 24.948594527532375, 60.218652126871291 ] } },
+{ "type": "Feature", "properties": { "name": "Stadin AO TK 23", "isDonor": "True" }, "geometry": { "type": "Point", "coordinates": [ 24.946754551268096, 60.194742515559611 ] } }
+]
+}
