@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Route as RouteIcon,
   GitMerge,
+  Beaker,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -163,6 +164,20 @@ export const TerminalUIShell: React.FC<TerminalUIShellProps> = ({
                 >
                   <LifeBuoy className="w-5 h-5" />
                   <span>Ohjeet</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terminal/experimental"
+                  className={cn(
+                    'flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors',
+                    pathname === '/terminal/experimental'
+                      ? 'bg-lime text-green-900 font-medium'
+                      : 'text-gray-700 hover:bg-green-50 hover:text-green-900'
+                  )}
+                >
+                  <Beaker className="w-5 h-5" />
+                  <span>Experimental</span>
                 </Link>
               </li>
             </ul>
