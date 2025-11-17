@@ -20,6 +20,7 @@ import {
   formatWeight,
   formatCurrency,
 } from '@/lib/dashboard-utils';
+import donationsMock from '@/lib/data/donations_rows.json';
 
 type ProfileRow = {
   id: string;
@@ -37,8 +38,6 @@ function DonorDashboardPage(): React.ReactElement {
   // Use selectors to prevent unnecessary re-renders
   const currentUser = useDatabase((state) => state.currentUser);
   const isInitialized = useDatabase((state) => state.isInitialized);
-  const allDonations = useDatabase((state) => state.donations);
-  const foodItems = useDatabase((state) => state.foodItems);
   const clearDonation = useDonationStore((state) => state.clearDonation);
   const { t } = useCommonTranslation();
 
@@ -73,34 +72,80 @@ function DonorDashboardPage(): React.ReactElement {
       organization_name: null, // Not available in mock user
     };
 
-    // Use existing data from store (already fetched during app initialization)
-    const { donations: freshDonations, foodItems: freshFoodItems } =
-      useDatabase.getState();
+    // Always use mock data for now
+    const mockDonations = (donationsMock as any[]).filter(
+      (d) =>
+        d.donor_id === currentUser.id ||
+        d.donor_id === '44a324c3-7892-4f75-a065-eb2ae1c9d64c'
+    );
 
-    const userDonations = freshDonations
-      .filter((d) => d.donor_id === currentUser.id)
-      .map((d) => {
-        const foodItem = freshFoodItems.find((fi) => fi.id === d.food_item_id);
-        return { ...d, food_item: foodItem! };
-      });
+    const userDonations: DonationWithFoodItem[] = mockDonations.map((d) => ({
+      id: d.id,
+      donor_id: d.donor_id,
+      food_item_id: d.food_item_id,
+      receiver_id: d.receiver_id || null,
+      quantity: parseFloat(d.quantity),
+      status: d.status as 'available' | 'claimed' | 'picked_up' | 'cancelled',
+      created_at: d.created_at,
+      updated_at: d.updated_at,
+      claimed_at: d.claimed_at || null,
+      picked_up_at: d.picked_up_at || null,
+      pickup_time: d.pickup_time || null,
+      pickup_slots:
+        typeof d.pickup_slots === 'string'
+          ? JSON.parse(d.pickup_slots)
+          : d.pickup_slots || null,
+      instructions_for_driver: d.instructions_for_driver || null,
+      address: d.address || null,
+      postal_code: d.postal_code || null,
+      latitude: d.latitude || null,
+      longitude: d.longitude || null,
+      start_date: d.start_date || null,
+      end_date: d.end_date || null,
+      timezone: d.timezone || 'UTC',
+      unit: d.unit || 'kg',
+      food_item: {
+        id: d.food_item_id,
+        name: 'Food',
+        description: null,
+        image_url: null,
+        image_urls: null,
+        allergens: null,
+        category: null,
+        donor_id: d.donor_id,
+        expires_at: null,
+        food_type: null,
+        quantity: parseFloat(d.quantity),
+        unit: d.unit || 'kg',
+        user_id: d.donor_id,
+        created_at: d.created_at,
+        updated_at: d.updated_at,
+      },
+      donor: {
+        id: d.donor_id,
+        full_name: currentUser.full_name || null,
+        organization_name: currentUser.organization_name || '',
+        email: currentUser.email || '',
+        role: (currentUser.role || 'food_donor') as
+          | 'food_donor'
+          | 'food_receiver'
+          | 'city'
+          | 'terminals',
+        address: null,
+        city: null,
+        contact_number: null,
+        country: null,
+        driver_instructions: null,
+        postal_code: null,
+        street_address: null,
+        created_at: d.created_at,
+        updated_at: d.updated_at,
+      },
+    }));
 
     setDashboardData({ profile, donations: userDonations });
     setLoading(false);
-  }, [isInitialized, currentUser, router]); // Remove allDonations and foodItems from dependencies
-
-  // Add a separate effect to update dashboard data when donations/foodItems change
-  useEffect(() => {
-    if (!currentUser || !isInitialized) return;
-
-    const userDonations = allDonations
-      .filter((d) => d.donor_id === currentUser.id)
-      .map((d) => {
-        const foodItem = foodItems.find((fi) => fi.id === d.food_item_id);
-        return { ...d, food_item: foodItem! };
-      });
-
-    setDashboardData((prev) => ({ ...prev, donations: userDonations }));
-  }, [allDonations, foodItems, currentUser, isInitialized]);
+  }, [isInitialized, currentUser, router]);
 
   // Calculate dynamic metrics from user donations
   const metrics = React.useMemo(() => {
