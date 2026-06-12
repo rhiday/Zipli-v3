@@ -50,7 +50,7 @@
     "framer-motion": "^11.0.0",
     "jspdf": "^3.0.1",
     "lucide-react": "^0.323.0",
-    "next": "^15.5.2",
+    "next": "15.5.9",
     "node-fetch": "^3.3.2",
     "openai": "^4.98.0",
     "picocolors": "^1.1.1",
